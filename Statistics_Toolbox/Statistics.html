@@ -170,26 +170,98 @@
         .sample-btn { color: #0e7490; border-color: #a5f3fc; background: #ecfeff; }
         .sample-btn:hover { background: #cffafe; border-color: #67e8f9; }
 
+        /* ---------- RESULT / SOLUTION CARD ---------- */
         .result-card {
-            position: relative; background: #fff; border: 1px solid var(--line); border-top: 4px solid var(--good);
-            border-radius: var(--radius); padding: 22px 26px; margin-top: 8px; box-shadow: var(--shadow);
+            position: relative; background: #fff; border: 1px solid var(--line); border-radius: 22px;
+            padding: 0; margin-top: 10px; overflow: hidden; box-shadow: 0 24px 48px -28px rgba(30,27,75,.45), 0 2px 6px rgba(15,23,42,.05);
             animation: fadeSlideUp .3s ease-out;
         }
-        .result-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 800; color: var(--muted); }
+        .result-card::before { content: ""; display: block; height: 5px; background: linear-gradient(90deg, #10b981, #06b6d4, #6366f1); }
+        .result-card > .result-label {
+            display: flex; align-items: center; gap: 8px; padding: 16px 150px 0 28px; margin: 0;
+            font-size: .72rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 800; color: var(--muted);
+        }
+        .result-card > .result-label::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 4px rgba(16,185,129,.18); }
+        /* answer tile */
         .result-value {
-            display: inline-block; margin: 10px 0 14px; padding: 6px 20px; border-radius: 14px; max-width: 100%;
-            font-family: var(--mono); font-size: clamp(1.4rem, 2.6vw, 2.1rem); font-weight: 800; letter-spacing: -.5px;
-            color: #065f46; background: linear-gradient(135deg, #d1fae5, #ecfdf5); border: 1px solid #a7f3d0; word-break: break-word;
+            position: relative; display: block; margin: 14px 28px 4px; padding: 26px 28px 22px; border-radius: 18px; overflow-wrap: anywhere;
+            font-family: var(--mono); font-size: clamp(1.5rem, 3vw, 2.4rem); font-weight: 800; letter-spacing: -.8px; line-height: 1.15;
+            color: #064e3b; background: radial-gradient(420px 160px at 100% 0, rgba(16,185,129,.18), transparent 70%), linear-gradient(135deg, #ecfdf5, #f0fdfa);
+            border: 1px solid #a7f3d0;
         }
-        .calculation-steps {
-            margin-top: 14px; padding: 18px 22px; border-radius: 14px; white-space: pre-wrap; overflow-x: auto;
-            font-family: var(--mono); font-size: .82rem; line-height: 1.7; color: #cbd5e1;
-            background: #0f172a; border: 1px solid #1e293b; max-height: 560px; overflow-y: auto;
-        }
-        .calculation-steps * { color: inherit; }
+        .result-value::before { content: "ANSWER"; position: absolute; top: 9px; left: 28px; font-family: 'Inter', sans-serif; font-size: .62rem; font-weight: 800; letter-spacing: .18em; color: #059669; }
+        .result-value.long { font-size: clamp(1.05rem, 1.9vw, 1.35rem); letter-spacing: -.2px; line-height: 1.35; }
+        .result-value.chips-on { display: none; }
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 28px 4px; }
+        .kpi { position: relative; padding: 16px 18px 14px; border-radius: 16px; background: #fff; border: 1px solid var(--line); overflow: hidden; box-shadow: 0 6px 16px -10px rgba(15,23,42,.25); }
+        .kpi::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--c, var(--brand)); }
+        .kpi small { display: block; font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+        .kpi b { display: block; font-family: var(--mono); font-size: 1.35rem; font-weight: 800; letter-spacing: -.5px; color: var(--ink); overflow-wrap: anywhere; }
+        .kpi.verdict { background: linear-gradient(135deg, #f1f5f9, #fff); --c: #64748b; }
+        .kpi.verdict.sig { background: linear-gradient(135deg, #fff1f2, #fff); --c: #e11d48; }
+        .kpi.verdict.sig b { color: #be123c; }
+        .kpi.verdict.ns b { color: #334155; }
+        .kpi.verdict.ok { background: linear-gradient(135deg, #ecfdf5, #fff); --c: #10b981; }
+        .kpi.verdict.ok b { color: #047857; }
+        .kpi:nth-child(5n+1) { --c: #6366f1; } .kpi:nth-child(5n+2) { --c: #06b6d4; } .kpi:nth-child(5n+3) { --c: #10b981; } .kpi:nth-child(5n+4) { --c: #f59e0b; } .kpi:nth-child(5n+5) { --c: #ec4899; }
+        .kpi.verdict { --c: #64748b; } .kpi.verdict.sig { --c: #e11d48; } .kpi.verdict.ok { --c: #10b981; }
+
+        .calculation-steps { margin: 22px 28px 28px; padding: 0; background: transparent; border: 0; color: var(--ink); white-space: normal; font-family: 'Inter', sans-serif; font-size: .9rem; line-height: 1.6; }
+        /* plain-text solutions: original node is kept for the app logic but hidden behind the structured view */
+        .calculation-steps.plain-src { display: none; }
+        /* legacy rich-HTML solutions: keep their layout, unify the palette */
+        .calculation-steps.rich { overflow-x: auto; }
+        .calculation-steps.rich h2 { letter-spacing: -.3px; }
+        .calculation-steps.rich [style*="linear-gradient(135deg, #1a5490"] { background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%) !important; box-shadow: 0 18px 30px -20px rgba(30,27,75,.9) !important; }
+        .calculation-steps.rich h3[style*="#1a5490"] { color: var(--brand) !important; }
+        .calculation-steps.rich h3[style*="background: #1a5490"] { background: linear-gradient(90deg, #4338ca, #6366f1) !important; color: #fff !important; }
+        .calculation-steps.rich [style*="border-left: 4px solid #1a5490"] { border-left-color: var(--brand) !important; }
+        .calculation-steps.rich [style*="color: #1a5490"] { color: var(--brand) !important; }
+        .calculation-steps.rich [style*="background: #f8f9fa"] { background: #f8fafc !important; border: 1px solid var(--line) !important; }
+        .calculation-steps.rich [style*="linear-gradient(135deg, #e8f4f8"] { background: linear-gradient(135deg, #eef2ff, #f5f3ff) !important; border: 1px solid #e0e7ff !important; }
+        .calculation-steps.rich table { width: 100%; font-size: .85rem; }
+        .calculation-steps.rich th { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+        .calculation-steps.rich td, .calculation-steps.rich th { border-color: var(--line) !important; font-variant-numeric: tabular-nums; }
+        .calculation-steps.rich tbody tr:nth-child(even) { background: #f8fafc; }
+
+        .calculation-steps.raw { white-space: pre-wrap; font-family: var(--mono); font-size: .84rem; line-height: 1.75; background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+        /* the global font reset would otherwise override monospace on nested elements */
+        .result-value, .kpi b, .final-row b, .sol-formula code, .step-body, .step-body *, .calculation-steps.raw, .formula-card .formula, .metric-formula, textarea, code, pre { font-family: var(--mono) !important; }
+        /* structured solution view */
+        .solution { margin: 22px 28px 28px; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: #fff; }
+        .sol-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 22px; background: linear-gradient(135deg, #1e1b4b, #3730a3); color: #fff; }
+        .sol-head h4 { font-size: 1rem; font-weight: 800; letter-spacing: -.2px; display: flex; align-items: center; gap: 10px; color: #fff; }
+        .sol-head h4 span.ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: rgba(255,255,255,.16); }
+        .sol-tools { display: flex; align-items: center; gap: 8px; }
+        .sol-count { font-size: .72rem; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: rgba(255,255,255,.16); color: #e0e7ff; }
+        .sol-toggle { cursor: pointer; font-size: .74rem; font-weight: 700; padding: 5px 12px; border-radius: 99px; border: 1px solid rgba(255,255,255,.3); background: transparent; color: #fff; }
+        .sol-toggle:hover { background: rgba(255,255,255,.14); }
+        .sol-formula { display: flex; gap: 14px; align-items: flex-start; padding: 16px 22px; background: #f5f3ff; border-bottom: 1px solid #e0e7ff; }
+        .sol-formula .tag { flex: 0 0 auto; font-size: .64rem; font-weight: 800; letter-spacing: .14em; padding: 5px 9px; border-radius: 8px; background: #4338ca; color: #fff; margin-top: 2px; }
+        .sol-formula code { font-family: var(--mono); font-size: .95rem; font-weight: 700; color: #312e81; overflow-wrap: anywhere; }
+        .sol-body { padding: 8px 22px 6px; position: relative; }
+        .sol-body::before { content: ""; position: absolute; left: 43px; top: 30px; bottom: 30px; width: 2px; background: linear-gradient(#c7d2fe, #e0e7ff); }
+        .sol-note { font-size: .84rem; color: var(--muted); padding: 10px 0; }
+        details.step { position: relative; padding: 10px 0; }
+        details.step > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 14px; font-weight: 700; color: var(--ink); padding: 6px 0; }
+        details.step > summary::-webkit-details-marker { display: none; }
+        .step-no { position: relative; z-index: 1; flex: 0 0 auto; width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-weight: 800; font-size: .95rem; color: #fff; background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 8px 16px -8px rgba(99,102,241,.9), 0 0 0 5px #fff; }
+        .step-title { flex: 1; font-size: .95rem; line-height: 1.35; }
+        .step-caret { color: var(--muted); transition: transform .2s; font-size: .8rem; }
+        details.step[open] > summary .step-caret { transform: rotate(90deg); }
+        .step-body { margin: 6px 0 4px 58px; padding: 14px 16px; border-radius: 14px; background: #f8fafc; border: 1px solid var(--line); font-family: var(--mono); font-size: .83rem; line-height: 1.75; color: #1e293b; white-space: pre-wrap; overflow-x: auto; }
+        .step-body .ln { display: block; }
+        .step-body .ln.hl { margin: 4px -6px; padding: 4px 10px; border-radius: 8px; background: #eef2ff; color: #3730a3; font-weight: 700; border-left: 3px solid #6366f1; }
+        .sol-final { margin: 8px 22px 22px; padding: 18px 20px; border-radius: 16px; background: linear-gradient(135deg, #ecfdf5, #f0fdfa); border: 1px solid #a7f3d0; }
+        .sol-final h5 { font-size: .68rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #047857; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .final-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 8px 0; border-top: 1px dashed #a7f3d0; font-size: .88rem; }
+        .final-row:first-of-type { border-top: 0; }
+        .final-row span { color: #065f46; font-weight: 600; }
+        .final-row b { font-family: var(--mono); color: #064e3b; font-size: .95rem; text-align: right; overflow-wrap: anywhere; }
+        .final-row.text { display: block; color: #065f46; font-weight: 600; }
         .copy-btn {
-            position: absolute; top: 16px; right: 18px; cursor: pointer; font-size: .75rem; font-weight: 700; color: var(--ink-2);
-            padding: 6px 12px; border-radius: 9px; border: 1px solid var(--line); background: #f8fafc; transition: .15s;
+            position: absolute; top: 16px; right: 18px; z-index: 3; cursor: pointer; font-size: .75rem; font-weight: 700; color: var(--ink-2);
+            padding: 6px 12px; border-radius: 9px; border: 1px solid var(--line); background: #fff; transition: .15s;
         }
         .copy-btn:hover { background: #eef2ff; border-color: #c7d2fe; color: var(--brand); }
         .error-message { color: #991b1b; background: #fee2e2; border: 1px solid #fecaca; padding: 12px 18px; border-radius: 12px; font-weight: 600; }
@@ -30291,6 +30363,7 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
             });
             row.insertBefore(b, $('.secondary-btn', row));
         }
+        $$('.result-card', iface).forEach(hookCard);
         $$('.result-card', iface).forEach(card => {
             if (card.querySelector('.copy-btn')) return;
             const c = document.createElement('button'); c.type = 'button'; c.className = 'copy-btn'; c.textContent = '⧉ Copy solution';
@@ -30302,6 +30375,94 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
             });
             card.appendChild(c);
         });
+    }
+    // ---------- answer tiles + structured worked solution ----------
+    const esc = t => t.replace(/\\bar\{(.)\}/g, '$1\u0304').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const RULE = /^[\s━─═\-_=*•·]{6,}$/;
+    function buildAnswer(valEl) {
+        const old = valEl.parentNode.querySelector(':scope > .kpi-row[data-for="' + valEl.id + '"]');
+        if (old) old.remove();
+        const txt = (valEl.textContent || '').trim();
+        valEl.classList.toggle('long', txt.length > 26);
+        valEl.classList.remove('chips-on');
+        const parts = txt.split(/\s*\|\s*/).filter(Boolean);
+        if (parts.length < 2) return;
+        const row = document.createElement('div'); row.className = 'kpi-row'; row.dataset.for = valEl.id;
+        parts.forEach(part => {
+            const m = part.match(/^(.{1,40}?)\s*(?:=|:)\s*(.+)$/);
+            const d = document.createElement('div'); d.className = 'kpi';
+            if (m) { d.innerHTML = '<small>' + esc(m[1]) + '</small><b>' + esc(m[2]) + '</b>'; }
+            else {
+                const sig = /^reject/i.test(part), ns = /fail to reject|not significant/i.test(part);
+                d.className = 'kpi verdict ' + (sig ? 'sig' : ns ? 'ns' : 'ok');
+                d.innerHTML = '<small>Decision</small><b>' + esc(part) + '</b>';
+            }
+            row.appendChild(d);
+        });
+        valEl.classList.add('chips-on');
+        valEl.after(row);
+    }
+    function buildSolution(el) {
+        const card = el.closest('.result-card');
+        const old = card.querySelector(':scope > .solution[data-for="' + el.id + '"]');
+        if (old) old.remove();
+        const rich = !!el.querySelector('div, table, h2, h3');
+        el.classList.toggle('rich', rich); el.classList.remove('raw');
+        if (rich) { el.classList.remove('plain-src'); return; }
+        const tmp = document.createElement('div'); tmp.innerHTML = el.innerHTML.replace(/<br\s*\/?>/gi, '\n'); const raw = tmp.textContent.replace(/\r/g, '');
+        const lines = raw.split('\n');
+        let formula = '', steps = [], cur = null, intro = [], finals = [], inFinal = false, title = '';
+        lines.forEach(line => {
+            const t = line.trim();
+            if (!t) return;
+            if (RULE.test(t)) { if (steps.length) inFinal = true; return; }
+            let m;
+            if (!steps.length && !formula && (m = t.match(/^\W*(?:FORMULA|Formula)\s*:\s*(.+)$/))) { formula = m[1]; return; }
+            if (!inFinal && (m = t.match(/^\W*(?:Step|STEP)\s*(\d+)\s*[:.\-–]?\s*(.*)$/))) { cur = { no: m[1], title: m[2] || 'Step ' + m[1], lines: [] }; steps.push(cur); return; }
+            if (inFinal || /^✅/.test(t)) { inFinal = true; finals.push(t); return; }
+            if (cur) cur.lines.push(line.replace(/\s+$/, '')); else intro.push(t);
+        });
+        if (!steps.length) {   // unknown layout: still present it cleanly
+            el.classList.remove('plain-src');
+            el.classList.add('raw');
+            return;
+        }
+        const sol = document.createElement('div'); sol.className = 'solution'; sol.dataset.for = el.id;
+        const label = (card.querySelector('.result-label')?.textContent || 'Solution').replace(/\s*(RESULTS?|RESULT)\s*$/i, '').replace(/^[^\wΑ-ω]+/, '').trim();
+        let h = '<div class="sol-head"><h4><span class="ico">🧮</span>Worked Solution · ' + esc(label.charAt(0) + label.slice(1).toLowerCase()) + '</h4><div class="sol-tools"><span class="sol-count">' + steps.length + ' step' + (steps.length > 1 ? 's' : '') + '</span><button type="button" class="sol-toggle" data-open="1">Collapse all</button></div></div>';
+        if (formula) h += '<div class="sol-formula"><span class="tag">FORMULA</span><code>' + esc(formula) + '</code></div>';
+        h += '<div class="sol-body">';
+        intro.forEach(t => h += '<div class="sol-note">' + esc(t) + '</div>');
+        steps.forEach(st => {
+            const body = st.lines.map(l => '<span class="ln' + (/^\s*(Result|Answer|Therefore|Conclusion)\b/i.test(l) ? ' hl' : '') + '">' + esc(l.replace(/^ {1,3}/, '')) + '</span>').join('');
+            h += '<details class="step" open><summary><span class="step-no">' + esc(st.no) + '</span><span class="step-title">' + esc(st.title) + '</span><span class="step-caret">▶</span></summary>' + (body ? '<div class="step-body">' + body + '</div>' : '') + '</details>';
+        });
+        h += '</div>';
+        if (finals.length) {
+            h += '<div class="sol-final"><h5>✔ Final results</h5>';
+            finals.forEach(f => {
+                const t = f.replace(/^[✅✔☑️\s]+/u, '');
+                const m = t.match(/^(.+?)\s+(?:=|:)\s+(.+)$/);
+                h += m ? '<div class="final-row"><span>' + esc(m[1]) + '</span><b>' + esc(m[2]) + '</b></div>' : '<div class="final-row text">' + esc(t) + '</div>';
+            });
+            h += '</div>';
+        }
+        sol.innerHTML = h;
+        sol.querySelector('.sol-toggle').addEventListener('click', e => {
+            const b = e.currentTarget, open = b.dataset.open !== '1';
+            sol.querySelectorAll('details.step').forEach(d => d.open = open);
+            b.dataset.open = open ? '1' : '0'; b.textContent = open ? 'Collapse all' : 'Expand all';
+        });
+        el.classList.add('plain-src');
+        el.after(sol);
+    }
+    function hookCard(card) {
+        if (card.dataset.hooked) return; card.dataset.hooked = '1';
+        const val = card.querySelector('.result-value'), st = card.querySelector('.calculation-steps');
+        const run = () => { if (val) buildAnswer(val); if (st) buildSolution(st); };
+        run();
+        if (val) new MutationObserver(() => buildAnswer(val)).observe(val, { childList: true, characterData: true, subtree: true });
+        if (st) new MutationObserver(() => buildSolution(st)).observe(st, { childList: true, characterData: true, subtree: true });
     }
     const root = $('#interfaceRoot');
     new MutationObserver(() => $$('.stat-interface', root).forEach(enhance)).observe(root, { childList: true, subtree: true });
