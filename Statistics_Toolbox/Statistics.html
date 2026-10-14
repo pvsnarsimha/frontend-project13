@@ -190,6 +190,10 @@
             border: 1px solid #a7f3d0;
         }
         .result-value::before { content: "ANSWER"; position: absolute; top: 9px; left: 28px; font-family: 'Inter', sans-serif; font-size: .62rem; font-weight: 800; letter-spacing: .18em; color: #059669; }
+        .result-card.is-notice::before { background: linear-gradient(90deg, #f59e0b, #f97316); }
+        .result-card.is-notice > .result-label::before { background: #f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.2); }
+        .result-card.is-notice .result-value { color: #92400e; background: linear-gradient(135deg, #fffbeb, #fff7ed); border-color: #fde68a; }
+        .result-card.is-notice .result-value::before { content: "NOTICE"; color: #d97706; }
         .result-value.long { font-size: clamp(1.05rem, 1.9vw, 1.35rem); letter-spacing: -.2px; line-height: 1.35; }
         .result-value.chips-on { display: none; }
         .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 28px 4px; }
@@ -220,7 +224,10 @@
         .calculation-steps.rich [style*="background: #f8f9fa"] { background: #f8fafc !important; border: 1px solid var(--line) !important; }
         .calculation-steps.rich [style*="linear-gradient(135deg, #e8f4f8"] { background: linear-gradient(135deg, #eef2ff, #f5f3ff) !important; border: 1px solid #e0e7ff !important; }
         .calculation-steps.rich table { width: 100%; font-size: .85rem; }
-        .calculation-steps.rich th { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+        .calculation-steps.rich th { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; }
+        .calculation-steps.rich tr[style*="#1a5490"], .calculation-steps.rich thead[style*="#1a5490"] { background: linear-gradient(90deg, #3730a3, #6366f1) !important; color: #fff !important; }
+        .calculation-steps.rich tr[style*="#1a5490"] th, .calculation-steps.rich thead[style*="#1a5490"] th { color: #fff !important; background: transparent !important; }
+        .calculation-steps.rich th[style*="background: #1a5490"] { background: linear-gradient(90deg, #3730a3, #6366f1) !important; color: #fff !important; }
         .calculation-steps.rich td, .calculation-steps.rich th { border-color: var(--line) !important; font-variant-numeric: tabular-nums; }
         .calculation-steps.rich tbody tr:nth-child(even) { background: #f8fafc; }
 
@@ -252,6 +259,42 @@
         .step.static { display: flex; align-items: center; gap: 14px; padding: 10px 0; flex-wrap: wrap; }
         .step.static .step-title { font-weight: 700; }
         .step-val { margin-left: auto; font-family: var(--mono) !important; font-size: .9rem; font-weight: 700; color: #3730a3; background: #eef2ff; border: 1px solid #c7d2fe; border-left: 3px solid #6366f1; border-radius: 10px; padding: 7px 14px; overflow-wrap: anywhere; max-width: 100%; }
+        .sol-head h4 > span:last-child { display: flex; flex-direction: column; line-height: 1.2; }
+        .sol-head h4 em { font-style: normal; font-weight: 600; font-size: .8rem; color: #c7d2fe; letter-spacing: 0; margin-top: 2px; }
+        .sol-meta { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 22px 0; }
+        .sol-meta div { padding: 8px 14px; border-radius: 12px; background: #f1f5f9; border: 1px solid var(--line); }
+        .sol-meta small { display: block; font-size: .62rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+        .sol-meta b { font-family: var(--mono) !important; font-size: .88rem; color: var(--ink); }
+        .sol-intro { padding: 12px 22px 0; }
+        .sol-intro p { font-size: .86rem; color: var(--muted); padding: 2px 0; }
+        .sol-body::before { display: none; }
+        details.step, .step.static { position: relative; }
+        details.step:not(:last-child)::after, .step.static:not(:last-child)::after { content: ""; position: absolute; left: 21px; top: 58px; bottom: -6px; width: 2px; background: linear-gradient(#c7d2fe, #e0e7ff); }
+        details.step.part .step-no { background: linear-gradient(135deg, #06b6d4, #6366f1); }
+        .step-body .ln.gap { margin-top: 10px; }
+        .step-body .ln.fm { margin: 6px 0; padding: 7px 12px; border-radius: 10px; background: #f5f3ff; border: 1px solid #ddd6fe; color: #4338ca; font-weight: 700; }
+        .step-body .ln.bx { margin: 6px 0; padding: 8px 14px; border-radius: 10px; background: linear-gradient(135deg, #eef2ff, #f5f3ff); border: 1px dashed #a5b4fc; color: #3730a3; font-weight: 700; }
+        .step-body .ln.bl::before { content: "•"; color: var(--brand); font-weight: 800; margin-right: .5em; margin-left: -1.1em; }
+        .step-body sup, .sol-formula sup, .final-row sup { font-size: .7em; }
+        .final-sub { font-size: .8rem; font-weight: 800; color: #065f46; margin: 10px 0 2px; }
+        .solution.notice { display: flex; gap: 14px; align-items: flex-start; padding: 18px 22px; background: linear-gradient(135deg, #fffbeb, #fff); border-color: #fde68a; }
+        .solution.notice .n-ico { font-size: 1.5rem; }
+        .solution.notice b { color: #92400e; font-size: .9rem; }
+        .solution.notice p { color: #78350f; font-size: .88rem; margin-top: 2px; }
+        .chapter { margin: 16px 0 6px; display: flex; align-items: center; gap: 12px; }
+        .chapter::before, .chapter::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, #c7d2fe); }
+        .chapter::after { background: linear-gradient(90deg, #c7d2fe, transparent); }
+        .chapter span { font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #4338ca; background: #eef2ff; border: 1px solid #c7d2fe; padding: 6px 14px; border-radius: 99px; }
+        .anon { margin: 6px 0 10px; padding: 14px 16px; border-radius: 14px; background: #f8fafc; border: 1px solid var(--line); font-family: var(--mono); font-size: .83rem; line-height: 1.75; color: #1e293b; }
+        .anon .ln { display: block; }
+        .subs { margin: 10px 0 4px; display: grid; gap: 8px; }
+        .sub { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: #fff; border: 1px solid var(--line); }
+        .sub-no { flex: 0 0 auto; width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; font-size: .72rem; font-weight: 800; color: #4338ca; background: #e0e7ff; font-family: 'Inter', sans-serif; }
+        .sub-main { flex: 1; min-width: 0; }
+        .sub-t { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-family: 'Inter', sans-serif !important; font-weight: 700; font-size: .84rem; color: var(--ink); }
+        .sub-t span:first-child { font-family: 'Inter', sans-serif !important; }
+        .sub-t .step-val { padding: 4px 10px; font-size: .8rem; }
+        .sub-b { margin-top: 6px; }
         .step-body { margin: 6px 0 4px 58px; padding: 14px 16px; border-radius: 14px; background: #f8fafc; border: 1px solid var(--line); font-family: var(--mono); font-size: .83rem; line-height: 1.75; color: #1e293b; white-space: pre-wrap; overflow-x: auto; }
         .step-body .ln { display: block; }
         .step-body .ln.hl { margin: 4px -6px; padding: 4px 10px; border-radius: 8px; background: #eef2ff; color: #3730a3; font-weight: 700; border-left: 3px solid #6366f1; }
@@ -30349,7 +30392,7 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
             const ph = t.getAttribute('placeholder') || '';
             const m = ph.match(/(?:example|e\.g\.)\s*[:\-]?\s*([\s\S]+)/i);
             const val = (m ? m[1] : ph).trim();
-            if (/\d/.test(val) && /^[\d\s,.;\-+eE\n\r]+$/.test(val) && val.length < 400) out.push([t, val]);
+            if (/\d/.test(val) && val.length < 700 && (m ? /^[^<>]+$/.test(val) : /^[\d\s,.;\-+eE\n\r]+$/.test(val))) out.push([t, val]);
         });
         return out;
     }
@@ -30405,6 +30448,71 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
         valEl.classList.add('chips-on');
         valEl.after(row);
     }
+    const fmt = t => esc(t).replace(/\^\{([^}]*)\}/g, '<sup>$1</sup>').replace(/\^(\d+)/g, '<sup>$1</sup>');
+    const BOX = /[╔╗╚╝═║│┌┐└┘─━┃┏┓┗┛┠┨┯┷]/g;
+    const isRule = t => /^[\s━─═\-_=*•·╔╗╚╝║│┌┐└┘┃┏┓┗┛]{6,}$/.test(t) && !/[A-Za-z0-9]/.test(t);
+    function parseSolution(raw) {
+        const lines = raw.split('\n').map(l => l.replace(/\s+$/, ''));
+        const cleanOf = l => l.replace(BOX, ' ').replace(/\s+/g, ' ').trim();
+        const okFin = lines.findIndex(l => /^\s*(✅|✔|☑)/u.test(l));
+        const chFin = lines.findIndex(l => /^(FINAL (ANSWERS?|RESULTS?)|SUMMARY)$/.test(cleanOf(l).replace(/^[^A-Za-z]+/, '')));
+        let fin = -1, skip = 0;
+        if (chFin >= 0 && (okFin < 0 || chFin < okFin)) { fin = chFin; skip = 1; } else if (okFin >= 0) fin = okFin;
+        const body = fin < 0 ? lines : lines.slice(0, fin);
+        const finals = fin < 0 ? [] : lines.slice(fin + skip).map(l => l.replace(BOX, ' ').replace(/\s+$/, '')).filter(l => l.trim() && !isRule(l.trim()));
+        const sol = { title: '', formulas: [], meta: [], intro: [], items: [], finals };
+        let cur = null, first = true, lastBlank = false, sub = null, subIndent = 0;
+        const indentOf = l => l.match(/^\s*/)[0].length;
+        const push = (line, extra) => {
+            const o = Object.assign({ t: line }, extra || {});
+            if (cur && sub && indentOf(line) > subIndent) sub.lines.push(o);
+            else if (cur && cur.subs.length) { sub = null; cur.post.push(o); }
+            else (cur ? cur.lines : sol.intro).push(o);
+        };
+        const open = it => { it.subs = []; it.post = []; cur = it; sub = null; sol.items.push(it); lastBlank = false; };
+        body.forEach(line => {
+            const t = line.trim();
+            if (!t) { if (cur && (cur.lines.length || cur.post.length)) lastBlank = true; return; }
+            if (isRule(t)) { lastBlank = false; return; }
+            const boxed = /^[║│┃]/.test(t) || /[║│┃]$/.test(t);
+            const clean = cleanOf(t);
+            if (!clean) return;
+            let m;
+            if (first) {
+                first = false;
+                const letters = clean.replace(/[^A-Za-z]/g, '');
+                if (letters.length > 3 && letters.replace(/[^A-Z]/g, '').length / letters.length > .7 && !/=/.test(clean)) { sol.title = clean.replace(/^[^A-Za-z0-9(]+/, ''); return; }
+            }
+            const bare = clean.replace(/^[^\w(Α-ωμσ]+/u, '');
+            if ((m = bare.match(/^(?:FORMULA|Formula)\s*:\s*(.+)$/)) && !cur) { sol.formulas.push(m[1]); return; }
+            if ((m = bare.match(/^(?:Step|STEP)\s*(\d+)\s*[:.\-–]?\s*(.*)$/))) {
+                const st = { no: m[1], title: m[2] || 'Step ' + m[1], lines: [], step: true };
+                if (cur && !cur.step && !cur.anon) { sub = st; subIndent = indentOf(line); cur.subs.push(st); lastBlank = false; }
+                else { open(st); }
+                return;
+            }
+            if (boxed && !/[=<>≤≥≈]/.test(clean) && clean.length < 80) { open({ no: '', title: clean, lines: [], chapter: true }); open({ no: '', title: '', lines: [], anon: true }); return; }
+            if (!boxed && (m = bare.match(/^(.{2,70}):$/)) && !/^[•\-*]/.test(bare)) { open({ no: '', title: m[1], lines: [] }); return; }
+            if (!cur && (m = bare.match(/^([A-Za-zΑ-ωμσ][\w ()\/.\-]{0,28}):\s+(.+)$/)) && !/^(Note|Interpretation)/i.test(m[1])) { sol.meta.push([m[1], m[2]]); return; }
+            if (cur && (m = bare.match(/^(?:FORMULA|Formula)\s*:\s*(.+)$/))) { push(m[1], { cls: 'formula' }); lastBlank = false; return; }
+            push(line.replace(/[║│┃]/g, ' ').replace(/\s+$/, ''), { cls: boxed ? 'box' : '', gap: lastBlank });
+            lastBlank = false;
+        });
+        sol.items = sol.items.filter(it => !(it.anon && !it.lines.length && !it.post.length) && !(it.chapter && false));
+        if (!sol.items.some(it => !it.chapter) && sol.intro.some(x => x.t.trim())) { sol.items = sol.items.filter(it => it.chapter); sol.items.push({ no: '', title: 'Working', lines: sol.intro, subs: [], post: [] }); sol.intro = []; }
+        return sol;
+    }
+    function lineHtml(l, minLead) {
+        const lead = Math.max(0, (l.t.match(/^\s*/)[0].length) - minLead);
+        const txt = l.t.trim();
+        let cls = 'ln' + (l.gap ? ' gap' : '');
+        if (l.cls === 'formula') cls += ' fm';
+        else if (l.cls === 'box') cls += ' bx';
+        else if (/^(Interpretation|Conclusion|Note|Therefore|Result|Answer|Decision|Meaning)\b/i.test(txt)) cls += ' hl';
+        else if (/^[•\-*]\s/.test(txt)) cls += ' bl';
+        const body = /^[•\-*]\s/.test(txt) && cls.includes('bl') ? txt.replace(/^[•\-*]\s*/, '') : txt;
+        return '<span class="' + cls + '" style="padding-left:' + (lead * .55 + (cls.includes(' bl') ? 1.1 : 0)) + 'em">' + fmt(body) + '</span>';
+    }
     function buildSolution(el) {
         const card = el.closest('.result-card');
         const old = card.querySelector(':scope > .solution[data-for="' + el.id + '"]');
@@ -30412,57 +30520,73 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
         const rich = !!el.querySelector('div, table, h2, h3');
         el.classList.toggle('rich', rich); el.classList.remove('raw');
         if (rich) { el.classList.remove('plain-src'); return; }
-        const tmp = document.createElement('div'); tmp.innerHTML = el.innerHTML.replace(/<br\s*\/?>/gi, '\n'); const raw = tmp.textContent.replace(/\r/g, '');
-        const lines = raw.split('\n');
-        let formula = '', steps = [], cur = null, intro = [], finals = [], inFinal = false, title = '';
-        lines.forEach(line => {
-            const t = line.trim();
-            if (!t) return;
-            if (RULE.test(t)) { if (steps.length) inFinal = true; return; }
-            let m;
-            if (!steps.length && !formula && (m = t.match(/^\W*(?:FORMULA|Formula)\s*:\s*(.+)$/))) { formula = m[1]; return; }
-            if (!inFinal && (m = t.match(/^\W*(?:Step|STEP)\s*(\d+)\s*[:.\-–]?\s*(.*)$/))) { cur = { no: m[1], title: m[2] || 'Step ' + m[1], lines: [] }; steps.push(cur); return; }
-            if (inFinal || /^✅/.test(t)) { inFinal = true; finals.push(t); return; }
-            if (cur) cur.lines.push(line.replace(/\s+$/, '')); else intro.push(t);
-        });
-        if (!steps.length) {   // unknown layout: still present it cleanly
-            el.classList.remove('plain-src');
-            el.classList.add('raw');
-            return;
-        }
-        const sol = document.createElement('div'); sol.className = 'solution'; sol.dataset.for = el.id;
+        const tmp = document.createElement('div'); tmp.innerHTML = el.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+        const raw = tmp.textContent.replace(/\r/g, '');
+        if (!raw.trim()) { el.classList.remove('plain-src'); return; }
+        const sol = parseSolution(raw);
+        const box = document.createElement('div'); box.className = 'solution'; box.dataset.for = el.id;
         const label = (card.querySelector('.result-label')?.textContent || 'Solution').replace(/\s*(RESULTS?|RESULT)\s*$/i, '').replace(/^[^\wΑ-ω]+/, '').trim();
-        let h = '<div class="sol-head"><h4><span class="ico">🧮</span>Worked Solution · ' + esc(label.charAt(0) + label.slice(1).toLowerCase()) + '</h4><div class="sol-tools"><span class="sol-count">' + steps.length + ' step' + (steps.length > 1 ? 's' : '') + '</span>' + (steps.some(x => x.lines.length) ? '<button type="button" class="sol-toggle" data-open="1">Collapse all</button>' : '') + '</div></div>';
-        if (formula) h += '<div class="sol-formula"><span class="tag">FORMULA</span><code>' + esc(formula) + '</code></div>';
-        h += '<div class="sol-body">';
-        intro.forEach(t => h += '<div class="sol-note">' + esc(t) + '</div>');
-        steps.forEach(st => {
-            const body = st.lines.map(l => '<span class="ln' + (/^\s*(Result|Answer|Therefore|Conclusion)\b/i.test(l) ? ' hl' : '') + '">' + esc(l.replace(/^ {1,3}/, '')) + '</span>').join('');
-            if (body) {
-                h += '<details class="step" open><summary><span class="step-no">' + esc(st.no) + '</span><span class="step-title">' + esc(st.title) + '</span><span class="step-caret">▶</span></summary><div class="step-body">' + body + '</div></details>';
-            } else {   // nothing to expand: show the step as a static row, value (if any) as a pill
-                const m = st.title.match(/^(.+?)\s*=\s*(.+)$/);
-                h += '<div class="step static"><span class="step-no">' + esc(st.no) + '</span><span class="step-title">' + esc(m ? m[1] : st.title) + '</span>' + (m ? '<span class="step-val">' + esc(m[2]) + '</span>' : '') + '</div>';
-            }
-        });
-        h += '</div>';
-        if (finals.length) {
-            h += '<div class="sol-final"><h5>✔ Final results</h5>';
-            finals.forEach(f => {
-                const t = f.replace(/^[✅✔☑️\s]+/u, '');
-                const m = t.match(/^(.+?)\s+(?:=|:)\s+(.+)$/);
-                h += m ? '<div class="final-row"><span>' + esc(m[1]) + '</span><b>' + esc(m[2]) + '</b></div>' : '<div class="final-row text">' + esc(t) + '</div>';
+        // short single message (validation / hint) → friendly notice instead of a solution
+        const trivial = sol.items.every(x => x.title === 'Working' && !x.subs.length);
+        card.classList.toggle('is-notice', false);
+        if (trivial && !sol.finals.length && !sol.formulas.length && raw.trim().split('\n').filter(x => x.trim()).length <= 2 && raw.trim().length < 160) {
+            card.classList.add('is-notice');
+            box.className = 'solution notice'; box.innerHTML = '<span class="n-ico">💡</span><div><b>Heads up</b><p>' + fmt(raw.trim()) + '</p></div>';
+            el.classList.add('plain-src'); el.after(box); return;
+        }
+        const nItems = sol.items.filter(x => !x.chapter && !x.anon).length, expandable = sol.items.some(x => x.lines.some(l => l.t.trim()) || (x.subs && x.subs.length));
+        const title = sol.title ? sol.title.charAt(0) + sol.title.slice(1).toLowerCase().replace(/\b(cdf|pdf|pmf|mgf|anova|manova|ancova|iqr|sem|mad|vif|ss)\b/g, s => s.toUpperCase()) : label.charAt(0) + label.slice(1).toLowerCase();
+        let h = '<div class="sol-head"><h4><span class="ico">🧮</span><span>Worked Solution<em>' + fmt(title) + '</em></span></h4><div class="sol-tools">' + (nItems ? '<span class="sol-count">' + nItems + (sol.items.find(x => !x.chapter && !x.anon).step ? ' step' : ' part') + (nItems > 1 ? 's' : '') + '</span>' : '') + (expandable ? '<button type="button" class="sol-toggle" data-open="1">Collapse all</button>' : '') + '</div></div>';
+        sol.formulas.forEach(f => h += '<div class="sol-formula"><span class="tag">FORMULA</span><code>' + fmt(f) + '</code></div>');
+        if (sol.meta.length) h += '<div class="sol-meta">' + sol.meta.map(([k, v]) => '<div><small>' + fmt(k) + '</small><b>' + fmt(v) + '</b></div>').join('') + '</div>';
+        if (sol.intro.length) h += '<div class="sol-intro">' + sol.intro.map(l => '<p>' + fmt(l.t.trim()) + '</p>').join('') + '</div>';
+        if (nItems) {
+            h += '<div class="sol-body">';
+            const blk = (lines) => {
+                const ls = lines.filter(l => l.t.trim());
+                const ml = ls.length ? Math.min.apply(null, ls.map(l => l.t.match(/^\s*/)[0].length)) : 0;
+                return ls.map(l => lineHtml(l, ml)).join('');
+            };
+            const subHtml = sb => {
+                const m = sb.title.match(/^(.+?)\s*=\s*(.+)$/), ls = sb.lines.filter(l => l.t.trim());
+                return '<div class="sub"><span class="sub-no">' + esc(sb.no) + '</span><div class="sub-main"><div class="sub-t"><span>' + fmt(m && !ls.length ? m[1] : sb.title) + '</span>' + (m && !ls.length ? '<span class="step-val">' + fmt(m[2]) + '</span>' : '') + '</div>' + (ls.length ? '<div class="sub-b">' + blk(sb.lines) + '</div>' : '') + '</div></div>';
+            };
+            let n = 0;
+            sol.items.forEach((st, i) => {
+                if (st.chapter) { h += '<div class="chapter"><span>' + fmt(st.title) + '</span></div>'; return; }
+                const hasBody = st.lines.some(l => l.t.trim()) || st.subs.length || st.post.some(l => l.t.trim());
+                if (st.anon) { h += '<div class="anon">' + blk(st.lines) + st.subs.map(subHtml).join('') + blk(st.post) + '</div>'; return; }
+                n++;
+                const no = st.no || n;
+                const open = nItems <= 10 || n <= 3 ? ' open' : '';
+                if (hasBody) h += '<details class="step' + (st.step ? '' : ' part') + '"' + open + '><summary><span class="step-no">' + esc(String(no)) + '</span><span class="step-title">' + fmt(st.title) + '</span><span class="step-caret">▶</span></summary><div class="step-body">' + blk(st.lines) + (st.subs.length ? '<div class="subs">' + st.subs.map(subHtml).join('') + '</div>' : '') + blk(st.post) + '</div></details>';
+                else {
+                    const m = st.title.match(/^(.+?)\s*=\s*(.+)$/);
+                    h += '<div class="step static"><span class="step-no">' + esc(String(no)) + '</span><span class="step-title">' + fmt(m ? m[1] : st.title) + '</span>' + (m ? '<span class="step-val">' + fmt(m[2]) + '</span>' : '') + '</div>';
+                }
             });
             h += '</div>';
         }
-        sol.innerHTML = h;
-        const tg = sol.querySelector('.sol-toggle'); if (tg) tg.addEventListener('click', e => {
+        if (sol.finals.length) {
+            h += '<div class="sol-final"><h5>✔ Final results</h5>';
+            sol.finals.forEach(f => {
+                const t = f.replace(/^[✅✔☑️\s]+/u, '').trim();
+                let m;
+                if (/:$/.test(t)) h += '<div class="final-sub">' + fmt(t.replace(/:$/, '')) + '</div>';
+                else if ((m = t.match(/^(.+?)\s+(?:=|:|→)\s+(.+)$/))) h += '<div class="final-row"><span>' + fmt(m[1]) + '</span><b>' + fmt(m[2]) + '</b></div>';
+                else h += '<div class="final-row text">' + fmt(t) + '</div>';
+            });
+            h += '</div>';
+        }
+        box.innerHTML = h;
+        const tg = box.querySelector('.sol-toggle');
+        if (tg) tg.addEventListener('click', e => {
             const b = e.currentTarget, open = b.dataset.open !== '1';
-            sol.querySelectorAll('details.step').forEach(d => d.open = open);
+            box.querySelectorAll('details.step').forEach(d => d.open = open);
             b.dataset.open = open ? '1' : '0'; b.textContent = open ? 'Collapse all' : 'Expand all';
         });
         el.classList.add('plain-src');
-        el.after(sol);
+        el.after(box);
     }
     function hookCard(card) {
         if (card.dataset.hooked) return; card.dataset.hooked = '1';
