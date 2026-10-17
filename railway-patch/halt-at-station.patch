@@ -1,0 +1,59 @@
+--- a/mobile-app/src/screens/LiveTrackingScreen.js
++++ b/mobile-app/src/screens/LiveTrackingScreen.js
+@@ -2088,6 +2088,22 @@
+   const ltNextEtaMinutes = !ltJourneyLikelyComplete
+     ? minutesFromNowClockTime(payload?.next_station_live_eta || payload?.next_station_expected_arrival)
+     : null;
++  // FEATURE: while the train is standing at a halt station (arrived, not yet
++  // departed) keep showing "At <station> · departs HH:MM (in N min)" for the
++  // whole halt instead of jumping straight to the next station. Built only
++  // from the stop's own real arrival/departure fields. Null once a real
++  // (non-predicted) departure is recorded, or if no departure time exists.
++  const ltHalt = (() => {
++    if (ltJourneyLikelyComplete || !timeline.length) return null;
++    const isReal = (x) => x && x.actual && x.actual_is_predicted !== true;
++    const at = timeline.find((x) => x.status === "current" && x.kind !== "intermediate" && isReal(x.arrival) && !isReal(x.departure));
++    if (!at) return null;
++    const hhmm = (v) => (v ? String(v).slice(0, 5) : null);
++    const depAt = hhmm(at.departure && (at.departure.expected || at.departure.scheduled));
++    if (!depAt) return null;
++    const left = minutesFromNowClockTime(depAt);
++    return { name: at.name, arrivedAt: hhmm(at.arrival.actual), departsAt: depAt, minsLeft: left != null ? Math.max(0, left) : null };
++  })();
+ 
+   // REDESIGN (RailYatri-style bottom sticky bar): "Next: X in N mins
+   // (delay)" plus two quick-action buttons that jump to the real Time
+@@ -2164,6 +2180,12 @@
+       };
+     }
+     if (gpsOn && payload.gps_headline) return { headline: payload.gps_headline, sub };
++    if (ltHalt) {
++      return {
++        headline: `Halted at ${toDisplayCase(ltHalt.name)}`,
++        sub: `${ltHalt.arrivedAt ? `Arrived ${ltHalt.arrivedAt} · ` : ""}Departs ${ltHalt.departsAt}${ltHalt.minsLeft != null && ltHalt.minsLeft <= 60 ? ` (in ${ltHalt.minsLeft} min)` : ""}`,
++      };
++    }
+     const at = timeline[lastReached];
+     const timing = (at.departure && at.departure.actual) || (at.arrival && at.arrival.actual);
+     const verb = at.status === "current" && at.kind !== "intermediate" && !(at.departure && at.departure.actual) ? "At" : "Crossed";
+@@ -3009,8 +3031,18 @@
+       <View style={styles.bottomBar}>
+         <View style={styles.bottomBarInfo}>
+           <Text style={styles.bottomBarLabel} numberOfLines={1}>
+-            {t("Next:")} <Text style={styles.bottomBarStation}>{t(payload.next_station)}</Text>
+-            {ltNextEtaMinutes != null ? ` ${tf("in {n} min", { n: ltNextEtaMinutes })}` : ""}
++            {ltHalt ? (
++              <>
++                {t("Halted at")} <Text style={styles.bottomBarStation}>{toDisplayCase(ltHalt.name)}</Text>
++                {` · ${t("departs")} ${ltHalt.departsAt}`}
++                {ltHalt.minsLeft != null && ltHalt.minsLeft <= 60 ? ` ${tf("in {n} min", { n: ltHalt.minsLeft })}` : ""}
++              </>
++            ) : (
++              <>
++                {t("Next:")} <Text style={styles.bottomBarStation}>{t(payload.next_station)}</Text>
++                {ltNextEtaMinutes != null ? ` ${ltNextEtaMinutes > 0 ? tf("in {n} min", { n: ltNextEtaMinutes }) : t("arriving now")}` : ""}
++              </>
++            )}
+           </Text>
+           {ltEffectiveDelay != null && (
+             <Text style={[styles.bottomBarDelay, ltEffectiveDelay > 0 ? styles.bottomBarDelayLate : styles.bottomBarDelayOnTime]}>
