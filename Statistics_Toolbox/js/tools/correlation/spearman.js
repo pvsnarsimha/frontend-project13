@@ -81,7 +81,20 @@ function computeSpearmanWithSteps(xValues, yValues) {
         });
     }
     
-    let rho = 1 - (6 * sumDSquared) / (n * (n * n - 1));
+    // With ties the shortcut 1 - 6Σd²/(n(n²-1)) is wrong; ρ is the Pearson correlation of the (average) ranks,
+    // which equals the shortcut when there are no ties.
+    const hasTies = new Set(rankX).size < n || new Set(rankY).size < n;
+    const meanRank = (n + 1) / 2;
+    let sRxRy = 0, sRxRx = 0, sRyRy = 0;
+    for (let i = 0; i < n; i++) {
+        sRxRy += (rankX[i] - meanRank) * (rankY[i] - meanRank);
+        sRxRx += (rankX[i] - meanRank) * (rankX[i] - meanRank);
+        sRyRy += (rankY[i] - meanRank) * (rankY[i] - meanRank);
+    }
+    if (sRxRx === 0 || sRyRy === 0) {
+        return { error: true, message: `Spearman's ρ is undefined: all ${sRxRx === 0 ? 'X' : 'Y'} values are identical (zero variance).` };
+    }
+    const rho = sRxRy / Math.sqrt(sRxRx * sRyRy);
     
     let tableRows = '';
     for (let d of rankData) {
@@ -166,7 +179,7 @@ function computeSpearmanWithSteps(xValues, yValues) {
                     <div><strong>Calculate Spearman's ρ</strong></div>
                 </div>
                 <div style="margin-left: 40px; font-family: monospace; font-size: 16px; font-weight: 700; color: #1a5490;">
-                    ρ = 1 - [6 × ${sumDSquared}] / ${n * (n*n - 1)} = ${rho.toFixed(8)}
+                    ${hasTies ? `Ties present → ρ = Pearson correlation of the ranks = Σ(Rx - R̄)(Ry - R̄) / √[Σ(Rx - R̄)² × Σ(Ry - R̄)²] = ${sRxRy} / √(${sRxRx} × ${sRyRy}) = ${rho.toFixed(8)}` : `ρ = 1 - [6 × ${sumDSquared}] / ${n * (n*n - 1)} = ${rho.toFixed(8)}`}
                 </div>
             </div>
         </div>
@@ -209,12 +222,5 @@ function setupSpearmanLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("spearmanClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("spearmanXInput").value = '';
-            document.getElementById("spearmanYInput").value = '';
-            document.getElementById("spearmanResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("spearmanClearBtn", ["spearmanXInput", "spearmanYInput"], "spearmanResultArea");
 }

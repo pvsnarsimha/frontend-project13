@@ -19,14 +19,9 @@ function createBoxPlot(numbers, chartTitle) {
         else return arr[Math.floor(m/2)];
     };
     
-    let q1, q3;
-    if (n % 2 === 0) {
-        q1 = getMedian(sorted.slice(0, n/2));
-        q3 = getMedian(sorted.slice(n/2));
-    } else {
-        q1 = getMedian(sorted.slice(0, Math.floor(n/2)));
-        q3 = getMedian(sorted.slice(Math.floor(n/2) + 1));
-    }
+    // Type 7 quantiles (linear interpolation at (n - 1)p), the same method as every other quantile in the app
+    const q1 = quantileType7(sorted, 0.25);
+    const q3 = quantileType7(sorted, 0.75);
     
     const median = getMedian(sorted);
     const iqr = q3 - q1;
@@ -38,7 +33,9 @@ function createBoxPlot(numbers, chartTitle) {
         currentChart.destroy();
     }
     
-    const ctx = document.getElementById('dataChart').getContext('2d');
+    const dataCanvas = document.getElementById('dataChart');
+    labelChart(dataCanvas, `Box plot of ${describeSample(numbers)}. Quartiles: Q1 ${+q1.toFixed(3)}, median ${+median.toFixed(3)}, Q3 ${+q3.toFixed(3)}; whiskers ${+lowerWhisker.toFixed(3)} to ${+upperWhisker.toFixed(3)}. ${chartTitle}.`);
+    const ctx = dataCanvas.getContext('2d');
     
     // Create a horizontal bar chart representing the box plot
     currentChart = new Chart(ctx, {
@@ -158,8 +155,7 @@ function renderBoxplotInterface() {
             area: "boxplotResultArea",
             label: "🎯 BOXPLOT",
             value: "boxplotValueDisplay",
-            steps: "boxplotStepsDisplay",
-            extra: ["<canvas id=\"boxplotChartCanvas\" style=\"max-height: 400px; margin-top: 20px;\"></canvas>"]
+            steps: "boxplotStepsDisplay"
         }
     });
 }
@@ -439,94 +435,8 @@ ctx.fillText(maxVal.toFixed(4), xCenter + 35, maxY - 8);   // ← 18 to 35
     }
 };
 
-// Register the plugin
-if (typeof Chart !== 'undefined') {
-    Chart.register(boxplotPlugin);
-}
-
-// Custom tooltip handler for interactive elements
-function setupCanvasTooltip(canvas, chart) {
-    const tooltipDiv = document.createElement('div');
-    tooltipDiv.style.position = 'absolute';
-    tooltipDiv.style.background = '#1a5490';
-    tooltipDiv.style.color = 'white';
-    tooltipDiv.style.padding = '8px 16px';
-    tooltipDiv.style.borderRadius = '8px';
-    tooltipDiv.style.fontSize = '12px';
-    tooltipDiv.style.fontFamily = 'monospace';
-    tooltipDiv.style.pointerEvents = 'none';
-    tooltipDiv.style.zIndex = '1000';
-    tooltipDiv.style.display = 'none';
-    tooltipDiv.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
-    tooltipDiv.style.borderLeft = '4px solid';
-    document.body.appendChild(tooltipDiv);
-    
-    canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const mouseX = (e.clientX - rect.left) * scaleX;
-        const mouseY = (e.clientY - rect.top) * scaleY;
-        
-        let found = null;
-        const tolerance = 10;
-        
-        if (chart.interactiveElements) {
-            for (let elem of chart.interactiveElements) {
-                if (elem.type === 'whisker' || elem.type === 'median' || elem.type === 'q1' || elem.type === 'q3') {
-                    const distance = Math.abs(mouseY - elem.y);
-                    if (distance < tolerance) {
-                        found = elem;
-                        break;
-                    }
-                } else if (elem.type === 'point' || elem.type === 'outlier') {
-                    const distance = Math.hypot(mouseX - elem.x, mouseY - elem.y);
-                    if (distance < tolerance) {
-                        found = elem;
-                        break;
-                    }
-                } else if (elem.type === 'box') {
-                    // Box detection handled differently
-                }
-            }
-        }
-        
-        if (found) {
-            let tooltipText = '';
-            switch (found.type) {
-                case 'whisker':
-                    tooltipText = `${found.label}: ${found.value.toFixed(4)}`;
-                    break;
-                case 'median':
-                    tooltipText = `📊 ${found.label}: ${found.value.toFixed(4)}`;
-                    break;
-                case 'q1':
-                    tooltipText = `📉 ${found.label}: ${found.value.toFixed(4)} (25% of data ≤ this value)`;
-                    break;
-                case 'q3':
-                    tooltipText = `📈 ${found.label}: ${found.value.toFixed(4)} (75% of data ≤ this value)`;
-                    break;
-                case 'point':
-                    tooltipText = `${found.label}: ${found.value.toFixed(4)}`;
-                    break;
-                case 'outlier':
-                    tooltipText = `⚠️ ${found.label}: ${found.value.toFixed(4)}`;
-                    break;
-            }
-            setHtml(tooltipDiv, tooltipText);
-            tooltipDiv.style.display = 'block';
-            tooltipDiv.style.borderLeftColor = found.color || '#4fc3f7';
-            tooltipDiv.style.left = (e.clientX + 15) + 'px';
-            tooltipDiv.style.top = (e.clientY - 35) + 'px';
-        } else {
-            tooltipDiv.style.display = 'none';
-        }
-    });
-    
-    canvas.addEventListener('mouseleave', () => {
-        tooltipDiv.style.display = 'none';
-    });
-}
+// The plugin is passed to each boxplot chart through its own `plugins: [boxplotPlugin]` option (renderBoxplotChart),
+// so it never runs for the other charts in the app.
 
 function computeBoxplotWithSteps(numbers) {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
@@ -538,7 +448,7 @@ function computeBoxplotWithSteps(numbers) {
     const sum = numbers.reduce((a,b) => a+b, 0);
     const mean = sum / n;
     
-    // Calculate quartiles
+    // Type 7 quantiles (linear interpolation at (n - 1)p)
     const getMedian = (arr) => {
         const m = arr.length;
         if (m % 2 === 0) {
@@ -551,21 +461,8 @@ function computeBoxplotWithSteps(numbers) {
         }
     };
     
-    let q1, q3;
-    let lowerHalf, upperHalf;
-    
-    if (n % 2 === 0) {
-        lowerHalf = sorted.slice(0, n/2);
-        upperHalf = sorted.slice(n/2);
-    } else {
-        lowerHalf = sorted.slice(0, Math.floor(n/2));
-        upperHalf = sorted.slice(Math.floor(n/2) + 1);
-    }
-    
-    const q1Result = getMedian(lowerHalf);
-    const q3Result = getMedian(upperHalf);
-    q1 = q1Result.value;
-    q3 = q3Result.value;
+    const q1 = quantileType7(sorted, 0.25);
+    const q3 = quantileType7(sorted, 0.75);
     
     const medianResult = getMedian(sorted);
     const median = medianResult.value;
@@ -599,8 +496,8 @@ function computeBoxplotWithSteps(numbers) {
             <tbody>
                 <tr style="border-bottom: 1px solid #e9ecef;">
                     <td style="padding: 12px; font-weight: bold; text-align: center;">Q₁ (25th Percentile)</td>
-                    <td style="padding: 12px;">Lower half: [${lowerHalf.join(', ')}]</td>
-                    <td style="padding: 12px; font-family: monospace; text-align: center;">${q1Result.formula}</td>
+                    <td style="padding: 12px;">Full sorted data, p = 0.25</td>
+                    <td style="padding: 12px; font-family: monospace; text-align: center;">${describeQuantileType7(sorted, 0.25, 'Q₁')}</td>
                     <td style="padding: 12px; background: #e8f4f8; font-weight: bold; text-align: center;">${q1.toFixed(4)}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #e9ecef;">
@@ -611,8 +508,8 @@ function computeBoxplotWithSteps(numbers) {
                 </tr>
                 <tr style="border-bottom: 1px solid #e9ecef;">
                     <td style="padding: 12px; font-weight: bold; text-align: center;">Q₃ (75th Percentile)</td>
-                    <td style="padding: 12px;">Upper half: [${upperHalf.join(', ')}]</td>
-                    <td style="padding: 12px; font-family: monospace; text-align: center;">${q3Result.formula}</td>
+                    <td style="padding: 12px;">Full sorted data, p = 0.75</td>
+                    <td style="padding: 12px; font-family: monospace; text-align: center;">${describeQuantileType7(sorted, 0.75, 'Q₃')}</td>
                     <td style="padding: 12px; background: #e8f4f8; font-weight: bold; text-align: center;">${q3.toFixed(4)}</td>
                 </tr>
             </tbody>
@@ -902,6 +799,7 @@ function computeBoxplotWithSteps(numbers) {
 function renderBoxplotChart(numbers, stats) {
     const canvas = document.getElementById('boxplotChartCanvas');
     if (!canvas) return;
+    labelChart(canvas, `Box plot of ${describeSample(numbers)}. Quartiles: Q1 ${+stats.q1.toFixed(3)}, median ${+stats.median.toFixed(3)}, Q3 ${+stats.q3.toFixed(3)}; whiskers ${+stats.whiskerMin.toFixed(3)} to ${+stats.whiskerMax.toFixed(3)}; ${stats.outliers.length} outlier${stats.outliers.length === 1 ? '' : 's'}.`);
     
     if (boxplotChartInstance) {
         boxplotChartInstance.destroy();
@@ -920,6 +818,7 @@ function renderBoxplotChart(numbers, stats) {
     
     boxplotChartInstance = new Chart(ctx, {
         type: 'scatter',
+        plugins: [boxplotPlugin],
         data: {
             datasets: [{
                 label: 'Data Range',

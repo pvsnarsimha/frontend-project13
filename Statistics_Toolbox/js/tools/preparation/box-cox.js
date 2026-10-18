@@ -54,32 +54,35 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
     // Determine lambda
     if (lambdaType === 'optimal') {
         isOptimal = true;
-        // Find optimal lambda by maximizing log-likelihood
-        const lambdas = [];
-        const logLikelihoods = [];
-        
-        // Try lambdas from -2 to 2
-        for (let lam = -2; lam <= 2; lam += 0.1) {
-            let transformed;
-            if (Math.abs(lam) < 1e-6) {
-                transformed = validNumbers.map(x => Math.log(x));
-            } else {
-                transformed = validNumbers.map(x => (Math.pow(x, lam) - 1) / lam);
-            }
+        // Find the optimal lambda by maximizing the profile log-likelihood:
+        // coarse grid scan on [-5, 5] to bracket the peak, then golden-section search inside the bracket.
+        const sumLogX = validNumbers.reduce((a, b) => a + Math.log(b), 0);
+        const logLikelihood = lam => {
+            const transformed = Math.abs(lam) < 1e-9
+                ? validNumbers.map(x => Math.log(x))
+                : validNumbers.map(x => (Math.pow(x, lam) - 1) / lam);
             const mean = transformed.reduce((a, b) => a + b, 0) / n;
-            const variance = transformed.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
-            const logLik = -n/2 * Math.log(variance) + (lam - 1) * validNumbers.reduce((a, b) => a + Math.log(b), 0);
-            lambdas.push(lam);
-            logLikelihoods.push(logLik);
+            const variance = transformed.reduce((a, b) => a + (b - mean) * (b - mean), 0) / n;
+            return variance > 0 ? -n / 2 * Math.log(variance) + (lam - 1) * sumLogX : -Infinity;
+        };
+        const LAMBDA_MIN = -5, LAMBDA_MAX = 5, GRID_STEP = 0.25;
+        let bestLam = LAMBDA_MIN, bestLL = -Infinity;
+        for (let lam = LAMBDA_MIN; lam <= LAMBDA_MAX + 1e-9; lam += GRID_STEP) {
+            const ll = logLikelihood(lam);
+            if (ll > bestLL) { bestLL = ll; bestLam = lam; }
         }
-        
-        // Find lambda with max log-likelihood
-        let maxIdx = 0;
-        for (let i = 1; i < logLikelihoods.length; i++) {
-            if (logLikelihoods[i] > logLikelihoods[maxIdx]) maxIdx = i;
+        if (!isFinite(bestLL)) {
+            return { error: true, message: "❌ All values are identical, so Box-Cox cannot choose λ (the transformed variance is 0)." };
         }
-        lambda = lambdas[maxIdx];
-        lambda = Math.round(lambda * 10) / 10; // Round to 1 decimal
+        let lo = Math.max(LAMBDA_MIN, bestLam - GRID_STEP), hi = Math.min(LAMBDA_MAX, bestLam + GRID_STEP);
+        const INV_PHI = (Math.sqrt(5) - 1) / 2;
+        let x1 = hi - INV_PHI * (hi - lo), x2 = lo + INV_PHI * (hi - lo);
+        let f1 = logLikelihood(x1), f2 = logLikelihood(x2);
+        while (hi - lo > 1e-8) {
+            if (f1 < f2) { lo = x1; x1 = x2; f1 = f2; x2 = lo + INV_PHI * (hi - lo); f2 = logLikelihood(x2); }
+            else { hi = x2; x2 = x1; f2 = f1; x1 = hi - INV_PHI * (hi - lo); f1 = logLikelihood(x1); }
+        }
+        lambda = (lo + hi) / 2;
     } else {
         lambda = customLambda;
         if (lambda === null || isNaN(lambda)) lambda = 0;
@@ -93,7 +96,7 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
         formula = `y = ln(x)`;
     } else {
         transformed = validNumbers.map(x => (Math.pow(x, lambda) - 1) / lambda);
-        formula = `y = (x^${lambda.toFixed(2)} - 1) / ${lambda.toFixed(2)}`;
+        formula = `y = (x^${lambda.toFixed(4)} - 1) / ${lambda.toFixed(4)}`;
     }
     
     // Calculate statistics
@@ -116,7 +119,8 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
     if (isOptimal) {
         steps += `🔍 STEP 1: Find optimal λ by maximizing log-likelihood\n`;
         steps += `   Formula: LL(λ) = -n/2 × ln(σ̂²(λ)) + (λ-1) × Σ ln(xᵢ)\n`;
-        steps += `   Optimal λ = ${lambda.toFixed(2)}\n\n`;
+        steps += `   Search: grid scan on [-5, 5], then golden-section refinement (no rounding)\n`;
+        steps += `   Optimal λ = ${lambda.toFixed(4)}\n\n`;
     } else {
         steps += `📐 STEP 1: Using custom λ = ${lambda.toFixed(2)}\n`;
         steps += `   Formula: ${formula}\n\n`;
@@ -148,7 +152,7 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
     steps += `\n`;
     
     steps += `✅ BOX-COX TRANSFORMATION SUMMARY:\n`;
-    steps += `   • Lambda (λ) = ${lambda.toFixed(2)}\n`;
+    steps += `   • Lambda (λ) = ${lambda.toFixed(4)}\n`;
     steps += `   • Transformation: ${formula}\n`;
     steps += `   • Transformed data: [${transformed.map(x => x.toFixed(6)).join(', ')}]\n`;
     if (isOptimal) {
@@ -161,7 +165,7 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
         } else if (Math.abs(lambda - 2) < 0.1) {
             steps += `   • λ ≈ 2 → Square transformation is optimal\n`;
         } else {
-            steps += `   • λ = ${lambda.toFixed(2)} maximizes normality of the data\n`;
+            steps += `   • λ = ${lambda.toFixed(4)} maximizes normality of the data\n`;
         }
     }
     
@@ -218,7 +222,7 @@ function setupBoxCoxLogic() {
             valueSpan.innerText = "Error";
             stepsSpan.innerText = result.message;
         } else {
-            setHtml(valueSpan, `λ = ${result.lambda.toFixed(2)} | Skewness: ${result.origSkew.toFixed(4)} → ${result.transSkew.toFixed(4)}`);
+            setHtml(valueSpan, `λ = ${result.lambda.toFixed(4)} | Skewness: ${result.origSkew.toFixed(4)} → ${result.transSkew.toFixed(4)}`);
             stepsSpan.innerText = result.steps;
         }
     });

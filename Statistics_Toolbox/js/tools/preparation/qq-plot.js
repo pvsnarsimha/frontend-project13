@@ -26,8 +26,7 @@ function renderQQPlotInterface() {
             area: "qqplotResultArea",
             label: "🎯 Q-Q PLOT RESULTS",
             value: "qqplotValueDisplay",
-            steps: "qqplotStepsDisplay",
-            extra: ["<canvas id=\"qqplotChartCanvas\" style=\"max-height: 500px; width: 100%; margin-top: 20px;\"></canvas>"]
+            steps: "qqplotStepsDisplay"
         }
     });
 }
@@ -529,6 +528,7 @@ function computeQQPlotWithSteps(numbers) {
 function renderQQPlotChart(stats) {
     const canvas = document.getElementById('qqplotChartCanvas');
     if (!canvas) return;
+    labelChart(canvas, `Normal Q-Q plot of ${describeSample(stats.sorted)}. Sample quantiles are plotted against theoretical normal quantiles; points near the reference line mean the data are close to normal.`);
     
     if (qqplotChart) qqplotChart.destroy();
     

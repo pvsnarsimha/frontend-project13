@@ -86,6 +86,9 @@ function computeTwoSampleTTest(sample1, sample2, alpha, alternative) {
     const denominatorDF = Math.pow(var1 / n1, 2) / (n1 - 1) + Math.pow(var2 / n2, 2) / (n2 - 1);
     const df = numeratorDF / denominatorDF;
     
+    // Confidence intervals are two-sided at level 1 - α whatever the alternative of the test
+    const ciT = tCriticalValue(alpha / 2, df);
+    
     // Critical value and p-value
     let criticalValue, pValue;
     
@@ -200,7 +203,7 @@ function computeTwoSampleTTest(sample1, sample2, alpha, alternative) {
         
         <div style="margin-top: 20px; padding: 16px; background: #e8f4f8; border-radius: 12px; font-size: 13px;">
             💡 <strong>${(1-alpha)*100}% Confidence Interval for μ₁ - μ₂:</strong><br>
-            ${(mean1 - mean2).toFixed(4)} ± ${(criticalValue * se).toFixed(4)} → [${(mean1 - mean2 - criticalValue * se).toFixed(4)}, ${(mean1 - mean2 + criticalValue * se).toFixed(4)}]
+            ${(mean1 - mean2).toFixed(4)} ± ${(ciT * se).toFixed(4)} → [${(mean1 - mean2 - ciT * se).toFixed(4)}, ${(mean1 - mean2 + ciT * se).toFixed(4)}]<br>t<sub>${alpha / 2}, ${df.toFixed(2)}</sub> = ${ciT.toFixed(4)}
         </div>
     </div>`;
     
@@ -241,12 +244,5 @@ function setupTwoSampleTLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("twoSampleTClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("twoSampleData1").value = '';
-            document.getElementById("twoSampleData2").value = '';
-            document.getElementById("twoSampleTResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("twoSampleTClearBtn", ["twoSampleData1", "twoSampleData2"], "twoSampleTResultArea");
 }

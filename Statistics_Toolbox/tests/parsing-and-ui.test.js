@@ -87,3 +87,161 @@ test('parseSolution tolerates plain text with no structure and escapes HTML', ()
     assert.equal(sol.items[0].title, 'Working');
     assert.equal(UI.fmt('a < b & c^2'), 'a &lt; b &amp; c<sup>2</sup>');
 });
+
+// ---- One-sided and tie-corrected tests, checked against SciPy (scipy.stats 1.18) ----
+const near = (a, e, tol, msg) => assert.ok(Math.abs(a - e) <= tol, `${msg || ''} expected ${e}, got ${a}`);
+const A = [12.1, 9.8, 14.2, 11.5, 10.9, 13.3, 15.0, 9.1, 12.7, 11.0], B = [10.2, 9.9, 12.0, 10.5, 11.1, 12.4, 13.9, 8.8, 10.0, 10.4];
+const M1 = [3, 5, 5, 8, 9, 12, 12, 12, 15, 20], M2 = [2, 5, 6, 6, 9, 10, 14, 14, 17, 18, 25];
+
+test('sign test: one-sided p-values use P(X >= k), not P(X >= k - 1) (scipy.stats.binomtest)', () => {
+    const p = alt => app.computeSignTest(A, 11, 0.05, alt).pValue;
+    near(p('two.sided'), 0.5078125, 1e-12);
+    near(p('greater'), 0.25390625, 1e-12);
+    near(p('less'), 0.91015625, 1e-12);
+});
+
+test('Mann-Whitney: one-sided direction, continuity correction and tie correction (scipy.stats.mannwhitneyu)', () => {
+    const p = alt => app.computeMannWhitneyTest(M1, M2, 0.05, alt).pValue;
+    near(p('two.sided'), 0.6715480472230665, 1e-10);
+    near(p('greater'), 0.6895923151731271, 1e-10);
+    near(p('less'), 0.33577402361153325, 1e-10);
+    // clearly larger first sample: "greater" is significant, "less" is not
+    const big = [21, 22, 23, 24, 25, 26], small = [1, 2, 3, 4, 5, 6];
+    assert.equal(app.computeMannWhitneyTest(big, small, 0.05, 'greater').rejectH0, true);
+    assert.equal(app.computeMannWhitneyTest(big, small, 0.05, 'less').rejectH0, false);
+    assert.equal(app.computeMannWhitneyTest(small, big, 0.05, 'less').rejectH0, true);
+});
+
+test('Wilcoxon signed-rank: one-sided direction, zeros dropped, ties corrected (scipy.stats.wilcoxon)', () => {
+    const p = (b, a, alt) => app.computeWilcoxonTest(b, a, 0.05, alt).pValue;
+    near(p(A, B, 'two.sided'), 0.014432823938841816, 1e-10);
+    near(p(A, B, 'greater'), 0.9945865393614344, 1e-10);
+    near(p(A, B, 'less'), 0.007216411969420908, 1e-10);
+    const before = M1, after = [3, 4, 7, 8, 9, 10, 12, 14, 13, 22];       // zero differences and tied |d|
+    near(p(before, after, 'two.sided'), 0.8241408957418852, 1e-10);
+    near(p(before, after, 'greater'), 0.4120704478709426, 1e-10);
+    near(p(before, after, 'less'), 0.6716393567181147, 1e-10);
+    assert.equal(app.computeWilcoxonTest([1, 2, 3], [1, 2, 3], 0.05, 'two.sided').error, true);
+});
+
+test('one-sample z and one-proportion z: rejectH0 follows p < alpha for every alternative', () => {
+    const z = alt => app.computeOneSampleZTest(A, 11, 2, 0.05, alt);
+    near(z('two.sided').pValue, 0.12904130509946773, 1e-12);
+    near(z('greater').pValue, 0.06452065254973387, 1e-12);
+    near(z('less').pValue, 0.9354793474502662, 1e-12);
+    // a clearly negative statistic must reject the "less" alternative (the old |z| > z_crit rule got this wrong)
+    const low = app.computeOneSampleZTest([1, 2, 3, 2, 1, 2], 10, 1, 0.05, 'less');
+    assert.equal(low.rejectH0, true);
+    assert.equal(app.computeOneSampleZTest([1, 2, 3, 2, 1, 2], 10, 1, 0.05, 'greater').rejectH0, false);
+    const prop = alt => app.computeOneProportionZTest(18, 40, 0.5, 0.05, alt);
+    near(prop('two.sided').pValue, 0.5270892568655383, 1e-12);
+    near(prop('greater').pValue, 0.7364553715672308, 1e-12);
+    near(prop('less').pValue, 0.26354462843276916, 1e-12);
+    const lowProp = app.computeOneProportionZTest(5, 40, 0.5, 0.05, 'less');
+    assert.equal(lowProp.rejectH0, true);
+    // the confidence interval uses sqrt(p̂(1-p̂)/n) and the two-sided z, whatever the alternative
+    const ci = app.computeOneProportionZTest(5, 40, 0.5, 0.05, 'less').steps;
+    const se = Math.sqrt(0.125 * 0.875 / 40);
+    assert.ok(ci.includes((0.125 - 1.959963984540054 * se).toFixed(4)), 'lower CI limit');
+});
+
+test('F-test: unswapped one-sided alternatives and folded two-sided p-value (scipy.stats.f)', () => {
+    const f = alt => app.computeFTest(A, B, 0.05, alt);
+    near(f('greater').pValue, 0.2425447521779146, 1e-12);
+    near(f('less').pValue, 0.7574552478220855, 1e-12);
+    near(f('two.sided').pValue, 0.4850895043558292, 1e-12);
+    assert.equal(f('less').df1, A.length - 1);
+    assert.equal(f('less').df2, B.length - 1);
+    near(f('less').fStatistic, f('greater').fStatistic, 1e-15);
+});
+
+test('t confidence intervals use the t quantile and are two-sided for one-sided tests', () => {
+    const ci = app.computePairedTTest(A, B, 0.05, 'less').steps;
+    const d = A.map((v, i) => B[i] - v), n = d.length, md = d.reduce((s, v) => s + v, 0) / n;
+    const sd = Math.sqrt(d.reduce((s, v) => s + (v - md) ** 2, 0) / (n - 1)), half = 2.2621571627409915 * sd / Math.sqrt(n);
+    assert.ok(ci.includes(`[${(md - half).toFixed(4)}, ${(md + half).toFixed(4)}]`), 'paired CI uses t(0.025, 9) = 2.262');
+    const sem = app.computeStdErrorWithSteps([1, 2, 3, 4, 5]).steps;
+    assert.ok(sem.includes('2.7764') && !/± 1\.96 /.test(sem), 'standard error CI uses t(0.025, 4), not 1.96');
+});
+
+test('Kendall τ-b, Spearman ρ and Friedman χ² handle ties like SciPy', () => {
+    const y = [1, 3, 3, 7, 5, 9, 9, 10, 12, 11];
+    near(app.computeKendallWithSteps(M1, y).tau, 0.8812021902246507, 1e-12);                 // scipy kendalltau, variant b
+    near(app.computeKendallWithSteps([1, 2, 3, 4, 5, 6], [2, 1, 4, 3, 6, 5]).tau, 0.6, 1e-12);   // no ties: τ-a = τ-b
+    near(app.computeSpearmanWithSteps(M1, y).rho, 0.9659859390052364, 1e-12);                 // scipy spearmanr
+    const rows = '1,2,2\n1,2,2\n2,1,3\n3,3,1\n1,1,2\n2,2,2\n4,3,5';
+    near(app.computeFriedmanTest(rows, 0.05).chiSq, 2.8, 1e-9);                              // scipy friedmanchisquare (tie corrected)
+    assert.equal(app.computeFriedmanTest('1,1,1\n2,2,2\n3,3,3', 0.05).error, true);
+});
+
+test('zero variance is an error, never a silent correlation of 0', () => {
+    for (const r of [
+        app.computePearsonWithSteps([1, 2, 3, 4], [5, 5, 5, 5]), app.computeSpearmanWithSteps([1, 2, 3, 4], [5, 5, 5, 5]),
+        app.computeKendallWithSteps([1, 2, 3, 4], [5, 5, 5, 5]), app.computePointBiserialWithSteps([1, 1, 1, 1], [0, 1, 0, 1]),
+        app.computeDistanceCorrelationWithSteps([1, 2, 3, 4], [5, 5, 5, 5]), app.computePhiWithSteps('5, 3, 0, 0'),
+        app.computeCorrelationMatrixWithSteps([[1, 2, 3, 4], [7, 7, 7, 7]])
+    ]) { assert.equal(r.error, true); assert.match(r.message, /zero variance|identical|undefined|sums to zero/i); }
+});
+
+test('every tool that reports quartiles uses Type 7 (NumPy/SciPy default)', () => {
+    const q = [5, 3, 8, 1, 9, 4, 7, 2, 6, 10, 12];                       // np.percentile: Q1 = 3.5, Q3 = 8.5, P10 = 2, P90 = 10
+    const results = {
+        iqr: app.computeIQRWithSteps(q), five: app.computeFiveNumWithSteps(q), quartiles: app.computeQuartilesWithSteps(q),
+        boxplot: app.computeBoxplotWithSteps(q), outlier: app.computeIQROutlierWithSteps(q), violin: app.computeViolinWithSteps(q, 1)
+    };
+    for (const [name, r] of Object.entries(results)) { near(r.q1, 3.5, 1e-12, name + ' Q1'); near(r.q3, 8.5, 1e-12, name + ' Q3'); }
+    const pct = app.computePercentilesWithSteps(q, [10, 90]).results;
+    near(pct[10], 2, 1e-12); near(pct[90], 10, 1e-12);
+    const dec = app.computeDecilesWithSteps(q).deciles;
+    near(dec.D1, 2, 1e-12); near(dec.D9, 10, 1e-12);
+    near(app.quantileType7([1, 2, 3, 4], 0.25), 1.75, 1e-12);          // an even-sized sample, where hinge methods disagree
+});
+
+test('sample-data extraction strips HTML entities and accepts category samples', () => {
+    const sample = UI.sampleFromPlaceholder;
+    assert.equal(sample('Example: 12, 45.5, 78'), '12, 45.5, 78');
+    assert.equal(sample('Example:&#10;1, 4, 7&#10;2, 5, 8'), '1, 4, 7\n2, 5, 8');          // numeric entity -> newline
+    assert.equal(sample('Example:&amp;#10;1, 2&amp;#13;&amp;#10;3, 4'), '1, 2\n3, 4');      // double-escaped, CR LF collapsed
+    assert.equal(sample('Example:&#x0A;5, 6'), '5, 6');
+    assert.equal(sample('Example: a &amp; b, c&nbsp;d, 1'), 'a & b, c d, 1');             // named entities decoded
+    assert.equal(sample('Example: 1 &lt;b&gt; 2'), null);                                // ...but entities that decode to markup are refused
+    assert.equal(sample('Example:&#10;Red, Apple&#10;Green, Orange'), 'Red, Apple\nGreen, Orange');   // categories have no digits
+    assert.equal(sample('1, 2, 3'), '1, 2, 3');                                         // bare numeric placeholder
+    assert.equal(sample('Enter your values here'), null);                              // no marker, not numeric
+    assert.equal(sample('Example: <b>bold</b> 1'), null);                              // markup is never accepted
+    assert.equal(sample(''), null);
+    // no sample on the page contains entity debris
+    const R = app.get('STAT_ROUTES');
+    for (const [name, [render]] of Object.entries(R)) {
+        for (const m of render().matchAll(/placeholder="([^"]*)"/g)) {
+            const s = sample(m[1]);
+            if (s !== null) assert.ok(!/&#?\w+;/.test(s), `${name}: ${s}`);
+        }
+    }
+});
+
+test('copy falls back to execCommand when the Clipboard API is missing or refuses', async () => {
+    const calls = [];
+    const el = () => ({ style: {}, setAttribute() {}, select() { calls.push('select'); }, setSelectionRange() {}, remove() { calls.push('remove'); }, focus() {} });
+    const fresh = loadApp();
+    fresh.document.createElement = el;
+    fresh.document.body.appendChild = () => {};
+    fresh.document.execCommand = cmd => { calls.push(cmd); return true; };
+    fresh.navigator.clipboard = undefined;
+    assert.equal(await fresh.get('window.StatLabUI').copyText('hello'), true);
+    assert.deepEqual(calls, ['select', 'copy', 'remove']);
+    // clipboard present but rejected (permission / insecure context): same fallback
+    calls.length = 0;
+    fresh.navigator.clipboard = { writeText: () => Promise.reject(new Error('denied')) };
+    assert.equal(await fresh.get('window.StatLabUI').copyText('hello'), true);
+    assert.ok(calls.includes('copy'));
+    // clipboard works: no fallback
+    calls.length = 0;
+    fresh.navigator.clipboard = { writeText: () => Promise.resolve() };
+    assert.equal(await fresh.get('window.StatLabUI').copyText('hello'), true);
+    assert.deepEqual(calls, []);
+    // nothing works: reports failure instead of pretending
+    fresh.document.execCommand = () => false;
+    fresh.navigator.clipboard = undefined;
+    assert.equal(await fresh.get('window.StatLabUI').copyText('hello'), false);
+});

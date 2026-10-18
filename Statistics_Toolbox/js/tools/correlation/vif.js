@@ -13,11 +13,11 @@ function renderVIFInterface() {
                 textarea: {
                     id: "vifData",
                     rows: "6",
-                    placeholder: "Example (X1, X2, X3, ...):&#10;1, 4, 7&#10;2, 5, 8&#10;3, 6, 9&#10;4, 7, 10&#10;5, 8, 11"
+                    placeholder: "Example:&#10;2, 5, 7&#10;4, 3, 9&#10;5, 8, 6&#10;7, 6, 12&#10;9, 11, 10&#10;10, 9, 15&#10;12, 14, 13&#10;14, 12, 18"
                 }
             },
             {
-                hint: "Each row represents one observation. Columns are predictor variables.",
+                hint: "Each row represents one observation. Columns are the predictor variables X1, X2, X3, ... (at least 2 columns, more rows than columns, and no constant or perfectly collinear column).",
                 hintAttrs: { style: HINT_STYLE }
             }
         ],
@@ -41,6 +41,15 @@ function computeVIF(dataMatrix) {
     
     const n = dataMatrix.length;
     const p = dataMatrix[0].length;
+    if (n <= p) {
+        return { error: true, message: `Need more observations than predictors for VIF (got ${n} rows and ${p} predictors).` };
+    }
+    for (let j = 0; j < p; j++) {
+        const col = dataMatrix.map(row => row[j]);
+        if (col.every(v => v === col[0])) {
+            return { error: true, message: `Predictor X${j+1} is constant (zero variance), so its VIF is undefined. Remove it or enter data that varies.` };
+        }
+    }
     const vifs = [];
     const detailedCalculations = []; // Store detailed R² calculations
     
@@ -58,7 +67,7 @@ function computeVIF(dataMatrix) {
             xxSum += dx * dx;
             yySum += dy * dy;
         }
-        if (xxSum === 0 || yySum === 0) return 0;
+        if (xxSum === 0 || yySum === 0) return NaN;
         return xySum / Math.sqrt(xxSum * yySum);
     }
     
@@ -154,37 +163,25 @@ function computeVIF(dataMatrix) {
             </div>`;
             
         } else {
-            // Multiple predictors: calculate R² using correlation matrix
-            let sumCorrSq = 0;
-            let corrDetails = [];
-            for (let k = 0; k < p; k++) {
-                if (k !== j) {
-                    const corr = correlations[j][k];
-                    sumCorrSq += corr * corr;
-                    corrDetails.push(`r(X<sub>${j+1}</sub>, X<sub>${k+1}</sub>) = ${corr.toFixed(4)} → squared = ${(corr * corr).toFixed(4)}`);
-                }
-            }
-            rSquared = Math.min(Math.max(sumCorrSq / (p - 1), 0.01), 0.99);
+            // Multiple predictors: R² of the OLS regression of X_j on all the other predictors (with intercept)
+            const others = [];
+            for (let k = 0; k < p; k++) if (k !== j) others.push(dataMatrix.map(row => row[k]));
+            rSquared = olsRSquared(dependent, others);
             
             calculationDetails = `
             <div style="margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                <strong>📐 Step-by-Step R² Calculation for X<sub>${j+1}</sub>:</strong><br><br>
+                <strong>📐 R² Calculation for X<sub>${j+1}</sub>:</strong><br><br>
                 
-                <strong>Step 1: Calculate correlations with other predictors</strong><br>
-                ${corrDetails.join('<br>')}<br><br>
+                <strong>Step 1: Regress X<sub>${j+1}</sub> on the other ${p - 1} predictors</strong><br>
+                X<sub>${j+1}</sub> = b₀ + ${others.map((_, i) => `b${i + 1}·X<sub>${i < j ? i + 1 : i + 2}</sub>`).join(' + ')} (ordinary least squares, normal equations β = (XᵀX)⁻¹Xᵀy)<br><br>
                 
-                <strong>Step 2: Calculate average squared correlation</strong><br>
-                Σr² = ${sumCorrSq.toFixed(4)}<br>
-                Average r² = Σr² / (k-1) = ${sumCorrSq.toFixed(4)} / ${p-1} = ${(sumCorrSq/(p-1)).toFixed(4)}<br><br>
-                
-                <strong>Step 3: R² ≈ Average r² (approximation for multiple regression)</strong><br>
+                <strong>Step 2: R² = 1 - SS<sub>res</sub>/SS<sub>tot</sub></strong><br>
                 R² = ${rSquared.toFixed(6)}<br>
             </div>`;
         }
         
-        // Ensure R² is not exactly 1 to avoid division by zero
-        rSquared = Math.min(rSquared, 0.999999);
-        const vif = 1 / (1 - rSquared);
+        // Perfect collinearity (R² = 1) gives an infinite VIF
+        const vif = rSquared >= 1 - 1e-12 ? Infinity : 1 / (1 - rSquared);
         
         let severity = "";
         let severityColor = "";

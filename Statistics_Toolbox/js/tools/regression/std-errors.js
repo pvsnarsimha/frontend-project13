@@ -100,6 +100,7 @@ function computeStdErrorsWithSteps(xValues, yValues) {
     }
     
     const mse = ssRes / (n - 2);
+    const tCrit = n > 2 ? tCriticalValue(0.025, n - 2) : NaN;   // 95% CI uses the t quantile with n - 2 df
     const seSlope = Math.sqrt(mse / denominator);
     const seIntercept = Math.sqrt(mse * (1/n + Math.pow(meanX, 2) / denominator));
     
@@ -225,7 +226,7 @@ function computeStdErrorsWithSteps(xValues, yValues) {
                         <th style="padding: 12px;">Coefficient</th>
                         <th style="padding: 12px;">Estimate (β̂)</th>
                         <th style="padding: 12px;">Standard Error (SE)</th>
-                        <th style="padding: 12px;">95% Confidence Interval</th>
+                        <th style="padding: 12px;">95% Confidence Interval (t, df = n − 2)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -233,13 +234,13 @@ function computeStdErrorsWithSteps(xValues, yValues) {
                         <td style="padding: 12px; font-weight: bold;">Intercept (β₀)</td>
                         <td style="text-align: center;">${intercept.toFixed(6)}</td>
                         <td style="text-align: center; font-weight: bold; color: #1a5490;">${seIntercept.toFixed(6)}</td>
-                        <td style="text-align: center;">[${(intercept - 1.96*seIntercept).toFixed(4)}, ${(intercept + 1.96*seIntercept).toFixed(4)}]</td>
+                        <td style="text-align: center;">[${(intercept - tCrit*seIntercept).toFixed(4)}, ${(intercept + tCrit*seIntercept).toFixed(4)}]</td>
                     </tr>
                     <tr>
                         <td style="padding: 12px; font-weight: bold;">Slope (β₁)</td>
                         <td style="text-align: center;">${slope.toFixed(6)}</td>
                         <td style="text-align: center; font-weight: bold; color: #1a5490;">${seSlope.toFixed(6)}</td>
-                        <td style="text-align: center;">[${(slope - 1.96*seSlope).toFixed(4)}, ${(slope + 1.96*seSlope).toFixed(4)}]</td>
+                        <td style="text-align: center;">[${(slope - tCrit*seSlope).toFixed(4)}, ${(slope + tCrit*seSlope).toFixed(4)}]</td>
                     </tr>
                 </tbody>
             </table>
@@ -249,7 +250,7 @@ function computeStdErrorsWithSteps(xValues, yValues) {
         <div style="background: #d4edda; border-radius: 16px; padding: 20px; border-left: 6px solid #28a745;">
             <h3 style="margin: 0 0 12px 0;">📌 Interpretation</h3>
             <p><strong>SE(β₀) = ${seIntercept.toFixed(6)}</strong> → The intercept estimate has a standard error of ${seIntercept.toFixed(4)} units.</p>
-            <p><strong>SE(β₁) = ${seSlope.toFixed(6)}</strong> → For each 1-unit change in X, the predicted Y changes by ${slope.toFixed(4)} ± ${(1.96*seSlope).toFixed(4)} (95% CI).</p>
+            <p><strong>SE(β₁) = ${seSlope.toFixed(6)}</strong> → For each 1-unit change in X, the predicted Y changes by ${slope.toFixed(4)} ± ${(tCrit*seSlope).toFixed(4)} (95% CI).</p>
             <p><strong>Smaller SE = More precise estimate.</strong> SE depends on: variance of residuals (MSE) and spread of X values.</p>
         </div>
     </div>`;
@@ -283,12 +284,5 @@ function setupStdErrorsLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("stderrorsClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("stderrorsXInput").value = '';
-            document.getElementById("stderrorsYInput").value = '';
-            document.getElementById("stderrorsResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("stderrorsClearBtn", ["stderrorsXInput", "stderrorsYInput"], "stderrorsResultArea");
 }

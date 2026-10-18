@@ -33,6 +33,9 @@ function computePartialCorrelationWithSteps(x, y, z) {
         xy_sumBB += dy * dy;
         xy_details += `      (${x[i]} - ${meanX.toFixed(4)}) × (${y[i]} - ${meanY.toFixed(4)}) = ${dx.toFixed(4)} × ${dy.toFixed(4)} = ${product.toFixed(4)}\n`;
     }
+    if (xy_sumAA === 0 || xy_sumBB === 0) {
+        return { error: true, message: `Partial correlation is undefined: all ${xy_sumAA === 0 ? 'X' : 'Y'} values are identical (zero variance).` };
+    }
     const r_xy = xy_sumAB / Math.sqrt(xy_sumAA * xy_sumBB);
     
     // ========== CALCULATE r_xz WITH FULL DETAILS ==========
@@ -47,6 +50,9 @@ function computePartialCorrelationWithSteps(x, y, z) {
         xz_sumAA += dx * dx;
         xz_sumBB += dz * dz;
         xz_details += `      (${x[i]} - ${meanX.toFixed(4)}) × (${z[i]} - ${meanZ.toFixed(4)}) = ${dx.toFixed(4)} × ${dz.toFixed(4)} = ${product.toFixed(4)}\n`;
+    }
+    if (xz_sumBB === 0) {
+        return { error: true, message: "Partial correlation is undefined: all control (Z) values are identical (zero variance)." };
     }
     const r_xz = xz_sumAB / Math.sqrt(xz_sumAA * xz_sumBB);
     
@@ -68,6 +74,9 @@ function computePartialCorrelationWithSteps(x, y, z) {
     // ========== PARTIAL CORRELATION ==========
     const numerator = r_xy - r_xz * r_yz;
     const denominator = Math.sqrt((1 - r_xz * r_xz) * (1 - r_yz * r_yz));
+    if (!(denominator > 1e-12)) {
+        return { error: true, message: "Partial correlation is undefined: Z is perfectly correlated with X or Y, so nothing is left after controlling for Z." };
+    }
     const r_xy_z = numerator / denominator;
     
     // Build the complete HTML output
@@ -306,15 +315,7 @@ function setupPartialCorrelationLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("partialClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("partialXInput").value = '';
-            document.getElementById("partialYInput").value = '';
-            document.getElementById("partialZInput").value = '';
-            document.getElementById("partialResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("partialClearBtn", ["partialXInput", "partialYInput", "partialZInput"], "partialResultArea");
 }
 
 // ========== PARTIAL CORRELATION INTERFACE RENDER ==========

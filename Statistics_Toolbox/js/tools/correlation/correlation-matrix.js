@@ -80,7 +80,7 @@ function computeCorrelationMatrixWithSteps(variables) {
             <td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #e8f4f8; font-weight: bold;">${mean.toFixed(6)}</td>
         </tr>`;
     }
-    meansTable += `</tbody>\\tour</div>`;
+    meansTable += `</tbody></table></div>`;
     
     // ========== STEP 2: Calculate STANDARD DEVIATIONS for each variable ==========
     let stdDevs = [];
@@ -113,6 +113,9 @@ function computeCorrelationMatrixWithSteps(variables) {
         
         let variance = sumSqDiff / (numObs - 1);
         let stdDev = Math.sqrt(variance);
+        if (sumSqDiff === 0) {
+            return { error: true, message: `Variable ${i+1} has zero variance (all values identical), so its correlations are undefined. Remove it or enter data that varies.` };
+        }
         stdDevs.push(stdDev);
         
         stdTable += `<tr>
@@ -124,7 +127,7 @@ function computeCorrelationMatrixWithSteps(variables) {
             <td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #e8f4f8; font-weight: bold;">${stdDev.toFixed(6)}</td>
         </tr>`;
     }
-    stdTable += `</tbody>\\tour</div>`;
+    stdTable += `</tbody></table></div>`;
     
     // ========== STEP 3: Calculate PAIRWISE CORRELATIONS ==========
     let corrMatrix = Array(numVars).fill().map(() => Array(numVars).fill(0));
@@ -287,7 +290,7 @@ function computeCorrelationMatrixWithSteps(variables) {
         }
         matrixTable += `</tr>`;
     }
-    matrixTable += `</tbody>\\tour</div>`;
+    matrixTable += `</tbody></table></div>`;
     
     // Complete HTML output
     let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">

@@ -96,6 +96,8 @@ function computePairedTTest(before, after, alpha, alternative) {
     const tStatistic = meanDiff / standardError;
     const df = n - 1;
     
+    // Confidence intervals are two-sided at level 1 - α whatever the alternative of the test
+    const ciT = tCriticalValue(alpha / 2, df);
     let criticalValue, pValue;
     if (alternative === 'two.sided') {
         criticalValue = tCriticalValue(alpha / 2, df);
@@ -296,14 +298,14 @@ function computePairedTTest(before, after, alpha, alternative) {
             <h4 style="margin: 0 0 8px 0; color: #1a5490;">${(1-alpha)*100}% Confidence Interval for Mean Difference (μ<sub>d</sub>)</h4>
             <div style="font-family: monospace; font-size: 14px;">
                 CI = \u0304d ± t<sub>critical</sub> × SE<br>
-                CI = ${meanDiff.toFixed(4)} ± ${criticalValue.toFixed(4)} × ${standardError.toFixed(4)}<br>
-                CI = ${meanDiff.toFixed(4)} ± ${(criticalValue * standardError).toFixed(4)}<br>
-                <strong style="font-size: 16px;">CI = [${(meanDiff - criticalValue * standardError).toFixed(4)}, ${(meanDiff + criticalValue * standardError).toFixed(4)}]</strong>
+                CI = ${meanDiff.toFixed(4)} ± ${ciT.toFixed(4)} × ${standardError.toFixed(4)}<br>
+                CI = ${meanDiff.toFixed(4)} ± ${(ciT * standardError).toFixed(4)}<br>
+                <strong style="font-size: 16px;">CI = [${(meanDiff - ciT * standardError).toFixed(4)}, ${(meanDiff + ciT * standardError).toFixed(4)}]</strong>
             </div>
             <div style="margin-top: 8px; font-size: 13px; color: #555;">
-                ${(meanDiff - criticalValue * standardError) > 0 ? '✓ The entire confidence interval is above zero, indicating a significant increase after the intervention.' : 
-                  (meanDiff + criticalValue * standardError) < 0 ? '✓ The entire confidence interval is below zero, indicating a significant decrease after the intervention.' :
-                  (meanDiff - criticalValue * standardError) < 0 && (meanDiff + criticalValue * standardError) > 0 ? '⚠ The confidence interval contains zero, indicating the change may not be statistically significant.' :
+                ${(meanDiff - ciT * standardError) > 0 ? '✓ The entire confidence interval is above zero, indicating a significant increase after the intervention.' : 
+                  (meanDiff + ciT * standardError) < 0 ? '✓ The entire confidence interval is below zero, indicating a significant decrease after the intervention.' :
+                  (meanDiff - ciT * standardError) < 0 && (meanDiff + ciT * standardError) > 0 ? '⚠ The confidence interval contains zero, indicating the change may not be statistically significant.' :
                   'Interpret the confidence interval relative to zero.'}
             </div>
         </div>
@@ -347,12 +349,5 @@ function setupPairedTLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("pairedTClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("pairedBeforeData").value = '';
-            document.getElementById("pairedAfterData").value = '';
-            document.getElementById("pairedTResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("pairedTClearBtn", ["pairedBeforeData", "pairedAfterData"], "pairedTResultArea");
 }

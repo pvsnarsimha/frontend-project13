@@ -73,15 +73,17 @@ function computeOneSampleZTest(data, mu0, sigma, alpha, alternative) {
     
     let pValue;
     if (alternative === 'two.sided') {
-        pValue = 2 * (1 - normCDF(Math.abs(zStatistic)));
+        pValue = 2 * normCDF(-Math.abs(zStatistic));
     } else if (alternative === 'greater') {
-        pValue = 1 - normCDF(zStatistic);
+        pValue = normCDF(-zStatistic);
     } else {
         pValue = normCDF(zStatistic);
     }
     
     const criticalZ = normInv(1 - (alternative === 'two.sided' ? alpha / 2 : alpha));
-    const rejectH0 = Math.abs(zStatistic) > criticalZ;
+    const rejectH0 = pValue < alpha;
+    // Confidence intervals are always two-sided at level 1 - α
+    const ciZ = normInv(1 - alpha / 2);
     
     let conclusion = rejectH0 ? "REJECT the null hypothesis" : "FAIL TO REJECT the null hypothesis";
     let interpretation = rejectH0 ?
@@ -141,9 +143,9 @@ function computeOneSampleZTest(data, mu0, sigma, alpha, alternative) {
                 </div>
                 <div style="margin-left: 40px; font-family: monospace;">
                     α = ${alpha} (${(1-alpha)*100}% Confidence Level)<br>
-                    Critical z-value = ${criticalZ.toFixed(6)}<br>
+                    Critical z-value = ${alternative === 'two.sided' ? '±' : (alternative === 'less' ? '-' : '')}${criticalZ.toFixed(6)}<br>
                     p-value = ${pValue.toFixed(8)}<br>
-                    |z| = ${Math.abs(zStatistic).toFixed(6)} ${Math.abs(zStatistic) > criticalZ ? '>' : '<'} ${criticalZ.toFixed(6)}
+                    Decision rule: reject H₀ when p-value &lt; α → ${pValue.toFixed(6)} ${pValue < alpha ? '&lt;' : '≥'} ${alpha}
                 </div>
             </div>
         </div>
@@ -151,7 +153,7 @@ function computeOneSampleZTest(data, mu0, sigma, alpha, alternative) {
         <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
             <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
             <div><strong>z-statistic:</strong> ${zStatistic.toFixed(6)}</div>
-            <div><strong>Critical value:</strong> ${criticalZ.toFixed(6)}</div>
+            <div><strong>Critical value:</strong> ${alternative === 'two.sided' ? '±' : (alternative === 'less' ? '-' : '')}${criticalZ.toFixed(6)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                 <strong>Decision:</strong> ${conclusion}<br>
@@ -162,7 +164,7 @@ function computeOneSampleZTest(data, mu0, sigma, alpha, alternative) {
         
         <div style="margin-top: 20px; padding: 16px; background: #e8f4f8; border-radius: 12px; font-size: 13px;">
             💡 <strong>${(1-alpha)*100}% Confidence Interval for μ:</strong><br>
-            ${mean.toFixed(4)} ± ${(criticalZ * standardError).toFixed(4)} → [${(mean - criticalZ * standardError).toFixed(4)}, ${(mean + criticalZ * standardError).toFixed(4)}]
+            ${mean.toFixed(4)} ± ${(ciZ * standardError).toFixed(4)} → [${(mean - ciZ * standardError).toFixed(4)}, ${(mean + ciZ * standardError).toFixed(4)}]
         </div>
     </div>`;
     

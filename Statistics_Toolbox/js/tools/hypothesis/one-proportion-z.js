@@ -75,15 +75,19 @@ function computeOneProportionZTest(successes, n, p0, alpha, alternative) {
     
     let pValue;
     if (alternative === 'two.sided') {
-        pValue = 2 * (1 - normCDF(Math.abs(zStatistic)));
+        pValue = 2 * normCDF(-Math.abs(zStatistic));
     } else if (alternative === 'greater') {
-        pValue = 1 - normCDF(zStatistic);
+        pValue = normCDF(-zStatistic);
     } else {
         pValue = normCDF(zStatistic);
     }
     
     const criticalZ = normInv(1 - (alternative === 'two.sided' ? alpha / 2 : alpha));
-    const rejectH0 = Math.abs(zStatistic) > criticalZ;
+    const rejectH0 = pValue < alpha;
+    // Confidence intervals are always two-sided at level 1 - α
+    const ciZ = normInv(1 - alpha / 2);
+    // The CI uses the sample proportion's own standard error, not the null-hypothesis one used for the test
+    const ciSE = Math.sqrt(pHat * (1 - pHat) / n);
     
     let conclusion = rejectH0 ? "REJECT the null hypothesis" : "FAIL TO REJECT the null hypothesis";
     let interpretation = rejectH0 ?
@@ -146,9 +150,9 @@ function computeOneProportionZTest(successes, n, p0, alpha, alternative) {
                 </div>
                 <div style="margin-left: 40px; font-family: monospace;">
                     α = ${alpha} (${(1-alpha)*100}% Confidence Level)<br>
-                    Critical z-value = ${criticalZ.toFixed(6)}<br>
+                    Critical z-value = ${alternative === 'two.sided' ? '±' : (alternative === 'less' ? '-' : '')}${criticalZ.toFixed(6)}<br>
                     p-value = ${pValue.toFixed(8)}<br>
-                    |z| = ${Math.abs(zStatistic).toFixed(6)} ${Math.abs(zStatistic) > criticalZ ? '>' : '<'} ${criticalZ.toFixed(6)}
+                    Decision rule: reject H₀ when p-value &lt; α → ${pValue.toFixed(6)} ${pValue < alpha ? '&lt;' : '≥'} ${alpha}
                 </div>
             </div>
         </div>
@@ -156,7 +160,7 @@ function computeOneProportionZTest(successes, n, p0, alpha, alternative) {
         <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
             <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
             <div><strong>z-statistic:</strong> ${zStatistic.toFixed(6)}</div>
-            <div><strong>Critical value:</strong> ${criticalZ.toFixed(6)}</div>
+            <div><strong>Critical value:</strong> ${alternative === 'two.sided' ? '±' : (alternative === 'less' ? '-' : '')}${criticalZ.toFixed(6)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                 <strong>Decision:</strong> ${conclusion}<br>
@@ -166,7 +170,7 @@ function computeOneProportionZTest(successes, n, p0, alpha, alternative) {
         
         <div style="margin-top: 20px; padding: 16px; background: #e8f4f8; border-radius: 12px; font-size: 13px;">
             💡 <strong>${(1-alpha)*100}% Confidence Interval for p:</strong><br>
-            ${pHat.toFixed(4)} ± ${(criticalZ * standardError).toFixed(4)} → [${(pHat - criticalZ * standardError).toFixed(4)}, ${(pHat + criticalZ * standardError).toFixed(4)}]
+            ${pHat.toFixed(4)} ± ${(ciZ * ciSE).toFixed(4)} → [${(pHat - ciZ * ciSE).toFixed(4)}, ${(pHat + ciZ * ciSE).toFixed(4)}]<br>Standard error for the interval: √(p̂(1-p̂)/n) = ${ciSE.toFixed(6)}
         </div>
     </div>`;
     
@@ -191,5 +195,5 @@ function setupOneProportionZLogic() {
         setHtml(valueSpan, `z = ${result.zStatistic?.toFixed(6) || 'Error'} | p = ${result.pValue?.toFixed(6) || 'Error'}`);
         setHtml(stepsSpan, result.steps || "Calculation completed.");
     });
-    attachClearHandler("onePropZClearBtn", "", "onePropZResultArea");
+    attachClearHandler("onePropZClearBtn", ["propSuccesses", "propSampleSize"], "onePropZResultArea");
 }

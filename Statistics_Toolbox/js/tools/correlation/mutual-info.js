@@ -56,7 +56,7 @@ function renderMutualInfoInterface() {
 
 // ========== MUTUAL INFORMATION COMPUTATION ==========
 // ========== MUTUAL INFORMATION COMPUTATION ==========
-function computeMutualInformationWithSteps(xValues, yValues, numBins) {
+function computeMutualInfoWithSteps(xValues, yValues, numBins) {
     if (!xValues.length || !yValues.length) {
         return { error: true, message: "Please enter both X and Y values." };
     }
@@ -437,7 +437,7 @@ function setupMutualInfoLogic() {
         const valueSpan = document.getElementById("mutualInfoValueDisplay");
         const stepsSpan = document.getElementById("mutualInfoStepsDisplay");
         
-        const result = computeMutualInformationWithSteps(xValues, yValues, numBins);
+        const result = computeMutualInfoWithSteps(xValues, yValues, numBins);
         resultDiv.style.display = "block";
         
         if (result.error) {
@@ -449,12 +449,5 @@ function setupMutualInfoLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("mutualInfoClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("mutualInfoXInput").value = '';
-            document.getElementById("mutualInfoYInput").value = '';
-            document.getElementById("mutualInfoResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("mutualInfoClearBtn", ["mutualInfoXInput", "mutualInfoYInput"], "mutualInfoResultArea");
 }

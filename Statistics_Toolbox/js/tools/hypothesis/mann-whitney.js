@@ -91,30 +91,50 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
     let U2 = n1 * n2 - U1;
     let U = Math.min(U1, U2);
     
-    // Calculate expected U and standard deviation
+    // Calculate expected U and standard deviation (with the tie correction to the variance)
+    const N = n1 + n2;
     const expectedU = (n1 * n2) / 2;
-    const stdU = Math.sqrt((n1 * n2 * (n1 + n2 + 1)) / 12);
+    let tieTerm = 0;
+    for (let a = 0; a < N;) {
+        let b = a;
+        while (b < N && combined[b].value === combined[a].value) b++;
+        const t = b - a;
+        tieTerm += t * t * t - t;
+        a = b;
+    }
+    const varU = (n1 * n2 / 12) * ((N + 1) - tieTerm / (N * (N - 1)));
+    if (!(varU > 0)) {
+        return { error: true, message: "All values are identical, so the Mann-Whitney test cannot be computed." };
+    }
+    const stdU = Math.sqrt(varU);
     
-    // Calculate z-score approximation
+    // z-score with continuity correction: 0.5 is always moved toward the null (U₁ = n₁n₂/2).
+    // U₁ = n₁n₂ + n₁(n₁+1)/2 - R₁ is SMALL when Sample 1 has the larger ranks, so "greater" (Sample 1 > Sample 2)
+    // uses the lower tail of U₁; diffU1 flips the sign so that a positive z always points toward "Sample 1 larger".
     const continuityCorrection = 0.5;
-    let z = (U - expectedU) / stdU;
-    if (Math.abs(U - expectedU) > 0) {
-        z = (U - expectedU + (U < expectedU ? continuityCorrection : -continuityCorrection)) / stdU;
+    const diffU1 = expectedU - U1;
+    let z;
+    if (alternative === 'two.sided') {
+        z = Math.sign(diffU1) * Math.max(Math.abs(diffU1) - continuityCorrection, 0) / stdU;
+    } else if (alternative === 'greater') {
+        z = (diffU1 - continuityCorrection) / stdU;
+    } else {
+        z = (diffU1 + continuityCorrection) / stdU;
     }
     
     // Calculate p-value based on alternative
     let pValue;
     if (alternative === 'two.sided') {
-        pValue = 2 * (1 - normCDF(Math.abs(z)));
+        pValue = Math.min(1, 2 * normCDF(-Math.abs(z)));
     } else if (alternative === 'greater') {
-        pValue = 1 - normCDF(z);
+        pValue = normCDF(-z);
     } else {
         pValue = normCDF(z);
     }
     
     // Critical value (approximate)
     const criticalZ = normInv(1 - (alternative === 'two.sided' ? alpha / 2 : alpha));
-    const rejectH0 = Math.abs(z) > criticalZ;
+    const rejectH0 = pValue < alpha;
     
     let conclusion = rejectH0 ? "REJECT the null hypothesis" : "FAIL TO REJECT the null hypothesis";
     let interpretation = rejectH0 ?
@@ -189,8 +209,9 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
             <div style="background: white; border-radius: 12px; padding: 16px;">
                 <strong>Step 3: Calculate z-score approximation</strong><br>
                 Expected U = n₁n₂/2 = ${expectedU.toFixed(2)}<br>
-                Standard Deviation = √[n₁n₂(n₁+n₂+1)/12] = ${stdU.toFixed(4)}<br>
-                z = (U - ExpectedU) / SD = ${z.toFixed(6)}<br>
+                Standard Deviation = √(tie-corrected variance) = ${stdU.toFixed(4)}<br>
+                Tie-corrected variance = n₁n₂/12 × [(N+1) − Σ(t³−t)/(N(N−1))] = ${varU.toFixed(4)}<br>
+                z = (ExpectedU − U₁ ∓ 0.5) / SD = ${z.toFixed(6)} (continuity correction 0.5 toward H₀; positive z means Sample 1 tends to be larger, so a one-sided test uses the matching tail)<br>
                 p-value = ${pValue.toFixed(8)}
             </div>
         </div>
@@ -245,12 +266,5 @@ function setupMannWhitneyLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("mannWhitneyClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("mannWhitneyData1").value = '';
-            document.getElementById("mannWhitneyData2").value = '';
-            document.getElementById("mannWhitneyResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("mannWhitneyClearBtn", ["mannWhitneyData1", "mannWhitneyData2"], "mannWhitneyResultArea");
 }

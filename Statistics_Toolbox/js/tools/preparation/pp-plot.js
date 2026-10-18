@@ -40,8 +40,7 @@ function renderPPPlotInterface() {
             area: "ppplotResultArea",
             label: "🎯 P-P PLOT RESULTS",
             value: "ppplotValueDisplay",
-            steps: "ppplotStepsDisplay",
-            extra: ["<canvas id=\"ppplotChartCanvas\" style=\"max-height: 500px; width: 100%; margin-top: 20px;\"></canvas>"]
+            steps: "ppplotStepsDisplay"
         }
     });
 }
@@ -289,6 +288,7 @@ function computePPPlotWithSteps(numbers, distType = 'normal') {
 function renderPPPlotChart(stats) {
     const canvas = document.getElementById('ppplotChartCanvas');
     if (!canvas) return;
+    labelChart(canvas, `P-P plot of ${stats.ppPoints.length} values against the ${stats.distName} distribution. Correlation between empirical and theoretical probabilities: ${(+stats.correlation).toFixed(4)}; points close to the diagonal mean a good fit.`);
     
     if (ppplotChart) ppplotChart.destroy();
     

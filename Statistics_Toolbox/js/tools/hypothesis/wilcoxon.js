@@ -105,28 +105,46 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
     
     let W = Math.min(Wpos, Wneg);
     
-    // Calculate z-score approximation
-    const expectedW = (n * (n + 1)) / 4;
-    const stdW = Math.sqrt((n * (n + 1) * (2 * n + 1)) / 24);
-    let z = (W - expectedW) / stdW;
+    // Zero differences are dropped (Wilcoxon's method), so the normal approximation uses the number of non-zero pairs
+    const nEff = withRanks.length;
+    if (nEff === 0) {
+        return { error: true, message: "All differences are zero, so the Wilcoxon test cannot be computed." };
+    }
+    let tieTerm = 0;
+    for (let a = 0; a < nEff;) {
+        let b = a;
+        while (b < nEff && withRanks[b].absDiff === withRanks[a].absDiff) b++;
+        const t = b - a;
+        tieTerm += t * t * t - t;
+        a = b;
+    }
+    const expectedW = (nEff * (nEff + 1)) / 4;
+    const stdW = Math.sqrt((nEff * (nEff + 1) * (2 * nEff + 1)) / 24 - tieTerm / 48);
     
-    // Apply continuity correction
-    if (Math.abs(W - expectedW) > 0.5) {
-        z = (W - expectedW + (W < expectedW ? 0.5 : -0.5)) / stdW;
+    // z-score with continuity correction: 0.5 is always moved toward the null (W⁺ = n(n+1)/4).
+    // Differences are after − before, so W⁺ large means "after > before" (alternative "greater").
+    const diffW = Wpos - expectedW;
+    let z;
+    if (alternative === 'two.sided') {
+        z = Math.sign(diffW) * Math.max(Math.abs(diffW) - 0.5, 0) / stdW;
+    } else if (alternative === 'greater') {
+        z = (diffW - 0.5) / stdW;
+    } else {
+        z = (diffW + 0.5) / stdW;
     }
     
     // Calculate p-value
     let pValue;
     if (alternative === 'two.sided') {
-        pValue = 2 * (1 - normCDF(Math.abs(z)));
+        pValue = Math.min(1, 2 * normCDF(-Math.abs(z)));
     } else if (alternative === 'greater') {
-        pValue = 1 - normCDF(z);
+        pValue = normCDF(-z);
     } else {
         pValue = normCDF(z);
     }
     
     const criticalZ = normInv(1 - (alternative === 'two.sided' ? alpha / 2 : alpha));
-    const rejectH0 = Math.abs(z) > criticalZ;
+    const rejectH0 = pValue < alpha;
     
     let conclusion = rejectH0 ? "REJECT the null hypothesis" : "FAIL TO REJECT the null hypothesis";
     let interpretation = rejectH0 ?
@@ -201,9 +219,10 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
             
             <div style="background: white; border-radius: 12px; padding: 16px;">
                 <strong>Step 3: Calculate z-score approximation</strong><br>
+                Non-zero differences used: n = ${nEff} of ${n}<br>
                 Expected W = n(n+1)/4 = ${expectedW.toFixed(2)}<br>
-                Standard Deviation = √[n(n+1)(2n+1)/24] = ${stdW.toFixed(4)}<br>
-                z = (W - ExpectedW) / SD = ${z.toFixed(6)}<br>
+                Standard Deviation = √[n(n+1)(2n+1)/24 − Σ(t³−t)/48] = ${stdW.toFixed(4)}<br>
+                z = (W⁺ − ExpectedW ∓ 0.5) / SD = ${z.toFixed(6)} (continuity correction 0.5 toward H₀; sign follows W⁺, so a one-sided test uses the matching tail)<br>
                 p-value = ${pValue.toFixed(8)}
             </div>
         </div>
@@ -258,12 +277,5 @@ function setupWilcoxonLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("wilcoxonClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("wilcoxonBeforeData").value = '';
-            document.getElementById("wilcoxonAfterData").value = '';
-            document.getElementById("wilcoxonResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("wilcoxonClearBtn", ["wilcoxonBeforeData", "wilcoxonAfterData"], "wilcoxonResultArea");
 }

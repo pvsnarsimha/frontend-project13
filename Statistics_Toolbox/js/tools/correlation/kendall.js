@@ -4,9 +4,9 @@
 function renderKendallInterface() {
     return buildInterface({
         id: "statKendallInterface",
-        title: "🔗 Kendall's Tau (τ)",
-        formula: "📌 τ = (C - D) / [n(n-1)/2]",
-        desc: "Measures ordinal association based on concordant vs discordant pairs. Range: -1 to +1.",
+        title: "🔗 Kendall's Tau (τ-b)",
+        formula: "📌 τ-b = (C - D) / √[(n₀ - n₁)(n₀ - n₂)]",
+        desc: "Measures ordinal association based on concordant vs discordant pairs. Range: -1 to +1. Ties in X or Y are handled with the τ-b correction (n₀ = n(n-1)/2; n₁, n₂ = pairs tied in X, Y); with no ties it equals τ-a = (C - D) / n₀.",
         inputs: [
             {
                 label: "📋 Enter X values:",
@@ -68,33 +68,37 @@ function computeKendallWithSteps(xValues, yValues) {
     // Calculate concordant and discordant pairs with detailed comparison
     let concordant = 0;
     let discordant = 0;
-    let ties = 0;
+    let ties = 0;          // pairs tied in X, in Y, or in both (neither concordant nor discordant)
+    let tiedX = 0;         // n1: pairs tied in X (includes pairs tied in both)
+    let tiedY = 0;         // n2: pairs tied in Y (includes pairs tied in both)
     let comparisonRows = '';
     
     // Generate all pair comparisons
     for (let i = 0; i < n - 1; i++) {
         for (let j = i + 1; j < n; j++) {
-            let y1 = pairs[i].y;
-            let y2 = pairs[j].y;
+            const x1 = pairs[i].x, x2 = pairs[j].x;
+            const y1 = pairs[i].y, y2 = pairs[j].y;
             let comparison = "";
             let result = "";
             let bgColor = "";
             
-            if (y1 < y2) {
+            if (x1 === x2 || y1 === y2) {
+                ties++;
+                if (x1 === x2) tiedX++;
+                if (y1 === y2) tiedY++;
+                comparison = x1 === x2 && y1 === y2 ? `X: ${x1} = ${x2}, Y: ${y1} = ${y2}` : (x1 === x2 ? `X: ${x1} = ${x2}` : `Y: ${y1} = ${y2}`);
+                result = "○ TIE (neither C nor D)";
+                bgColor = "#fff3cd";
+            } else if (y1 < y2) {
                 concordant++;
                 comparison = `${y1} < ${y2}`;
                 result = "✓ CONCORDANT (+)";
                 bgColor = "#d4edda";
-            } else if (y1 > y2) {
+            } else {
                 discordant++;
                 comparison = `${y1} > ${y2}`;
                 result = "✗ DISCORDANT (-)";
                 bgColor = "#f8d7da";
-            } else {
-                ties++;
-                comparison = `${y1} = ${y2}`;
-                result = "○ TIE (ignored)";
-                bgColor = "#fff3cd";
             }
             
             comparisonRows += `<tr style="background: ${bgColor}; border-bottom: 1px solid #dee2e6;">
@@ -108,7 +112,12 @@ function computeKendallWithSteps(xValues, yValues) {
     }
     
     let totalPairs = (n * (n - 1)) / 2;
-    let tau = (concordant - discordant) / totalPairs;
+    const denominator = Math.sqrt((totalPairs - tiedX) * (totalPairs - tiedY));
+    if (denominator === 0) {
+        return { error: true, message: "Kendall's τ is undefined: all X values are identical or all Y values are identical." };
+    }
+    // tau-b: reduces to tau-a, (C - D) / [n(n-1)/2], when there are no ties
+    let tau = (concordant - discordant) / denominator;
     
     // Build the complete HTML
     let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 100%;">
@@ -116,9 +125,9 @@ function computeKendallWithSteps(xValues, yValues) {
         <div style="background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
                 <span style="font-size: 32px;">🔗</span>
-                <h2 style="margin: 0; font-size: 24px; font-weight: 600;">Kendall's Tau (τ)</h2>
+                <h2 style="margin: 0; font-size: 24px; font-weight: 600;">Kendall's Tau (τ-b)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">Formula: τ = (C - D) / [n(n-1)/2]</p>
+            <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">Formula (τ-b): τ = (C - D) / √[(n₀ - n₁)(n₀ - n₂)], where n₀ = n(n-1)/2; with no ties this is τ-a = (C - D) / n₀</p>
             <p style="margin: 4px 0 0 0; opacity: 0.75; font-size: 13px;">Measures ordinal association | Based on concordant vs discordant pairs | Range: -1 to +1</p>
         </div>
         
@@ -201,19 +210,19 @@ function computeKendallWithSteps(xValues, yValues) {
                     <div style="font-size: 36px;">✓</div>
                     <div style="font-size: 12px; color: #6c757d; margin-top: 4px;">Concordant Pairs (C)</div>
                     <div style="font-size: 32px; font-weight: 700; color: #28a745;">${concordant}</div>
-                    <div style="font-size: 11px; color: #6c757d;">When Yᵢ &lt; Yⱼ</div>
+                    <div style="font-size: 11px; color: #6c757d;">When Yᵢ &lt; Yⱼ (X values differ)</div>
                 </div>
                 <div style="background: white; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                     <div style="font-size: 36px;">✗</div>
                     <div style="font-size: 12px; color: #6c757d; margin-top: 4px;">Discordant Pairs (D)</div>
                     <div style="font-size: 32px; font-weight: 700; color: #dc3545;">${discordant}</div>
-                    <div style="font-size: 11px; color: #6c757d;">When Yᵢ &gt; Yⱼ</div>
+                    <div style="font-size: 11px; color: #6c757d;">When Yᵢ &gt; Yⱼ (X values differ)</div>
                 </div>
                 <div style="background: white; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                     <div style="font-size: 36px;">○</div>
-                    <div style="font-size: 12px; color: #6c757d; margin-top: 4px;">Ties (ignored)</div>
+                    <div style="font-size: 12px; color: #6c757d; margin-top: 4px;">Tied pairs (neither C nor D)</div>
                     <div style="font-size: 32px; font-weight: 700; color: #ffc107;">${ties}</div>
-                    <div style="font-size: 11px; color: #6c757d;">When Yᵢ = Yⱼ</div>
+                    <div style="font-size: 11px; color: #6c757d;">Tied in X and/or Y</div>
                 </div>
             </div>
             
@@ -235,13 +244,13 @@ function computeKendallWithSteps(xValues, yValues) {
             </h3>
             <div style="background: white; border-radius: 12px; padding: 20px;">
                 <div style="font-family: monospace; font-size: 16px; margin-bottom: 12px;">
-                    τ = (C - D) / [n(n-1)/2]
+                    τ-b = (C - D) / √[(n₀ - n₁)(n₀ - n₂)]
                 </div>
                 <div style="font-family: monospace; font-size: 16px; margin-bottom: 12px;">
-                    τ = (${concordant} - ${discordant}) / ${totalPairs}
+                    n₀ = ${totalPairs}, n₁ (pairs tied in X) = ${tiedX}, n₂ (pairs tied in Y) = ${tiedY}
                 </div>
                 <div style="font-family: monospace; font-size: 16px; margin-bottom: 12px;">
-                    τ = ${concordant - discordant} / ${totalPairs}
+                    τ-b = (${concordant} - ${discordant}) / √[(${totalPairs} - ${tiedX})(${totalPairs} - ${tiedY})] = ${concordant - discordant} / ${denominator.toFixed(6)}
                 </div>
                 <div style="font-family: monospace; font-size: 28px; font-weight: 700; color: #2d6a4f; text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px; margin-top: 12px;">
                     τ = ${tau.toFixed(8)}
@@ -287,17 +296,10 @@ function setupKendallLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);  // Changed to innerHTML
         } else {
-            setHtml(valueSpan, `τ = ${result.tau.toFixed(6)}`);
+            setHtml(valueSpan, `τ-b = ${result.tau.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);  // Changed to innerHTML
         }
     });
     
-    const clearBtn = document.getElementById("kendallClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("kendallXInput").value = '';
-            document.getElementById("kendallYInput").value = '';
-            document.getElementById("kendallResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("kendallClearBtn", ["kendallXInput", "kendallYInput"], "kendallResultArea");
 }

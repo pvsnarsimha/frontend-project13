@@ -34,7 +34,9 @@ function createHistogram(numbers, chartTitle) {
         currentChart.destroy();
     }
     
-    const ctx = document.getElementById('dataChart').getContext('2d');
+    const dataCanvas = document.getElementById('dataChart');
+    labelChart(dataCanvas, `Histogram of ${describeSample(numbers)}, in ${bins.length} bins. ${chartTitle}.`);
+    const ctx = dataCanvas.getContext('2d');
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -158,8 +160,8 @@ function computeHistogramWithSteps(numbers, numBins) {
     
     // Calculate optimal bin width using Freedman-Diaconis rule
     const sorted = [...numbers].sort((a, b) => a - b);
-    const q1 = sorted[Math.floor(n * 0.25)];
-    const q3 = sorted[Math.floor(n * 0.75)];
+    const q1 = quantileType7(sorted, 0.25);
+    const q3 = quantileType7(sorted, 0.75);
     const iqr = q3 - q1;
     const fdWidth = 2 * iqr / Math.pow(n, 1/3);
     const fdBins = Math.ceil(range / fdWidth);
@@ -282,6 +284,10 @@ function getMode(numbers) {
 function renderHistogramChart(bins, binLabels, numbers) {
     const canvas = document.getElementById('histogramChartCanvas');
     if (!canvas) return;
+    {
+        const tallest = bins.indexOf(Math.max(...bins));
+        labelChart(canvas, `Histogram of ${describeSample(numbers)}, in ${bins.length} bins. The tallest bin, ${binLabels[tallest]}, holds ${bins[tallest]} value${bins[tallest] === 1 ? '' : 's'}.`);
+    }
     
     if (histogramChart) histogramChart.destroy();
     

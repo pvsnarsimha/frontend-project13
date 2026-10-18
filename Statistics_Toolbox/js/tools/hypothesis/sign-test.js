@@ -91,10 +91,10 @@ function computeSignTest(data, hypothesizedMedian, alpha, alternative) {
         pValue = 2 * binomialCumulative(testStatistic, nonZero, 0.5);
     } else if (alternative === 'greater') {
         testStatistic = positives;
-        pValue = binomialCumulativeComplement(testStatistic - 1, nonZero, 0.5);
+        pValue = binomialCumulativeComplement(testStatistic, nonZero, 0.5);
     } else {
         testStatistic = negatives;
-        pValue = binomialCumulativeComplement(testStatistic - 1, nonZero, 0.5);
+        pValue = binomialCumulativeComplement(testStatistic, nonZero, 0.5);
     }
     
     pValue = Math.min(Math.max(pValue, 0), 1);

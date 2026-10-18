@@ -229,6 +229,9 @@ function computeDistanceCorrelationWithSteps(x, y) {
     dVarX = dVarX / (n * n);
     dVarY = dVarY / (n * n);
     
+    if (!(dVarX > 0) || !(dVarY > 0)) {
+        return { error: true, message: `Distance correlation is undefined: all ${!(dVarX > 0) ? 'X' : 'Y'} values are identical (zero distance variance).` };
+    }
     let dCor = dCov / Math.sqrt(dVarX * dVarY);
     
     // Calculate Pearson correlation for comparison
@@ -442,12 +445,5 @@ function setupDistanceCorrelationLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("distCorrClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("distCorrXInput").value = '';
-            document.getElementById("distCorrYInput").value = '';
-            document.getElementById("distCorrResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("distCorrClearBtn", ["distCorrXInput", "distCorrYInput"], "distCorrResultArea");
 }

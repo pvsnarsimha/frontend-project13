@@ -77,8 +77,11 @@ function computePearsonWithSteps(xValues, yValues) {
         sumProduct += product;
     }
     
+    if (sumDevX === 0 || sumDevY === 0) {
+        return { error: true, message: `Pearson's r is undefined: all ${sumDevX === 0 ? 'X' : 'Y'} values are identical (zero variance). Enter data that varies.` };
+    }
     let denominator = Math.sqrt(sumDevX * sumDevY);
-    let r = denominator !== 0 ? sumProduct / denominator : 0;
+    let r = sumProduct / denominator;
     
     // Build table rows with perfect alignment
     let tableRows = '';
@@ -236,12 +239,5 @@ function setupPearsonLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("pearsonClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("pearsonXInput").value = '';
-            document.getElementById("pearsonYInput").value = '';
-            document.getElementById("pearsonResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("pearsonClearBtn", ["pearsonXInput", "pearsonYInput"], "pearsonResultArea");
 }

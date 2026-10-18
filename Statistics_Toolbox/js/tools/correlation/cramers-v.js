@@ -113,7 +113,7 @@ function computeCramersVWithSteps(inputText) {
         observedTableHtml += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center;">${colTotals[col]}</td>`;
     }
     observedTableHtml += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center;">${n}</td>
-    <tr></tbody>\\tour</div>`;
+    </tr></tbody></table></div>`;
     
     // Build Expected Frequencies Table HTML
     let expectedTableHtml = `<div style="overflow-x: auto; margin-bottom: 25px;">
@@ -145,7 +145,7 @@ function computeCramersVWithSteps(inputText) {
         expectedTableHtml += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center;">${colTotals[col]}</td>`;
     }
     expectedTableHtml += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center;">${n}</td>
-    <tr></tbody>\\tour</div>`;
+    </tr></tbody></table></div>`;
     
     // Build Chi-Square Contributions Table
     let chiTableHtml = `<div style="overflow-x: auto; margin-bottom: 25px;">
@@ -175,7 +175,7 @@ function computeCramersVWithSteps(inputText) {
         </tr>`;
     }
     
-    chiTableHtml += `</tbody>\\tour</div>`;
+    chiTableHtml += `</tbody></table></div>`;
     
     // Calculate Cramér's V
     const minDim = Math.min(r - 1, c - 1);

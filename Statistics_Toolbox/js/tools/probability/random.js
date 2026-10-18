@@ -81,86 +81,56 @@ function updateRandomParams() {
     }
 }
 
-function generateRandomNumbers(count, dist, params) {
-    let numbers = [];
-    
-    // Set seed if provided
-    const seedInput = document.getElementById('randomSeed');
-    if (seedInput && seedInput.value) {
-        const seed = parseInt(seedInput.value);
-        if (!isNaN(seed)) {
-            // Simple seeded random generator
-            let seedValue = seed;
-            const seededRandom = () => {
-                seedValue = (seedValue * 9301 + 49297) % 233280;
-                return seedValue / 233280;
-            };
-            
-            for (let i = 0; i < count; i++) {
-                const u = seededRandom();
-                if (dist === 'normal') {
-                    // Box-Muller transform
-                    const u1 = seededRandom();
-                    const u2 = seededRandom();
-                    const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-                    numbers.push(params.mean + params.std * z0);
-                } else if (dist === 'uniform') {
-                    numbers.push(params.min + u * (params.max - params.min));
-                } else if (dist === 'exponential') {
-                    numbers.push(-Math.log(1 - u) / params.rate);
-                } else if (dist === 'beta') {
-                    // Beta distribution approximation using Gamma
-                    let x = Math.pow(u, 1/params.alpha);
-                    numbers.push(x);
-                }
-            }
+// ---- Samplers ----
+// A random source wraps a uniform generator (seeded when a seed is given). normal() uses the Box-Muller transform,
+// which yields two independent normals per pair of uniforms; the second one is kept for the next call.
+function createRandomSource(seed) {
+    const uniform = seed === null || seed === undefined ? Math.random : seededRandom(seed);
+    let spare = null;
+    return {
+        uniform() { return uniform(); },
+        normal() {
+            if (spare !== null) { const z = spare; spare = null; return z; }
+            const u1 = 1 - uniform(), u2 = uniform();            // 1 - U avoids log(0)
+            const r = Math.sqrt(-2 * Math.log(u1));
+            spare = r * Math.sin(2 * Math.PI * u2);
+            return r * Math.cos(2 * Math.PI * u2);
         }
-    } else {
-        // Standard random generation
-        for (let i = 0; i < count; i++) {
-            if (dist === 'normal') {
-                // Box-Muller transform
-                const u1 = Math.random();
-                const u2 = Math.random();
-                const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-                numbers.push(params.mean + params.std * z0);
-            } else if (dist === 'uniform') {
-                numbers.push(params.min + Math.random() * (params.max - params.min));
-            } else if (dist === 'exponential') {
-                numbers.push(-Math.log(1 - Math.random()) / params.rate);
-            } else if (dist === 'beta') {
-    // Enhanced Beta generation using acceptance-rejection method
-    const alpha = params.alpha;
-    const beta = params.beta;
-    
-    // For α,β > 1, use efficient method
-    if (alpha > 1 && beta > 1) {
-        const mode = (alpha - 1) / (alpha + beta - 2);
-        const maxDensity = betaPDF(mode, alpha, beta);
-        
-        for (let i = 0; i < count; i++) {
-            let x, y;
-            do {
-                x = Math.random(); // Uniform [0,1]
-                y = Math.random() * maxDensity; // Scale to max density
-            } while (y > betaPDF(x, alpha, beta));
-            numbers.push(x);
-        }
-    } else {
-        // For other cases, use Gamma ratio method
-        for (let i = 0; i < count; i++) {
-            let u = Math.random();
-            let v = Math.random();
-            let x = Math.pow(u, 1/alpha);
-            let y = Math.pow(v, 1/beta);
-            numbers.push(x / (x + y));
-        }
+    };
+}
+
+// Gamma(shape, 1) by Marsaglia & Tsang (2000); shapes below 1 use the boost Gamma(a) = Gamma(a + 1) * U^(1/a).
+function sampleGamma(shape, source) {
+    if (shape < 1) return sampleGamma(shape + 1, source) * Math.pow(1 - source.uniform(), 1 / shape);
+    const d = shape - 1 / 3, c = 1 / Math.sqrt(9 * d);
+    for (;;) {
+        let x, v;
+        do { x = source.normal(); v = 1 + c * x; } while (v <= 0);
+        v = v * v * v;
+        const u = 1 - source.uniform();
+        if (u < 1 - 0.0331 * x * x * x * x) return d * v;
+        if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v;
     }
 }
 
+function sampleBeta(alpha, beta, source) {
+    const x = sampleGamma(alpha, source), y = sampleGamma(beta, source);
+    return x / (x + y);
+}
+
+function generateRandomNumbers(count, dist, params, source) {
+    const numbers = [];
+    for (let i = 0; i < count; i++) {
+        if (dist === 'normal') {
+            numbers.push(params.mean + params.std * source.normal());
+        } else if (dist === 'uniform') {
+            numbers.push(params.min + source.uniform() * (params.max - params.min));
+        } else if (dist === 'exponential') {
+            numbers.push(-Math.log(1 - source.uniform()) / params.rate);
+        } else if (dist === 'beta') {
+            numbers.push(sampleBeta(params.alpha, params.beta, source));
         }
     }
-    
     return numbers;
 }
 
@@ -176,6 +146,10 @@ function computeRandomWithSteps() {
         return { error: true, message: "Maximum 1000 values can be generated at once." };
     }
     
+    const seedText = document.getElementById('randomSeed') ? document.getElementById('randomSeed').value : '';
+    const seed = seedText !== '' && !isNaN(parseInt(seedText)) ? parseInt(seedText) : null;
+    const source = createRandomSource(seed);
+    
     let params = {};
     let steps = `🎲 RANDOM NUMBER GENERATION\n`;
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
@@ -189,10 +163,10 @@ function computeRandomWithSteps() {
         params.mean = parseFloat(document.getElementById('randomMean').value);
         params.std = parseFloat(document.getElementById('randomStd').value);
         steps += `Parameters: μ = ${params.mean}, σ = ${params.std}\n`;
-        steps += `Method: Box-Muller transform\n`;
-        steps += `Z = μ + σ × √(-2 ln(U₁)) × cos(2πU₂)\n\n`;
+        steps += `Method: Box-Muller transform (each pair of uniforms gives two independent normals)\n`;
+        steps += `Z = μ + σ × √(-2 ln(U₁)) × cos(2πU₂)  and  μ + σ × √(-2 ln(U₁)) × sin(2πU₂)\n\n`;
         
-        randomNumbers = generateRandomNumbers(count, dist, params);
+        randomNumbers = generateRandomNumbers(count, dist, params, source);
         
     } else if (dist === 'uniform') {
         params.min = parseFloat(document.getElementById('randomMin').value);
@@ -200,14 +174,14 @@ function computeRandomWithSteps() {
         steps += `Parameters: a = ${params.min}, b = ${params.max}\n`;
         steps += `Method: X = a + U × (b - a)\n\n`;
         
-        randomNumbers = generateRandomNumbers(count, dist, params);
+        randomNumbers = generateRandomNumbers(count, dist, params, source);
         
     } else if (dist === 'exponential') {
         params.rate = parseFloat(document.getElementById('randomRate').value);
         steps += `Parameters: λ = ${params.rate}\n`;
         steps += `Method: X = -ln(1 - U) / λ\n\n`;
         
-        randomNumbers = generateRandomNumbers(count, dist, params);
+        randomNumbers = generateRandomNumbers(count, dist, params, source);
         
     } else if (dist === 'beta') {
         params.alpha = parseFloat(document.getElementById('randomAlpha').value);
@@ -268,8 +242,8 @@ function computeRandomWithSteps() {
             for (let i = 0; i < count; i++) {
                 let x, y, attempts = 0;
                 do {
-                    x = Math.random();
-                    y = Math.random() * maxDensity;
+                    x = source.uniform();
+                    y = source.uniform() * maxDensity;
                     attempts++;
                 } while (y > betaPDF(x, params.alpha, params.beta));
                 randomNumbers.push(x);
@@ -291,10 +265,10 @@ function computeRandomWithSteps() {
             }
             
         } else {
-            steps += `✓ METHOD: Gamma Ratio Transformation (Works for all α,β > 0)\n\n`;
+            steps += `✓ METHOD: Gamma Ratio (Marsaglia-Tsang Gamma generator, works for all α,β > 0)\n\n`;
             steps += `Why this method?\n`;
             steps += `• One or both shape parameters ≤ 1 → Distribution may be J-shaped or U-shaped\n`;
-            steps += `• Gamma ratio method is more stable and works for all parameter values\n`;
+            steps += `• Gamma ratio method is stable and works for all parameter values\n`;
             steps += `• Based on relationship between Beta and Gamma distributions\n\n`;
             
             steps += `📐 MATHEMATICAL BASIS:\n`;
@@ -302,12 +276,10 @@ function computeRandomWithSteps() {
             steps += `   then Z = X/(X+Y) ~ Beta(α,β)\n\n`;
             
             steps += `🔢 ALGORITHM STEPS:\n`;
-            steps += `1. Generate U ~ Uniform(0,1)\n`;
-            steps += `2. Generate V ~ Uniform(0,1) (independent)\n`;
-            steps += `3. Transform using Gamma quantile:\n`;
-            steps += `   X = (-ln(U))^(1/α)  [approximation for Gamma(α,1)]\n`;
-            steps += `   Y = (-ln(V))^(1/β)  [approximation for Gamma(β,1)]\n`;
-            steps += `4. Return Z = X/(X+Y) ~ Beta(α,β)\n\n`;
+            steps += `1. Draw X ~ Gamma(α,1) and Y ~ Gamma(β,1) independently using Marsaglia-Tsang\n`;
+            steps += `   (d = a - 1/3, c = 1/√(9d); accept d·(1 + c·N)³ for N ~ Normal(0,1) by a squeeze test;\n`;
+            steps += `    for a < 1 draw Gamma(a+1) and multiply by U^(1/a))\n`;
+            steps += `2. Return Z = X/(X+Y) ~ Beta(α,β)\n\n`;
             
             steps += `🔢 GENERATION PROCESS (showing first 5 samples in detail):\n`;
             steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -316,20 +288,16 @@ function computeRandomWithSteps() {
             const maxShowDetails = Math.min(5, count);
             
             for (let i = 0; i < count; i++) {
-                const u = Math.random();
-                const v = Math.random();
-                const X = Math.pow(-Math.log(u), 1/params.alpha);
-                const Y = Math.pow(-Math.log(v), 1/params.beta);
+                const X = sampleGamma(params.alpha, source);
+                const Y = sampleGamma(params.beta, source);
                 const Z = X / (X + Y);
                 randomNumbers.push(Z);
                 
                 if (samplesShown < maxShowDetails) {
                     steps += `\nSample #${i+1}:\n`;
-                    steps += `  Step 1: Generate U = ${u.toFixed(6)}\n`;
-                    steps += `  Step 2: Generate V = ${v.toFixed(6)}\n`;
-                    steps += `  Step 3: Calculate X = (-ln(${u.toFixed(6)}))^(1/${params.alpha}) = ${X.toFixed(6)}\n`;
-                    steps += `  Step 4: Calculate Y = (-ln(${v.toFixed(6)}))^(1/${params.beta}) = ${Y.toFixed(6)}\n`;
-                    steps += `  Step 5: Calculate Z = X/(X+Y) = ${X.toFixed(6)}/(${X.toFixed(6)}+${Y.toFixed(6)}) = ${Z.toFixed(6)}\n`;
+                    steps += `  Step 1: Draw X ~ Gamma(${params.alpha}, 1) = ${X.toFixed(6)}\n`;
+                    steps += `  Step 2: Draw Y ~ Gamma(${params.beta}, 1) = ${Y.toFixed(6)}\n`;
+                    steps += `  Step 3: Calculate Z = X/(X+Y) = ${X.toFixed(6)}/(${X.toFixed(6)}+${Y.toFixed(6)}) = ${Z.toFixed(6)}\n`;
                     steps += `  ✓ Generated Beta(α=${params.alpha}, β=${params.beta}) value = ${Z.toFixed(6)}\n`;
                     samplesShown++;
                 }
@@ -374,7 +342,7 @@ function computeRandomWithSteps() {
     
     // If randomNumbers is still empty (shouldn't happen), generate generic
     if (randomNumbers.length === 0) {
-        randomNumbers = generateRandomNumbers(count, dist, params);
+        randomNumbers = generateRandomNumbers(count, dist, params, source);
     }
     
     steps += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -426,5 +394,5 @@ function setupRandomLogic() {
         });
     }
     
-    attachClearHandler('randomClearBtn', 'randomCount', 'randomResultArea');
+    attachClearHandler('randomClearBtn', ['randomCount', 'randomSeed'], 'randomResultArea');
 }

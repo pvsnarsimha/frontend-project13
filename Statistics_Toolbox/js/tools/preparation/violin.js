@@ -43,8 +43,7 @@ function renderViolinInterface() {
             area: "violinResultArea",
             label: "🎯 VIOLIN PLOT RESULTS",
             value: "violinValueDisplay",
-            steps: "violinStepsDisplay",
-            extra: ["<canvas id=\"violinChartCanvas\" style=\"max-height: 500px; width: 100%; margin-top: 20px;\"></canvas>"]
+            steps: "violinStepsDisplay"
         }
     });
 }
@@ -66,14 +65,9 @@ function computeViolinWithSteps(numbers, bandwidth) {
         else return arr[Math.floor(m/2)];
     };
     
-    let q1, q3;
-    if (n % 2 === 0) {
-        q1 = getMedian(sorted.slice(0, n/2));
-        q3 = getMedian(sorted.slice(n/2));
-    } else {
-        q1 = getMedian(sorted.slice(0, Math.floor(n/2)));
-        q3 = getMedian(sorted.slice(Math.floor(n/2) + 1));
-    }
+    // Type 7 quantiles (linear interpolation at (n - 1)p), the same method as every other quantile in the app
+    const q1 = quantileType7(sorted, 0.25);
+    const q3 = quantileType7(sorted, 0.75);
     
     const median = getMedian(sorted);
     const iqr = q3 - q1;
@@ -305,6 +299,7 @@ function computeViolinWithSteps(numbers, bandwidth) {
 function renderViolinChart(stats, numbers, bandwidth) {
     const canvas = document.getElementById('violinChartCanvas');
     if (!canvas) return;
+    labelChart(canvas, `Violin plot of ${describeSample(numbers)}. Quartiles: Q1 ${+stats.q1.toFixed(3)}, median ${+stats.median.toFixed(3)}, Q3 ${+stats.q3.toFixed(3)}; kernel density with bandwidth ${bandwidth}.`);
     
     if (violinChart) violinChart.destroy();
     

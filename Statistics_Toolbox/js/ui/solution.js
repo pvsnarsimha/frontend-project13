@@ -7,7 +7,15 @@
     function buildAnswer(valEl) {
         const old = valEl.parentNode.querySelector(':scope > .kpi-row[data-for="' + valEl.id + '"]');
         if (old) old.remove();
-        const txt = (valEl.textContent || '').trim();
+        // The visible answer text, without the screen-reader-only "Answer:" label this function adds below
+        const txt = Array.from(valEl.childNodes).filter(n => !(n.nodeType === 1 && n.classList.contains('answer-prefix'))).map(n => n.textContent).join('').trim();
+        // Spoken label for the live region ("Answer: mean = 4"); added once per value, only when there is an answer to announce
+        if (txt && txt !== '—' && !valEl.querySelector(':scope > .answer-prefix')) {
+            const label = document.createElement('span');
+            label.className = 'sr-only answer-prefix';
+            label.textContent = 'Answer: ';
+            valEl.insertBefore(label, valEl.firstChild);
+        }
         valEl.classList.toggle('long', txt.length > 26);
         // Failed calculations are flagged by text and icon, not only by colour
         valEl.classList.toggle('is-error', /^(?:⚠️?\s*)?(?:error|invalid|no data)/i.test(txt));
@@ -15,6 +23,7 @@
         const parts = txt.split(/\s*\|\s*/).filter(Boolean);
         if (parts.length < 2) return;
         const row = document.createElement('div'); row.className = 'kpi-row'; row.dataset.for = valEl.id;
+        row.setAttribute('aria-hidden', 'true');   // the same text is announced through the (visually hidden) live value above
         parts.forEach(part => {
             const m = part.match(/^(.{1,40}?)\s*(?:=|:)\s*(.+)$/);
             const d = document.createElement('div'); d.className = 'kpi';
@@ -319,6 +328,22 @@
         });
     }
 
+    // Generated result markup carries its layout in inline styles. Read each declaration once and expose it as a class, so the
+    // responsive rules (css/responsive.css) can be written against classes instead of substrings of the style attribute.
+    function tagGeneratedLayout(root) {
+        $$('[style]', root).forEach(el => {
+            const st = el.getAttribute('style') || '';
+            if (/grid-template-columns/.test(st)) {
+                el.classList.add('gen-grid');
+                if (/repeat\(\s*[3-9]\b/.test(st)) el.classList.add('gen-grid-many');
+            }
+            if (/display:\s*flex/.test(st)) el.classList.add('gen-flex');
+            if (/(?:^|;)\s*padding:\s*2\d/.test(st)) el.classList.add('gen-pad');
+            if (/(?:^|;)\s*(?:min-)?width:/.test(st)) el.classList.add('gen-sized');
+            if (/font-size:\s*[34]\d/.test(st)) el.classList.add('gen-big');
+        });
+    }
+
     // Degenerate input (identical values, one observation, zero divisor) makes some formulas undefined. The working is still shown,
     // but the page says plainly what happened instead of leaving a bare NaN / Infinity.
     const UNDEFINED_RESULT = /\bNaN\b|-?\bInfinity\b|\bundefined\b/;
@@ -338,10 +363,10 @@
     function hookCard(card) {
         if (card.dataset.hooked) return; card.dataset.hooked = '1';
         const val = card.querySelector('.result-value'), st = card.querySelector('.calculation-steps');
-        const run = () => { if (val) buildAnswer(val); if (st) { buildSolution(st); describeTables(card); } flagUndefined(card); };
+        const run = () => { if (val) buildAnswer(val); if (st) { buildSolution(st); describeTables(card); tagGeneratedLayout(card); } flagUndefined(card); };
         run();
         if (val) new MutationObserver(() => { buildAnswer(val); flagUndefined(card); }).observe(val, { childList: true, characterData: true, subtree: true });
-        if (st) new MutationObserver(() => { buildSolution(st); describeTables(card); flagUndefined(card); }).observe(st, { childList: true, characterData: true, subtree: true });
+        if (st) new MutationObserver(() => { buildSolution(st); describeTables(card); tagGeneratedLayout(card); flagUndefined(card); }).observe(st, { childList: true, characterData: true, subtree: true });
     }
-    Object.assign(window.StatLabUI, { esc, fmt, buildAnswer, parseSolution, buildSolution, describeTables, flagUndefined, hookCard });
+    Object.assign(window.StatLabUI, { esc, fmt, buildAnswer, parseSolution, buildSolution, describeTables, tagGeneratedLayout, flagUndefined, hookCard });
 })();

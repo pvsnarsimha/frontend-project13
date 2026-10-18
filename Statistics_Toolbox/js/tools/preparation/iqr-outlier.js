@@ -42,14 +42,9 @@ function computeIQROutlierWithSteps(numbers) {
         else return arr[Math.floor(m/2)];
     };
     
-    let q1, q3;
-    if (n % 2 === 0) {
-        q1 = getMedian(sorted.slice(0, n/2));
-        q3 = getMedian(sorted.slice(n/2));
-    } else {
-        q1 = getMedian(sorted.slice(0, Math.floor(n/2)));
-        q3 = getMedian(sorted.slice(Math.floor(n/2) + 1));
-    }
+    // Type 7 quantiles (linear interpolation at (n - 1)p), the same method as every other quantile in the app
+    const q1 = quantileType7(sorted, 0.25);
+    const q3 = quantileType7(sorted, 0.75);
     
     const iqr = q3 - q1;
     const lowerBound = q1 - 1.5 * iqr;

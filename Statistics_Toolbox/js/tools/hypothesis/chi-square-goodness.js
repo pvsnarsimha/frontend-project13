@@ -257,5 +257,5 @@ function setupChiSquareGoodnessLogic() {
         }
     });
     
-    attachClearHandler("goodnessClearBtn", "goodnessObserved", "goodnessResultArea");
+    attachClearHandler("goodnessClearBtn", ["goodnessObserved", "goodnessExpected"], "goodnessResultArea");
 }

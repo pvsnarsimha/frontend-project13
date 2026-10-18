@@ -35,6 +35,10 @@ function computePointBiserialWithSteps(xContinuous, yBinary) {
         return { error: true, message: "Binary variable must contain only 0 and 1 values." };
     }
     
+    if (n1 === 0 || n0 === 0) {
+        return { error: true, message: "Point-biserial correlation needs both groups: the binary variable has no 0s or no 1s." };
+    }
+    
     const meanX = sumX / n;
     const meanX1 = n1 > 0 ? sumX1 / n1 : 0;
     const meanX0 = n0 > 0 ? sumX0 / n0 : 0;
@@ -42,6 +46,9 @@ function computePointBiserialWithSteps(xContinuous, yBinary) {
     let sumSqDiff = 0;
     for (let i = 0; i < n; i++) {
         sumSqDiff += Math.pow(xContinuous[i] - meanX, 2);
+    }
+    if (sumSqDiff === 0) {
+        return { error: true, message: "Point-biserial correlation is undefined: all X values are identical (zero variance)." };
     }
     const sdX = Math.sqrt(sumSqDiff / n);
     
@@ -196,14 +203,7 @@ function setupPointBiserialLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("pointBiserialClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("pointBiserialXInput").value = '';
-            document.getElementById("pointBiserialYInput").value = '';
-            document.getElementById("pointBiserialResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("pointBiserialClearBtn", ["pointBiserialXInput", "pointBiserialYInput"], "pointBiserialResultArea");
 }
 
 // ========== POINT-BISERIAL INTERFACE RENDER ==========

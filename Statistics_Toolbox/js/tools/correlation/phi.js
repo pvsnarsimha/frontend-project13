@@ -52,10 +52,10 @@ function computePhiWithSteps(inputText) {
     // Calculate Phi coefficient
     const numerator = (a * d) - (b * c);
     const denominator = Math.sqrt((a + b) * (c + d) * (a + c) * (b + d));
-    let phi = 0;
-    if (denominator !== 0) {
-        phi = numerator / denominator;
+    if (denominator === 0) {
+        return { error: true, message: "Phi is undefined: a row or a column of the 2×2 table sums to zero (one variable has no variation)." };
     }
+    const phi = numerator / denominator;
     
     // Interpret Phi
     let interpretation = "";
