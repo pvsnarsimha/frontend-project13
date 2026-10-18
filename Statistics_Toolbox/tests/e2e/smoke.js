@@ -37,6 +37,20 @@ const { chromium } = require('playwright');
       n++;
     }
   }
+  // Security: setHtml() must strip anything that can run code, whatever the tool put into the HTML string
+  const sanitised = await p.evaluate(() => {
+    window.__xss = 0;
+    const box = document.createElement('div');
+    document.body.appendChild(box);
+    setHtml(box, '<img src=x onerror="window.__xss=1"><script>window.__xss=2<\/script><a href="java\nscript:window.__xss=3" onclick="window.__xss=4">link</a><iframe src="about:blank"></iframe><p style="color:red">kept <b>bold</b></p>');
+    const html = box.innerHTML;
+    box.querySelector('a').click();
+    box.remove();
+    return { html, flag: window.__xss };
+  });
+  if (sanitised.flag) errs.push('XSS payload executed: ' + sanitised.flag);
+  if (/onerror|<script|<iframe|javascript:|onclick/i.test(sanitised.html)) errs.push('setHtml left dangerous markup: ' + sanitised.html);
+  if (!/<b>bold<\/b>/.test(sanitised.html) || !/color:\s*red/.test(sanitised.html)) errs.push('setHtml removed harmless markup: ' + sanitised.html);
   console.log('tools exercised:', n);
   console.log(errs.length ? errs.slice(0, 40).join('\n') : 'NO ERRORS');
   if (errs.length) process.exitCode = 1;

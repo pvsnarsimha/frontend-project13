@@ -8,19 +8,25 @@ browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offl
 
 ```
 Statistics.html            Page shell only: header, tabs, sidebars (static, accessible markup), script tags
-css/statlab.css            All styles
+css/statlab.css            Styles
+css/responsive.css         Phone / tablet rules (breakpoints 1100, 900, 640, 420)
 vendor/                    Chart.js and web fonts, self-hosted (see vendor/README.md for versions and licenses)
-js/00-toolkit.js           defineListTool(): declarative definition of "paste numbers, press Calculate" tools, escapeHtml()
-js/00-numerics.js          Special functions, CDFs and exact critical values (normal, t, F, chi-square,
-                           beta, studentized range, Shapiro-Wilk, Kolmogorov). Single source of truth.
-js/01..09-*.js             The tools: for each one a renderXInterface(), computeX() and setupXLogic()
+js/core/numerics.js        Special functions, CDFs and exact critical values (normal, t, F, chi-square, beta,
+                           studentized range, Shapiro-Wilk, Lilliefors). Single source of truth.
+js/core/toolkit.js         buildInterface(), defineListTool(), setHtml() (sanitised HTML insertion), escapeHtml()
+js/core/charts.js          One variable per plotting tool for its Chart.js instance
+js/core/helpers.js         Input parsing and helpers shared by several tools
+js/tools/<module>/*.js     One file per tool (about 100): renderXInterface(), computeX(), setupXLogic()
+                           modules: descriptive, preparation, probability, correlation, hypothesis, regression
 js/app.js                  Route table (STAT_ROUTES), tab/sidebar navigation, chart controls
 js/ui/*.js                 Presentation layer: navigation + search, answer tiles and worked-solution layout, form a11y
-tests/                     Node tests (no dependencies)
+scripts/sync-script-tags.js  Regenerates the <script> list in Statistics.html from the files under js/
+tests/                     Node tests (no dependencies) and a Playwright browser test
 ```
 
 Scripts are plain classic scripts loaded in order, so they share one global scope. Order matters only for
-code that runs at load time, which is why `00-numerics.js` comes first and `app.js` last.
+code that runs at load time (the `const xTool = defineListTool(...)` lines and the toolkit), which is why `core/`
+loads first and `app.js` after every tool. `npm run sync:scripts` writes the list for you.
 
 ## Adding a tool
 
@@ -36,18 +42,19 @@ const myTool = defineListTool({
 });
 ```
 
-**Any other tool** (two samples, grouped data, tables, plots) hand-writes `renderMyToolInterface()` (form HTML),
-`computeMyTool(...)` and `setupMyToolLogic()` (wires Calculate/Clear). These still carry the older, repetitive
-template markup; porting them to a shared builder is the next refactoring step.
+**Any other tool** (two samples, grouped data, tables, plots) writes `renderMyToolInterface()` as a
+`buildInterface({...})` call (title, formula card, a list of labelled inputs, buttons and result ids; see the comment in
+`core/toolkit.js`), plus `computeMyTool(...)` and `setupMyToolLogic()` (wires Calculate/Clear).
 
-Then register it: one row in `STAT_ROUTES` (`js/app.js`) and one `<button class="stat-btn" data-stat="my">` in the
-right sidebar of `Statistics.html`.
+Put the tool in `js/tools/<module>/<name>.js`, then register it: one row in `STAT_ROUTES` (`js/app.js`), one
+`<button class="stat-btn" data-stat="my">` in the right sidebar of `Statistics.html`, and run `npm run sync:scripts`.
 
 Rules for all tools:
-* Use `normCDF`, `tCriticalValue`, `fCriticalValue`, `chiSquareCriticalValue`, ... from `00-numerics.js` rather than
+* Use `normCDF`, `tCriticalValue`, `fCriticalValue`, `chiSquareCriticalValue`, ... from `core/numerics.js` rather than
   lookup tables or local approximations.
 * Return `{ error: true, message }` for bad input and say how to fix it.
-* **Escape user text** (`escapeHtml`) before it goes into generated HTML. The page also ships a Content-Security-
+* **Escape user text** (`escapeHtml`) before it goes into generated HTML, and insert HTML only with `setHtml(element, html)`
+  (it strips scripts, event handlers and `javascript:` URLs). Never assign to `.innerHTML`; a test enforces this. The page also ships a Content-Security-
   Policy that blocks inline scripts and event handlers, so never emit `onclick=`/`<script>`; mark clickable parts with
   a `data-*` attribute and handle it in `app.js`.
 * **Sample data contract:** the "Try sample data" button reads the `Example:` text in a textarea's `placeholder`
@@ -103,6 +110,8 @@ npm run test:all    # both
 ```
 
 * `.github/workflows/ci.yml` runs the unit tests on Node 18/20/22 and the browser test on every pull request
+* `tests/e2e/edge-cases.js`: every tool with one value, identical values, zeros, negatives and huge numbers: no freeze, no script error, and any NaN/Infinity comes with an explanation
+* `tests/e2e/responsive.js`: no tool makes the page scroll sideways at 360 px and 768 px
 * `tests/e2e/smoke.js`: every tool opens, sample data produces a result with no NaN/undefined, no script or console errors
 * `tests/numerics.test.js`: special functions and critical values against SciPy reference values
 * `tests/calculations.test.js`: whole tests (t, ANOVA, ANCOVA, MANOVA, Tukey, Shapiro-Wilk, ...) against SciPy/NumPy
