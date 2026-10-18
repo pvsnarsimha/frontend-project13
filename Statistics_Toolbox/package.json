@@ -5,9 +5,13 @@
   "description": "StatLab: interactive statistics toolbox with step-by-step solutions (static site, no build step)",
   "scripts": {
     "test": "node --test",
-    "test:e2e": "node tests/e2e/smoke.js"
+    "test:e2e": "node tests/e2e/smoke.js",
+    "test:all": "npm test && npm run test:e2e"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
   }
 }

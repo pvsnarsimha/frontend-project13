@@ -1,5 +1,5 @@
 // Browser smoke test: opens every tool, loads sample data, presses Calculate and fails on any script error.
-// Needs Playwright (not a dependency of the app): npm i -D playwright && npx playwright install chromium
+// Needs the Playwright dev dependency and a browser:  npm install && npx playwright install chromium
 // Usage: node tests/e2e/smoke.js   (set CHROMIUM=/path/to/chromium to use an existing browser)
 const path = require('path');
 const { chromium } = require('playwright');
@@ -8,8 +8,8 @@ const { chromium } = require('playwright');
   const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
   const p = await b.newPage();
   const errs = [];
-  p.on('pageerror', e => { if (!/Chart is not defined/.test(e.message)) errs.push('PAGEERROR ' + e.message); });  // Chart.js comes from a CDN
-  p.on('console', m => { if (m.type() === 'error' && !/fonts|chart\.umd|net::ERR/.test(m.text())) errs.push('CONSOLE ' + m.text()); });
+  p.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
+  p.on('console', m => { if (m.type() === 'error') errs.push('CONSOLE ' + m.text()); });
   await p.goto('file://' + file);
   const tabs = await p.$$eval('.tab', t => t.map(x => x.dataset.tab));
   let n = 0;
@@ -25,6 +25,15 @@ const { chromium } = require('playwright');
       if (sample) await sample.click();
       const go = await p.$('#interfaceRoot .primary-btn');
       if (go) await go.click();
+      // A tool that offers sample data must produce a clean, non-empty result for it
+      if (sample && go) {
+        const shown = await p.evaluate(() => {
+          const v = document.querySelector('#interfaceRoot .result-value'), st = document.querySelector('#interfaceRoot .calculation-steps');
+          return { value: v ? v.textContent.trim() : '', steps: st ? st.textContent : '' };
+        });
+        if (!shown.value || shown.value === '—') errs.push(`${s}: no result after calculating the sample data`);
+        else if (/\bNaN\b|undefined|\[object/.test(shown.value + ' ' + shown.steps)) errs.push(`${s}: NaN/undefined in the result`);
+      }
       n++;
     }
   }
