@@ -4,7 +4,10 @@
   "private": true,
   "description": "StatLab: interactive statistics toolbox with step-by-step solutions (static site, no build step)",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "test:e2e": "node tests/e2e/smoke.js"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

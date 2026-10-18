@@ -1,13 +1,15 @@
 /* Descriptive statistics (mean, spread, shape, quartiles) and shared helpers */
-    // Robust numeric parser
+    // Robust numeric parser: values may be separated by commas, semicolons, spaces, tabs or new lines.
+    // Accepts negatives (also the typographic minus), decimals and scientific notation. A token that is not
+    // a complete number ("12abc", "1.2.3") is skipped instead of being silently read as 12 or 1.2.
+    const NUMBER_TOKEN = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/;
     function parseNumbersFromInput(rawText) {
-        let parts = rawText.split(/[,\s\n]+/);
-        let numbers = [];
-        for (let part of parts) {
-            part = part.trim();
-            if (part === "") continue;
-            let num = parseFloat(part);
-            if (!isNaN(num) && isFinite(num)) numbers.push(num);
+        const parts = String(rawText).replace(/\u2212/g, '-').split(/[,;\s]+/);
+        const numbers = [];
+        for (const part of parts) {
+            if (!NUMBER_TOKEN.test(part)) continue;
+            const num = Number(part);
+            if (isFinite(num)) numbers.push(num);
         }
         return numbers;
     }

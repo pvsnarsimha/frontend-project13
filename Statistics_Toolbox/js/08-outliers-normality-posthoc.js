@@ -1100,11 +1100,11 @@ function computeKolmogorovSmirnovTest(data, alpha) {
         }
     }
     
-    // Kolmogorov distribution with Stephens' finite-n correction; critical value and p-value come from the same function.
-    // The mean and SD were estimated from the data, so this is conservative (the Lilliefors test would reject more often).
-    const criticalValue = kolmogorovCritical(alpha, n);
+    // The mean and SD are estimated from the data, so the plain Kolmogorov distribution is too conservative.
+    // Critical value and p-value come from the Lilliefors null distribution (simulated, seeded, cached per n).
+    const criticalValue = lillieforsCritical(alpha, n);
     const rejectH0 = maxDiff > criticalValue;
-    const pValue = kolmogorovPValue(maxDiff, n);
+    const pValue = lillieforsPValue(maxDiff, n);
     
     // Build table rows with formula explanations
     let tableRows = '';
@@ -2885,13 +2885,17 @@ function computeMANOVA(inputText, alpha) {
     let roysRoot = Math.max(...eigenvalues);
     
     // ========== STEP 8: F-statistic ==========
-    let s = Math.min(p, k - 1);
-    let df1 = p * (k - 1);
-    let u = (n - k - (p - (k - 1)) / 2) * 2;
-    let df2 = u;
+    // Rao's F approximation to Wilks' Lambda (exact when p = 1, 2 or q = 1, 2)
+    const q = k - 1;
+    const rao = (n - k) - (p - q + 1) / 2;
+    const raoU = (p * q - 2) / 4;
+    const raoT = (p * p + q * q - 5) > 0 ? Math.sqrt((p * p * q * q - 4) / (p * p + q * q - 5)) : 1;
+    let df1 = p * q;
+    let df2 = rao * raoT - 2 * raoU;
     let fStatistic = 0;
-    if (wilksLambda > 0 && wilksLambda < 1) {
-        fStatistic = (1 - Math.pow(wilksLambda, 1/s)) / Math.pow(wilksLambda, 1/s) * df2 / df1;
+    if (wilksLambda > 0 && wilksLambda < 1 && df2 > 0) {
+        const root = Math.pow(wilksLambda, 1 / raoT);
+        fStatistic = (1 - root) / root * df2 / df1;
     }
     if (isNaN(fStatistic) || !isFinite(fStatistic)) fStatistic = 0;
     
@@ -3322,21 +3326,21 @@ function computeMANOVA(inputText, alpha) {
             
             <div style="background: white; border-radius: 15px; padding: 20px;">
                 <div style="background: #f0f4fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                    <strong>📐 Formula:</strong> F = (1 - Λ^{1/s}) / Λ^{1/s} × df₂ / df₁
+                    <strong>📐 Formula (Rao's approximation):</strong> F = (1 - Λ^{1/t}) / Λ^{1/t} × df₂ / df₁
                 </div>
                 
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
                     <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
-                        <strong>s = min(p, k-1)</strong> = min(${p}, ${k-1}) = ${s}
+                        <strong>t = √((p²q² - 4)/(p² + q² - 5))</strong> (q = k-1) = ${raoT.toFixed(6)}
                     </div>
                     <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
-                        <strong>df₁ = p × (k-1)</strong> = ${p} × ${k-1} = ${df1}
+                        <strong>df₁ = p × q</strong> = ${p} × ${q} = ${df1}
                     </div>
                     <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
-                        <strong>df₂ = (n - k - (p - (k-1)) / 2) × 2</strong> = ${df2}
+                        <strong>df₂ = t × (n - k - (p - q + 1)/2) - (pq - 2)/2</strong> = ${df2.toFixed(4)}
                     </div>
                     <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
-                        <strong>Λ^{1/s}</strong> = ${Math.pow(wilksLambda, 1/s).toFixed(6)}
+                        <strong>Λ^{1/t}</strong> = ${Math.pow(wilksLambda, 1/raoT).toFixed(6)}
                     </div>
                 </div>
                 

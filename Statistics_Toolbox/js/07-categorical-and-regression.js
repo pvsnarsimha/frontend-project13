@@ -1504,6 +1504,7 @@ function computeMultipleLinearRegression(dataMatrix) {
     // Calculate inverse of XtX with detailed steps
     function matrixInverseWithSteps(matrix, stepCallback) {
         const size = matrix.length;
+        const matrixScale = Math.max(1, ...matrix.map(r => Math.max(...r.map(Math.abs))));   // pivots are judged relative to the data scale
         // Create augmented matrix [A|I]
         const augmented = [];
         for (let i = 0; i < size; i++) {
@@ -1532,7 +1533,7 @@ function computeMultipleLinearRegression(dataMatrix) {
             
             // Make diagonal 1
             const pivot = augmented[i][i];
-            if (Math.abs(pivot) < 1e-10) {
+            if (Math.abs(pivot) < 1e-10 * matrixScale) {
                 throw new Error("Matrix is singular, cannot compute inverse");
             }
             
@@ -1553,6 +1554,17 @@ function computeMultipleLinearRegression(dataMatrix) {
                     }
                 }
             }
+        }
+        
+        // Condition number (1-norm) of X'X: near-collinear predictors make the coefficients unstable
+        const norm1 = m => Math.max(...m[0].map((_, j) => m.reduce((sum, row) => sum + Math.abs(row[j]), 0)));
+        const inv = augmented.map(row => row.slice(size));
+        const cond = norm1(matrix) * norm1(inv);
+        if (cond > 1e12) {
+            throw new Error(`X'X is numerically singular (condition number ≈ ${cond.toExponential(1)})`);
+        }
+        if (cond > 1e6) {
+            stepLog += `<div style="margin: 8px 0; padding: 8px 12px; background: #fff3cd; border-radius: 6px; color: #856404;">⚠️ Near-collinearity: the condition number of X'X is ≈ ${cond.toExponential(1)}. Two or more predictors are almost linearly dependent, so individual coefficients may be unreliable even though the fit looks fine. Consider removing or combining correlated predictors (see VIF).</div>`;
         }
         
         stepLog += '</div>';
