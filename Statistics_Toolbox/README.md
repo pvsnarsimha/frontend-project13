@@ -2,13 +2,14 @@
 
 An interactive statistics workbench: paste data, pick one of 99 techniques, and get the result, the formula,
 a full worked solution and a chart. It is a static site with **no build step**: open `Statistics.html` in a
-browser (Chart.js and the web fonts load from a CDN).
+browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offline).
 
 ## Layout
 
 ```
 Statistics.html            Page shell only: header, tabs, sidebars (static, accessible markup), script tags
 css/statlab.css            All styles
+vendor/                    Chart.js and web fonts, self-hosted (see vendor/README.md for versions and licenses)
 js/00-toolkit.js           defineListTool(): declarative definition of "paste numbers, press Calculate" tools, escapeHtml()
 js/00-numerics.js          Special functions, CDFs and exact critical values (normal, t, F, chi-square,
                            beta, studentized range, Shapiro-Wilk, Kolmogorov). Single source of truth.
@@ -59,14 +60,50 @@ Rules for all tools:
 * **Classic scripts, not ES modules.** The page is meant to open straight from disk (`file://`), where browsers
   refuse to load ES modules. The cost is one shared global scope, which `tests/structure.test.js` polices
   (duplicate definitions, route integrity). Moving to modules would require serving the folder over http and a bundler.
-* **No build step** means no minification or tree-shaking; the page loads about 1.7 MB of script.
+* **No build step** means no minification or tree-shaking: the page loads about 1.7 MB of script from disk (instant locally,
+  noticeable over a slow network if you host it). Chart.js and the fonts are vendored, so there are no CDN requests and
+  the Content-Security-Policy only allows the page's own files.
+
+## Accuracy and verification
+
+**How results are computed**
+
+| Quantity | Method | Accuracy |
+|---|---|---|
+| Normal, t, F, chi-square, beta, gamma CDFs and critical values | Exact (incomplete gamma / beta functions, bisection for quantiles) | about 1e-12 |
+| Studentized range (Tukey HSD) | Numerical integration (Gauss-Legendre) | about 1e-9 |
+| Shapiro-Wilk W and p | Royston (1992/1995), same algorithm as SciPy and R | W to 1e-9, p to 1e-7 |
+| Kolmogorov-Smirnov (normality) | Lilliefors null distribution, simulated with a fixed seed and cached per n | p within about 0.004 |
+| Anderson-Darling p | D'Agostino and Stephens polynomial formulas | approximate (3 digits) |
+| MANOVA F | Rao's approximation to Wilks' Lambda | exact only for 1-2 dependent variables or 2-3 groups |
+| Mann-Whitney, Wilcoxon, runs test | Normal approximation | **not exact for small samples** (e.g. n = 6 vs 7 can differ from SciPy's exact p) |
+| Kruskal-Wallis, Friedman, Cochran Q, Mood's median, chi-square tests | Asymptotic chi-square | needs reasonable sample sizes; expected counts below 5 weaken the p-value |
+| Sign test, binomial exact | Exact binomial | exact |
+
+**What has been checked against a reference implementation (SciPy / statsmodels / NumPy)**
+
+* **28 tools have automated tests** in `tests/`: mean, variance, geometric and harmonic mean, one-sample t, Welch t,
+  one-way ANOVA, Pearson, simple and multiple linear regression, chi-square independence and goodness of fit,
+  F-test, ANCOVA, MANOVA, Tukey HSD, Scheffe, Shapiro-Wilk, Anderson-Darling, Kolmogorov-Smirnov, one-sample z,
+  binomial exact, Kruskal-Wallis, Friedman, Cochran Q, runs test, Cook's distance, Mann-Whitney (decision).
+* **8 more were compared by hand once** (paired t, Levene, Spearman, Kendall, sign test, Mood's median,
+  one-proportion z, Wilcoxon) but have no automated test yet.
+* **The remaining ~63 tools have not been independently verified.** They share the verified numerics layer, but
+  their own formulas and worked solutions may still contain mistakes. Please report any result that disagrees with
+  R, SciPy or a textbook.
 
 ## Tests
 
 ```
-npm test        # or: node --test
+npm test            # unit tests, no dependencies (Node 18+)
+npm install         # once, for the browser test
+npx playwright install chromium
+npm run test:e2e    # opens every tool in a real browser, loads sample data, presses Calculate
+npm run test:all    # both
 ```
 
+* `.github/workflows/ci.yml` runs the unit tests on Node 18/20/22 and the browser test on every pull request
+* `tests/e2e/smoke.js`: every tool opens, sample data produces a result with no NaN/undefined, no script or console errors
 * `tests/numerics.test.js`: special functions and critical values against SciPy reference values
 * `tests/calculations.test.js`: whole tests (t, ANOVA, ANCOVA, MANOVA, Tukey, Shapiro-Wilk, ...) against SciPy/NumPy
 * `tests/toolkit-and-safety.test.js`: toolkit behaviour, HTML escaping, CSP / no inline handlers, chart cleanup

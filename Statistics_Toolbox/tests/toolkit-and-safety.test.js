@@ -1,6 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const deepEqual = require('node:assert').deepEqual;
 const fs = require('fs');
 const path = require('path');
 const { loadApp, scriptList, ROOT } = require('./load-app');
@@ -58,7 +59,7 @@ test('user-supplied group labels are HTML-escaped before they reach innerHTML', 
 
 test('page ships a Content-Security-Policy and no inline event handlers or inline scripts', () => {
     assert.match(html, /Content-Security-Policy/);
-    assert.match(html, /script-src 'self' https:\/\/cdn\.jsdelivr\.net/);
+    assert.match(html, /script-src 'self';/);
     assert.ok(!/<script>/.test(html), 'no inline <script> in the page');
     for (const rel of scriptList()) {
         const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -95,4 +96,18 @@ test('sample-data contract: tools offering "Try sample data" declare an "Example
     const withExample = Object.entries(R).filter(([, [render]]) => /placeholder="[^"]*(Example|e\.g\.)/i.test(render()));
     // Documented in README: this is how the sample button finds its data. Guard against regressions in coverage.
     assert.ok(withExample.length >= 85, `only ${withExample.length} tools declare an Example placeholder`);
+});
+
+test('the app is self-contained: no external URLs in the page, styles or scripts (works offline)', () => {
+    const files = ['Statistics.html', 'css/statlab.css', 'vendor/fonts/fonts.css', ...scriptList()];
+    for (const rel of files) {
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        const external = [...src.matchAll(/(?:src|href)=["'](https?:)?\/\/[^"']+|url\(["']?https?:/g)].map(m => m[0]);
+        deepEqual(external, [], `${rel} references an external resource`);
+    }
+    for (const rel of ['vendor/chart.umd.js', 'vendor/fonts/inter-latin-400-normal.woff2', 'vendor/fonts/jetbrains-mono-latin-700-normal.woff2'])
+        assert.ok(fs.existsSync(path.join(ROOT, rel)), rel);
+    // every font file referenced by fonts.css exists
+    const css = fs.readFileSync(path.join(ROOT, 'vendor/fonts/fonts.css'), 'utf8');
+    for (const m of css.matchAll(/url\('([^']+)'\)/g)) assert.ok(fs.existsSync(path.join(ROOT, 'vendor/fonts', m[1])), m[1]);
 });
