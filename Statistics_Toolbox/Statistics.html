@@ -297,6 +297,10 @@
         .sub-b { margin-top: 6px; }
         .step-body { margin: 6px 0 4px 58px; padding: 14px 16px; border-radius: 14px; background: #f8fafc; border: 1px solid var(--line); font-family: var(--mono); font-size: .83rem; line-height: 1.75; color: #1e293b; white-space: pre-wrap; overflow-x: auto; }
         .step-body .ln { display: block; }
+        .step-body table.tbl { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: .8rem; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+        .step-body table.tbl th { background: linear-gradient(90deg, #3730a3, #6366f1); color: #fff; font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; padding: 7px 10px; text-align: left; }
+        .step-body table.tbl td { padding: 6px 10px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+        .step-body table.tbl tbody tr:nth-child(even) { background: #f8fafc; }
         .step-body .ln.hl { margin: 4px -6px; padding: 4px 10px; border-radius: 8px; background: #eef2ff; color: #3730a3; font-weight: 700; border-left: 3px solid #6366f1; }
         .sol-final { margin: 8px 22px 22px; padding: 18px 20px; border-radius: 16px; background: linear-gradient(135deg, #ecfdf5, #f0fdfa); border: 1px solid #a7f3d0; }
         .sol-final h5 { font-size: .68rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #047857; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
@@ -8797,8 +8801,13 @@ function computeHazardWithSteps() {
         steps += `   meaning the failure risk does not change over time (memoryless property).\n\n`;
         
         xValues.forEach(t => {
+            const pdf = rate * Math.exp(-rate * t);
+            const surv = Math.exp(-rate * t);
             steps += `\nFor t = ${t}:\n`;
-            steps += `  h(${t}) = λ = ${rate}\n`;
+            steps += `  Step 1: Calculate PDF: f(${t}) = λ·e^{-λt} = ${rate} × e^{-${rate}×${t}} = ${pdf.toFixed(8)}\n`;
+            steps += `  Step 2: Calculate Survival: S(${t}) = e^{-λt} = e^{-${rate}×${t}} = ${surv.toFixed(8)}\n`;
+            steps += `  Step 3: Calculate hazard: h(${t}) = f(${t})/S(${t}) = ${pdf.toFixed(8)}/${surv.toFixed(8)}\n`;
+            steps += `  h(${t}) = ${(pdf / surv).toFixed(8)} = λ\n`;
             steps += `  Interpretation: Instantaneous failure rate is ${rate} at time ${t}\n\n`;
         });
         
@@ -8839,6 +8848,8 @@ function computeHazardWithSteps() {
                 steps += `  Step 2: Calculate (t/λ)^{k-1} = ${(t/scale).toFixed(6)}^${shape-1} = ${Math.pow(t/scale, shape-1).toFixed(8)}\n`;
                 steps += `  Step 3: Calculate k/λ = ${shape}/${scale} = ${(shape/scale).toFixed(6)}\n`;
                 steps += `  Step 4: Multiply: ${(shape/scale).toFixed(6)} × ${Math.pow(t/scale, shape-1).toFixed(8)}\n`;
+                const wSurv = Math.exp(-Math.pow(t / scale, shape));
+                steps += `  Step 5: Check with S(${t}) = e^{-(t/λ)^k} = ${wSurv.toFixed(8)} and f(${t}) = h(${t})·S(${t}) = ${(hazard * wSurv).toFixed(8)}\n`;
                 steps += `  h(${t}) = ${hazard.toFixed(8)}\n`;
                 steps += `  Interpretation: Instantaneous failure rate at time ${t} is ${hazard.toFixed(6)}\n\n`;
             }
@@ -30449,8 +30460,8 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
         valEl.after(row);
     }
     const fmt = t => esc(t).replace(/\^\{([^}]*)\}/g, '<sup>$1</sup>').replace(/\^(\d+)/g, '<sup>$1</sup>');
-    const BOX = /[╔╗╚╝═║│┌┐└┘─━┃┏┓┗┛┠┨┯┷]/g;
-    const isRule = t => /^[\s━─═\-_=*•·╔╗╚╝║│┌┐└┘┃┏┓┗┛]{6,}$/.test(t) && !/[A-Za-z0-9]/.test(t);
+    const BOX = /[╔╗╚╝═║│┌┐└┘─━┃┏┓┗┛┠┨┯┷├┤┬┴┼]/g;
+    const isRule = t => /^[\s━─═\-_=*•·╔╗╚╝║│┌┐└┘┃┏┓┗┛├┤┬┴┼]{6,}$/.test(t) && !/[A-Za-z0-9]/.test(t);
     function parseSolution(raw) {
         const lines = raw.split('\n').map(l => l.replace(/\s+$/, ''));
         const cleanOf = l => l.replace(BOX, ' ').replace(/\s+/g, ' ').trim();
@@ -30477,6 +30488,10 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
             const boxed = /^[║│┃]/.test(t) || /[║│┃]$/.test(t);
             const clean = cleanOf(t);
             if (!clean) return;
+            if (/^[│┃]/.test(t) && /[│┃]$/.test(t)) {
+                const cells = t.replace(/^[│┃]|[│┃]$/g, '').split(/[│┃]/).map(c => c.trim());
+                if (cells.length >= 2) { push(line, { cls: 'row', cells }); lastBlank = false; return; }
+            }
             let m;
             if (first) {
                 first = false;
@@ -30487,7 +30502,7 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
             if ((m = bare.match(/^(?:FORMULA|Formula)\s*:\s*(.+)$/)) && !cur) { sol.formulas.push(m[1]); return; }
             if ((m = bare.match(/^(?:Step|STEP)\s*(\d+)\s*[:.\-–]?\s*(.*)$/))) {
                 const st = { no: m[1], title: m[2] || 'Step ' + m[1], lines: [], step: true };
-                if (cur && !cur.step && !cur.anon) { sub = st; subIndent = indentOf(line); cur.subs.push(st); lastBlank = false; }
+                if (cur && !cur.step && !cur.anon && !cur.chapter && (cur.subs.length || !cur.lines.some(x => x.t.trim()))) { sub = st; subIndent = indentOf(line); cur.subs.push(st); lastBlank = false; }
                 else { open(st); }
                 return;
             }
@@ -30545,19 +30560,30 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
             const blk = (lines) => {
                 const ls = lines.filter(l => l.t.trim());
                 const ml = ls.length ? Math.min.apply(null, ls.map(l => l.t.match(/^\s*/)[0].length)) : 0;
-                return ls.map(l => lineHtml(l, ml)).join('');
+                let out = '', rows = [];
+                const flush = () => {
+                    if (!rows.length) return;
+                    const cell = (c, tag) => '<' + tag + '>' + fmt(c) + '</' + tag + '>';
+                    out += '<table class="tbl"><thead><tr>' + rows[0].cells.map(c => cell(c, 'th')).join('') + '</tr></thead><tbody>' +
+                        rows.slice(1).map(r => '<tr>' + r.cells.map(c => cell(c, 'td')).join('') + '</tr>').join('') + '</tbody></table>';
+                    rows = [];
+                };
+                ls.forEach(l => { if (l.cls === 'row') rows.push(l); else { flush(); out += lineHtml(l, ml); } });
+                flush();
+                return out;
             };
             const subHtml = sb => {
                 const m = sb.title.match(/^(.+?)\s*=\s*(.+)$/), ls = sb.lines.filter(l => l.t.trim());
                 return '<div class="sub"><span class="sub-no">' + esc(sb.no) + '</span><div class="sub-main"><div class="sub-t"><span>' + fmt(m && !ls.length ? m[1] : sb.title) + '</span>' + (m && !ls.length ? '<span class="step-val">' + fmt(m[2]) + '</span>' : '') + '</div>' + (ls.length ? '<div class="sub-b">' + blk(sb.lines) + '</div>' : '') + '</div></div>';
             };
             let n = 0;
+            const hasSteps = sol.items.some(x => x.step);
             sol.items.forEach((st, i) => {
                 if (st.chapter) { h += '<div class="chapter"><span>' + fmt(st.title) + '</span></div>'; return; }
                 const hasBody = st.lines.some(l => l.t.trim()) || st.subs.length || st.post.some(l => l.t.trim());
                 if (st.anon) { h += '<div class="anon">' + blk(st.lines) + st.subs.map(subHtml).join('') + blk(st.post) + '</div>'; return; }
                 n++;
-                const no = st.no || n;
+                const no = st.no || (hasSteps ? '•' : n);
                 const open = nItems <= 10 || n <= 3 ? ' open' : '';
                 if (hasBody) h += '<details class="step' + (st.step ? '' : ' part') + '"' + open + '><summary><span class="step-no">' + esc(String(no)) + '</span><span class="step-title">' + fmt(st.title) + '</span><span class="step-caret">▶</span></summary><div class="step-body">' + blk(st.lines) + (st.subs.length ? '<div class="subs">' + st.subs.map(subHtml).join('') + '</div>' : '') + blk(st.post) + '</div></details>';
                 else {
