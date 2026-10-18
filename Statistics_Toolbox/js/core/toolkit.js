@@ -50,9 +50,17 @@ function sanitizeHtmlTree(root) {
     return root;
 }
 
+// Removes on*="..." attributes from the tags of an HTML string BEFORE it is parsed. The DOM pass below is the real
+// sanitiser; this only stops recent browsers from reporting a Content-Security-Policy violation (console noise, and a
+// failing browser test) merely because markup containing a handler was parsed, even inside an inert <template>.
+const EVENT_HANDLER_ATTRIBUTE = /[\s/]+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'<>`]+)/gi;
+function stripEventHandlerAttributes(html) {
+    return String(html).replace(/<[a-zA-Z][^<>]*>/g, tag => tag.replace(EVENT_HANDLER_ATTRIBUTE, ''));
+}
+
 function setHtml(element, html) {
     const template = document.createElement('template');
-    template.innerHTML = String(html);
+    template.innerHTML = stripEventHandlerAttributes(html);
     if (!template.content || typeof template.content.querySelectorAll !== 'function') {
         element.innerHTML = String(html);          // no real DOM (unit tests with a stub document)
         return;
