@@ -296,6 +296,50 @@
         .sub-t .step-val { padding: 4px 10px; font-size: .8rem; }
         .sub-b { margin-top: 6px; }
         .step-body { margin: 6px 0 4px 58px; padding: 14px 16px; border-radius: 14px; background: #f8fafc; border: 1px solid var(--line); font-family: var(--mono); font-size: .83rem; line-height: 1.75; color: #1e293b; white-space: pre-wrap; overflow-x: auto; }
+
+        /* ---- unified layout for hand-built solutions ---- */
+        .calculation-steps.rich .rd-nav { margin: 0 0 22px; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: 0 8px 22px -18px rgba(30,27,75,.5); }
+        .rd-nav-h { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+        .rd-nav-h b { font-weight: 800; }
+        .rd-all { border: 1px solid var(--line); background: #f8fafc; color: var(--ink-2); border-radius: 999px; padding: 4px 12px; font: 700 .72rem 'Inter', sans-serif; cursor: pointer; text-transform: none; letter-spacing: 0; }
+        .rd-all:hover { border-color: #a5b4fc; color: var(--brand); }
+        .rd-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; }
+        .rd-flow em { color: #a5b4fc; font-style: normal; font-weight: 800; }
+        .rd-flow a { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 6px; border-radius: 999px; background: #eef2ff; border: 1px solid #e0e7ff; color: #3730a3; font: 600 .78rem 'Inter', sans-serif; text-decoration: none; }
+        .rd-flow a:hover { background: #e0e7ff; }
+        .rd-flow a i { font-style: normal; display: grid; place-items: center; min-width: 22px; height: 22px; padding: 0 4px; border-radius: 999px; background: linear-gradient(135deg, #4338ca, #6366f1); color: #fff; font-size: .7rem; font-weight: 800; }
+        .rd-sec { scroll-margin-top: 14px; }
+        .rd-det > summary { list-style: none; display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 2px 0 12px; font: 800 1.02rem 'Inter', sans-serif; color: var(--ink); }
+        .rd-det > summary::-webkit-details-marker { display: none; }
+        .rd-no { display: grid; place-items: center; min-width: 32px; height: 32px; padding: 0 6px; border-radius: 10px; background: linear-gradient(135deg, #4338ca, #6366f1); color: #fff; font-size: .85rem; box-shadow: 0 6px 12px -6px rgba(67,56,202,.7); }
+        .rd-final .rd-no { background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 6px 12px -6px rgba(5,150,105,.7); }
+        .rd-tt { flex: 1; }
+        .rd-car { font-size: .7rem; color: var(--muted); transition: transform .15s; }
+        .rd-det[open] > summary .rd-car { transform: rotate(90deg); }
+        .rd-det:not([open]) > summary { padding-bottom: 2px; }
+        .rd-body > .rd-dup { display: none !important; }
+        .rd-scroll { overflow-x: auto; max-width: 100%; border-radius: 12px; }
+        .calculation-steps.rich .rd-scroll table { min-width: 100%; }
+        .calculation-steps.rich td, .calculation-steps.rich th { white-space: nowrap; }
+        .calculation-steps.rich td.wrap { white-space: normal; min-width: 220px; }
+        .rd-fig { margin: 0 0 22px; padding: 14px 16px 12px; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: 0 8px 22px -18px rgba(30,27,75,.5); }
+        .rd-fig figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 14px; margin-bottom: 6px; }
+        .rd-fig figcaption b { font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+        .rd-fig figcaption span { font: 600 .8rem var(--mono); color: var(--brand); }
+        .rd-fig svg { width: 100%; height: auto; display: block; }
+        .rd-fig .g { stroke: #e2e8f0; stroke-width: 1; }
+        .rd-fig .ax { stroke: #94a3b8; stroke-width: 1.4; }
+        .rd-fig .t { font: 11px var(--mono); fill: #64748b; }
+        .rd-fig .al { font: 700 12px 'Inter', sans-serif; fill: #334155; }
+        .rd-fig .pt { fill: #4f46e5; stroke: #fff; stroke-width: 1.5; }
+        .rd-fig .fit { stroke: #ef4444; stroke-width: 2.4; stroke-linecap: round; }
+        .rd-fig .rs { stroke: #f59e0b; stroke-width: 1.4; stroke-dasharray: 3 3; }
+        .rd-key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 6px; font-size: .75rem; color: var(--muted); }
+        .rd-key span { display: inline-flex; align-items: center; gap: 6px; }
+        .rd-key i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; }
+        .rd-key .k-pt { width: 10px; height: 10px; border: 0; border-radius: 50%; background: #4f46e5; }
+        .rd-key .k-fit { border-color: #ef4444; }
+        .rd-key .k-rs { border-top: 2px dashed #f59e0b; }
         .step-body .ln { display: block; }
         .step-body table.tbl { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: .8rem; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
         .step-body table.tbl th { background: linear-gradient(90deg, #3730a3, #6366f1); color: #fff; font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; padding: 7px 10px; text-align: left; }
@@ -3934,7 +3978,7 @@ function renderPearsonInterface() {
                 <label>📋 Enter X values (comma, space, or line separated):</label>
                 <textarea id="pearsonXInput" rows="3" placeholder="Example: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"></textarea>
                 <label style="margin-top: 15px;">📋 Enter Y values (same number of values):</label>
-                <textarea id="pearsonYInput" rows="3" placeholder="Example: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20"></textarea>
+                <textarea id="pearsonYInput" rows="3" placeholder="Example: 2.1, 3.9, 6.5, 7.8, 10.4, 11.9, 14.6, 15.8, 18.5, 19.7"></textarea>
                 <div class="action-row">
                     <button class="primary-btn" id="pearsonComputeBtn">📐 Calculate Pearson r + Full Steps</button>
                     <button class="secondary-btn" id="pearsonClearBtn">Clear All</button>
@@ -10877,15 +10921,45 @@ function tCriticalValue(p, df) {
     return normInv(1 - p);
 }
 
+function betaIncReg(x, a, b) {
+    // Regularized incomplete beta I_x(a, b) via continued fraction (Lentz)
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    const lbeta = logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log(1 - x);
+    const cf = (xx, aa, bb) => {
+        const TINY = 1e-300;
+        let c = 1, d = 1 - (aa + bb) * xx / (aa + 1);
+        if (Math.abs(d) < TINY) d = TINY;
+        d = 1 / d;
+        let h = d;
+        for (let m = 1; m <= 300; m++) {
+            const m2 = 2 * m;
+            let n = m * (bb - m) * xx / ((aa + m2 - 1) * (aa + m2));
+            d = 1 + n * d; if (Math.abs(d) < TINY) d = TINY;
+            c = 1 + n / c; if (Math.abs(c) < TINY) c = TINY;
+            d = 1 / d; h *= d * c;
+            n = -(aa + m) * (aa + bb + m) * xx / ((aa + m2) * (aa + m2 + 1));
+            d = 1 + n * d; if (Math.abs(d) < TINY) d = TINY;
+            c = 1 + n / c; if (Math.abs(c) < TINY) c = TINY;
+            d = 1 / d;
+            const del = d * c; h *= del;
+            if (Math.abs(del - 1) < 3e-14) break;
+        }
+        return h;
+    };
+    return x < (a + 1) / (a + b + 2)
+        ? Math.exp(lbeta) * cf(x, a, b) / a
+        : 1 - Math.exp(lbeta) * cf(1 - x, b, a) / b;
+}
+
 function tCDF(t, df) {
-    // Approximation of t-distribution CDF
+    // Exact Student-t CDF through the incomplete beta function
     if (df <= 0) return t > 0 ? 1 : 0;
-    if (df > 1000) return normCDF(t);
-    
-    const x = df / (t * t + df);
-    let cdf = 0.5 * (1 + (t / Math.sqrt(t * t + df)) * 
-        (1 - 1 / (4 * df) + 1 / (32 * df * df)));
-    return Math.min(Math.max(cdf, 0), 1);
+    if (t === Infinity) return 1;
+    if (t === -Infinity) return 0;
+    if (isNaN(t)) return NaN;
+    const ib = betaIncReg(df / (df + t * t), df / 2, 0.5);
+    return t >= 0 ? 1 - ib / 2 : ib / 2;
 }
 
 function normInv(p) {
@@ -11807,10 +11881,10 @@ function fCriticalValue(alpha, df1, df2) {
 }
 
 function fCDF(f, df1, df2) {
+    // Exact F CDF through the incomplete beta function
     if (f <= 0) return 0;
-    // Simplified approximation
-    let x = df1 * f / (df1 * f + df2);
-    return 0.5;
+    if (f === Infinity) return 1;
+    return betaIncReg(df1 * f / (df1 * f + df2), df1 / 2, df2 / 2);
 }
 
 function normInv(p) {
@@ -15376,7 +15450,7 @@ function renderSimpleLinearInterface() {
                 <textarea id="simpleXInput" rows="3" placeholder="Example: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"></textarea>
                 
                 <label style="margin-top: 15px;">📋 Enter Y values (dependent variable):</label>
-                <textarea id="simpleYInput" rows="3" placeholder="Example: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20"></textarea>
+                <textarea id="simpleYInput" rows="3" placeholder="Example: 2.1, 3.9, 6.5, 7.8, 10.4, 11.9, 14.6, 15.8, 18.5, 19.7"></textarea>
                 
                 <div class="action-row">
                     <button class="primary-btn" id="simpleLinearComputeBtn">📈 Fit Regression Model + Full Steps</button>
@@ -21161,7 +21235,7 @@ function renderCooksDistanceInterface() {
                 <textarea id="cooksXInput" rows="3" placeholder="Example: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"></textarea>
                 
                 <label style="margin-top: 15px;">📋 Enter Y values (outcome):</label>
-                <textarea id="cooksYInput" rows="3" placeholder="Example: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20"></textarea>
+                <textarea id="cooksYInput" rows="3" placeholder="Example: 2.1, 3.9, 6.5, 7.8, 10.4, 11.9, 14.6, 15.8, 18.5, 19.7"></textarea>
                 
                 <div class="action-row">
                     <button class="primary-btn" id="cooksComputeBtn">🔥 Calculate Cook's Distance + Full Steps</button>
@@ -23729,7 +23803,7 @@ function renderStdErrorsInterface() {
                 <textarea id="stderrorsXInput" rows="3" placeholder="Example: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"></textarea>
                 
                 <label style="margin-top: 15px;">📋 Enter Y values (dependent variable):</label>
-                <textarea id="stderrorsYInput" rows="3" placeholder="Example: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20"></textarea>
+                <textarea id="stderrorsYInput" rows="3" placeholder="Example: 2.1, 3.9, 6.5, 7.8, 10.4, 11.9, 14.6, 15.8, 18.5, 19.7"></textarea>
                 
                 <div class="action-row">
                     <button class="primary-btn" id="stderrorsComputeBtn">📏 Calculate Standard Errors + Full Steps</button>
@@ -23751,7 +23825,7 @@ function renderStdErrorsInterface() {
 function renderTStatsInterface() {
     return `
         <div class="stat-interface" id="statTStatsInterface">
-            <div class="interface-title">t t-Statistics for Regression Coefficients</div>
+            <div class="interface-title">t-Statistics for Regression Coefficients</div>
             <div class="formula-card">
                 <div class="formula">📌 t = β̂ / SE(β̂)</div>
                 <div class="desc">
@@ -23766,7 +23840,7 @@ function renderTStatsInterface() {
                 <textarea id="tstatsXInput" rows="3" placeholder="Example: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"></textarea>
                 
                 <label style="margin-top: 15px;">📋 Enter Y values (dependent variable):</label>
-                <textarea id="tstatsYInput" rows="3" placeholder="Example: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20"></textarea>
+                <textarea id="tstatsYInput" rows="3" placeholder="Example: 2.1, 3.9, 6.5, 7.8, 10.4, 11.9, 14.6, 15.8, 18.5, 19.7"></textarea>
                 
                 <div class="action-row">
                     <button class="primary-btn" id="tstatsComputeBtn">t Calculate t-Statistics + Full Steps</button>
@@ -23788,7 +23862,7 @@ function renderTStatsInterface() {
 function renderFTestOverallInterface() {
     return `
         <div class="stat-interface" id="statFTestOverallInterface">
-            <div class="interface-title">F F-Test for Overall Model Significance</div>
+            <div class="interface-title">F-Test for Overall Model Significance</div>
             <div class="formula-card">
                 <div class="formula">📌 F = (SS<sub>reg</sub> / k) / (SS<sub>res</sub> / (n - k - 1))</div>
                 <div class="desc">
@@ -23802,7 +23876,7 @@ function renderFTestOverallInterface() {
                 <textarea id="ftestOverallXInput" rows="3" placeholder="Example: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"></textarea>
                 
                 <label style="margin-top: 15px;">📋 Enter Y values (dependent variable):</label>
-                <textarea id="ftestOverallYInput" rows="3" placeholder="Example: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20"></textarea>
+                <textarea id="ftestOverallYInput" rows="3" placeholder="Example: 2.1, 3.9, 6.5, 7.8, 10.4, 11.9, 14.6, 15.8, 18.5, 19.7"></textarea>
                 
                 <label style="margin-top: 15px;">📊 Significance Level (α):</label>
                 <select id="ftestOverallAlpha" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 15px;">
@@ -24137,7 +24211,7 @@ function computeTStatsWithSteps(xValues, yValues) {
         
         <!-- HEADER -->
         <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 30px;">
-            <h1 style="margin: 0 0 10px 0;">t t-Statistics for Regression Coefficients</h1>
+            <h1 style="margin: 0 0 10px 0;">t-Statistics for Regression Coefficients</h1>
             <p style="margin: 0; opacity: 0.95;">t = β̂ / SE(β̂) | H₀: β = 0 | H₁: β ≠ 0</p>
             <p style="margin: 8px 0 0 0; font-size: 14px;">df = n - 2 = ${df} | Critical t (α=0.05, two-tailed) = ±${criticalT.toFixed(4)}</p>
         </div>
@@ -24475,7 +24549,7 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
         
         <!-- HEADER -->
         <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 30px;">
-            <h1 style="margin: 0 0 10px 0;">F F-Test for Overall Model Significance</h1>
+            <h1 style="margin: 0 0 10px 0;">F-Test for Overall Model Significance</h1>
             <p style="margin: 0; opacity: 0.95;">F = (SS<sub>reg</sub> / k) / (SS<sub>res</sub> / (n - k - 1))</p>
             <p style="margin: 8px 0 0 0; font-size: 14px;">H₀: β₁ = 0 (Model explains no variance) | H₁: β₁ ≠ 0 (Model is useful)</p>
         </div>
@@ -28364,14 +28438,14 @@ function computeMutualInformationWithSteps(xValues, yValues, numBins) {
     for (let i = 0; i < xBins; i++) {
         const count = xCounts[i];
         const px = count / n;
-        const log2px = Math.log2(px);
-        const term = px * log2px;
+        const log2px = count > 0 ? Math.log2(px) : 0;
+        const term = count > 0 ? px * log2px : 0; // 0·log 0 is taken as 0
         hxSum += term;
         hxRows += '<tr style="border-bottom: 1px solid #e9ecef;">';
         hxRows += '<td style="padding: 8px; text-align: center;">Bin ' + (i+1) + '<br>[' + xBinEdges[i].toFixed(2) + '-' + xBinEdges[i+1].toFixed(2) + ']</td>';
         hxRows += '<td style="padding: 8px; text-align: center;">' + count + '</td>';
         hxRows += '<td style="padding: 8px; text-align: center;">' + count + '/' + n + ' = ' + px.toFixed(6) + '</td>';
-        hxRows += '<td style="padding: 8px; text-align: center;">log₂(' + px.toFixed(6) + ') = ' + log2px.toFixed(6) + '</td>';
+        hxRows += '<td style="padding: 8px; text-align: center;">' + (count > 0 ? 'log₂(' + px.toFixed(6) + ') = ' + log2px.toFixed(6) : 'empty bin (0·log 0 = 0)') + '</td>';
         hxRows += '<td style="padding: 8px; text-align: center; font-weight: bold;">' + px.toFixed(6) + ' × ' + log2px.toFixed(6) + ' = ' + term.toFixed(6) + '</td>';
         hxRows += '</tr>';
     }
@@ -28382,14 +28456,14 @@ function computeMutualInformationWithSteps(xValues, yValues, numBins) {
     for (let j = 0; j < yBins; j++) {
         const count = yCounts[j];
         const py = count / n;
-        const log2py = Math.log2(py);
-        const term = py * log2py;
+        const log2py = count > 0 ? Math.log2(py) : 0;
+        const term = count > 0 ? py * log2py : 0; // 0·log 0 is taken as 0
         hySum += term;
         hyRows += '<tr style="border-bottom: 1px solid #e9ecef;">';
         hyRows += '<td style="padding: 8px; text-align: center;">Bin ' + (j+1) + '<br>[' + yBinEdges[j].toFixed(2) + '-' + yBinEdges[j+1].toFixed(2) + ']</td>';
         hyRows += '<td style="padding: 8px; text-align: center;">' + count + '</td>';
         hyRows += '<td style="padding: 8px; text-align: center;">' + count + '/' + n + ' = ' + py.toFixed(6) + '</td>';
-        hyRows += '<td style="padding: 8px; text-align: center;">log₂(' + py.toFixed(6) + ') = ' + log2py.toFixed(6) + '</td>';
+        hyRows += '<td style="padding: 8px; text-align: center;">' + (count > 0 ? 'log₂(' + py.toFixed(6) + ') = ' + log2py.toFixed(6) : 'empty bin (0·log 0 = 0)') + '</td>';
         hyRows += '<td style="padding: 8px; text-align: center; font-weight: bold;">' + py.toFixed(6) + ' × ' + log2py.toFixed(6) + ' = ' + term.toFixed(6) + '</td>';
         hyRows += '</tr>';
     }
@@ -30528,13 +30602,109 @@ btnIQR.addEventListener('click', () => switchToStat("iqr"));
         const body = /^[•\-*]\s/.test(txt) && cls.includes('bl') ? txt.replace(/^[•\-*]\s*/, '') : txt;
         return '<span class="' + cls + '" style="padding-left:' + (lead * .55 + (cls.includes(' bl') ? 1.1 : 0)) + 'em">' + fmt(body) + '</span>';
     }
+
+    // ---------- unified layout for hand-built (rich) solutions: roadmap, collapsible sections, scatter diagram ----------
+    const SCATTER_IFACE = /Pearson|Spearman|Kendall|Covariance|SimpleLinear|StdErrors|TStats|FTestOverall|ModelSummary|DurbinWatson|CooksDistance|PointBiserial/;
+    const numsOf = t => ((t && t.value) || '').split(/[\s,;]+/).filter(Boolean).map(Number).filter(isFinite);
+    const nice = (lo, hi, n) => {
+        const span = (hi - lo) || 1, raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+        const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(v => v >= raw) || raw;
+        const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + step * 1e-9; v += step) out.push(+v.toFixed(10));
+        return out;
+    };
+    const f4 = v => Math.abs(v) >= 1000 || (v !== 0 && Math.abs(v) < 0.01) ? v.toExponential(2) : String(+v.toFixed(3));
+    function scatterSvg(iface) {
+        if (!SCATTER_IFACE.test(iface.id)) return '';
+        const areas = $$('textarea', iface).filter(t => numsOf(t).length >= 3);
+        let tx = areas.find(t => /X(Input)?$/i.test(t.id)), ty = areas.find(t => /Y(Input)?$/i.test(t.id));
+        if (!tx || !ty) { tx = areas[0]; ty = areas[1]; }
+        if (!tx || !ty) return '';
+        const X = numsOf(tx), Y = numsOf(ty), n = Math.min(X.length, Y.length);
+        if (n < 3 || X.length !== Y.length) return '';
+        const mx = X.reduce((a, b) => a + b, 0) / n, my = Y.reduce((a, b) => a + b, 0) / n;
+        let sxy = 0, sxx = 0, syy = 0;
+        for (let i = 0; i < n; i++) { sxy += (X[i] - mx) * (Y[i] - my); sxx += (X[i] - mx) ** 2; syy += (Y[i] - my) ** 2; }
+        const b1 = sxx ? sxy / sxx : 0, b0 = my - b1 * mx, r = sxx && syy ? sxy / Math.sqrt(sxx * syy) : 0;
+        const W = 640, H = 300, L = 54, R = 16, T = 16, B = 40;
+        const xlo = Math.min(...X), xhi = Math.max(...X), ylo = Math.min(...Y, b0 + b1 * xlo, b0 + b1 * xhi), yhi = Math.max(...Y, b0 + b1 * xlo, b0 + b1 * xhi);
+        const px = (xhi - xlo) * .06 || 1, py = (yhi - ylo) * .08 || 1;
+        const x0 = xlo - px, x1 = xhi + px, y0 = ylo - py, y1 = yhi + py;
+        const sx = v => L + (v - x0) / (x1 - x0) * (W - L - R), sy = v => H - B - (v - y0) / (y1 - y0) * (H - T - B);
+        let g = '';
+        nice(x0, x1, 6).forEach(v => { g += '<line class="g" x1="' + sx(v) + '" x2="' + sx(v) + '" y1="' + T + '" y2="' + (H - B) + '"/><text class="t" x="' + sx(v) + '" y="' + (H - B + 16) + '" text-anchor="middle">' + f4(v) + '</text>'; });
+        nice(y0, y1, 5).forEach(v => { g += '<line class="g" y1="' + sy(v) + '" y2="' + sy(v) + '" x1="' + L + '" x2="' + (W - R) + '"/><text class="t" y="' + (sy(v) + 4) + '" x="' + (L - 8) + '" text-anchor="end">' + f4(v) + '</text>'; });
+        let stems = '', dots = '';
+        for (let i = 0; i < n; i++) {
+            stems += '<line class="rs" x1="' + sx(X[i]) + '" x2="' + sx(X[i]) + '" y1="' + sy(Y[i]) + '" y2="' + sy(b0 + b1 * X[i]) + '"/>';
+            dots += '<circle class="pt" cx="' + sx(X[i]) + '" cy="' + sy(Y[i]) + '" r="4.5"><title>(' + X[i] + ', ' + Y[i] + ')</title></circle>';
+        }
+        const line = '<line class="fit" x1="' + sx(xlo) + '" y1="' + sy(b0 + b1 * xlo) + '" x2="' + sx(xhi) + '" y2="' + sy(b0 + b1 * xhi) + '"/>';
+        return '<figure class="rd-fig"><figcaption><b>Scatter plot with least-squares line</b><span>ŷ = ' + f4(b0) + (b1 < 0 ? ' − ' : ' + ') + f4(Math.abs(b1)) + 'x &nbsp;·&nbsp; r = ' + r.toFixed(4) + ' &nbsp;·&nbsp; n = ' + n + '</span></figcaption>' +
+            '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Scatter plot of Y against X with fitted line">' + g +
+            '<line class="ax" x1="' + L + '" x2="' + (W - R) + '" y1="' + (H - B) + '" y2="' + (H - B) + '"/><line class="ax" x1="' + L + '" x2="' + L + '" y1="' + T + '" y2="' + (H - B) + '"/>' +
+            stems + line + dots + '<text class="al" x="' + ((L + W - R) / 2) + '" y="' + (H - 6) + '" text-anchor="middle">X</text><text class="al" transform="translate(13 ' + ((T + H - B) / 2) + ') rotate(-90)" text-anchor="middle">Y</text></svg>' +
+            '<div class="rd-key"><span><i class="k-pt"></i>Observed point</span><span><i class="k-fit"></i>Fitted line</span><span><i class="k-rs"></i>Residual</span></div></figure>';
+    }
+    function decorateRich(el) {
+        const root = el.firstElementChild;
+        if (!root || root.dataset.rd) return;
+        root.dataset.rd = '1';
+        const kids = Array.from(root.children);
+        if (kids.length < 3) return;
+        const banner = kids[0], secs = kids.slice(1);
+        const titleOf = c => {
+            let n = c;
+            for (let i = 0; i < 4; i++) {
+                const k = Array.from(n.children).find(x => x.textContent.trim());
+                if (!k) break;
+                n = k;
+                if (n.textContent.trim().length <= 90) break;
+            }
+            return (n.textContent || '').replace(/\s+/g, ' ').trim();
+        };
+        const clean = t => t.replace(/^[^\p{L}\p{N}]+/u, '').replace(/\s+/g, ' ');
+        const chips = [];
+        secs.forEach((sec, i) => {
+            const raw = titleOf(sec), title = clean(raw);
+            if (!title) return;
+            const isFinal = /^[📌✅✔]/u.test(raw), isRef = /^[📖📚]/u.test(raw) || /^(Formula Reference|Complete Formula)/i.test(title);
+            sec.id = (el.id || 'rd') + '-s' + (i + 1); sec.classList.add('rd-sec'); if (isFinal) sec.classList.add('rd-final');
+            const first = sec.firstElementChild, ft = first ? clean(first.textContent || '') : '', dup = !!first && ft.length <= title.length + 4 && ft.startsWith(title.slice(0, 20));
+            const d = document.createElement('details'); d.className = 'rd-det'; if (!isRef) d.open = true;
+            const sm = document.createElement('summary');
+            const num = chips.length + 1;
+            sm.innerHTML = '<span class="rd-no">' + (isFinal ? '✔' : isRef ? '≡' : num) + '</span><span class="rd-tt">' + fmt(title.length > 70 ? title.slice(0, 68) + '…' : title) + '</span><span class="rd-car">▶</span>';
+            const body = document.createElement('div'); body.className = 'rd-body';
+            while (sec.firstChild) body.appendChild(sec.firstChild);
+            if (dup && body.firstElementChild) body.firstElementChild.classList.add('rd-dup');
+            d.appendChild(sm); d.appendChild(body); sec.appendChild(d);
+            chips.push({ id: sec.id, no: isFinal ? '✔' : isRef ? '≡' : num, title: (t => t.length > 30 ? t.slice(0, 29) + '…' : t)(title.replace(/^(PART|Step)\s*\d+(\.\d+)?\s*[:.\-–]?\s*/i, '') || title), det: d });
+        });
+        $$('table', root).forEach(t => {
+            $$('td', t).forEach(td => { if ((td.textContent || '').trim().length > 34) td.classList.add('wrap'); });
+            const w = document.createElement('div'); w.className = 'rd-scroll'; t.parentNode.insertBefore(w, t); w.appendChild(t);
+        });
+        const iface = el.closest('.stat-interface');
+        const figHtml = iface ? scatterSvg(iface) : '';
+        const nav = document.createElement('nav'); nav.className = 'rd-nav'; nav.setAttribute('aria-label', 'Solution roadmap');
+        nav.innerHTML = '<div class="rd-nav-h"><b>Solution roadmap</b><button type="button" class="rd-all">Collapse all</button></div><div class="rd-flow">' +
+            chips.map(c => '<a href="#' + c.id + '" data-id="' + c.id + '"><i>' + c.no + '</i><span>' + fmt(c.title) + '</span></a>').join('<em>›</em>') + '</div>';
+        banner.after(nav);
+        if (figHtml) { const f = document.createElement('div'); f.innerHTML = figHtml; nav.after(f.firstChild); }
+        nav.addEventListener('click', e => {
+            const a = e.target.closest('a[data-id]');
+            if (a) { e.preventDefault(); const c = chips.find(x => x.id === a.dataset.id); if (c) c.det.open = true; document.getElementById(a.dataset.id).scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            const b = e.target.closest('.rd-all');
+            if (b) { const open = b.textContent !== 'Collapse all'; chips.forEach(c => c.det.open = open); b.textContent = open ? 'Collapse all' : 'Expand all'; }
+        });
+    }
     function buildSolution(el) {
         const card = el.closest('.result-card');
         const old = card.querySelector(':scope > .solution[data-for="' + el.id + '"]');
         if (old) old.remove();
         const rich = !!el.querySelector('div, table, h2, h3');
         el.classList.toggle('rich', rich); el.classList.remove('raw');
-        if (rich) { el.classList.remove('plain-src'); return; }
+        if (rich) { el.classList.remove('plain-src'); decorateRich(el); return; }
         const tmp = document.createElement('div'); tmp.innerHTML = el.innerHTML.replace(/<br\s*\/?>/gi, '\n');
         const raw = tmp.textContent.replace(/\r/g, '');
         if (!raw.trim()) { el.classList.remove('plain-src'); return; }
