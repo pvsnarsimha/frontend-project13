@@ -2012,7 +2012,7 @@ function computeModelSummary(actual, predicted) {
     
     // R² Expandable
     steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div onclick="toggleMetric(this)" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
+    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
     steps.push('<span style="font-weight: 600;">📐 R-Squared (R²)</span>');
     steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + rSquared.toFixed(6) + '</span>');
     steps.push('</div>');
@@ -2031,7 +2031,7 @@ function computeModelSummary(actual, predicted) {
     
     // Adjusted R² Expandable
     steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div onclick="toggleMetric(this)" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
+    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
     steps.push('<span style="font-weight: 600;">🔧 Adjusted R-Squared</span>');
     steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + adjRSquared.toFixed(6) + '</span>');
     steps.push('</div>');
@@ -2045,7 +2045,7 @@ function computeModelSummary(actual, predicted) {
     
     // RMSE Expandable
     steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div onclick="toggleMetric(this)" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
+    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
     steps.push('<span style="font-weight: 600;">📏 RMSE (Root Mean Square Error)</span>');
     steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + rmse.toFixed(6) + '</span>');
     steps.push('</div>');
@@ -2058,7 +2058,7 @@ function computeModelSummary(actual, predicted) {
     
     // MAE Expandable
     steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div onclick="toggleMetric(this)" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
+    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
     steps.push('<span style="font-weight: 600;">📊 MAE (Mean Absolute Error)</span>');
     steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + mae.toFixed(6) + '</span>');
     steps.push('</div>');
@@ -2073,7 +2073,7 @@ function computeModelSummary(actual, predicted) {
     
     // MAPE Expandable
     steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div onclick="toggleMetric(this)" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
+    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
     steps.push('<span style="font-weight: 600;">% MAPE (Mean Absolute Percentage Error)</span>');
     steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + mape.toFixed(2) + '%</span>');
     steps.push('</div>');
@@ -2180,19 +2180,6 @@ function computeModelSummary(actual, predicted) {
     steps.push('<strong>MAPE = ' + mape.toFixed(1) + '%</strong> — ' + (mape < 10 ? 'Excellent forecasting accuracy (highly reliable predictions).' : (mape < 20 ? 'Good forecasting accuracy with acceptable error margins.' : 'Moderate accuracy; consider model refinement or additional predictors.')));
     steps.push('</div></div>');
     
-    // JavaScript
-    steps.push('<script>');
-    steps.push('function toggleMetric(element) {');
-    steps.push('  var formulaDiv = element.nextElementSibling;');
-    steps.push('  if (formulaDiv.style.display === "none" || formulaDiv.style.display === "") {');
-    steps.push('    formulaDiv.style.display = "block";');
-    steps.push('  } else {');
-    steps.push('    formulaDiv.style.display = "none";');
-    steps.push('  }');
-    steps.push('}');
-    steps.push('var firstMetric = document.querySelectorAll(".metric-formula")[0];');
-    steps.push('if (firstMetric) firstMetric.style.display = "block";');
-    steps.push('<\/script>');
     steps.push('</div>');
     
     var finalSteps = steps.join('');
@@ -2352,4 +2339,10 @@ function setupModelSummaryLogic() {
     });
     
     attachClearHandler("modelSummaryClearBtn", "modelSummaryData", "modelSummaryResultArea");
+}
+
+// Expand/collapse a metric explanation in the model summary (called from the onclick of each metric header)
+function toggleMetric(element) {
+    const formulaDiv = element.nextElementSibling;
+    if (formulaDiv) formulaDiv.style.display = formulaDiv.style.display === 'block' ? 'none' : 'block';
 }

@@ -285,13 +285,37 @@
         el.classList.add('plain-src');
         el.after(box);
     }
+    // Result tables are generated as bare HTML: give header cells a scope and each table a name taken from the heading above it
+    function describeTables(root) {
+        $$('table', root).forEach(table => {
+            if (!table.getAttribute('aria-label') && !table.querySelector('caption')) {
+                let prev = table.closest('.rd-scroll') || table;
+                let label = '';
+                for (let hop = 0; hop < 6 && prev && !label; hop++) {
+                    let node = prev.previousElementSibling;
+                    while (node && !label) {
+                        const h = /^H[2-6]$/.test(node.tagName) ? node : node.querySelector && node.querySelector('h2, h3, h4, h5');
+                        if (h) label = h.textContent.replace(/\s+/g, ' ').replace(/^[^\p{L}\p{N}]+/u, '').trim();
+                        node = label ? null : node.previousElementSibling;
+                    }
+                    prev = prev.parentElement;
+                    if (prev === root) break;
+                }
+                table.setAttribute('aria-label', label || 'Calculation table');
+            }
+            $$('th:not([scope])', table).forEach(th => {
+                th.setAttribute('scope', th.closest('thead') || th.parentElement === table.rows[0] ? 'col' : 'row');
+            });
+        });
+    }
+
     function hookCard(card) {
         if (card.dataset.hooked) return; card.dataset.hooked = '1';
         const val = card.querySelector('.result-value'), st = card.querySelector('.calculation-steps');
-        const run = () => { if (val) buildAnswer(val); if (st) buildSolution(st); };
+        const run = () => { if (val) buildAnswer(val); if (st) { buildSolution(st); describeTables(card); } };
         run();
         if (val) new MutationObserver(() => buildAnswer(val)).observe(val, { childList: true, characterData: true, subtree: true });
-        if (st) new MutationObserver(() => buildSolution(st)).observe(st, { childList: true, characterData: true, subtree: true });
+        if (st) new MutationObserver(() => { buildSolution(st); describeTables(card); }).observe(st, { childList: true, characterData: true, subtree: true });
     }
-    Object.assign(window.StatLabUI, { esc, fmt, buildAnswer, parseSolution, buildSolution, hookCard });
+    Object.assign(window.StatLabUI, { esc, fmt, buildAnswer, parseSolution, buildSolution, describeTables, hookCard });
 })();

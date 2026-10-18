@@ -5,20 +5,20 @@
  * to the matching sidebar in Statistics.html. Nothing else needs touching.
  */
 const STAT_ROUTES = {
-    mean: [renderMeanInterface, setupMeanLogic],
-    median: [renderMedianInterface, setupMedianLogic],
-    mode: [renderModeInterface, setupModeLogic],
-    geometric: [renderGeometricInterface, setupGeometricLogic],
-    harmonic: [renderHarmonicInterface, setupHarmonicLogic],
-    variance: [renderVarianceInterface, setupVarianceLogic],
-    stddev: [renderStdDevInterface, setupStdDevLogic],
-    range: [renderRangeInterface, setupRangeLogic],
+    mean: [meanTool.render, meanTool.setup],
+    median: [medianTool.render, medianTool.setup],
+    mode: [modeTool.render, modeTool.setup],
+    geometric: [geometricTool.render, geometricTool.setup],
+    harmonic: [harmonicTool.render, harmonicTool.setup],
+    variance: [varianceTool.render, varianceTool.setup],
+    stddev: [stddevTool.render, stddevTool.setup],
+    range: [rangeTool.render, rangeTool.setup],
     iqr: [renderIQRInterface, setupIQRCustomLogic],
     quartiles: [renderQuartilesInterface, setupQuartilesLogic],
     percentiles: [renderPercentilesInterface, setupPercentilesLogic],
-    cv: [renderCVInterface, setupCVLogic],
-    skewness: [renderSkewnessInterface, setupSkewnessLogic],
-    kurtosis: [renderKurtosisInterface, setupKurtosisLogic],
+    cv: [cvTool.render, cvTool.setup],
+    skewness: [skewnessTool.render, skewnessTool.setup],
+    kurtosis: [kurtosisTool.render, kurtosisTool.setup],
     meanabsdev: [renderMeanAbsDevInterface, setupMeanAbsDevLogic],
     medianabsdev: [renderMedianAbsDevInterface, setupMedianAbsDevLogic],
     deciles: [renderDecilesInterface, setupDecilesLogic],
@@ -119,18 +119,33 @@ const STAT_MODULES = {
 const interfaceRoot = document.getElementById('interfaceRoot');
 let currentStat = null;
 
+// Each plotting tool keeps its own Chart.js instance in a module-level variable; this is the single place that knows them all
+function destroyAllCharts() {
+    const holders = [
+        [() => currentChart, () => { currentChart = null; }],
+        [() => histogramChart, () => { histogramChart = null; }],
+        [() => boxplotChartInstance, () => { boxplotChartInstance = null; }],
+        [() => violinChart, () => { violinChart = null; }],
+        [() => qqplotChart, () => { qqplotChart = null; }],
+        [() => ppplotChart, () => { ppplotChart = null; }],
+        [() => stemLeafChart, () => { stemLeafChart = null; }]
+    ];
+    holders.forEach(([get, clear]) => {
+        const chart = get();
+        if (chart && typeof chart.destroy === 'function') chart.destroy();
+        clear();
+    });
+}
+
 function switchToStat(statType) {
     const route = STAT_ROUTES[statType] || STAT_ROUTES.mean;
     if (!STAT_ROUTES[statType]) statType = 'mean';
     currentStat = statType;
 
-    // Closing the chart: a different tool means a different data set
+    // A different tool means different data: close the chart panel and release every Chart.js instance
     const chartArea = document.getElementById('chartDisplayArea');
     if (chartArea) chartArea.classList.remove('show');
-    if (currentChart) {
-        currentChart.destroy();
-        currentChart = null;
-    }
+    destroyAllCharts();
 
     const [render, setup] = route;
     interfaceRoot.innerHTML = render();
@@ -198,10 +213,13 @@ function visualizeCurrentData() {
 
 document.getElementById('closeChartBtn').addEventListener('click', () => {
     document.getElementById('chartDisplayArea').classList.remove('show');
-    if (currentChart) {
-        currentChart.destroy();
-        currentChart = null;
-    }
+    destroyAllCharts();
+});
+
+// Expandable metric explanations in the model summary (markup carries data-toggle-metric instead of an inline handler)
+document.addEventListener('click', e => {
+    const header = e.target.closest('[data-toggle-metric]');
+    if (header) toggleMetric(header);
 });
 
 switchToStat('mean');
