@@ -148,7 +148,7 @@ function switchToStat(statType) {
     destroyAllCharts();
 
     const [render, setup] = route;
-    interfaceRoot.innerHTML = render();
+    setHtml(interfaceRoot, render());
     if (setup) setup();
 
     document.querySelectorAll('.stat-btn[data-stat]').forEach(b => {

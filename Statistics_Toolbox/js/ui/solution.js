@@ -18,13 +18,13 @@
         parts.forEach(part => {
             const m = part.match(/^(.{1,40}?)\s*(?:=|:)\s*(.+)$/);
             const d = document.createElement('div'); d.className = 'kpi';
-            if (m) { d.innerHTML = '<small>' + esc(m[1]) + '</small><b>' + esc(m[2]) + '</b>'; }
+            if (m) { setHtml(d, '<small>' + esc(m[1]) + '</small><b>' + esc(m[2]) + '</b>'); }
             else {
                 const sig = /^reject/i.test(part), ns = /fail to reject|not significant/i.test(part);
                 d.className = 'kpi verdict ' + (sig ? 'sig' : ns ? 'ns' : 'ok');
                 // Colour is never the only signal: a glyph and a spoken label carry the same meaning
                 const icon = sig ? '▲' : ns ? '●' : '✔', word = sig ? 'Significant result: ' : ns ? 'Not significant: ' : '';
-                d.innerHTML = '<small>Decision</small><b><span class="vd-ico" aria-hidden="true">' + icon + '</span><span class="sr-only">' + word + '</span>' + esc(part) + '</b>';
+                setHtml(d, '<small>Decision</small><b><span class="vd-ico" aria-hidden="true">' + icon + '</span><span class="sr-only">' + word + '</span>' + esc(part) + '</b>');
             }
             row.appendChild(d);
         });
@@ -171,7 +171,7 @@
             const d = document.createElement('details'); d.className = 'rd-det'; if (!isRef) d.open = true;
             const sm = document.createElement('summary');
             const num = chips.length + 1;
-            sm.innerHTML = '<span class="rd-no">' + (isFinal ? '✔' : isRef ? '≡' : num) + '</span><span class="rd-tt">' + fmt(title.length > 70 ? title.slice(0, 68) + '…' : title) + '</span><span class="rd-car">▶</span>';
+            setHtml(sm, '<span class="rd-no">' + (isFinal ? '✔' : isRef ? '≡' : num) + '</span><span class="rd-tt">' + fmt(title.length > 70 ? title.slice(0, 68) + '…' : title) + '</span><span class="rd-car">▶</span>');
             const body = document.createElement('div'); body.className = 'rd-body';
             while (sec.firstChild) body.appendChild(sec.firstChild);
             if (dup && body.firstElementChild) body.firstElementChild.classList.add('rd-dup');
@@ -185,10 +185,10 @@
         const iface = el.closest('.stat-interface');
         const figHtml = iface ? scatterSvg(iface) : '';
         const nav = document.createElement('nav'); nav.className = 'rd-nav'; nav.setAttribute('aria-label', 'Solution roadmap');
-        nav.innerHTML = '<div class="rd-nav-h"><b>Solution roadmap</b><button type="button" class="rd-all">Collapse all</button></div><div class="rd-flow">' +
-            chips.map(c => '<a href="#' + c.id + '" data-id="' + c.id + '"><i>' + c.no + '</i><span>' + fmt(c.title) + '</span></a>').join('<em>›</em>') + '</div>';
+        setHtml(nav, '<div class="rd-nav-h"><b>Solution roadmap</b><button type="button" class="rd-all">Collapse all</button></div><div class="rd-flow">' +
+            chips.map(c => '<a href="#' + c.id + '" data-id="' + c.id + '"><i>' + c.no + '</i><span>' + fmt(c.title) + '</span></a>').join('<em>›</em>') + '</div>');
         banner.after(nav);
-        if (figHtml) { const f = document.createElement('div'); f.innerHTML = figHtml; nav.after(f.firstChild); }
+        if (figHtml) { const f = document.createElement('div'); setHtml(f, figHtml); nav.after(f.firstChild); }
         nav.addEventListener('click', e => {
             const a = e.target.closest('a[data-id]');
             if (a) { e.preventDefault(); const c = chips.find(x => x.id === a.dataset.id); if (c) c.det.open = true; document.getElementById(a.dataset.id).scrollIntoView({ behavior: 'smooth', block: 'start' }); }
@@ -203,7 +203,7 @@
         const rich = !!el.querySelector('div, table, h2, h3');
         el.classList.toggle('rich', rich); el.classList.remove('raw');
         if (rich) { el.classList.remove('plain-src'); decorateRich(el); return; }
-        const tmp = document.createElement('div'); tmp.innerHTML = el.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+        const tmp = document.createElement('div'); setHtml(tmp, el.innerHTML.replace(/<br\s*\/?>/gi, '\n'));
         const raw = tmp.textContent.replace(/\r/g, '');
         if (!raw.trim()) { el.classList.remove('plain-src'); return; }
         const sol = parseSolution(raw);
@@ -217,7 +217,7 @@
             const iface = card.closest('.stat-interface');
             const tip = iface && iface.querySelector('.sample-btn') ? '<p class="n-tip">Tip: choose “Try sample data” to see the expected input format.</p>' : '';
             box.className = 'solution notice'; box.setAttribute('role', 'alert');
-            box.innerHTML = '<span class="n-ico" aria-hidden="true">💡</span><div><b>Heads up</b><p>' + fmt(raw.trim()) + '</p>' + tip + '</div>';
+            setHtml(box, '<span class="n-ico" aria-hidden="true">💡</span><div><b>Heads up</b><p>' + fmt(raw.trim()) + '</p>' + tip + '</div>');
             el.classList.add('plain-src'); el.after(box); return;
         }
         const nItems = sol.items.filter(x => !x.chapter && !x.anon).length, expandable = sol.items.some(x => x.lines.some(l => l.t.trim()) || (x.subs && x.subs.length));
@@ -275,7 +275,7 @@
             });
             h += '</div>';
         }
-        box.innerHTML = h;
+        setHtml(box, h);
         const tg = box.querySelector('.sol-toggle');
         if (tg) tg.addEventListener('click', e => {
             const b = e.currentTarget, open = b.dataset.open !== '1';
@@ -303,19 +303,45 @@
                 }
                 table.setAttribute('aria-label', label || 'Calculation table');
             }
+            // Wide tables scroll inside their own box instead of stretching the page (keyboard-focusable so they can be scrolled without a mouse)
+            if (!table.closest('.rd-scroll, .table-scroll')) {
+                const wrap = document.createElement('div');
+                wrap.className = 'table-scroll';
+                wrap.tabIndex = 0;
+                wrap.setAttribute('role', 'region');
+                wrap.setAttribute('aria-label', table.getAttribute('aria-label') || 'Calculation table');
+                table.parentNode.insertBefore(wrap, table);
+                wrap.appendChild(table);
+            }
             $$('th:not([scope])', table).forEach(th => {
                 th.setAttribute('scope', th.closest('thead') || th.parentElement === table.rows[0] ? 'col' : 'row');
             });
         });
     }
 
+    // Degenerate input (identical values, one observation, zero divisor) makes some formulas undefined. The working is still shown,
+    // but the page says plainly what happened instead of leaving a bare NaN / Infinity.
+    const UNDEFINED_RESULT = /\bNaN\b|-?\bInfinity\b|\bundefined\b/;
+    function flagUndefined(card) {
+        const val = card.querySelector('.result-value'), st = card.querySelector('.calculation-steps');
+        const text = ((val && val.textContent) || '') + ' ' + ((st && st.textContent) || '');
+        const existing = card.querySelector(':scope > .undef-note');
+        if (!UNDEFINED_RESULT.test(text)) { if (existing) existing.remove(); return; }
+        if (existing || !val) return;
+        const note = document.createElement('div');
+        note.className = 'undef-note';
+        note.setAttribute('role', 'note');
+        setHtml(note, '<b>Some values are not defined for this data.</b> They appear as NaN or ∞. This usually means all values are identical (zero variance), there are too few observations for the formula, or a divisor was zero. The working below is still shown; try different data or add more observations.');
+        (card.querySelector(':scope > .kpi-row') || val).after(note);
+    }
+
     function hookCard(card) {
         if (card.dataset.hooked) return; card.dataset.hooked = '1';
         const val = card.querySelector('.result-value'), st = card.querySelector('.calculation-steps');
-        const run = () => { if (val) buildAnswer(val); if (st) { buildSolution(st); describeTables(card); } };
+        const run = () => { if (val) buildAnswer(val); if (st) { buildSolution(st); describeTables(card); } flagUndefined(card); };
         run();
-        if (val) new MutationObserver(() => buildAnswer(val)).observe(val, { childList: true, characterData: true, subtree: true });
-        if (st) new MutationObserver(() => { buildSolution(st); describeTables(card); }).observe(st, { childList: true, characterData: true, subtree: true });
+        if (val) new MutationObserver(() => { buildAnswer(val); flagUndefined(card); }).observe(val, { childList: true, characterData: true, subtree: true });
+        if (st) new MutationObserver(() => { buildSolution(st); describeTables(card); flagUndefined(card); }).observe(st, { childList: true, characterData: true, subtree: true });
     }
-    Object.assign(window.StatLabUI, { esc, fmt, buildAnswer, parseSolution, buildSolution, describeTables, hookCard });
+    Object.assign(window.StatLabUI, { esc, fmt, buildAnswer, parseSolution, buildSolution, describeTables, flagUndefined, hookCard });
 })();

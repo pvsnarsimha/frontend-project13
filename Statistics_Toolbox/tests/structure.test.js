@@ -69,3 +69,33 @@ test('accessibility basics in the page shell', () => {
     assert.ok(icons.length > 90);
     for (const m of icons) assert.match(m[1], /aria-hidden="true"/);
 });
+
+test('tool code never assigns to .innerHTML directly: everything goes through setHtml()', () => {
+    const offenders = [];
+    for (const rel of scriptList()) {
+        if (rel.endsWith('core/toolkit.js')) continue;               // the sanitiser itself
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        src.split('\n').forEach((line, i) => { if (/\.(innerHTML|outerHTML)\s*\+?=(?!=)/.test(line) || /insertAdjacentHTML|document\.write/.test(line)) offenders.push(`${rel}:${i + 1}`); });
+    }
+    assert.deepEqual(offenders, []);
+});
+
+test('Statistics.html lists exactly the scripts under js/, in dependency order (run `npm run sync:scripts` after adding a file)', () => {
+    const { scriptOrder } = require('../scripts/sync-script-tags');
+    assert.deepEqual(scriptList(), scriptOrder());
+    // nothing on disk is left out
+    const onDisk = [];
+    (function walk(dir) {
+        for (const e of fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })) {
+            if (e.isDirectory()) walk(`${dir}/${e.name}`); else if (e.name.endsWith('.js')) onDisk.push(`${dir}/${e.name}`);
+        }
+    })('js');
+    assert.deepEqual([...onDisk].sort(), [...scriptOrder()].sort());
+});
+
+test('each tool lives in its own file: one route per file, no file larger than 1,200 lines', () => {
+    for (const rel of scriptList()) {
+        const lines = fs.readFileSync(path.join(ROOT, rel), 'utf8').split('\n').length;
+        assert.ok(lines <= 1200, `${rel} has ${lines} lines`);
+    }
+});
