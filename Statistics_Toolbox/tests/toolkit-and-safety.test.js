@@ -155,3 +155,14 @@ test('the Clear buttons of two-input tools clear both fields', () => {
     assert.equal(byBtn.ftestClearBtn.length, 2);
     assert.equal(byBtn.twoSampleTClearBtn.length, 2);
 });
+
+test('stripEventHandlerAttributes removes on* attributes from tags but leaves text and other attributes alone', () => {
+    const strip = app.stripEventHandlerAttributes;
+    assert.equal(strip('<img src=x onerror="window.__xss=1">'), '<img src=x>');
+    assert.equal(strip(`<a href="#" onclick='go()' class="k" onmouseover=evil() title="t">x</a>`), '<a href="#" class="k" title="t">x</a>');
+    assert.equal(strip('<p ONCLICK = "a()">hi</p>'), '<p>hi</p>');
+    assert.equal(strip('<svg/onload=alert(1)><img src="a"/onerror=b()>'), '<svg><img src="a">');
+    assert.equal(strip('turn on = 5 and onset="3" in text'), 'turn on = 5 and onset="3" in text');
+    assert.equal(strip('<td data-one="1" style="color:red">a</td>'), '<td data-one="1" style="color:red">a</td>');
+    assert.equal(strip('<b>bold</b> & more'), '<b>bold</b> & more');
+});
