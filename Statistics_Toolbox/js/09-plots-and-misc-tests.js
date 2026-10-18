@@ -4437,7 +4437,7 @@ function computeMoodsMedianTest(inputText, alpha) {
         let [valStr, groupName] = entry.split(':');
         let val = parseFloat(valStr);
         if (!isNaN(val) && isFinite(val) && groupName) {
-            groupName = groupName.trim();
+            groupName = escapeHtml(groupName.trim());
             if (!groups.has(groupName)) groups.set(groupName, []);
             groups.get(groupName).push(val);
         }

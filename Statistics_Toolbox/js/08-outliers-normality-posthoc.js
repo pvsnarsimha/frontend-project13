@@ -3714,7 +3714,7 @@ function computeLeveneTest(inputText, alpha) {
         let [valStr, groupName] = entry.split(':');
         let val = parseFloat(valStr);
         if (!isNaN(val) && isFinite(val) && groupName) {
-            groupName = groupName.trim();
+            groupName = escapeHtml(groupName.trim());
             if (!groups.has(groupName)) groups.set(groupName, []);
             groups.get(groupName).push(val);
         }
@@ -4092,7 +4092,7 @@ function computeBartlettTest(inputText, alpha) {
         let [valStr, groupName] = entry.split(':');
         let val = parseFloat(valStr);
         if (!isNaN(val) && isFinite(val) && groupName) {
-            groupName = groupName.trim();
+            groupName = escapeHtml(groupName.trim());
             if (!groups.has(groupName)) groups.set(groupName, []);
             groups.get(groupName).push(val);
         }
@@ -5309,7 +5309,10 @@ function computeCooksDistance(xValues, yValues) {
             </div>
         `);
         
-        const D = (residuals[i] * residuals[i]) / (2 * mse) * (hii / Math.pow(1 - hii, 2));
+        // A leverage of 1 (the only observation at its x value) makes the denominator 0; a perfect fit makes MSE 0
+        const D = mse < 1e-15 ? 0
+            : (1 - hii) < 1e-12 ? Infinity
+            : (residuals[i] * residuals[i]) / (2 * mse) * (hii / Math.pow(1 - hii, 2));
         
         let influence = "";
         let influenceColor = "";
@@ -5624,7 +5627,7 @@ function computeCooksDistance(xValues, yValues) {
                 <div>Min D = ${Math.min(...cookDetails.map(d => d.cooksD)).toFixed(6)}</div>
                 <div>Max D = ${Math.max(...cookDetails.map(d => d.cooksD)).toFixed(6)}</div>
                 <div>Mean D = ${(cookDetails.reduce((a,b) => a + b.cooksD, 0) / n).toFixed(6)}</div>
-                <div>Median D = ${cookDetails.sort((a,b) => a.cooksD - b.cooksD)[Math.floor(n/2)].cooksD.toFixed(6)}</div>
+                <div>Median D = ${[...cookDetails].sort((a,b) => a.cooksD - b.cooksD)[Math.floor(n/2)].cooksD.toFixed(6)}</div>
             </div>
         </div>
         
@@ -5905,7 +5908,7 @@ function computeTukeyHSD(inputText, alpha) {
         let [valStr, groupName] = entry.split(':');
         let val = parseFloat(valStr);
         if (!isNaN(val) && isFinite(val) && groupName) {
-            groupName = groupName.trim();
+            groupName = escapeHtml(groupName.trim());
             if (!groups.has(groupName)) groups.set(groupName, []);
             groups.get(groupName).push(val);
         }
@@ -6267,7 +6270,7 @@ function computeBonferroniCorrection(inputText, alpha) {
         let [valStr, groupName] = entry.split(':');
         let val = parseFloat(valStr);
         if (!isNaN(val) && isFinite(val) && groupName) {
-            groupName = groupName.trim();
+            groupName = escapeHtml(groupName.trim());
             if (!groups.has(groupName)) groups.set(groupName, []);
             groups.get(groupName).push(val);
         }
@@ -6644,7 +6647,7 @@ function computeScheffeTest(inputText, alpha) {
         let [valStr, groupName] = entry.split(':');
         let val = parseFloat(valStr);
         if (!isNaN(val) && isFinite(val) && groupName) {
-            groupName = groupName.trim();
+            groupName = escapeHtml(groupName.trim());
             if (!groups.has(groupName)) groups.set(groupName, []);
             groups.get(groupName).push(val);
         }

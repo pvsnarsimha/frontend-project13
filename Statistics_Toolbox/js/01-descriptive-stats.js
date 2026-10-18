@@ -143,115 +143,6 @@
         }
     }
 
-    // ---------- RENDER INTERFACES with nicely formatted formulas (plain text but clear) ----------
-    function renderMeanInterface() {
-        return `
-            <div class="stat-interface" id="statMeanInterface">
-                <div class="interface-title">📐 Arithmetic Mean (Average)</div>
-                <div class="formula-card">
-                    <div class="formula">📌 μ = (Σ xᵢ) / n</div>
-                    <div class="desc">Sum of all data points divided by the total count. Most common measure of central tendency.</div>
-                </div>
-                <div class="data-input-section">
-                    <label>📋 Enter numeric values (commas, spaces, or line breaks)</label>
-                    <textarea id="meanInput" rows="3" placeholder="Example: 12, 45.5, 78, 99.99, 23"></textarea>
-                    <div class="action-row">
-                        <button class="primary-btn" id="meanComputeBtn">📐 Calculate Mean + Full Steps</button>
-                        <button class="secondary-btn" id="meanClearBtn">Clear</button>
-                    </div>
-                </div>
-                <div id="meanResultArea" style="display: none;">
-                    <div class="result-card">
-                        <div class="result-label">📊 ARITHMETIC MEAN RESULT</div>
-                        <div class="result-value" id="meanValueDisplay">—</div>
-                        <div class="calculation-steps" id="meanStepsDisplay">Detailed calculation will appear here...</div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    function renderMedianInterface() {
-        return `
-            <div class="stat-interface" id="statMedianInterface">
-                <div class="interface-title">📈 Median (50th Percentile)</div>
-                <div class="formula-card">
-                    <div class="formula">📌 Median = { x_{(n+1)/2} if n odd | (x_{n/2} + x_{n/2+1})/2 if n even }</div>
-                    <div class="desc">Middle value after sorting data. Robust against outliers.</div>
-                </div>
-                <div class="data-input-section">
-                    <label>📋 Enter numeric values</label>
-                    <textarea id="medianInput" rows="3" placeholder="Example: 2, 8, 3, 10, 5, 4"></textarea>
-                    <div class="action-row">
-                        <button class="primary-btn" id="medianComputeBtn">📈 Calculate Median + Full Steps</button>
-                        <button class="secondary-btn" id="medianClearBtn">Clear</button>
-                    </div>
-                </div>
-                <div id="medianResultArea" style="display: none;">
-                    <div class="result-card">
-                        <div class="result-label">🎯 MEDIAN RESULT</div>
-                        <div class="result-value" id="medianValueDisplay">—</div>
-                        <div class="calculation-steps" id="medianStepsDisplay"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    function renderModeInterface() {
-        return `
-            <div class="stat-interface" id="statModeInterface">
-                <div class="interface-title">⭐ Mode (Most Frequent Value)</div>
-                <div class="formula-card">
-                    <div class="formula">📌 Mode = argmax_v freq(v)</div>
-                    <div class="desc">Value(s) that occur most often. Dataset can have one mode, multiple modes, or no mode.</div>
-                </div>
-                <div class="data-input-section">
-                    <label>📋 Enter numeric values</label>
-                    <textarea id="modeInput" rows="3" placeholder="Example: 5, 3, 5, 2, 5, 8, 2, 2"></textarea>
-                    <div class="action-row">
-                        <button class="primary-btn" id="modeComputeBtn">⭐ Calculate Mode + Frequency Steps</button>
-                        <button class="secondary-btn" id="modeClearBtn">Clear</button>
-                    </div>
-                </div>
-                <div id="modeResultArea" style="display: none;">
-                    <div class="result-card">
-                        <div class="result-label">🔥 MODE RESULT</div>
-                        <div class="result-value" id="modeValueDisplay">—</div>
-                        <div class="calculation-steps" id="modeStepsDisplay"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    function renderGeometricInterface() {
-        return `
-            <div class="stat-interface" id="statGeomInterface">
-                <div class="interface-title">📉 Geometric Mean (Multiplicative Average)</div>
-                <div class="formula-card">
-                    <div class="formula">📌 GM = (∏ x_i)^{1/n}   (all x_i > 0)</div>
-                    <div class="desc">Used for growth rates, ratios, percentages. Always ≤ arithmetic mean for positive data.</div>
-                </div>
-                <div class="data-input-section">
-                    <label>📋 Enter positive numeric values (growth rates, ratios, or any positive numbers)</label>
-                    <textarea id="geomInput" rows="3" placeholder="Example: 1.05, 1.08, 1.02   or   2, 8, 4"></textarea>
-                    <div class="action-row">
-                        <button class="primary-btn" id="geomComputeBtn">📉 Calculate Geometric Mean + Steps</button>
-                        <button class="secondary-btn" id="geomClearBtn">Clear</button>
-                    </div>
-                </div>
-                <div id="geomResultArea" style="display: none;">
-                    <div class="result-card">
-                        <div class="result-label">📐 GEOMETRIC MEAN RESULT</div>
-                        <div class="result-value" id="geomValueDisplay">—</div>
-                        <div class="calculation-steps" id="geomStepsDisplay"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
     function attachClearHandler(clearBtnId, textareaId, resultAreaId) {
         const clearBtn = document.getElementById(clearBtnId);
         if (clearBtn) {
@@ -264,103 +155,6 @@
         }
     }
 
-    function setupMeanLogic() {
-        const computeBtn = document.getElementById("meanComputeBtn");
-        if (!computeBtn) return;
-        computeBtn.addEventListener('click', () => {
-            const raw = document.getElementById("meanInput").value;
-            const numbers = parseNumbersFromInput(raw);
-            const resultDiv = document.getElementById("meanResultArea");
-            const valueSpan = document.getElementById("meanValueDisplay");
-            const stepsSpan = document.getElementById("meanStepsDisplay");
-            if (!numbers.length) {
-                resultDiv.style.display = "block";
-                valueSpan.innerText = "⚠️ Invalid input";
-                stepsSpan.innerText = "Please enter at least one numeric value (e.g., 4, 7.5, 12).";
-                return;
-            }
-            const meanRes = computeMeanWithSteps(numbers);
-            resultDiv.style.display = "block";
-            valueSpan.innerText = meanRes.value.toFixed(10);
-            stepsSpan.innerText = meanRes.steps;
-        });
-        attachClearHandler("meanClearBtn", "meanInput", "meanResultArea");
-    }
-
-    function setupMedianLogic() {
-        const computeBtn = document.getElementById("medianComputeBtn");
-        if (!computeBtn) return;
-        computeBtn.addEventListener('click', () => {
-            const raw = document.getElementById("medianInput").value;
-            const numbers = parseNumbersFromInput(raw);
-            const resultDiv = document.getElementById("medianResultArea");
-            const valueSpan = document.getElementById("medianValueDisplay");
-            const stepsSpan = document.getElementById("medianStepsDisplay");
-            if (!numbers.length) {
-                resultDiv.style.display = "block";
-                valueSpan.innerText = "No data";
-                stepsSpan.innerText = "Enter numbers to compute median (e.g., 10, 20, 30).";
-                return;
-            }
-            const medianRes = computeMedianWithSteps(numbers);
-            resultDiv.style.display = "block";
-            valueSpan.innerText = (Number.isInteger(medianRes.value) ? medianRes.value : medianRes.value.toFixed(10));
-            stepsSpan.innerText = medianRes.steps;
-        });
-        attachClearHandler("medianClearBtn", "medianInput", "medianResultArea");
-    }
-
-    function setupModeLogic() {
-        const computeBtn = document.getElementById("modeComputeBtn");
-        if (!computeBtn) return;
-        computeBtn.addEventListener('click', () => {
-            const raw = document.getElementById("modeInput").value;
-            const numbers = parseNumbersFromInput(raw);
-            const resultDiv = document.getElementById("modeResultArea");
-            const valueSpan = document.getElementById("modeValueDisplay");
-            const stepsSpan = document.getElementById("modeStepsDisplay");
-            if (!numbers.length) {
-                resultDiv.style.display = "block";
-                valueSpan.innerText = "No data";
-                stepsSpan.innerText = "Provide numeric values for mode analysis.";
-                return;
-            }
-            const modeRes = computeModeWithSteps(numbers);
-            resultDiv.style.display = "block";
-            valueSpan.innerText = modeRes.display;
-            stepsSpan.innerText = modeRes.steps;
-        });
-        attachClearHandler("modeClearBtn", "modeInput", "modeResultArea");
-    }
-
-    function setupGeometricLogic() {
-        const computeBtn = document.getElementById("geomComputeBtn");
-        if (!computeBtn) return;
-        computeBtn.addEventListener('click', () => {
-            const raw = document.getElementById("geomInput").value;
-            const numbers = parseNumbersFromInput(raw);
-            const resultDiv = document.getElementById("geomResultArea");
-            const valueSpan = document.getElementById("geomValueDisplay");
-            const stepsSpan = document.getElementById("geomStepsDisplay");
-            if (!numbers.length) {
-                resultDiv.style.display = "block";
-                valueSpan.innerText = "⚠️ No valid numbers";
-                stepsSpan.innerText = "Please enter positive numbers for geometric mean.";
-                return;
-            }
-            const geomRes = computeGeometricWithSteps(numbers);
-            if (geomRes.error) {
-                resultDiv.style.display = "block";
-                valueSpan.innerText = "❌ Invalid";
-                stepsSpan.innerText = geomRes.message;
-                return;
-            }
-            resultDiv.style.display = "block";
-            valueSpan.innerText = geomRes.value.toFixed(12);
-            stepsSpan.innerText = geomRes.steps;
-        });
-        attachClearHandler("geomClearBtn", "geomInput", "geomResultArea");
-    }
     function setupQuartilesLogic() {
     const computeBtn = document.getElementById("quartilesComputeBtn");
     if (!computeBtn) return;
@@ -407,86 +201,6 @@ function setupPercentilesLogic() {
     attachClearHandler("percentilesClearBtn", "percentilesInput", "percentilesResultArea");
 }
 
-function setupCVLogic() {
-    const computeBtn = document.getElementById("cvComputeBtn");
-    if (!computeBtn) return;
-    computeBtn.addEventListener('click', () => {
-        const raw = document.getElementById("cvInput").value;
-        const numbers = parseNumbersFromInput(raw);
-        const resultDiv = document.getElementById("cvResultArea");
-        const valueSpan = document.getElementById("cvValueDisplay");
-        const stepsSpan = document.getElementById("cvStepsDisplay");
-        if (!numbers.length) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "No data";
-            stepsSpan.innerText = "Enter numbers to compute CV.";
-            return;
-        }
-        const cvRes = computeCVWithSteps(numbers);
-        resultDiv.style.display = "block";
-        valueSpan.innerText = `${cvRes.cv.toFixed(2)}%`;
-        stepsSpan.innerText = cvRes.steps;
-    });
-    attachClearHandler("cvClearBtn", "cvInput", "cvResultArea");
-}
-
-function setupSkewnessLogic() {
-    const computeBtn = document.getElementById("skewnessComputeBtn");
-    if (!computeBtn) return;
-    computeBtn.addEventListener('click', () => {
-        const raw = document.getElementById("skewnessInput").value;
-        const numbers = parseNumbersFromInput(raw);
-        const resultDiv = document.getElementById("skewnessResultArea");
-        const valueSpan = document.getElementById("skewnessValueDisplay");
-        const stepsSpan = document.getElementById("skewnessStepsDisplay");
-        if (!numbers.length) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "No data";
-            stepsSpan.innerText = "Enter numbers to compute skewness.";
-            return;
-        }
-        if (numbers.length < 3) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "❌ Need at least 3 values";
-            stepsSpan.innerText = "Skewness calculation requires at least 3 data points.";
-            return;
-        }
-        const skewRes = computeSkewnessWithSteps(numbers);
-        resultDiv.style.display = "block";
-        valueSpan.innerText = skewRes.skewness.toFixed(6);
-        stepsSpan.innerText = skewRes.steps;
-    });
-    attachClearHandler("skewnessClearBtn", "skewnessInput", "skewnessResultArea");
-}
-
-function setupKurtosisLogic() {
-    const computeBtn = document.getElementById("kurtosisComputeBtn");
-    if (!computeBtn) return;
-    computeBtn.addEventListener('click', () => {
-        const raw = document.getElementById("kurtosisInput").value;
-        const numbers = parseNumbersFromInput(raw);
-        const resultDiv = document.getElementById("kurtosisResultArea");
-        const valueSpan = document.getElementById("kurtosisValueDisplay");
-        const stepsSpan = document.getElementById("kurtosisStepsDisplay");
-        if (!numbers.length) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "No data";
-            stepsSpan.innerText = "Enter numbers to compute kurtosis.";
-            return;
-        }
-        if (numbers.length < 4) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "❌ Need at least 4 values";
-            stepsSpan.innerText = "Kurtosis calculation requires at least 4 data points.";
-            return;
-        }
-        const kurtRes = computeKurtosisWithSteps(numbers);
-        resultDiv.style.display = "block";
-        valueSpan.innerText = kurtRes.kurtosis.toFixed(6);
-        stepsSpan.innerText = kurtRes.steps;
-    });
-    attachClearHandler("kurtosisClearBtn", "kurtosisInput", "kurtosisResultArea");
-}
 // FIVE-NUMBER SUMMARY (Min, Q1, Median, Q3, Max)
 function renderFiveNumInterface() {
     return `
@@ -1105,118 +819,6 @@ function computeKurtosisWithSteps(numbers) {
     return { kurtosis: kurtosis, steps: steps };
 }
 
-// HARMONIC MEAN
-function renderHarmonicInterface() {
-    return `
-        <div class="stat-interface" id="statHarmonicInterface">
-            <div class="interface-title">🎵 Harmonic Mean (For Rates & Ratios)</div>
-            <div class="formula-card">
-                <div class="formula">📌 HM = n / Σ(1/xᵢ)</div>
-                <div class="desc">Best for rates, speeds, ratios. All values must be > 0.</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter positive numeric values (rates, speeds, ratios)</label>
-                <textarea id="harmonicInput" rows="3" placeholder="Example: 2, 4, 8, 16"></textarea>
-                <div class="action-row">
-                    <button class="primary-btn" id="harmonicComputeBtn">🎵 Calculate Harmonic Mean + Steps</button>
-                    <button class="secondary-btn" id="harmonicClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="harmonicResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">📐 HARMONIC MEAN RESULT</div>
-                    <div class="result-value" id="harmonicValueDisplay">—</div>
-                    <div class="calculation-steps" id="harmonicStepsDisplay"></div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// VARIANCE (Population and Sample)
-function renderVarianceInterface() {
-    return `
-        <div class="stat-interface" id="statVarianceInterface">
-            <div class="interface-title">📊 Variance (Population & Sample)</div>
-            <div class="formula-card">
-                <div class="formula">📌 Population: σ² = Σ(xᵢ - μ)² / N &nbsp;|&nbsp; Sample: s² = Σ(xᵢ - x̄)² / (n-1)</div>
-                <div class="desc">Measures spread around the mean. Sample variance uses (n-1) for unbiased estimation.</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter numeric values</label>
-                <textarea id="varianceInput" rows="3" placeholder="Example: 2, 4, 4, 4, 5, 5, 7, 9"></textarea>
-                <div class="action-row">
-                    <button class="primary-btn" id="varianceComputeBtn">📊 Calculate Variance + Steps</button>
-                    <button class="secondary-btn" id="varianceClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="varianceResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">🎯 VARIANCE RESULTS</div>
-                    <div class="result-value" id="varianceValueDisplay">—</div>
-                    <div class="calculation-steps" id="varianceStepsDisplay"></div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// STANDARD DEVIATION
-function renderStdDevInterface() {
-    return `
-        <div class="stat-interface" id="statStdDevInterface">
-            <div class="interface-title">📏 Standard Deviation (Spread Around Mean)</div>
-            <div class="formula-card">
-                <div class="formula">📌 Population: σ = √σ² &nbsp;|&nbsp; Sample: s = √s²</div>
-                <div class="desc">Square root of variance. Measures average distance from mean.</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter numeric values</label>
-                <textarea id="stddevInput" rows="3" placeholder="Example: 2, 4, 4, 4, 5, 5, 7, 9"></textarea>
-                <div class="action-row">
-                    <button class="primary-btn" id="stddevComputeBtn">📏 Calculate Std Dev + Steps</button>
-                    <button class="secondary-btn" id="stddevClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="stddevResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">🎯 STANDARD DEVIATION RESULTS</div>
-                    <div class="result-value" id="stddevValueDisplay">—</div>
-                    <div class="calculation-steps" id="stddevStepsDisplay"></div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// RANGE
-function renderRangeInterface() {
-    return `
-        <div class="stat-interface" id="statRangeInterface">
-            <div class="interface-title">↗️ Range (Max - Min)</div>
-            <div class="formula-card">
-                <div class="formula">📌 Range = Maximum Value - Minimum Value</div>
-                <div class="desc">Simplest measure of dispersion. Sensitive to outliers.</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter numeric values</label>
-                <textarea id="rangeInput" rows="3" placeholder="Example: 5, 12, 8, 20, 15, 9"></textarea>
-                <div class="action-row">
-                    <button class="primary-btn" id="rangeComputeBtn">↗️ Calculate Range + Steps</button>
-                    <button class="secondary-btn" id="rangeClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="rangeResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">🎯 RANGE RESULT</div>
-                    <div class="result-value" id="rangeValueDisplay">—</div>
-                    <div class="calculation-steps" id="rangeStepsDisplay"></div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
 // INTERQUARTILE RANGE (IQR)
 function renderIQRInterface() {
     return `
@@ -1294,90 +896,6 @@ function renderPercentilesInterface() {
                     <div class="result-label">🎯 PERCENTILES RESULTS</div>
                     <div class="result-value" id="percentilesValueDisplay">—</div>
                     <div class="calculation-steps" id="percentilesStepsDisplay"></div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// COEFFICIENT OF VARIATION
-function renderCVInterface() {
-    return `
-        <div class="stat-interface" id="statCVInterface">
-            <div class="interface-title">📊 Coefficient of Variation (CV)</div>
-            <div class="formula-card">
-                <div class="formula">📌 CV = (σ / μ) × 100%</div>
-                <div class="desc">Relative measure of dispersion. Compares variability regardless of units. CV < 30% = low variability.</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter numeric values</label>
-                <textarea id="cvInput" rows="3" placeholder="Example: 10, 12, 14, 11, 13, 15"></textarea>
-                <div class="action-row">
-                    <button class="primary-btn" id="cvComputeBtn">📊 Calculate CV + Steps</button>
-                    <button class="secondary-btn" id="cvClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="cvResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">🎯 COEFFICIENT OF VARIATION RESULT</div>
-                    <div class="result-value" id="cvValueDisplay">—</div>
-                    <div class="calculation-steps" id="cvStepsDisplay"></div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// SKEWNESS
-function renderSkewnessInterface() {
-    return `
-        <div class="stat-interface" id="statSkewnessInterface">
-            <div class="interface-title">📈 Skewness (Asymmetry)</div>
-            <div class="formula-card">
-                <div class="formula">📌 Skewness = Σ(xᵢ - x̄)³ / [(n-1)s³]</div>
-                <div class="desc">Measures asymmetry. 0 = symmetric, >0 = right-skewed, <0 = left-skewed.</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter numeric values</label>
-                <textarea id="skewnessInput" rows="3" placeholder="Example: 2, 3, 5, 7, 8, 10, 12, 15, 20"></textarea>
-                <div class="action-row">
-                    <button class="primary-btn" id="skewnessComputeBtn">📈 Calculate Skewness + Steps</button>
-                    <button class="secondary-btn" id="skewnessClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="skewnessResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">🎯 SKEWNESS RESULT</div>
-                    <div class="result-value" id="skewnessValueDisplay">—</div>
-                    <div class="calculation-steps" id="skewnessStepsDisplay"></div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// KURTOSIS
-function renderKurtosisInterface() {
-    return `
-        <div class="stat-interface" id="statKurtosisInterface">
-            <div class="interface-title">🎯 Kurtosis (Tails & Peakedness)</div>
-            <div class="formula-card">
-                <div class="formula">📌 Kurtosis = Σ(xᵢ - x̄)⁴ / [(n-1)s⁴] - 3</div>
-                <div class="desc">Excess kurtosis. 0 = mesokurtic (normal), >0 = leptokurtic (heavy tails), <0 = platykurtic (light tails).</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter numeric values</label>
-                <textarea id="kurtosisInput" rows="3" placeholder="Example: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"></textarea>
-                <div class="action-row">
-                    <button class="primary-btn" id="kurtosisComputeBtn">🎯 Calculate Kurtosis + Steps</button>
-                    <button class="secondary-btn" id="kurtosisClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="kurtosisResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">🎯 KURTOSIS RESULT</div>
-                    <div class="result-value" id="kurtosisValueDisplay">—</div>
-                    <div class="calculation-steps" id="kurtosisStepsDisplay"></div>
                 </div>
             </div>
         </div>
@@ -1498,125 +1016,6 @@ function computeIQRWithSteps(numbers) {
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     steps += `✅ Interquartile Range (IQR) = ${iqr}`;
     return { value: iqr, steps: steps, q1: q1, q3: q3 };
-}
-function setupHarmonicLogic() {
-    const computeBtn = document.getElementById("harmonicComputeBtn");
-    if (!computeBtn) return;
-    computeBtn.addEventListener('click', () => {
-        const raw = document.getElementById("harmonicInput").value;
-        const numbers = parseNumbersFromInput(raw);
-        const resultDiv = document.getElementById("harmonicResultArea");
-        const valueSpan = document.getElementById("harmonicValueDisplay");
-        const stepsSpan = document.getElementById("harmonicStepsDisplay");
-        if (!numbers.length) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "⚠️ Invalid input";
-            stepsSpan.innerText = "Please enter positive numbers.";
-            return;
-        }
-        const harmonicRes = computeHarmonicWithSteps(numbers);
-        if (harmonicRes.error) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "❌ Invalid";
-            stepsSpan.innerText = harmonicRes.message;
-            return;
-        }
-        resultDiv.style.display = "block";
-        valueSpan.innerText = harmonicRes.value.toFixed(10);
-        stepsSpan.innerText = harmonicRes.steps;
-    });
-    attachClearHandler("harmonicClearBtn", "harmonicInput", "harmonicResultArea");
-}
-
-function setupVarianceLogic() {
-    const computeBtn = document.getElementById("varianceComputeBtn");
-    if (!computeBtn) return;
-    computeBtn.addEventListener('click', () => {
-        const raw = document.getElementById("varianceInput").value;
-        const numbers = parseNumbersFromInput(raw);
-        const resultDiv = document.getElementById("varianceResultArea");
-        const valueSpan = document.getElementById("varianceValueDisplay");
-        const stepsSpan = document.getElementById("varianceStepsDisplay");
-        if (!numbers.length) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "No data";
-            stepsSpan.innerText = "Enter numbers to compute variance.";
-            return;
-        }
-        if (numbers.length < 2) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "❌ Need at least 2 values";
-            stepsSpan.innerText = "Sample variance requires at least 2 observations.";
-            return;
-        }
-        const varRes = computeVarianceWithSteps(numbers);
-        if (varRes.error) {
-            valueSpan.innerText = "Error";
-            stepsSpan.innerText = varRes.message;
-        } else {
-            valueSpan.innerText = `Pop: ${varRes.population.toFixed(8)} | Sample: ${varRes.sample.toFixed(8)}`;
-            stepsSpan.innerText = varRes.steps;
-        }
-        resultDiv.style.display = "block";
-    });
-    attachClearHandler("varianceClearBtn", "varianceInput", "varianceResultArea");
-}
-
-function setupStdDevLogic() {
-    const computeBtn = document.getElementById("stddevComputeBtn");
-    if (!computeBtn) return;
-    computeBtn.addEventListener('click', () => {
-        const raw = document.getElementById("stddevInput").value;
-        const numbers = parseNumbersFromInput(raw);
-        const resultDiv = document.getElementById("stddevResultArea");
-        const valueSpan = document.getElementById("stddevValueDisplay");
-        const stepsSpan = document.getElementById("stddevStepsDisplay");
-        if (!numbers.length) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "No data";
-            stepsSpan.innerText = "Enter numbers to compute standard deviation.";
-            return;
-        }
-        if (numbers.length < 2) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "❌ Need at least 2 values";
-            stepsSpan.innerText = "Sample standard deviation requires at least 2 observations.";
-            return;
-        }
-        const stdRes = computeStdDevWithSteps(numbers);
-        if (stdRes.error) {
-            valueSpan.innerText = "Error";
-            stepsSpan.innerText = stdRes.message;
-        } else {
-            valueSpan.innerText = `Pop: ${stdRes.population.toFixed(8)} | Sample: ${stdRes.sample.toFixed(8)}`;
-            stepsSpan.innerText = stdRes.steps;
-        }
-        resultDiv.style.display = "block";
-    });
-    attachClearHandler("stddevClearBtn", "stddevInput", "stddevResultArea");
-}
-
-function setupRangeLogic() {
-    const computeBtn = document.getElementById("rangeComputeBtn");
-    if (!computeBtn) return;
-    computeBtn.addEventListener('click', () => {
-        const raw = document.getElementById("rangeInput").value;
-        const numbers = parseNumbersFromInput(raw);
-        const resultDiv = document.getElementById("rangeResultArea");
-        const valueSpan = document.getElementById("rangeValueDisplay");
-        const stepsSpan = document.getElementById("rangeStepsDisplay");
-        if (!numbers.length) {
-            resultDiv.style.display = "block";
-            valueSpan.innerText = "No data";
-            stepsSpan.innerText = "Enter numbers to compute range.";
-            return;
-        }
-        const rangeRes = computeRangeWithSteps(numbers);
-        resultDiv.style.display = "block";
-        valueSpan.innerText = rangeRes.value;
-        stepsSpan.innerText = rangeRes.steps;
-    });
-    attachClearHandler("rangeClearBtn", "rangeInput", "rangeResultArea");
 }
 
 function setupIQRCustomLogic() {
@@ -2145,7 +1544,7 @@ function computeSumSquaresWithSteps(inputText) {
             let [valStr, groupName] = entry.split(':');
             let val = parseFloat(valStr);
             if (!isNaN(val) && isFinite(val) && groupName) {
-                groupName = groupName.trim();
+                groupName = escapeHtml(groupName.trim());
                 if (!groups.has(groupName)) groups.set(groupName, []);
                 groups.get(groupName).push(val);
                 allValues.push(val);
@@ -2314,3 +1713,158 @@ function setupSumSquaresLogic() {
     });
     attachClearHandler("sumSquaresClearBtn", "sumSquaresInput", "sumSquaresResultArea");
 }
+
+
+// ========== Tools defined with defineListTool (see js/00-toolkit.js) ==========
+const meanTool = defineListTool({
+    id: 'mean', interfaceId: 'statMeanInterface',
+    title: "📐 Arithmetic Mean (Average)",
+    formula: "📌 μ = (Σ xᵢ) / n",
+    desc: "Sum of all data points divided by the total count. Most common measure of central tendency.",
+    label: "📋 Enter numeric values (commas, spaces, or line breaks)",
+    placeholder: "Example: 12, 45.5, 78, 99.99, 23",
+    buttonText: "📐 Calculate Mean + Full Steps",
+    resultLabel: "📊 ARITHMETIC MEAN RESULT",
+    stepsPlaceholder: "Detailed calculation will appear here...",
+    empty: { value: "⚠️ Invalid input", steps: "Please enter at least one numeric value (e.g., 4, 7.5, 12)." },
+    compute: computeMeanWithSteps,
+    display: r => r.value.toFixed(10)
+});
+
+const medianTool = defineListTool({
+    id: 'median', interfaceId: 'statMedianInterface',
+    title: "📈 Median (50th Percentile)",
+    formula: "📌 Median = { x_{(n+1)/2} if n odd | (x_{n/2} + x_{n/2+1})/2 if n even }",
+    desc: "Middle value after sorting data. Robust against outliers.",
+    placeholder: "Example: 2, 8, 3, 10, 5, 4",
+    buttonText: "📈 Calculate Median + Full Steps",
+    resultLabel: "🎯 MEDIAN RESULT",
+    empty: { value: "No data", steps: "Enter numbers to compute median (e.g., 10, 20, 30)." },
+    compute: computeMedianWithSteps,
+    display: r => (Number.isInteger(r.value) ? r.value : r.value.toFixed(10))
+});
+
+const modeTool = defineListTool({
+    id: 'mode', interfaceId: 'statModeInterface',
+    title: "⭐ Mode (Most Frequent Value)",
+    formula: "📌 Mode = argmax_v freq(v)",
+    desc: "Value(s) that occur most often. Dataset can have one mode, multiple modes, or no mode.",
+    placeholder: "Example: 5, 3, 5, 2, 5, 8, 2, 2",
+    buttonText: "⭐ Calculate Mode + Frequency Steps",
+    resultLabel: "🔥 MODE RESULT",
+    empty: { value: "No data", steps: "Provide numeric values for mode analysis." },
+    compute: computeModeWithSteps,
+    display: r => r.display
+});
+
+const geometricTool = defineListTool({
+    id: 'geometric', interfaceId: 'statGeomInterface', elementPrefix: 'geom',
+    title: "📉 Geometric Mean (Multiplicative Average)",
+    formula: "📌 GM = (∏ x_i)^{1/n}   (all x_i > 0)",
+    desc: "Used for growth rates, ratios, percentages. Always ≤ arithmetic mean for positive data.",
+    label: "📋 Enter positive numeric values (growth rates, ratios, or any positive numbers)",
+    placeholder: "Example: 1.05, 1.08, 1.02   or   2, 8, 4",
+    buttonText: "📉 Calculate Geometric Mean + Steps",
+    resultLabel: "📐 GEOMETRIC MEAN RESULT",
+    empty: { value: "⚠️ No valid numbers", steps: "Please enter positive numbers for geometric mean." },
+    errorValue: "❌ Invalid",
+    compute: computeGeometricWithSteps,
+    display: r => r.value.toFixed(12)
+});
+
+const harmonicTool = defineListTool({
+    id: 'harmonic', interfaceId: 'statHarmonicInterface',
+    title: "🎵 Harmonic Mean (For Rates & Ratios)",
+    formula: "📌 HM = n / Σ(1/xᵢ)",
+    desc: "Best for rates, speeds, ratios. All values must be > 0.",
+    label: "📋 Enter positive numeric values (rates, speeds, ratios)",
+    placeholder: "Example: 2, 4, 8, 16",
+    buttonText: "🎵 Calculate Harmonic Mean + Steps",
+    resultLabel: "📐 HARMONIC MEAN RESULT",
+    empty: { value: "⚠️ Invalid input", steps: "Please enter positive numbers." },
+    errorValue: "❌ Invalid",
+    compute: computeHarmonicWithSteps,
+    display: r => r.value.toFixed(10)
+});
+
+const varianceTool = defineListTool({
+    id: 'variance', interfaceId: 'statVarianceInterface',
+    title: "📊 Variance (Population & Sample)",
+    formula: "📌 Population: σ² = Σ(xᵢ - μ)² / N &nbsp;|&nbsp; Sample: s² = Σ(xᵢ - x̄)² / (n-1)",
+    desc: "Measures spread around the mean. Sample variance uses (n-1) for unbiased estimation.",
+    placeholder: "Example: 2, 4, 4, 4, 5, 5, 7, 9",
+    buttonText: "📊 Calculate Variance + Steps",
+    resultLabel: "🎯 VARIANCE RESULTS",
+    empty: { value: "No data", steps: "Enter numbers to compute variance." },
+    min: { count: 2, value: "❌ Need at least 2 values", steps: "Sample variance requires at least 2 observations." },
+    compute: computeVarianceWithSteps,
+    display: r => `Pop: ${r.population.toFixed(8)} | Sample: ${r.sample.toFixed(8)}`
+});
+
+const stddevTool = defineListTool({
+    id: 'stddev', interfaceId: 'statStdDevInterface',
+    title: "📏 Standard Deviation (Spread Around Mean)",
+    formula: "📌 Population: σ = √σ² &nbsp;|&nbsp; Sample: s = √s²",
+    desc: "Square root of variance. Measures average distance from mean.",
+    placeholder: "Example: 2, 4, 4, 4, 5, 5, 7, 9",
+    buttonText: "📏 Calculate Std Dev + Steps",
+    resultLabel: "🎯 STANDARD DEVIATION RESULTS",
+    empty: { value: "No data", steps: "Enter numbers to compute standard deviation." },
+    min: { count: 2, value: "❌ Need at least 2 values", steps: "Sample standard deviation requires at least 2 observations." },
+    compute: computeStdDevWithSteps,
+    display: r => `Pop: ${r.population.toFixed(8)} | Sample: ${r.sample.toFixed(8)}`
+});
+
+const rangeTool = defineListTool({
+    id: 'range', interfaceId: 'statRangeInterface',
+    title: "↗️ Range (Max - Min)",
+    formula: "📌 Range = Maximum Value - Minimum Value",
+    desc: "Simplest measure of dispersion. Sensitive to outliers.",
+    placeholder: "Example: 5, 12, 8, 20, 15, 9",
+    buttonText: "↗️ Calculate Range + Steps",
+    resultLabel: "🎯 RANGE RESULT",
+    empty: { value: "No data", steps: "Enter numbers to compute range." },
+    compute: computeRangeWithSteps,
+    display: r => r.value
+});
+
+const cvTool = defineListTool({
+    id: 'cv', interfaceId: 'statCVInterface',
+    title: "📊 Coefficient of Variation (CV)",
+    formula: "📌 CV = (σ / μ) × 100%",
+    desc: "Relative measure of dispersion. Compares variability regardless of units. CV < 30% = low variability.",
+    placeholder: "Example: 10, 12, 14, 11, 13, 15",
+    buttonText: "📊 Calculate CV + Steps",
+    resultLabel: "🎯 COEFFICIENT OF VARIATION RESULT",
+    empty: { value: "No data", steps: "Enter numbers to compute CV." },
+    compute: computeCVWithSteps,
+    display: r => `${r.cv.toFixed(2)}%`
+});
+
+const skewnessTool = defineListTool({
+    id: 'skewness', interfaceId: 'statSkewnessInterface',
+    title: "📈 Skewness (Asymmetry)",
+    formula: "📌 Skewness = Σ(xᵢ - x̄)³ / [(n-1)s³]",
+    desc: "Measures asymmetry. 0 = symmetric, >0 = right-skewed, <0 = left-skewed.",
+    placeholder: "Example: 2, 3, 5, 7, 8, 10, 12, 15, 20",
+    buttonText: "📈 Calculate Skewness + Steps",
+    resultLabel: "🎯 SKEWNESS RESULT",
+    empty: { value: "No data", steps: "Enter numbers to compute skewness." },
+    min: { count: 3, value: "❌ Need at least 3 values", steps: "Skewness calculation requires at least 3 data points." },
+    compute: computeSkewnessWithSteps,
+    display: r => r.skewness.toFixed(6)
+});
+
+const kurtosisTool = defineListTool({
+    id: 'kurtosis', interfaceId: 'statKurtosisInterface',
+    title: "🎯 Kurtosis (Tails & Peakedness)",
+    formula: "📌 Kurtosis = Σ(xᵢ - x̄)⁴ / [(n-1)s⁴] - 3",
+    desc: "Excess kurtosis. 0 = mesokurtic (normal), >0 = leptokurtic (heavy tails), <0 = platykurtic (light tails).",
+    placeholder: "Example: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10",
+    buttonText: "🎯 Calculate Kurtosis + Steps",
+    resultLabel: "🎯 KURTOSIS RESULT",
+    empty: { value: "No data", steps: "Enter numbers to compute kurtosis." },
+    min: { count: 4, value: "❌ Need at least 4 values", steps: "Kurtosis calculation requires at least 4 data points." },
+    compute: computeKurtosisWithSteps,
+    display: r => r.kurtosis.toFixed(6)
+});
