@@ -166,6 +166,8 @@ function showModule(moduleName) {
         t.tabIndex = on ? 0 : -1;
     });
     document.querySelectorAll('.action-sidebar').forEach(sb => { sb.hidden = sb.dataset.module !== moduleName; });
+    // The one panel below the tab list is the tab panel of whichever tab is selected
+    document.getElementById('mainPanel').setAttribute('aria-labelledby', 'tab-' + moduleName);
     switchToStat(STAT_MODULES[moduleName] || 'mean');
 }
 

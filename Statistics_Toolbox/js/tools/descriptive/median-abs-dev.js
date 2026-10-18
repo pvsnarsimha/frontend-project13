@@ -2,30 +2,26 @@
 
 // Median Absolute Deviation Interface
 function renderMedianAbsDevInterface() {
-    return `
-        <div class="stat-interface" id="s
-        <div class="interface-title">📏 Median Absolute Deviation (MAD)</div>
-            <div class="formula-card">
-                <div class="formula">📌 MAD = median(|xᵢ - median(x)|)</div>
-                <div class="desc">Robust measure of dispersion using median instead of mean. Very resistant to outliers.</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter numeric values (commas, spaces, or line breaks)</label>
-                <textarea id="medianAbsDevInput" rows="3" placeholder="Example: 12, 45.5, 78, 99.99, 23"></textarea>
-                <div class="action-row">
-                    <button class="primary-btn" id="medianAbsDevComputeBtn">📏 Calculate Median Absolute Deviation + Full Steps</button>
-                    <button class="secondary-btn" id="medianAbsDevClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="medianAbsDevResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">📏 MEDIAN ABSOLUTE DEVIATION RESULT</div>
-                    <div class="result-value" id="medianAbsDevValueDisplay">—</div>
-                    <div class="calculation-steps" id="medianAbsDevStepsDisplay"></div>
-                </div>
-            </div>
-        </div>
-    `;
+    return buildInterface({
+        id: "statMedianAbsDevInterface",
+        title: "📏 Median Absolute Deviation (MAD)",
+        formula: "📌 MAD = median(|xᵢ - median(x)|)",
+        desc: "Robust measure of dispersion using median instead of mean. Very resistant to outliers.",
+        inputs: [
+            {
+                label: "📋 Enter numeric values (commas, spaces, or line breaks)",
+                textarea: { id: "medianAbsDevInput", rows: "3", placeholder: "Example: 12, 45.5, 78, 99.99, 23" }
+            }
+        ],
+        run: { id: "medianAbsDevComputeBtn", text: "📏 Calculate Median Absolute Deviation + Full Steps" },
+        clear: { id: "medianAbsDevClearBtn", text: "Clear" },
+        result: {
+            area: "medianAbsDevResultArea",
+            label: "📏 MEDIAN ABSOLUTE DEVIATION RESULT",
+            value: "medianAbsDevValueDisplay",
+            steps: "medianAbsDevStepsDisplay"
+        }
+    });
 }
 
 // Median Absolute Deviation Computation

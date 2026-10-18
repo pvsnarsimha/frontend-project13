@@ -162,12 +162,5 @@ function setupCovarianceLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("covarianceClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("covarianceXInput").value = '';
-            document.getElementById("covarianceYInput").value = '';
-            document.getElementById("covarianceResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("covarianceClearBtn", ["covarianceXInput", "covarianceYInput"], "covarianceResultArea");
 }

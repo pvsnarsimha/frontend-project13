@@ -52,14 +52,14 @@
 
 <div class="stats-dashboard">
 <div class="tab-bar" role="tablist" aria-label="Statistics modules">
-    <div class="tab active" id="tab-descriptive" data-tab="descriptive" role="tab" aria-selected="true" aria-controls="sidebar-descriptive" tabindex="0"><span aria-hidden="true">📊</span> Descriptive Statistics<small>Centre, spread &amp; shape</small></div>
-    <div class="tab" id="tab-manipulation" data-tab="manipulation" role="tab" aria-selected="false" aria-controls="sidebar-manipulation" tabindex="-1"><span aria-hidden="true">🔄</span> Data Preparation<small>Scaling, binning &amp; plots</small></div>
-    <div class="tab" id="tab-probability" data-tab="probability" role="tab" aria-selected="false" aria-controls="sidebar-probability" tabindex="-1"><span aria-hidden="true">📈</span> Probability Distributions<small>PDF, CDF &amp; sampling</small></div>
-    <div class="tab" id="tab-correlation" data-tab="correlation" role="tab" aria-selected="false" aria-controls="sidebar-correlation" tabindex="-1"><span aria-hidden="true">🔗</span> Correlation &amp; Association<small>Relationships in data</small></div>
-    <div class="tab" id="tab-hypothesis" data-tab="hypothesis" role="tab" aria-selected="false" aria-controls="sidebar-hypothesis" tabindex="-1"><span aria-hidden="true">📐</span> Hypothesis Testing<small>Tests &amp; p-values</small></div>
-    <div class="tab" id="tab-regression" data-tab="regression" role="tab" aria-selected="false" aria-controls="sidebar-regression" tabindex="-1"><span aria-hidden="true">📉</span> Regression &amp; Models<small>Fit &amp; assess models</small></div>
+    <div class="tab active" id="tab-descriptive" data-tab="descriptive" role="tab" aria-selected="true" aria-controls="mainPanel" tabindex="0"><span aria-hidden="true">📊</span> Descriptive Statistics<small>Centre, spread &amp; shape</small></div>
+    <div class="tab" id="tab-manipulation" data-tab="manipulation" role="tab" aria-selected="false" aria-controls="mainPanel" tabindex="-1"><span aria-hidden="true">🔄</span> Data Preparation<small>Scaling, binning &amp; plots</small></div>
+    <div class="tab" id="tab-probability" data-tab="probability" role="tab" aria-selected="false" aria-controls="mainPanel" tabindex="-1"><span aria-hidden="true">📈</span> Probability Distributions<small>PDF, CDF &amp; sampling</small></div>
+    <div class="tab" id="tab-correlation" data-tab="correlation" role="tab" aria-selected="false" aria-controls="mainPanel" tabindex="-1"><span aria-hidden="true">🔗</span> Correlation &amp; Association<small>Relationships in data</small></div>
+    <div class="tab" id="tab-hypothesis" data-tab="hypothesis" role="tab" aria-selected="false" aria-controls="mainPanel" tabindex="-1"><span aria-hidden="true">📐</span> Hypothesis Testing<small>Tests &amp; p-values</small></div>
+    <div class="tab" id="tab-regression" data-tab="regression" role="tab" aria-selected="false" aria-controls="mainPanel" tabindex="-1"><span aria-hidden="true">📉</span> Regression &amp; Models<small>Fit &amp; assess models</small></div>
 </div>
-    <div class="main-panel">
+    <div class="main-panel" id="mainPanel" role="tabpanel" aria-labelledby="tab-descriptive" tabindex="-1">
         <nav class="action-sidebar" id="sidebar-descriptive" data-module="descriptive" aria-label="Descriptive statistics tools">
             <button type="button" class="stat-btn" id="btnMean" data-stat="mean"><span class="btn-icon" aria-hidden="true">📐</span> Mean (Arithmetic)</button>
             <button type="button" class="stat-btn" id="btnMedian" data-stat="median"><span class="btn-icon" aria-hidden="true">📈</span> Median</button>

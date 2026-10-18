@@ -475,11 +475,5 @@ function setupMultipleLinearLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("multipleLinearClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("multipleData").value = '';
-            document.getElementById("multipleLinearResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("multipleLinearClearBtn", ["multipleData"], "multipleLinearResultArea");
 }

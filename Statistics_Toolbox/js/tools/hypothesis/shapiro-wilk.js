@@ -5,7 +5,7 @@ function renderShapiroWilkInterface() {
     return buildInterface({
         id: "statShapiroWilkInterface",
         title: "W Shapiro-Wilk Test (Normality)",
-        formula: "📌 W = (Σ aᵢxᵢ)² / Σ(xᵢ - x̄)²",
+        formula: "📌 W = (Σ aᵢ(x₍ₙ₋ᵢ₊₁₎ - x₍ᵢ₎))² / Σ(xᵢ - x̄)²",
         desc: "Tests whether a sample comes from a normal distribution. H₀: Data is normally distributed. Most powerful test for normality.",
         inputs: [
             {
@@ -204,8 +204,8 @@ function computeShapiroWilkTest(data, alpha) {
                 📊 Step 2: Calculate Numerator = Σ aᵢ × (xₙ₋ᵢ₊₁ - xᵢ)
             </h3>
             <div style="padding: 12px 20px; background: #e8f4f8; font-size: 13px;">
-                <strong>How aᵢ is calculated:</strong> aᵢ = [i/(n+1)] × [1 - i/(n+1)] × 2<br>
-                This formula gives more weight to pairs near the center of the distribution.
+                <strong>How aᵢ is calculated:</strong> mᵢ = Φ⁻¹((n−i+1−0.375)/(n+0.25)) are approximate expected normal order statistics; aᵢ = mᵢ/√(Σmⱼ²), with Royston's (1992) polynomial correction for the largest coefficients.<br>
+                The coefficients are largest for the extreme pairs, which carry the most information about the tails.
             </div>
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>

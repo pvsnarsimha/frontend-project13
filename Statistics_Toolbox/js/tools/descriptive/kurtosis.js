@@ -75,8 +75,8 @@ function computeKurtosisWithSteps(numbers) {
 const kurtosisTool = defineListTool({
     id: 'kurtosis', interfaceId: 'statKurtosisInterface',
     title: "🎯 Kurtosis (Tails & Peakedness)",
-    formula: "📌 Kurtosis = Σ(xᵢ - x̄)⁴ / [(n-1)s⁴] - 3",
-    desc: "Excess kurtosis. 0 = mesokurtic (normal), >0 = leptokurtic (heavy tails), <0 = platykurtic (light tails).",
+    formula: "📌 Excess kurtosis (G₂) = [n(n+1)/((n-1)(n-2)(n-3))] × Σ((xᵢ - x̄)/s)⁴ - 3(n-1)²/((n-2)(n-3))",
+    desc: "Sample excess kurtosis with the small-sample bias correction (the same estimator as Excel KURT and SciPy kurtosis(bias=False)); s is the sample standard deviation (n-1). 0 = mesokurtic (normal), >0 = leptokurtic (heavy tails), <0 = platykurtic (light tails).",
     placeholder: "Example: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10",
     buttonText: "🎯 Calculate Kurtosis + Steps",
     resultLabel: "🎯 KURTOSIS RESULT",

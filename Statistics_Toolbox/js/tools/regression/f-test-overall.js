@@ -484,12 +484,5 @@ function setupFTestOverallLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("ftestOverallClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("ftestOverallXInput").value = '';
-            document.getElementById("ftestOverallYInput").value = '';
-            document.getElementById("ftestOverallResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("ftestOverallClearBtn", ["ftestOverallXInput", "ftestOverallYInput"], "ftestOverallResultArea");
 }

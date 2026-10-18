@@ -280,12 +280,5 @@ function setupSimpleLinearLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("simpleLinearClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("simpleXInput").value = '';
-            document.getElementById("simpleYInput").value = '';
-            document.getElementById("simpleLinearResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("simpleLinearClearBtn", ["simpleXInput", "simpleYInput"], "simpleLinearResultArea");
 }

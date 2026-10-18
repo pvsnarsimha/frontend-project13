@@ -77,6 +77,8 @@ function computeOneSampleTTest(data, mu0, alpha, alternative) {
     const df = n - 1;
     
     // Calculate critical value and p-value
+    // Confidence intervals are two-sided at level 1 - α whatever the alternative of the test
+    const ciT = tCriticalValue(alpha / 2, df);
     let criticalValue, pValue;
     
     if (alternative === 'two.sided') {
@@ -181,7 +183,7 @@ function computeOneSampleTTest(data, mu0, alpha, alternative) {
         
         <div style="margin-top: 20px; padding: 16px; background: #e8f4f8; border-radius: 12px; font-size: 13px;">
             💡 <strong>${(1-alpha)*100}% Confidence Interval for μ:</strong><br>
-            ${mean.toFixed(4)} ± ${(criticalValue * standardError).toFixed(4)} → [${(mean - criticalValue * standardError).toFixed(4)}, ${(mean + criticalValue * standardError).toFixed(4)}]
+            ${mean.toFixed(4)} ± ${(ciT * standardError).toFixed(4)} → [${(mean - ciT * standardError).toFixed(4)}, ${(mean + ciT * standardError).toFixed(4)}]
         </div>
     </div>`;
     

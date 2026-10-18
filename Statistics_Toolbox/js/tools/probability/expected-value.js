@@ -34,8 +34,8 @@ function renderExpectedValueInterface() {
 function setupExpectedValueLogic() {
     const distSelect = document.getElementById('expectedDistribution');
     if (distSelect) {
-        distSelect.addEventListener('change', updateExpectedParams);
-        updateExpectedParams();
+        distSelect.addEventListener('change', updateExpectedValueParams);
+        updateExpectedValueParams();
     }
     
     const computeBtn = document.getElementById("expectedComputeBtn");
@@ -77,7 +77,7 @@ function setupExpectedValueLogic() {
 }
 
 // ========== PARAMETER UPDATE FUNCTIONS ==========
-function updateExpectedParams() {
+function updateExpectedValueParams() {
     const dist = document.getElementById('expectedDistribution').value;
     const paramsDiv = document.getElementById('expectedParams');
     

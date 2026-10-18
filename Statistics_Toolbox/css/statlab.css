@@ -186,9 +186,11 @@ textarea:focus, input:focus, select:focus { outline: none; border-color: var(--b
 .result-card.is-notice .result-value { color: #92400e; background: linear-gradient(135deg, #fffbeb, #fff7ed); border-color: #fde68a; }
 .result-card.is-notice .result-value::before { content: "NOTICE"; color: #d97706; }
 .result-value.long { font-size: clamp(1.05rem, 1.9vw, 1.35rem); letter-spacing: -.2px; line-height: 1.35; }
-.result-value.chips-on { display: none; }
-.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 28px 4px; }
-.kpi { position: relative; padding: 16px 18px 14px; border-radius: 16px; background: #fff; border: 1px solid var(--line); overflow: hidden; box-shadow: 0 6px 16px -10px rgba(15,23,42,.25); }
+/* The answer tiles (.kpi-row) replace the plain value visually, but the value stays in the page as the live region screen readers hear,
+   so it is clipped instead of display:none (which would silence it). */
+.result-value.chips-on { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(128px, 100%), 1fr)); gap: 12px; margin: 20px 28px 4px; }
+.kpi { position: relative; min-width: 0; padding: 16px 18px 14px; border-radius: 16px; background: #fff; border: 1px solid var(--line); overflow: hidden; box-shadow: 0 6px 16px -10px rgba(15,23,42,.25); }
 .kpi::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--c, var(--brand)); }
 .kpi small { display: block; font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 .kpi b { display: block; font-family: var(--mono); font-size: 1.35rem; font-weight: 800; letter-spacing: -.5px; color: var(--ink); overflow-wrap: anywhere; }
@@ -387,14 +389,7 @@ footer { font-size: .76rem; text-align: center; padding: 16px; color: var(--mute
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 12px; font-size: .85rem; font-weight: 600; opacity: 0; pointer-events: none; transition: .25s; z-index: 99; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-@media (max-width: 900px) {
-    .main-panel { flex-direction: column; }
-    .action-sidebar { position: static; width: 100%; flex: 0 0 auto; max-height: min(55vh, 420px); -webkit-overflow-scrolling: touch; border-right: none; border-bottom: 1px solid var(--line); }
-    .stats-dashboard { width: calc(100% - 20px); margin-top: -36px; border-radius: 18px; }
-    .hero-curve { opacity: .35; }
-    .result-value { font-size: 1.4rem; }
-    .formula-card .formula { font-size: .85rem; white-space: normal; }
-}
+/* Layout below 900px (tablets and phones) lives in responsive.css, the only file that sets the 900px breakpoint. */
 @media print { .hero, .tab-bar, .action-sidebar, .learn-strip, footer, .copy-btn, .action-row { display: none !important; } .stats-dashboard { margin: 0; width: 100%; box-shadow: none; } }
 
 /* ---------- Accessibility ---------- */
@@ -410,10 +405,6 @@ footer { font-size: .76rem; text-align: center; padding: 16px; color: var(--mute
 .kpi.verdict .vd-ico { display: inline-block; margin-right: .35em; font-weight: 900; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
-}
-@media (max-width: 900px) {
-    .stat-btn, .tab { min-height: 44px; }          /* comfortable touch targets */
-    .action-sidebar { overscroll-behavior: contain; }
 }
 
 .undef-note { margin: 14px 28px 0; padding: 12px 16px; border-radius: 12px; background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; font-size: .9rem; line-height: 1.45; }

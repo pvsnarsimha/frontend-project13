@@ -88,6 +88,11 @@ function computeRunsTest(inputText, alpha) {
         else if (value2 !== null && val === value2) n2++;
     }
     
+    // The runs test is for a two-symbol sequence; a third symbol would be silently dropped from the counts
+    if (uniqueValues.length > 2) {
+        return { error: true, message: `The runs test needs exactly 2 distinct symbols, but found ${uniqueValues.length}: ${uniqueValues.slice(0, 6).map(v => escapeHtml(v)).join(', ')}${uniqueValues.length > 6 ? ', ...' : ''}. Recode the data into two categories (for example above/below the median as 1/0).` };
+    }
+    
     // If only one unique value, test is trivial
     if (value2 === null) {
         return { error: true, message: "Sequence must contain at least two different symbols." };

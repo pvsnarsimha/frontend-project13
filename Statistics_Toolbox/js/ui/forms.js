@@ -1,13 +1,34 @@
 // StatLab UI layer (sample-data buttons, accessible labels, copy button, interface observer). Presentation only: no calculation logic lives here.
 (function () {
     const { $, $$, showToast, countTools, decorateSidebars, hookCard } = window.StatLabUI;
+    // Placeholders are written as HTML attribute text ("Example:&#10;1, 2, 3"), so entities that survive into the string
+    // (double-escaped markup, or text taken from the source rather than the DOM) are decoded before the sample is used.
+    const NAMED_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', minus: '-', ndash: '-', mdash: '-', hellip: '...' };
+    function decodeEntities(text) {
+        let out = String(text);
+        for (let pass = 0; pass < 2; pass++) {           // twice: "&amp;#10;" becomes "&#10;" and then a newline
+            out = out.replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(+d))
+                     .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+                     .replace(/&([a-z]+);/gi, (m, name) => (name.toLowerCase() in NAMED_ENTITIES ? NAMED_ENTITIES[name.toLowerCase()] : m));
+        }
+        return out;
+    }
+    // Returns the sample text of a placeholder ("Example: 1, 2, 3"), or null when the placeholder offers none
+    function sampleFromPlaceholder(placeholder) {
+        const ph = decodeEntities(placeholder || '').replace(/\r\n?/g, '\n');
+        const m = ph.match(/(?:example|e\.g\.)\s*[:\-]?\s*([\s\S]+)/i);
+        const val = (m ? m[1] : ph).trim();
+        if (!val || val.length >= 700) return null;
+        // An explicit "Example:" may be anything that is not markup (category names like "Red, Apple" have no digits);
+        // a placeholder without the marker is used only if it is purely numeric
+        if (m ? /^[^<>]+$/.test(val) : /\d/.test(val) && /^[\d\s,.;\-+eE\n]+$/.test(val)) return val;
+        return null;
+    }
     function samplesFor(iface) {
         const out = [];
         $$('textarea', iface).forEach(t => {
-            const ph = t.getAttribute('placeholder') || '';
-            const m = ph.match(/(?:example|e\.g\.)\s*[:\-]?\s*([\s\S]+)/i);
-            const val = (m ? m[1] : ph).trim();
-            if (/\d/.test(val) && val.length < 700 && (m ? /^[^<>]+$/.test(val) : /^[\d\s,.;\-+eE\n\r]+$/.test(val))) out.push([t, val]);
+            const val = sampleFromPlaceholder(t.getAttribute('placeholder'));
+            if (val !== null) out.push([t, val]);
         });
         return out;
     }
@@ -35,7 +56,33 @@
             l.htmlFor = ctl.id;
         });
         $$('.result-value', iface).forEach(v => { v.setAttribute('role', 'status'); v.setAttribute('aria-live', 'polite'); });
+        // The worked solution is rebuilt after every calculation: announce that it is ready without reading all of it out
+        $$('.calculation-steps', iface).forEach(v => {
+            v.setAttribute('role', 'region'); v.setAttribute('aria-label', 'Worked solution');
+            v.setAttribute('aria-live', 'polite'); v.setAttribute('aria-atomic', 'false'); v.setAttribute('aria-relevant', 'additions');
+        });
         $$('button:not([type])', iface).forEach(b => { b.type = 'button'; });
+    }
+    // Clipboard API where the page is allowed to use it (secure context + permission); otherwise the old execCommand route
+    // through a temporary textarea, which also works when the page is opened from file:// or in an iframe.
+    function copyText(text) {
+        const legacy = () => {
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.setAttribute('readonly', ''); ta.setAttribute('aria-hidden', 'true');
+            ta.style.cssText = 'position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0;';
+            document.body.appendChild(ta);
+            const active = document.activeElement;
+            ta.select(); ta.setSelectionRange(0, text.length);
+            let ok = false;
+            try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+            ta.remove();
+            if (active && typeof active.focus === 'function') active.focus();
+            return ok;
+        };
+        if (navigator.clipboard && window.isSecureContext !== false) {
+            return navigator.clipboard.writeText(text).then(() => true, () => legacy());
+        }
+        return Promise.resolve(legacy());
     }
     function enhance(iface) {
         if (iface.dataset.enhanced) return; iface.dataset.enhanced = '1';
@@ -57,9 +104,7 @@
             const c = document.createElement('button'); c.type = 'button'; c.className = 'copy-btn'; c.textContent = '⧉ Copy solution';
             c.addEventListener('click', () => {
                 const txt = card.innerText.replace('⧉ Copy solution', '').trim();
-                const done = () => showToast('Solution copied to clipboard');
-                if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, () => showToast('Copy blocked by browser'));
-                else showToast('Copy not available in this browser');
+                copyText(txt).then(ok => showToast(ok ? 'Solution copied to clipboard' : 'Copy is not available here: select the text and copy it manually'));
             });
             card.appendChild(c);
         });
@@ -71,4 +116,5 @@
     function init() { decorateSidebars(); countTools(); }
     init();
     window.addEventListener('load', init);
+    Object.assign(window.StatLabUI, { decodeEntities, sampleFromPlaceholder, copyText });
 })();

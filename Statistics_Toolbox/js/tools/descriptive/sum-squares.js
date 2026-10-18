@@ -9,11 +9,11 @@ function renderSumSquaresInterface() {
         desc: "Measures variability. For multiple groups, enter data with group labels (format: value:group). Example: \"23:A, 45:A, 32:B, 56:B\"",
         inputs: [
             {
-                label: "📋 Enter numeric values (for single group) OR values with group labels (format: value:group)",
+                label: "📋 Enter numeric values (single group, e.g. 12, 45, 23, 67) OR values with group labels (format: value:group)",
                 textarea: {
                     id: "sumSquaresInput",
                     rows: "4",
-                    placeholder: "Single group: 12, 45, 23, 67, 34, 89\nMultiple groups: 23:A, 45:A, 32:B, 56:B, 78:B, 44:C, 67:C"
+                    placeholder: "Example: 23:A, 45:A, 32:B, 56:B, 78:B, 44:C, 67:C"
                 }
             }
         ],

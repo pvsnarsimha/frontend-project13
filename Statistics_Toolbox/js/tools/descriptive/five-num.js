@@ -39,14 +39,9 @@ function computeFiveNumWithSteps(numbers) {
         else return arr[Math.floor(m/2)];
     };
     
-    let q1, q3;
-    if (n % 2 === 0) {
-        q1 = getMedian(sorted.slice(0, n/2));
-        q3 = getMedian(sorted.slice(n/2));
-    } else {
-        q1 = getMedian(sorted.slice(0, Math.floor(n/2)));
-        q3 = getMedian(sorted.slice(Math.floor(n/2) + 1));
-    }
+    // Type 7 quantiles (linear interpolation at (n - 1)p), the same method as every other quantile in the app
+    const q1 = quantileType7(sorted, 0.25);
+    const q3 = quantileType7(sorted, 0.75);
     
     let median = getMedian(sorted);
     let iqr = q3 - q1;
@@ -75,39 +70,11 @@ function computeFiveNumWithSteps(numbers) {
         steps += `   n is odd → median = value at position ${pos+1} = ${median}\n\n`;
     }
     
-    steps += `Step 5: Find Q₁ (25th percentile - median of lower half)\n`;
-    if (n % 2 === 0) {
-        let lowerHalf = sorted.slice(0, n/2);
-        steps += `   Lower half = [${lowerHalf.join(', ')}]\n`;
-        if (lowerHalf.length % 2 === 0) {
-            let left = lowerHalf[lowerHalf.length/2 - 1];
-            let right = lowerHalf[lowerHalf.length/2];
-            steps += `   Q₁ = (${left} + ${right}) / 2 = ${q1}\n\n`;
-        } else {
-            steps += `   Q₁ = ${q1}\n\n`;
-        }
-    } else {
-        let lowerHalf = sorted.slice(0, Math.floor(n/2));
-        steps += `   Lower half = [${lowerHalf.join(', ')}]\n`;
-        steps += `   Q₁ = ${q1}\n\n`;
-    }
+    steps += `Step 5: Find Q₁ (25th percentile, Type 7 linear interpolation)\n`;
+    steps += `   ${describeQuantileType7(sorted, 0.25, 'Q₁')}\n\n`;
     
-    steps += `Step 6: Find Q₃ (75th percentile - median of upper half)\n`;
-    if (n % 2 === 0) {
-        let upperHalf = sorted.slice(n/2);
-        steps += `   Upper half = [${upperHalf.join(', ')}]\n`;
-        if (upperHalf.length % 2 === 0) {
-            let left = upperHalf[upperHalf.length/2 - 1];
-            let right = upperHalf[upperHalf.length/2];
-            steps += `   Q₃ = (${left} + ${right}) / 2 = ${q3}\n\n`;
-        } else {
-            steps += `   Q₃ = ${q3}\n\n`;
-        }
-    } else {
-        let upperHalf = sorted.slice(Math.floor(n/2) + 1);
-        steps += `   Upper half = [${upperHalf.join(', ')}]\n`;
-        steps += `   Q₃ = ${q3}\n\n`;
-    }
+    steps += `Step 6: Find Q₃ (75th percentile, Type 7 linear interpolation)\n`;
+    steps += `   ${describeQuantileType7(sorted, 0.75, 'Q₃')}\n\n`;
     
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     steps += `✅ Five-Number Summary:\n`;

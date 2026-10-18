@@ -17,8 +17,7 @@ function renderStemLeafInterface() {
             area: "stemleafResultArea",
             label: "🎯 STEM-AND-LEAF PLOT",
             value: "stemleafValueDisplay",
-            steps: "stemleafStepsDisplay",
-            extra: ["<canvas id=\"stemLeafScatterChart\" style=\"max-height: 400px; width: 100%; margin-top: 20px;\"></canvas>"]
+            steps: "stemleafStepsDisplay"
         }
     });
 }
@@ -343,6 +342,7 @@ ${plotLines.join('\n')}
 function renderStemLeafScatterChart(scatterData, numbers) {
     const canvas = document.getElementById('stemLeafScatterChart');
     if (!canvas) return;
+    labelChart(canvas, `Scatter plot of the stem-and-leaf display for ${describeSample(numbers)}: each point is one value, plotted with its leaf digit.`);
     
     if (stemLeafChart) stemLeafChart.destroy();
     

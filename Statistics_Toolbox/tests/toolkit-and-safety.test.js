@@ -111,3 +111,47 @@ test('the app is self-contained: no external URLs in the page, styles or scripts
     const css = fs.readFileSync(path.join(ROOT, 'vendor/fonts/fonts.css'), 'utf8');
     for (const m of css.matchAll(/url\('([^']+)'\)/g)) assert.ok(fs.existsSync(path.join(ROOT, 'vendor/fonts', m[1])), m[1]);
 });
+
+test('attachClearHandler empties every listed field (textarea and input) and hides the result area', () => {
+    const fresh = loadApp();                                    // the shared app above had attachClearHandler replaced by a stub
+    const handlers = {};
+    const els = {
+        clearBtn: { addEventListener: (ev, fn) => { handlers[ev] = fn; } },
+        dataArea: { value: '1, 2, 3', tagName: 'TEXTAREA' },
+        seedInput: { value: '42', tagName: 'INPUT' },
+        otherInput: { value: 'keep me', tagName: 'INPUT' },
+        results: { style: { display: 'block' } }
+    };
+    fresh.document.getElementById = id => els[id] || null;
+    fresh.attachClearHandler('clearBtn', ['dataArea', 'seedInput'], 'results');
+    assert.equal(typeof handlers.click, 'function', 'a click handler was registered');
+    handlers.click();
+    assert.equal(els.dataArea.value, '');
+    assert.equal(els.seedInput.value, '', 'an <input> is cleared as well as a <textarea>');
+    assert.equal(els.otherInput.value, 'keep me', 'fields that were not listed are untouched');
+    assert.equal(els.results.style.display, 'none');
+
+    // a single id still works, and missing elements are tolerated
+    els.dataArea.value = 'x'; els.results.style.display = 'block';
+    const single = {};
+    els.clearBtn2 = { addEventListener: (ev, fn) => { single[ev] = fn; } };
+    fresh.attachClearHandler('clearBtn2', 'dataArea', 'results');
+    single.click();
+    assert.equal(els.dataArea.value, '');
+    assert.doesNotThrow(() => { fresh.attachClearHandler('noSuchButton', 'dataArea', 'results'); });
+    els.clearBtn3 = { addEventListener: (ev, fn) => { single.c3 = fn; } };
+    fresh.attachClearHandler('clearBtn3', ['dataArea', 'missingField', ''], 'missingResult');
+    assert.doesNotThrow(() => single.c3());
+});
+
+test('the Clear buttons of two-input tools clear both fields', () => {
+    const fresh = loadApp();
+    const registered = [];
+    fresh.attachClearHandler = (btn, ids, area) => registered.push({ btn, ids: [].concat(ids), area });
+    fresh.setupPearsonLogic(); fresh.setupMannWhitneyLogic(); fresh.setupFTestLogic(); fresh.setupTwoSampleTLogic();
+    const byBtn = Object.fromEntries(registered.map(r => [r.btn, r.ids]));
+    assert.equal(byBtn.pearsonClearBtn.length, 2);
+    assert.equal(byBtn.mannWhitneyClearBtn.length, 2);
+    assert.equal(byBtn.ftestClearBtn.length, 2);
+    assert.equal(byBtn.twoSampleTClearBtn.length, 2);
+});

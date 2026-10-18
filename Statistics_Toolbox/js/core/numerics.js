@@ -427,9 +427,15 @@ function kolmogorovD(sortedValues, mean, sd) {
     return d;
 }
 
-const _lillieforsCache = {};
+const LILLIEFORS_CACHE_LIMIT = 8;                 // each entry holds a simulated null distribution; keep the most recent few
+const _lillieforsCache = new Map();
 function lillieforsNullDistribution(n) {
-    if (_lillieforsCache[n]) return _lillieforsCache[n];
+    if (_lillieforsCache.has(n)) {
+        const hit = _lillieforsCache.get(n);
+        _lillieforsCache.delete(n);                  // re-insert so the Map keeps least-recently-used first
+        _lillieforsCache.set(n, hit);
+        return hit;
+    }
     const sims = n <= 100 ? 10000 : n <= 500 ? 4000 : 1500;
     const rand = seededRandom(12345 + n);
     const out = new Array(sims);
@@ -449,7 +455,9 @@ function lillieforsNullDistribution(n) {
         out[s] = kolmogorovD(sorted, mean, Math.sqrt(ss / (n - 1)));
     }
     out.sort((a, b) => a - b);
-    return (_lillieforsCache[n] = out);
+    _lillieforsCache.set(n, out);
+    if (_lillieforsCache.size > LILLIEFORS_CACHE_LIMIT) _lillieforsCache.delete(_lillieforsCache.keys().next().value);
+    return out;
 }
 
 function lillieforsPValue(D, n) {
@@ -462,4 +470,109 @@ function lillieforsPValue(D, n) {
 function lillieforsCritical(alpha, n) {
     const d = lillieforsNullDistribution(n);
     return d[Math.min(d.length - 1, Math.floor((1 - alpha) * d.length))];
+}
+
+// ---- Generic matrix helpers (arrays of rows) ----
+function multiplyMatrices(A, B) {
+    let result = Array(A.length).fill().map(() => Array(B[0].length).fill(0));
+    for (let i = 0; i < A.length; i++) {
+        for (let j = 0; j < B[0].length; j++) {
+            for (let k = 0; k < A[0].length; k++) {
+                result[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+    return result;
+}
+
+// Returns the inverse, or null when the matrix is singular (callers must handle null)
+function inverseMatrix(matrix) {
+    const n = matrix.length;
+    let augmented = matrix.map((row, i) => [...row, ...Array(n).fill().map((_, j) => i === j ? 1 : 0)]);
+    
+    for (let i = 0; i < n; i++) {
+        let maxRow = i;
+        for (let k = i + 1; k < n; k++) {
+            if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) maxRow = k;
+        }
+        [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+        
+        let pivot = augmented[i][i];
+        if (!isFinite(pivot) || Math.abs(pivot) < 1e-12) return null;   // singular (or numerically singular)
+        for (let j = 0; j < 2 * n; j++) augmented[i][j] /= pivot;
+        
+        for (let k = 0; k < n; k++) {
+            if (k !== i) {
+                let factor = augmented[k][i];
+                for (let j = 0; j < 2 * n; j++) augmented[k][j] -= factor * augmented[i][j];
+            }
+        }
+    }
+    
+    return augmented.map(row => row.slice(n));
+}
+
+function computeEigenvalues(matrix) {
+    // Eigenvalues (largest first) of a square matrix with real eigenvalues, such as B * W^-1 in MANOVA.
+    const n = matrix.length;
+    if (n === 1) return [matrix[0][0]];
+    if (n === 2) {
+        const [[a, b], [c, d]] = matrix;
+        const trace = a + d, disc = Math.max(0, trace * trace - 4 * (a * d - b * c));
+        return [(trace + Math.sqrt(disc)) / 2, (trace - Math.sqrt(disc)) / 2];
+    }
+    // Shifted QR iteration (Gram-Schmidt QR)
+    let A = matrix.map(r => r.slice());
+    for (let iter = 0; iter < 1000; iter++) {
+        const mu = A[n - 1][n - 1];
+        const M = A.map((r, i) => r.map((v, j) => v - (i === j ? mu : 0)));
+        const Q = Array.from({ length: n }, () => new Array(n).fill(0));
+        const R = Array.from({ length: n }, () => new Array(n).fill(0));
+        for (let j = 0; j < n; j++) {
+            const v = M.map(r => r[j]);
+            for (let i = 0; i < j; i++) {
+                R[i][j] = Q.reduce((s, r, k) => s + r[i] * M[k][j], 0);
+                for (let k = 0; k < n; k++) v[k] -= R[i][j] * Q[k][i];
+            }
+            R[j][j] = Math.sqrt(v.reduce((s, x) => s + x * x, 0));
+            for (let k = 0; k < n; k++) Q[k][j] = R[j][j] > 1e-300 ? v[k] / R[j][j] : 0;
+        }
+        A = R.map((r, i) => r.map((_, j) => r.reduce((s, _x, k) => s + R[i][k] * Q[k][j], 0) + (i === j ? mu : 0)));
+        let off = 0;
+        for (let i = 1; i < n; i++) for (let j = 0; j < i; j++) off += Math.abs(A[i][j]);
+        if (off < 1e-12) break;
+    }
+    return A.map((r, i) => r[i]).sort((x, y) => y - x);
+}
+
+function transposeMatrix(A) {
+    return A[0].map((_, j) => A.map(row => row[j]));
+}
+
+// R² of the ordinary-least-squares regression of y on the columns in `predictors` (with an intercept).
+// Returns 1 when the predictors are perfectly collinear with y or with each other (singular X'X).
+function olsRSquared(y, predictors) {
+    const n = y.length;
+    const X = y.map((_, i) => [1, ...predictors.map(col => col[i])]);
+    const Xt = transposeMatrix(X);
+    const XtXinv = inverseMatrix(multiplyMatrices(Xt, X));
+    if (!XtXinv) return 1;
+    const beta = multiplyMatrices(XtXinv, multiplyMatrices(Xt, y.map(v => [v]))).map(r => r[0]);
+    const yMean = y.reduce((a, b) => a + b, 0) / n;
+    let ssRes = 0, ssTot = 0;
+    for (let i = 0; i < n; i++) {
+        const fit = X[i].reduce((s, v, k) => s + v * beta[k], 0);
+        ssRes += (y[i] - fit) * (y[i] - fit);
+        ssTot += (y[i] - yMean) * (y[i] - yMean);
+    }
+    return ssTot === 0 ? 0 : Math.min(1, Math.max(0, 1 - ssRes / ssTot));
+}
+
+// ---- Quantiles ----
+// Type 7 (the default in R, NumPy and SciPy): h = (n - 1)p, interpolate linearly between the neighbouring order statistics.
+// `sorted` must be ascending and non-empty; p is a fraction in [0, 1].
+function quantileType7(sorted, p) {
+    const h = (sorted.length - 1) * p;
+    const lo = Math.floor(h), hi = Math.ceil(h);
+    return sorted[lo] + (h - lo) * (sorted[hi] - sorted[lo]);
 }

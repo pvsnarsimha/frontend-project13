@@ -388,12 +388,5 @@ function setupTStatsLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("tstatsClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("tstatsXInput").value = '';
-            document.getElementById("tstatsYInput").value = '';
-            document.getElementById("tstatsResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("tstatsClearBtn", ["tstatsXInput", "tstatsYInput"], "tstatsResultArea");
 }

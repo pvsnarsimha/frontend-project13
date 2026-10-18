@@ -151,31 +151,37 @@ function computeEntropyWithSteps(distType, params) {
         
     } else if (distType === 'poisson') {
         const lambda = params.lambda;
-        entropy = lambda * (1 - Math.log(lambda)) + Math.exp(-lambda) * 
-                  (lambda * Math.log(lambda) + (1 - lambda) * Math.log(1 + 1/lambda) - 
-                   lambda * Math.log(2 * Math.PI * lambda) / 2);
-        // Approximation
-        entropy = 0.5 * Math.log(2 * Math.PI * Math.E * lambda) - 1/(12 * lambda) - 1/(24 * lambda * lambda);
+        // Exact: H = -Σ P(k) ln P(k), summed until the remaining tail is negligible
+        entropy = 0;
+        const kMax = Math.ceil(lambda + 40 * Math.sqrt(lambda) + 50);
+        for (let k = 0; k <= kMax; k++) {
+            const logP = -lambda + k * Math.log(lambda) - logGamma(k + 1);
+            entropy -= Math.exp(logP) * logP;
+        }
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      POISSON DISTRIBUTION ENTROPY                ║\n`;
         steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
-        steps += `   Approximation: H ≈ ½ ln(2πeλ) - 1/(12λ) - 1/(24λ²)\n\n`;
+        steps += `   Exact sum: H = -Σ P(k) ln P(k), with P(k) = e^(-λ) λ^k / k!\n\n`;
         steps += `   Given λ = ${lambda}\n`;
         steps += `   H = ${entropy.toFixed(8)}\n\n`;
         
     } else if (distType === 'binomial') {
         const n = params.n;
         const p = params.p;
-        entropy = 0.5 * Math.log(2 * Math.PI * Math.E * n * p * (1 - p));
+        // Exact: H = -Σ P(k) ln P(k) over k = 0..n
+        entropy = 0;
+        for (let k = 0; k <= n; k++) {
+            const logP = logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1) + (k > 0 ? k * Math.log(p) : 0) + (n - k > 0 ? (n - k) * Math.log(1 - p) : 0);
+            if (isFinite(logP)) entropy -= Math.exp(logP) * logP;
+        }
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                     BINOMIAL DISTRIBUTION ENTROPY                ║\n`;
         steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
-        steps += `   Approximation: H ≈ ½ ln(2πe n p (1-p))\n\n`;
+        steps += `   Exact sum: H = -Σ P(k) ln P(k), with P(k) = C(n,k) p^k (1-p)^(n-k)\n\n`;
         steps += `   Given n = ${n}, p = ${p}\n`;
-        steps += `   n·p·(1-p) = ${n} × ${p} × ${(1-p).toFixed(6)} = ${(n * p * (1-p)).toFixed(6)}\n`;
-        steps += `   H = ½ ln(2πe × ${(n * p * (1-p)).toFixed(6)}) = ${entropy.toFixed(8)}\n\n`;
+        steps += `   H = ${entropy.toFixed(8)}\n\n`;
     }
     
     steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
@@ -190,18 +196,13 @@ function computeEntropyWithSteps(distType, params) {
     return { entropy, steps };
 }
 
-// Helper function for digamma (approximation)
+// Digamma ψ(x) for x > 0: shift x upward with the recurrence ψ(x) = ψ(x+1) - 1/x, then use the asymptotic series
 function digamma(x) {
-    if (x <= 0) return 0;
+    if (!(x > 0)) return NaN;
     let result = 0;
-    // Use asymptotic expansion for large x
-    if (x < 7) {
-        result = digamma(x + 1) - 1/x;
-    } else {
-        const invX = 1/x;
-        result = Math.log(x) - 0.5 * invX - 1/(12 * x * x) + 1/(120 * x * x * x * x);
-    }
-    return result;
+    while (x < 10) { result -= 1 / x; x += 1; }
+    const inv2 = 1 / (x * x);
+    return result + Math.log(x) - 0.5 / x - inv2 * (1 / 12 - inv2 * (1 / 120 - inv2 * (1 / 252 - inv2 / 240)));
 }
 
 // ========== SETUP FUNCTIONS FOR NEW FEATURES ==========

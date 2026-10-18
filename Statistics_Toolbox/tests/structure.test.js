@@ -99,3 +99,104 @@ test('each tool lives in its own file: one route per file, no file larger than 1
         assert.ok(lines <= 1200, `${rel} has ${lines} lines`);
     }
 });
+
+test('tool functions live in the file that names them (renderX/computeX/setupX/updateX belong to x.js)', () => {
+    const offenders = [];
+    for (const rel of scriptList()) {
+        if (!rel.startsWith('js/tools/')) continue;
+        const key = path.basename(rel, '.js').replace(/[^a-z0-9]/gi, '').toLowerCase();       // median-abs-dev.js -> medianabsdev
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        for (const m of src.matchAll(/^function\s+((?:render|setup|update|compute)[A-Za-z0-9_$]*)\s*\(/gm)) {
+            const rest = m[1].replace(/^(render|setup|update|compute)/, '');
+            // the file name must start the rest of the function name, ending at a word boundary (computeModelSummary is not a "mode" function)
+            const ok = rest.toLowerCase().startsWith(key) && (rest.length === key.length || !/[a-z]/.test(rest[key.length]));
+            if (!ok) offenders.push(`${m[1]} in ${rel}`);
+        }
+    }
+    assert.deepEqual(offenders, []);
+});
+
+// Opening and closing counts of block-level tags must agree in anything a tool renders or generates.
+function unbalancedTags(markup) {
+    const bad = [];
+    for (const tag of ['div', 'table', 'thead', 'tbody', 'tr', 'select', 'button', 'textarea', 'ul', 'ol', 'details']) {
+        const open = (markup.match(new RegExp(`<${tag}(?=[\\s>])`, 'g')) || []).length;
+        const close = (markup.match(new RegExp(`</${tag}>`, 'g')) || []).length;
+        if (open !== close) bad.push(`<${tag}> opened ${open}, closed ${close}`);
+    }
+    return bad;
+}
+
+test('no script has a syntax error, a stray brace or a damaged closing tag such as "\\\\tour" for "</table>"', () => {
+    const vm = require('vm');
+    for (const rel of scriptList()) {
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        assert.doesNotThrow(() => new vm.Script(src, { filename: rel }), `${rel} does not parse`);
+        src.split('\n').forEach((line, i) => {
+            assert.ok(!/\\\\t[a-z]/.test(line), `${rel}:${i + 1} contains the escape debris "\\\\t…" (a mangled closing tag)`);
+            assert.ok(!/(?<=[>\s])\/(?:table|tbody|thead|tr|td|th|div|span|ul|li|ol|p|h[1-6]|strong|details|summary)>/.test(line), `${rel}:${i + 1} has a closing tag without its "<"`);
+            assert.ok(!/\b(?:id|class|for|type|value)="[^"]*$/.test(line.replace(/\\"/g, '')), `${rel}:${i + 1} has an attribute whose closing quote is missing`);
+        });
+    }
+});
+
+test('every rendered interface is well-formed: balanced tags, quoted attributes', () => {
+    for (const [stat, [render]] of Object.entries(routes)) {
+        const out = render();
+        assert.deepEqual(unbalancedTags(out), [], `${stat}: unbalanced markup`);
+        assert.ok(!/\sid="[^">]*\s*</.test(out) && !/\sid="[^"]*\n/.test(out), `${stat}: an id attribute is not terminated`);
+        assert.ok((out.match(/"/g) || []).length % 2 === 0, `${stat}: odd number of quotes`);
+    }
+});
+
+test('worked-solution markup produced by representative HTML tools is balanced', () => {
+    const results = [
+        app.computeCorrelationMatrixWithSteps([[1, 2, 3, 4, 5], [2, 1, 4, 3, 6], [5, 3, 4, 1, 2]]).steps,
+        app.computeCramersVWithSteps('a,x\na,y\nb,x\nb,y\na,x\nb,y\na,y\nb,x\na,x\nb,y', 0.05).steps,
+        app.computeKendallWithSteps([1, 2, 3, 4, 5], [2, 1, 4, 3, 5]).steps,
+        app.computeSignTest([1, 2, 3, 4, 5, 6], 3, 0.05, 'two.sided').steps,
+        app.computeWilcoxonTest([1, 2, 3, 4, 5, 6], [2, 4, 3, 8, 9, 7], 0.05, 'two.sided').steps,
+        app.computeMannWhitneyTest([1, 2, 3, 4], [5, 6, 7, 8, 9], 0.05, 'two.sided').steps,
+        app.computeVIF([[1, 2, 4.1], [2, 1, 5.9], [3, 4, 8.2], [4, 3, 9.8], [5, 6, 13.1], [6, 5, 15.7]]).steps
+    ];
+    results.forEach((html, i) => assert.deepEqual(unbalancedTags(html), [], `solution #${i}`));
+});
+
+test('tabs control one labelled tab panel, and the panel is named by the selected tab', () => {
+    const panel = html.match(/<div class="main-panel"([^>]*)>/);
+    assert.ok(panel, 'main panel');
+    assert.match(panel[1], /role="tabpanel"/);
+    const id = panel[1].match(/\sid="([^"]+)"/)[1];
+    const labelledby = panel[1].match(/aria-labelledby="([^"]+)"/)[1];
+    const tabs = [...html.matchAll(/<div class="tab[^"]*" id="([^"]+)"[^>]*aria-controls="([^"]+)"/g)];
+    assert.equal(tabs.length, 6);
+    for (const [, tabId, controls] of tabs) assert.equal(controls, id, `${tabId} controls the tab panel`);
+    assert.ok(tabs.some(([, tabId]) => tabId === labelledby), 'the panel is labelled by one of the tabs');
+});
+
+test('the 900px breakpoint is set in exactly one stylesheet (responsive.css)', () => {
+    const withBreakpoint = [];
+    for (const rel of ['css/statlab.css', 'css/responsive.css']) {
+        const css = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        if (/@media[^{]*\(\s*max-width:\s*900px\s*\)/.test(css)) withBreakpoint.push(rel);
+        if (rel === 'css/responsive.css') assert.equal((css.match(/@media[^{]*\(\s*max-width:\s*900px\s*\)/g) || []).length, 1, '900px rules are merged into one block');
+        if (rel === 'css/responsive.css') assert.ok(!/\[style\*=/.test(css), 'responsive rules use classes, not substrings of the style attribute');
+    }
+    assert.deepEqual(withBreakpoint, ['css/responsive.css']);
+});
+
+test('no duplicate canvas ids: a tool puts its chart canvas in exactly one place', () => {
+    const offenders = [];
+    for (const rel of scriptList().filter(f => f.startsWith('js/tools/'))) {
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        const ids = [...src.matchAll(/<canvas id=\\?"([^"\\]+)/g)].map(m => m[1]);
+        ids.filter((id, i) => ids.indexOf(id) !== i).forEach(id => offenders.push(`${rel}: ${id}`));
+    }
+    assert.deepEqual(offenders, []);
+});
+
+test('the boxplot plugin is registered per chart, never globally', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js/tools/preparation/boxplot.js'), 'utf8');
+    assert.ok(!/Chart\.register\(/.test(src), 'no global Chart.register');
+    assert.match(src, /plugins:\s*\[boxplotPlugin\]/);
+});

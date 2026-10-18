@@ -16,17 +16,21 @@ function parseNumbersFromInput(rawText) {
         return numbers;
     }
 
-function attachClearHandler(clearBtnId, textareaId, resultAreaId) {
-        const clearBtn = document.getElementById(clearBtnId);
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => {
-                const textarea = document.getElementById(textareaId);
-                if (textarea) textarea.value = '';
-                const resultDiv = document.getElementById(resultAreaId);
-                if (resultDiv) resultDiv.style.display = 'none';
-            });
-        }
-    }
+// Wires a Clear button: empties every listed field (textarea or input; `inputIds` is one id or an array of ids)
+// and hides the result area.
+function attachClearHandler(clearBtnId, inputIds, resultAreaId) {
+    const clearBtn = document.getElementById(clearBtnId);
+    if (!clearBtn) return;
+    const ids = Array.isArray(inputIds) ? inputIds : [inputIds];
+    clearBtn.addEventListener('click', () => {
+        ids.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) field.value = '';
+        });
+        const resultDiv = document.getElementById(resultAreaId);
+        if (resultDiv) resultDiv.style.display = 'none';
+    });
+}
 
 // Function to generate detailed distribution analysis
 // Function to generate detailed distribution analysis
@@ -271,10 +275,21 @@ function calculateCorrelation(x, y) {
         xxSum += dx * dx;
         yySum += dy * dy;
     }
-    if (xxSum === 0 || yySum === 0) return 0;
+    if (xxSum === 0 || yySum === 0) return NaN;   // undefined for a constant variable (callers report an error)
     return xySum / Math.sqrt(xxSum * yySum);
 }
 
 function calculateCorrelationArray(y, x) {
     return calculateCorrelation(y, x);
+}
+
+// One-line worked example of a Type 7 quantile (see quantileType7 in numerics.js), for step-by-step solutions.
+// `sorted` is ascending, p is a fraction in [0, 1], `label` names the quantile ("Q₁", "P90", ...).
+function describeQuantileType7(sorted, p, label) {
+    const h = (sorted.length - 1) * p;
+    const lo = Math.floor(h), hi = Math.ceil(h);
+    const value = quantileType7(sorted, p);
+    const position = `h = (n - 1) × p = ${sorted.length - 1} × ${+p.toFixed(6)} = ${+h.toFixed(6)} (0-based position)`;
+    if (lo === hi) return `${position} → ${label} = x[${lo}] = ${sorted[lo]}`;
+    return `${position} → ${label} = x[${lo}] + ${+(h - lo).toFixed(6)} × (x[${hi}] - x[${lo}]) = ${sorted[lo]} + ${+(h - lo).toFixed(6)} × (${sorted[hi]} - ${sorted[lo]}) = ${+value.toFixed(10)}`;
 }

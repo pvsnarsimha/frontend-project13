@@ -210,5 +210,5 @@ function setupBinomialExactLogic() {
         setHtml(valueSpan, `p = ${result.pValue?.toFixed(6) || 'Error'} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
         setHtml(stepsSpan, result.steps || "Calculation completed.");
     });
-    attachClearHandler("binomExactClearBtn", "", "binomExactResultArea");
+    attachClearHandler("binomExactClearBtn", ["binomSuccesses", "binomSampleSize"], "binomExactResultArea");
 }

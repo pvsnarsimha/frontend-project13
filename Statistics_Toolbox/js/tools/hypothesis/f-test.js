@@ -90,48 +90,34 @@ function computeFTest(sample1, sample2, alpha, alternative) {
     }
     let var2 = sumSq2 / (n2 - 1);
     
-    let fStatistic, df1, df2;
-    let numeratorVar, denominatorVar;
-    
-    if (alternative === 'greater') {
-        fStatistic = var1 / var2;
-        df1 = n1 - 1;
-        df2 = n2 - 1;
-        numeratorVar = var1;
-        denominatorVar = var2;
-    } else if (alternative === 'less') {
-        fStatistic = var2 / var1;
-        df1 = n2 - 1;
-        df2 = n1 - 1;
-        numeratorVar = var2;
-        denominatorVar = var1;
-    } else {
-        if (var1 >= var2) {
-            fStatistic = var1 / var2;
-            df1 = n1 - 1;
-            df2 = n2 - 1;
-            numeratorVar = var1;
-            denominatorVar = var2;
-        } else {
-            fStatistic = var2 / var1;
-            df1 = n2 - 1;
-            df2 = n1 - 1;
-            numeratorVar = var2;
-            denominatorVar = var1;
-        }
-    }
-    
-    // Two-sided: the larger variance is placed on top, so the rejection region and the p-value
-    // are for one tail of a folded statistic and must be halved / doubled to keep the level at alpha.
+    // greater / less: F = s₁² / s₂² with df = (n₁ - 1, n₂ - 1), nothing swapped:
+    //   greater rejects for large F (upper tail), less rejects for small F (lower tail).
+    // two-sided: the larger variance goes on top (F ≥ 1), so only the upper tail matters and the p-value is doubled.
     const twoSided = alternative !== 'greater' && alternative !== 'less';
-    let criticalValue = fCriticalValue(twoSided ? alpha / 2 : alpha, df1, df2);
-    let pValue = Math.min(1, (twoSided ? 2 : 1) * (1 - fCDF(fStatistic, df1, df2)));
-    let rejectH0 = fStatistic > criticalValue;
+    const swapped = twoSided && var2 > var1;
+    const fStatistic = swapped ? var2 / var1 : var1 / var2;
+    const df1 = swapped ? n2 - 1 : n1 - 1;
+    const df2 = swapped ? n1 - 1 : n2 - 1;
+    const numeratorSample = swapped ? 2 : 1, denominatorSample = swapped ? 1 : 2;
+    const lowerCdf = fCDF(fStatistic, df1, df2);
+    let criticalValue, pValue;
+    if (alternative === 'greater') {
+        criticalValue = fCriticalValue(alpha, df1, df2);
+        pValue = 1 - lowerCdf;
+    } else if (alternative === 'less') {
+        criticalValue = fCriticalValue(1 - alpha, df1, df2);
+        pValue = lowerCdf;
+    } else {
+        criticalValue = fCriticalValue(alpha / 2, df1, df2);
+        pValue = Math.min(1, 2 * (1 - lowerCdf));
+    }
+    const rejectH0 = pValue < alpha;
     
     let conclusion = rejectH0 ? "REJECT the null hypothesis" : "FAIL TO REJECT the null hypothesis";
+    const claim = alternative === 'greater' ? 'σ₁² is greater than σ₂²' : (alternative === 'less' ? 'σ₁² is less than σ₂²' : 'the variances are different');
     let interpretation = rejectH0 ?
-        "There IS sufficient evidence that the variances are different." :
-        "There is NOT sufficient evidence that the variances are different.";
+        `There IS sufficient evidence that ${claim}.` :
+        `There is NOT sufficient evidence that ${claim}.`;
     
     // Build detailed variance calculation tables
     let var1Rows = '';
@@ -280,7 +266,7 @@ function computeFTest(sample1, sample2, alpha, alternative) {
             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
                     <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</div>
-                    <div><strong>Identify the larger variance</strong></div>
+                    <div><strong>Sample variances</strong></div>
                 </div>
                 <div style="margin-left: 40px; font-family: monospace;">
                     s₁² = ${var1.toFixed(6)} &nbsp;|&nbsp; s₂² = ${var2.toFixed(6)}<br>
@@ -295,8 +281,8 @@ function computeFTest(sample1, sample2, alpha, alternative) {
                     <div><strong>Calculate the F-statistic</strong></div>
                 </div>
                 <div style="margin-left: 40px; font-family: monospace;">
-                    <strong>F = (Larger Variance) / (Smaller Variance)</strong><br>
-                    F = ${Math.max(var1, var2).toFixed(6)} / ${Math.min(var1, var2).toFixed(6)}<br>
+                    <strong>${twoSided ? 'F = (larger variance) / (smaller variance)' : 'F = s₁² / s₂²'}</strong><br>
+                    F = ${(swapped ? var2 : var1).toFixed(6)} / ${(swapped ? var1 : var2).toFixed(6)}<br>
                     <div style="font-size: 20px; font-weight: 700; color: #1a5490; margin-top: 8px;">F = ${fStatistic.toFixed(8)}</div>
                 </div>
             </div>
@@ -307,10 +293,10 @@ function computeFTest(sample1, sample2, alpha, alternative) {
                     <div><strong>Determine Degrees of Freedom and Critical Value</strong></div>
                 </div>
                 <div style="margin-left: 40px; font-family: monospace;">
-                    df₁ (numerator) = n₁ - 1 = ${n1} - 1 = ${df1}<br>
-                    df₂ (denominator) = n₂ - 1 = ${n2} - 1 = ${df2}<br>
+                    df₁ (numerator, sample ${numeratorSample}) = n${numeratorSample === 1 ? '₁' : '₂'} - 1 = ${numeratorSample === 1 ? n1 : n2} - 1 = ${df1}<br>
+                    df₂ (denominator, sample ${denominatorSample}) = n${denominatorSample === 1 ? '₁' : '₂'} - 1 = ${denominatorSample === 1 ? n1 : n2} - 1 = ${df2}<br>
                     Significance level (α) = ${alpha}<br>
-                    Critical value F<sub>critical</sub>(${df1}, ${df2}) = ${criticalValue.toFixed(6)}<br>
+                    ${twoSided ? `Critical value F<sub>critical</sub>(${df1}, ${df2}) at α/2 = ${criticalValue.toFixed(6)}` : (alternative === 'less' ? `Lower critical value F<sub>critical</sub>(${df1}, ${df2}) = ${criticalValue.toFixed(6)} (reject if F is below it)` : `Critical value F<sub>critical</sub>(${df1}, ${df2}) = ${criticalValue.toFixed(6)}`)}<br>
                     p-value = ${pValue.toFixed(8)}
                 </div>
             </div>
@@ -326,9 +312,9 @@ function computeFTest(sample1, sample2, alpha, alternative) {
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}<br>
-                ${fStatistic > criticalValue ? 
-                    '✓ F-statistic > Critical value → Reject H₀, variances are significantly different' : 
-                    '✗ F-statistic < Critical value → Cannot reject H₀, variances may be equal'}
+                ${rejectH0 ? 
+                    `✓ p-value (${pValue.toFixed(6)}) < α (${alpha}) → Reject H₀` : 
+                    `✗ p-value (${pValue.toFixed(6)}) ≥ α (${alpha}) → Cannot reject H₀`}
             </div>
         </div>
         
@@ -379,12 +365,5 @@ function setupFTestLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("ftestClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("ftestData1").value = '';
-            document.getElementById("ftestData2").value = '';
-            document.getElementById("ftestResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("ftestClearBtn", ["ftestData1", "ftestData2"], "ftestResultArea");
 }

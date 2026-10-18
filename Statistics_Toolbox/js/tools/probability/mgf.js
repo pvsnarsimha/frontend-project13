@@ -85,7 +85,7 @@ function setupMGFLogic() {
         });
     }
     
-    attachClearHandler("mgfClearBtn", "", "mgfResultArea");
+    attachClearHandler("mgfClearBtn", ["mgfTValue"], "mgfResultArea");
 }
 
 function updateMGFParams() {

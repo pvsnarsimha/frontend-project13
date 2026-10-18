@@ -46,21 +46,9 @@ function computeQuartilesWithSteps(numbers) {
     let q2Result = getMedian(sorted, "full");
     let q2 = q2Result.value;
     
-    let q1, q3;
-    let lowerHalf, upperHalf;
-    
-    if (n % 2 === 0) {
-        lowerHalf = sorted.slice(0, n/2);
-        upperHalf = sorted.slice(n/2);
-    } else {
-        lowerHalf = sorted.slice(0, Math.floor(n/2));
-        upperHalf = sorted.slice(Math.floor(n/2) + 1);
-    }
-    
-    let q1Result = getMedian(lowerHalf, "lower");
-    let q3Result = getMedian(upperHalf, "upper");
-    q1 = q1Result.value;
-    q3 = q3Result.value;
+    // Type 7 quantiles (linear interpolation at (n - 1)p)
+    const q1 = quantileType7(sorted, 0.25);
+    const q3 = quantileType7(sorted, 0.75);
     
     let iqr = q3 - q1;
     
@@ -83,33 +71,14 @@ function computeQuartilesWithSteps(numbers) {
         steps += `   Q₂ = ${q2}\n\n`;
     }
     
-    steps += `Step 3: Split data into lower and upper halves\n`;
-    steps += `   Lower half (values below Q₂): [${lowerHalf.join(', ')}]\n`;
-    steps += `   Upper half (values above Q₂): [${upperHalf.join(', ')}]\n\n`;
+    steps += `Step 3: Find Q₁ (25th percentile) with Type 7 linear interpolation\n`;
+    steps += `   Position h = (n - 1) × p (0-based); Q = x[⌊h⌋] + (h - ⌊h⌋) × (x[⌈h⌉] - x[⌊h⌋])\n`;
+    steps += `   ${describeQuantileType7(sorted, 0.25, 'Q₁')}\n\n`;
     
-    steps += `Step 4: Find Q₁ (Median of lower half - 25th percentile)\n`;
-    let lowerLen = lowerHalf.length;
-    if (lowerLen % 2 === 0) {
-        steps += `   Lower half has ${lowerLen} values (even)\n`;
-        steps += `   Q₁ = average of values at positions ${lowerLen/2} and ${lowerLen/2 + 1}\n`;
-        steps += `   Q₁ = (${q1Result.left} + ${q1Result.right}) / 2 = ${q1}\n\n`;
-    } else {
-        steps += `   Lower half has ${lowerLen} values (odd)\n`;
-        steps += `   Q₁ = value at position ${Math.floor(lowerLen/2) + 1} = ${q1}\n\n`;
-    }
+    steps += `Step 4: Find Q₃ (75th percentile) the same way\n`;
+    steps += `   ${describeQuantileType7(sorted, 0.75, 'Q₃')}\n\n`;
     
-    steps += `Step 5: Find Q₃ (Median of upper half - 75th percentile)\n`;
-    let upperLen = upperHalf.length;
-    if (upperLen % 2 === 0) {
-        steps += `   Upper half has ${upperLen} values (even)\n`;
-        steps += `   Q₃ = average of values at positions ${upperLen/2} and ${upperLen/2 + 1}\n`;
-        steps += `   Q₃ = (${q3Result.left} + ${q3Result.right}) / 2 = ${q3}\n\n`;
-    } else {
-        steps += `   Upper half has ${upperLen} values (odd)\n`;
-        steps += `   Q₃ = value at position ${Math.floor(upperLen/2) + 1} = ${q3}\n\n`;
-    }
-    
-    steps += `Step 6: Calculate Interquartile Range (IQR)\n`;
+    steps += `Step 5: Calculate Interquartile Range (IQR)\n`;
     steps += `   IQR = Q₃ - Q₁ = ${q3} - ${q1} = ${iqr}\n\n`;
     
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;

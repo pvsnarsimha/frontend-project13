@@ -71,8 +71,8 @@ function computeSkewnessWithSteps(numbers) {
 const skewnessTool = defineListTool({
     id: 'skewness', interfaceId: 'statSkewnessInterface',
     title: "📈 Skewness (Asymmetry)",
-    formula: "📌 Skewness = Σ(xᵢ - x̄)³ / [(n-1)s³]",
-    desc: "Measures asymmetry. 0 = symmetric, >0 = right-skewed, <0 = left-skewed.",
+    formula: "📌 Skewness (G₁) = [n/((n-1)(n-2))] × Σ((xᵢ - x̄)/s)³",
+    desc: "Sample skewness with the small-sample bias correction (the same estimator as Excel SKEW and SciPy skew(bias=False)); s is the sample standard deviation (n-1). Measures asymmetry. 0 = symmetric, >0 = right-skewed, <0 = left-skewed.",
     placeholder: "Example: 2, 3, 5, 7, 8, 10, 12, 15, 20",
     buttonText: "📈 Calculate Skewness + Steps",
     resultLabel: "🎯 SKEWNESS RESULT",

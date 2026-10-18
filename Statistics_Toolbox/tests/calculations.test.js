@@ -155,3 +155,103 @@ test('Scheffe test uses the exact F critical value', () => {
     assert.ok(!r.error);
     assert.ok(JSON.stringify(r).includes('4.2565'), 'F(0.05; 2, 9) = 4.2565');
 });
+
+// ---- Helpers for tools that read their parameters from the page ----
+function withDom(values, fn) {
+    const original = app.document.getElementById;
+    app.document.getElementById = id => ({ value: values[id] === undefined ? '' : values[id], style: {}, innerText: '', textContent: '' });
+    try { return fn(); } finally { app.document.getElementById = original; }
+}
+
+test('VIF with three predictors is the real regression R² (SciPy/NumPy least squares), not an average of r²', () => {
+    const M = [[1, 2, 4.1], [2, 1, 5.9], [3, 4, 8.2], [4, 3, 9.8], [5, 6, 13.1], [6, 5, 15.7], [7, 8, 18.4], [8, 7, 19.9]];
+    const r = app.computeVIF(M);
+    [183.35145896303, 8.127673796791436, 220.4777958614278].forEach((v, i) => close(r.vifs[i].vif, v, 1e-6 * v, 'VIF' + (i + 1)));
+    // perfectly collinear predictors give an infinite VIF instead of a made-up cap
+    const exact = [[1, 2, 5], [2, 1, 4], [3, 4, 10], [4, 3, 9], [5, 6, 15], [6, 5, 14]];   // X3 = X1 + 2·X2
+    assert.ok(app.computeVIF(exact).vifs.every(v => v.vif === Infinity));
+    // a constant predictor is an error, not a silent 0 correlation
+    assert.equal(app.computeVIF([[1, 5], [2, 5], [3, 5], [4, 5]]).error, true);
+});
+
+test('random Beta variates follow Beta(α,β) for α, β above and below 1 (Marsaglia-Tsang gamma ratio)', () => {
+    for (const [a, b] of [[2, 5], [0.5, 0.5], [0.3, 3]]) {
+        const xs = app.generateRandomNumbers(40000, 'beta', { alpha: a, beta: b }, app.createRandomSource(2024));
+        const mean = xs.reduce((s, x) => s + x, 0) / xs.length;
+        const variance = xs.reduce((s, x) => s + (x - mean) ** 2, 0) / xs.length;
+        close(mean, a / (a + b), 0.01, `mean Beta(${a},${b})`);
+        close(variance, a * b / ((a + b) ** 2 * (a + b + 1)), 0.004, `variance Beta(${a},${b})`);
+        assert.ok(xs.every(x => x >= 0 && x <= 1));
+    }
+    // seeded generation is reproducible; the second Box-Muller normal is reused rather than discarded
+    const a = app.generateRandomNumbers(5, 'normal', { mean: 0, std: 1 }, app.createRandomSource(7));
+    const b = app.generateRandomNumbers(5, 'normal', { mean: 0, std: 1 }, app.createRandomSource(7));
+    assert.deepEqual(Array.from(a), Array.from(b));
+    const src = app.createRandomSource(7);
+    const first = src.normal(), second = src.normal();
+    assert.notEqual(first, second);
+});
+
+test('entropy matches SciPy, including Beta (digamma by loop) and Poisson', () => {
+    close(app.computeEntropyWithSteps('normal', { stdDev: 2 }).entropy, 2.112085713764618, 1e-12);
+    close(app.computeEntropyWithSteps('exponential', { rate: 2 }).entropy, 0.3068528194400547, 1e-12);
+    close(app.computeEntropyWithSteps('uniform', { min: 1, max: 5 }).entropy, 1.3862943611198906, 1e-12);
+    close(app.computeEntropyWithSteps('beta', { alpha: 2, beta: 5 }).entropy, -0.48453071499548805, 1e-9);
+    close(app.computeEntropyWithSteps('beta', { alpha: 0.5, beta: 0.5 }).entropy, -0.24156447527049074, 1e-9);
+    close(app.computeEntropyWithSteps('beta', { alpha: 0.3, beta: 4 }).entropy, -2.436522121349705, 1e-9);
+    close(app.computeEntropyWithSteps('poisson', { lambda: 3 }).entropy, 1.9314701981485691, 1e-9);
+    close(app.computeEntropyWithSteps('poisson', { lambda: 0.5 }).entropy, 0.9276374674957975, 1e-9);
+    close(app.computeEntropyWithSteps('binomial', { n: 10, p: 0.3 }).entropy, 1.7790787840900626, 1e-9);
+    // digamma: ψ(1) = -γ, ψ(1/2) = -γ - 2 ln 2, and a very small argument does not recurse deeply
+    close(app.digamma(1), -0.5772156649015329, 1e-11);
+    close(app.digamma(0.5), -1.9635100260214235, 1e-11);
+    assert.doesNotThrow(() => app.digamma(1e-9));
+});
+
+test('moment generating functions match the closed forms', () => {
+    close(app.computeMGFWithSteps('normal', { mean: 1, stdDev: 2 }, 0.5).mgfValue, Math.E, 1e-12);
+    close(app.computeMGFWithSteps('exponential', { rate: 3 }, 1).mgfValue, 1.5, 1e-12);
+    close(app.computeMGFWithSteps('uniform', { min: 0, max: 2 }, 1).mgfValue, 3.194528049465325, 1e-12);
+    close(app.computeMGFWithSteps('poisson', { lambda: 2 }, 0.5).mgfValue, 3.659924582769379, 1e-10);
+    close(app.computeMGFWithSteps('binomial', { n: 10, p: 0.3 }, 0.5).mgfValue, 5.919494989185632, 1e-9);
+    assert.ok(app.computeMGFWithSteps('exponential', { rate: 3 }, 4).error || !isFinite(app.computeMGFWithSteps('exponential', { rate: 3 }, 4).mgfValue), 'MGF of Exp(3) does not exist for t >= 3');
+});
+
+test('hazard and survival functions match SciPy', () => {
+    const hazard = (dist, extra, xs) => withDom({ hazardDistribution: dist, hazardXValues: xs, ...extra }, () => app.computeHazardWithSteps());
+    const w = hazard('weibull', { hazardShape: '2', hazardScale: '3' }, '0.5, 1, 2, 4');
+    [0.1111111111111111, 0.2222222222222222, 0.4444444444444444, 0.8888888888888888].forEach((v, i) => close(w.results[i], v, 1e-12));
+    const n = hazard('normal', { hazardMean: '0', hazardStd: '1' }, '0, 1, 2');
+    [0.7978845608028654, 1.525135276160981, 2.373215532822843].forEach((v, i) => close(n.results[i], v, 1e-7));
+    close(hazard('exponential', { hazardRate: '0.7' }, '3').results[0], 0.7, 1e-12);
+
+    const surv = (dist, extra, xs) => withDom({ survivalDistribution: dist, survivalXValues: xs, ...extra }, () => app.computeSurvivalWithSteps());
+    const sn = surv('normal', { survivalMean: '0', survivalStd: '1' }, '1.5, -1');
+    close(sn.results[0], 0.06680720126885807, 1e-10);
+    close(sn.results[1], 0.8413447460685429, 1e-10);
+    const sw = surv('weibull', { survivalShape: '2', survivalScale: '3' }, '2, 5');
+    close(sw.results[0], 0.6411803884299546, 1e-12);
+    close(sw.results[1], 0.06217652402211629, 1e-12);
+    close(surv('exponential', { survivalRate: '0.5' }, '3').results[0], 0.22313016014842982, 1e-12);
+});
+
+test('Box-Cox optimal λ is found by golden-section search (not rounded to one decimal) and matches SciPy', () => {
+    const x = [1.2, 2.3, 2.9, 4.1, 5.5, 7.8, 12.1, 20.4, 33.0, 60.2];
+    const r = app.computeBoxCoxWithSteps(x, 'optimal');
+    close(r.lambda, -0.10555311213115026, 1e-5);
+    assert.notEqual(Math.round(r.lambda * 10) / 10, r.lambda);
+    const x2 = [2, 3, 3, 4, 5, 7, 9, 15, 40, 41, 99];
+    close(app.computeBoxCoxWithSteps(x2, 'optimal').lambda, -0.3147662264562613, 1e-5);
+    assert.equal(app.computeBoxCoxWithSteps([5, 5, 5, 5], 'optimal').error, true);
+    assert.equal(app.computeBoxCoxWithSteps([1, 2, -3], 'optimal').error, true);
+});
+
+test('generated markup is balanced: tables built by correlation tools are closed and numbers are not NaN', () => {
+    const count = (s, re) => (s.match(re) || []).length;
+    const cm = app.computeCorrelationMatrixWithSteps([[1, 2, 3, 4, 5], [2, 1, 4, 3, 6], [5, 3, 4, 1, 2]]);
+    assert.equal(count(cm.steps, /<table/g), count(cm.steps, /<\/table>/g));
+    assert.ok(!cm.steps.includes('/table>') || !/[^<]\/table>/.test(cm.steps), 'a "</table>" lost its "<"');
+    const cv = app.computeCramersVWithSteps('a,x\na,y\nb,x\nb,y\na,x\nb,y\na,y\nb,x\na,x\nb,y', 0.05);
+    assert.equal(count(cv.steps, /<table/g), count(cv.steps, /<\/table>/g));
+    assert.ok(!/[^<]\/table>/.test(cv.steps));
+});

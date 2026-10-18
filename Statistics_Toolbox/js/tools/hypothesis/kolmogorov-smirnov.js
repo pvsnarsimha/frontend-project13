@@ -5,7 +5,7 @@ function renderKolmogorovSmirnovInterface() {
     return buildInterface({
         id: "statKolmogorovSmirnovInterface",
         title: "D Kolmogorov-Smirnov Test (Normality)",
-        formula: "📌 D = max|Fₙ(x) - F(x)|",
+        formula: "📌 D = max over i of max( i/n − F(xᵢ), F(xᵢ) − (i−1)/n )",
         desc: "Tests whether a sample comes from a normal distribution. H₀: Data is normally distributed. Compares empirical vs theoretical CDF.",
         inputs: [
             {
@@ -134,12 +134,12 @@ function computeKolmogorovSmirnovTest(data, alpha) {
             <ul style="margin-top: 12px; margin-left: 20px; line-height: 1.6;">
                 <li><strong>Fₙ(x)</strong> = Empirical CDF = (rank i) / n (proportion of data ≤ x)</li>
                 <li><strong>F(x)</strong> = Theoretical Normal CDF = Φ((x - μ)/σ)</li>
-                <li><strong>D statistic</strong> = max|Fₙ(x) - F(x)| = Maximum distance between the two distributions</li>
+                <li><strong>D statistic</strong> = largest vertical distance between the empirical step function and the normal CDF (checked on both sides of each jump)</li>
                 <li><strong>Small D</strong> → Data follows normal distribution closely</li>
                 <li><strong>Large D</strong> → Data deviates from normality</li>
             </ul>
             <div style="margin-top: 12px; background: #fff3cd; padding: 10px; border-radius: 8px; font-size: 13px;">
-                💡 <strong>Formula:</strong> D = max|Fₙ(x) - F(x)|
+                💡 <strong>Formula:</strong> D = max over i of max( i/n − F(xᵢ), F(xᵢ) − (i−1)/n )
             </div>
         </div>
         
@@ -168,8 +168,8 @@ function computeKolmogorovSmirnovTest(data, alpha) {
                 <strong>How each column is calculated:</strong><br>
                 • <strong>Fₙ(x)</strong> = i / n (where i is the rank from 1 to n)<br>
                 • <strong>z-score</strong> = (x - μ) / σ<br>
-                • <strong>F(x)</strong> = Φ(z) = Standard Normal CDF (lookup from z-table)<br>
-                • <strong>D</strong> = |Fₙ(x) - F(x)|
+                • <strong>F(x)</strong> = Φ(z) = Standard Normal CDF (computed exactly, no table lookup)<br>
+                • <strong>Dᵢ</strong> = max( |i/n − F(xᵢ)|, |F(xᵢ) − (i−1)/n| ); the statistic D is the largest Dᵢ
             </div>
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
@@ -178,7 +178,7 @@ function computeKolmogorovSmirnovTest(data, alpha) {
                         <th style="padding: 12px;">Value (x)</th>
                         <th style="padding: 12px;">Fₙ(x) = i/n</th>
                         <th style="padding: 12px;">F(x) = Φ((x-μ)/σ)</th>
-                        <th style="padding: 12px;">D = |Fₙ(x) - F(x)|</th>
+                        <th style="padding: 12px;">Dᵢ = max(|i/n − F|, |F − (i−1)/n|)</th>
                     </tr>
                 </thead>
                 <tbody>

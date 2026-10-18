@@ -64,9 +64,10 @@ function computeStdErrorWithSteps(numbers) {
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     steps += `✅ Standard Error of the Mean = ${stdError.toFixed(10)}\n`;
     steps += `\n📌 INTERPRETATION:\n`;
-    steps += `   • The sample mean is estimated to be ±${(stdError * 1.96).toFixed(6)} from the population mean (95% CI)\n`;
+    const tCrit = tCriticalValue(0.025, n - 1);   // t quantile, not 1.96: matters for small n
+    steps += `   • With t(0.025, df = ${n - 1}) = ${tCrit.toFixed(4)}, the sample mean is estimated to be within ±${(stdError * tCrit).toFixed(6)} of the population mean (95% CI)\n`;
     steps += `   • Smaller SEM = more precise estimate of the population mean\n`;
-    steps += `   • 95% Confidence Interval: ${mean.toFixed(6)} ± ${(stdError * 1.96).toFixed(6)}`;
+    steps += `   • 95% Confidence Interval: ${mean.toFixed(6)} ± ${tCrit.toFixed(4)} × ${stdError.toFixed(6)} = ${mean.toFixed(6)} ± ${(stdError * tCrit).toFixed(6)}`;
     
     return { value: stdError, mean: mean, stdDev: stdDev, n: n, steps: steps };
 }

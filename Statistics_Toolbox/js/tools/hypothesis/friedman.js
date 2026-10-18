@@ -70,6 +70,7 @@ function computeFriedmanTest(inputText, alpha) {
     }
     
     // Rank within each row
+    let tieTerm = 0;   // Σ(t³ - t) over every group of t tied values within a subject, for the tie correction
     let ranks = [];
     let rankingDetails = [];
     
@@ -85,6 +86,7 @@ function computeFriedmanTest(inputText, alpha) {
             while (l < rowData.length && rowData[l].value === rowData[j].value) l++;
             let avgRank = (j + 1 + l) / 2;
             for (let m = j; m < l; m++) rowData[m].rank = avgRank;
+            tieTerm += Math.pow(l - j, 3) - (l - j);
             j = l;
         }
         
@@ -110,12 +112,18 @@ function computeFriedmanTest(inputText, alpha) {
     
     // Calculate Friedman statistic
     let sumRjSquared = colRankSums.reduce((sum, Rj) => sum + Math.pow(Rj, 2), 0);
-    let chiSq = (12 / (n * k * (k + 1))) * sumRjSquared - 3 * n * (k + 1);
+    let chiSqUncorrected = (12 / (n * k * (k + 1))) * sumRjSquared - 3 * n * (k + 1);
+    // Tie correction: divide by C = 1 - Σ(t³ - t) / (n k (k² - 1)); C = 1 when there are no ties
+    const tieCorrection = 1 - tieTerm / (n * k * (k * k - 1));
+    if (tieCorrection <= 0) {
+        return { error: true, message: "Every subject has all values tied, so the Friedman statistic is undefined." };
+    }
+    let chiSq = chiSqUncorrected / tieCorrection;
     
     const df = k - 1;
     const criticalValue = chiSquareCriticalValue(alpha, df);
     const pValue = 1 - chiSquareCDF(chiSq, df);
-    const rejectH0 = chiSq > criticalValue;
+    const rejectH0 = pValue < alpha;
     
     let conclusion = rejectH0 ? "REJECT the null hypothesis" : "FAIL TO REJECT the null hypothesis";
     let interpretation = rejectH0 ?
@@ -268,7 +276,7 @@ function computeFriedmanTest(inputText, alpha) {
                 3n(k+1) = 3 × ${n} × ${k+1} = ${3 * n * (k+1)}<br><br>
                 
                 <strong>Step 3e: Final χ²</strong><br>
-                χ² = ${((12 / (n * k * (k+1))) * sumRjSquared).toFixed(4)} - ${3 * n * (k+1)} = <strong style="color: #1a5490; font-size: 18px;">${chiSq.toFixed(6)}</strong>
+                χ² = ${((12 / (n * k * (k+1))) * sumRjSquared).toFixed(4)} - ${3 * n * (k+1)} = ${chiSqUncorrected.toFixed(6)}${tieTerm > 0 ? `<br><br>Ties present → divide by C = 1 - Σ(t³ - t) / [n·k·(k²-1)] = 1 - ${tieTerm} / ${n * k * (k * k - 1)} = ${tieCorrection.toFixed(6)}<br>Corrected χ² = ${chiSqUncorrected.toFixed(6)} / ${tieCorrection.toFixed(6)} = ` : ' = '}<strong style="color: #1a5490; font-size: 18px;">${chiSq.toFixed(6)}</strong>
                 
                 <div style="margin-top: 16px;">
                     <strong>Degrees of Freedom:</strong> df = k - 1 = ${k} - 1 = ${df}<br>
@@ -287,7 +295,7 @@ function computeFriedmanTest(inputText, alpha) {
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}<br>
-                ${chiSq > criticalValue ? '✓ χ² > Critical value → Reject H₀, conditions differ significantly' : '✗ χ² < Critical value → Cannot reject H₀, conditions are similar'}
+                ${rejectH0 ? '✓ χ² > Critical value → Reject H₀, conditions differ significantly' : '✗ χ² < Critical value → Cannot reject H₀, conditions are similar'}
                 ${pValue < alpha ? '✓ p-value < α → Statistically significant' : '✗ p-value > α → Not statistically significant'}
             </div>
         </div>

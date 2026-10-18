@@ -469,12 +469,5 @@ function setupCooksDistanceLogic() {
         }
     });
     
-    const clearBtn = document.getElementById("cooksClearBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            document.getElementById("cooksXInput").value = '';
-            document.getElementById("cooksYInput").value = '';
-            document.getElementById("cooksResultArea").style.display = 'none';
-        });
-    }
+    attachClearHandler("cooksClearBtn", ["cooksXInput", "cooksYInput"], "cooksResultArea");
 }
