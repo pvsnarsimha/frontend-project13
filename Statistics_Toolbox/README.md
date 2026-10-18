@@ -13,7 +13,7 @@ js/00-numerics.js          Special functions, CDFs and exact critical values (no
                            beta, studentized range, Shapiro-Wilk, Kolmogorov). Single source of truth.
 js/01..09-*.js             The tools: for each one a renderXInterface(), computeX() and setupXLogic()
 js/app.js                  Route table (STAT_ROUTES), tab/sidebar navigation, chart controls
-js/ui-enhancements.js      Presentation layer: answer tiles, worked-solution layout, search, a11y helpers
+js/ui/*.js                 Presentation layer: navigation + search, answer tiles and worked-solution layout, form a11y
 tests/                     Node tests (no dependencies)
 ```
 

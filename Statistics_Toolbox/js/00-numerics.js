@@ -402,3 +402,64 @@ function kolmogorovCritical(alpha, n) {
     }
     return (lo + hi) / 2;
 }
+
+// ---- Lilliefors (K-S for normality with estimated mean and SD) ------------------------------------
+// The null distribution of D does not depend on the true mean/SD, so it is simulated once per n with a fixed
+// seed (deterministic results) and cached. This is Lilliefors' original method; precision is about +-0.004 in p.
+function seededRandom(seed) {
+    let a = seed >>> 0;
+    return () => {
+        a = (a + 0x6D2B79F5) >>> 0;
+        let t = a;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+function kolmogorovD(sortedValues, mean, sd) {
+    const n = sortedValues.length;
+    let d = 0;
+    for (let i = 0; i < n; i++) {
+        const F = normCDF((sortedValues[i] - mean) / sd);
+        d = Math.max(d, (i + 1) / n - F, F - i / n);
+    }
+    return d;
+}
+
+const _lillieforsCache = {};
+function lillieforsNullDistribution(n) {
+    if (_lillieforsCache[n]) return _lillieforsCache[n];
+    const sims = n <= 100 ? 10000 : n <= 500 ? 4000 : 1500;
+    const rand = seededRandom(12345 + n);
+    const out = new Array(sims);
+    const x = new Array(n);
+    for (let s = 0; s < sims; s++) {
+        let sum = 0;
+        for (let i = 0; i < n; i += 2) {
+            const r = Math.sqrt(-2 * Math.log(1 - rand())), t = 2 * Math.PI * rand();
+            x[i] = r * Math.cos(t);
+            if (i + 1 < n) x[i + 1] = r * Math.sin(t);
+        }
+        for (let i = 0; i < n; i++) sum += x[i];
+        const mean = sum / n;
+        let ss = 0;
+        for (let i = 0; i < n; i++) ss += (x[i] - mean) * (x[i] - mean);
+        const sorted = x.slice().sort((a, b) => a - b);
+        out[s] = kolmogorovD(sorted, mean, Math.sqrt(ss / (n - 1)));
+    }
+    out.sort((a, b) => a - b);
+    return (_lillieforsCache[n] = out);
+}
+
+function lillieforsPValue(D, n) {
+    const d = lillieforsNullDistribution(n);
+    let lo = 0, hi = d.length;                       // first index with d[i] >= D
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (d[mid] < D) lo = mid + 1; else hi = mid; }
+    return (d.length - lo + 1) / (d.length + 1);
+}
+
+function lillieforsCritical(alpha, n) {
+    const d = lillieforsNullDistribution(n);
+    return d[Math.min(d.length - 1, Math.floor((1 - alpha) * d.length))];
+}
