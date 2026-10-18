@@ -1,0 +1,10 @@
+{
+  "name": "statlab-statistics-toolbox",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StatLab: interactive statistics toolbox with step-by-step solutions (static site, no build step)",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": { "node": ">=18" }
+}
