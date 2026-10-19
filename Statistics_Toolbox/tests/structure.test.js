@@ -43,6 +43,12 @@ test('every sidebar button points at a registered tool, and every tool has a but
     assert.equal(new Set(buttonStats).size, buttonStats.length, 'two buttons open the same tool');
 });
 
+test('every sidebar button has a unique id', () => {
+    const ids = [...html.matchAll(/<button[^>]*\sdata-stat="[^"]+"[^>]*>/g)].map(m => (m[0].match(/\sid="([^"]+)"/) || [])[1]);
+    assert.ok(ids.every(Boolean), 'a data-stat button has no id');
+    assert.equal(new Set(ids).size, ids.length, 'two data-stat buttons share an id');
+});
+
 test('element ids in the page shell are unique', () => {
     const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
     const dups = ids.filter((id, i) => ids.indexOf(id) !== i);

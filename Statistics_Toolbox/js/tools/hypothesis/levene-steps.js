@@ -221,7 +221,7 @@ function stepsHtmlLevene(scope) {
                     <strong>p-value:</strong> ${pValue.toFixed(8)}
                 </div>
                 <div class="s-30cdaa">
-                    <strong>Comparison:</strong> ${fStatistic > criticalValue ? 'F > Critical Value' : 'F < Critical Value'}
+                    <strong>Comparison:</strong> ${rejectH0 ? 'p-value < α (F exceeds the critical value)' : 'p-value ≥ α (F does not exceed the critical value)'}
                 </div>
             </div>
             

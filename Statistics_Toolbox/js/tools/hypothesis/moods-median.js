@@ -125,7 +125,7 @@ function computeMoodsMedianTest(inputText, alpha) {
     const df = k - 1;
     const criticalValue = chiSquareCriticalValue(alpha, df);
     const pValue = 1 - chiSquareCDF(chiSquare, df);
-    const rejectH0 = chiSquare > criticalValue;
+    const rejectH0 = pValue < alpha;
     
     // Build contingency table
     let contingencyRows = '';
@@ -222,6 +222,7 @@ function computeMoodsMedianTest(inputText, alpha) {
             <div><strong>Critical value (α = ${alpha}):</strong> ${criticalValue.toFixed(4)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                <strong>Decision rule:</strong> p-value ${rejectH0 ? '<' : '≥'} α (${alpha})<br>
                 <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                 <strong>Conclusion:</strong> ${rejectH0 ? 'There IS sufficient evidence that at least one group median differs from others.' : 'There is NOT sufficient evidence that the group medians differ.'}
             </div>

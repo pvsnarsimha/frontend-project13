@@ -31,6 +31,16 @@ function computeStemLeafWithSteps(numbers) {
     const maxVal = Math.max(...sorted);
     const range = maxVal - minVal;
     const mean = sorted.reduce((a,b) => a+b, 0) / n;
+    // Shape verdict from the adjusted Fisher-Pearson skewness (same formula as the Skewness tool), not from stem sizes
+    let shapeLabel = 'not enough data to judge (needs at least 3 distinct values)';
+    if (n >= 3) {
+        const s2 = sorted.reduce((a, v) => a + (v - mean) * (v - mean), 0) / (n - 1);
+        if (s2 > 0) {
+            const g = (n / ((n - 1) * (n - 2))) * sorted.reduce((a, v) => a + Math.pow((v - mean) / Math.sqrt(s2), 3), 0);
+            shapeLabel = Math.abs(g) < 0.5 ? `approximately symmetric (skewness = ${g.toFixed(2)})`
+                : `${g > 0 ? 'right' : 'left'}-skewed (skewness = ${g.toFixed(2)})`;
+        }
+    }
     
     // Intelligent stem unit detection
     let stemUnit = 1;
@@ -330,7 +340,7 @@ ${plotLines.join('\n')}
         
         <div style="margin-top: 20px; background: #1a5490; color: white; border-radius: 12px; padding: 15px; text-align: center;">
             <strong>🎯 Key Insights from this Plot:</strong><br>
-            • Distribution shape: ${Math.max(...stems.map(s => stemMap.get(s).length)) > n/2 ? 'Skewed' : 'Approximately symmetric'}<br>
+            • Distribution shape: ${shapeLabel}<br>
             • Most frequent stem: ${stems.reduce((a,b) => stemMap.get(a).length > stemMap.get(b).length ? a : b)} (${Math.max(...stems.map(s => stemMap.get(s).length))} observations)<br>
             • Data spread: ${minVal} to ${maxVal} (Range: ${range.toFixed(2)})<br>
             • Center tendency: Mean = ${mean.toFixed(4)} | Median = ${sorted[Math.floor(n/2)].toFixed(4)}

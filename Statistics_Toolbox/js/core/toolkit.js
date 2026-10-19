@@ -95,6 +95,8 @@ function h(tag, attrs, ...children) {
 // ---- Shared form constants (used by many buildInterface configs) ----
 const FIELD_GAP = "margin-top: 15px;";
 const FIELD_STYLE = "width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 15px;";
+// Same as FIELD_STYLE plus the outlined border some selects use
+const FIELD_STYLE_BORDERED = "width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #cbdde9; margin-bottom: 15px;";
 const HINT_STYLE = "font-size: 0.75rem; margin-top: 5px;";
 const CARD_GAP = "margin-top: 8px;";
 const DISTRIBUTION_OPTIONS = [ ["normal", "Normal Distribution"], ["uniform", "Uniform Distribution"], ["exponential", "Exponential Distribution"], ["beta", "Beta Distribution"] ];

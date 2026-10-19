@@ -135,6 +135,7 @@ function renderHistogramInterface() {
 
 function computeHistogramWithSteps(numbers, numBins) {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
+    numBins = Math.max(1, Math.min(30, Math.floor(numBins) || 5));
     
     const n = numbers.length;
     const minVal = Math.min(...numbers);
@@ -332,7 +333,7 @@ function setupHistogramLogic() {
     computeBtn.addEventListener('click', () => {
         const raw = document.getElementById("histogramInput").value;
         const numbers = parseNumbersFromInput(raw);
-        const numBins = parseInt(document.getElementById("histogramBins").value) || 5;
+        const numBins = Math.max(1, Math.min(30, parseInt(document.getElementById("histogramBins").value) || 5));
         const resultDiv = document.getElementById("histogramResultArea");
         const valueSpan = document.getElementById("histogramValueDisplay");
         const stepsSpan = document.getElementById("histogramStepsDisplay");

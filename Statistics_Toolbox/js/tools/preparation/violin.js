@@ -50,6 +50,7 @@ function renderViolinInterface() {
 
 function computeViolinWithSteps(numbers, bandwidth) {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
+    if (!(bandwidth > 0) || !isFinite(bandwidth)) return { error: true, message: "Bandwidth must be greater than 0." };
     
     const sorted = [...numbers].sort((a, b) => a - b);
     const n = numbers.length;
@@ -490,6 +491,11 @@ function setupViolinLogic() {
         
         const result = computeViolinWithSteps(numbers, bandwidth);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.innerText = "Error";
+            setHtml(stepsSpan, result.message);
+            return;
+        }
         setHtml(valueSpan, `🎻 n = ${result.n} | Median = ${result.median.toFixed(4)} | IQR = ${result.iqr.toFixed(4)} | Outliers = ${result.outliers.length}`);
         setHtml(stepsSpan, result.steps);
         

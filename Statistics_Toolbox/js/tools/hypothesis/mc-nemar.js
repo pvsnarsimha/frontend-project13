@@ -64,7 +64,7 @@ function computeMcNemarTest(inputText, alpha) {
     const df = 1;
     const criticalValue = chiSquareCriticalValue(alpha, df);
     const pValue = 1 - chiSquareCDF(chiSquare, df);
-    const rejectH0 = chiSquare > criticalValue;
+    const rejectH0 = pValue < alpha;
     
     // Build HTML table
     let tableHtml = `
@@ -140,6 +140,7 @@ function computeMcNemarTest(inputText, alpha) {
                 Degrees of freedom = 1<br>
                 Critical value (α = ${alpha}) = ${criticalValue.toFixed(4)}<br>
                 p-value = ${pValue.toFixed(8)}<br><br>
+                <strong>Decision rule:</strong> p-value ${rejectH0 ? '<' : '≥'} α (${alpha})<br>
                 <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                 <strong>Conclusion:</strong> ${rejectH0 ? 'There is sufficient evidence that the proportions are different (significant change).' : 'There is NOT sufficient evidence of a difference between proportions.'}
             </div>

@@ -57,6 +57,7 @@ function renderMutualInfoInterface() {
 // ========== MUTUAL INFORMATION COMPUTATION ==========
 // ========== MUTUAL INFORMATION COMPUTATION ==========
 function computeMutualInfoWithSteps(xValues, yValues, numBins) {
+    numBins = Math.max(2, Math.min(50, Math.floor(numBins) || 10));
     if (!xValues.length || !yValues.length) {
         return { error: true, message: "Please enter both X and Y values." };
     }
@@ -432,7 +433,7 @@ function setupMutualInfoLogic() {
         const rawY = document.getElementById("mutualInfoYInput").value;
         const xValues = parseNumbersFromInput(rawX);
         const yValues = parseNumbersFromInput(rawY);
-        const numBins = parseInt(document.getElementById("mutualInfoBins").value) || 10;
+        const numBins = Math.max(2, Math.min(50, parseInt(document.getElementById("mutualInfoBins").value) || 10));
         const resultDiv = document.getElementById("mutualInfoResultArea");
         const valueSpan = document.getElementById("mutualInfoValueDisplay");
         const stepsSpan = document.getElementById("mutualInfoStepsDisplay");

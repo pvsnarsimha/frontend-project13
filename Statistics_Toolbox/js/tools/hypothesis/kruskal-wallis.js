@@ -133,7 +133,7 @@ function computeKruskalWallisTest(inputText, alpha) {
     const df = k - 1;
     const criticalValue = chiSquareCriticalValue(alpha, df);
     const pValue = 1 - chiSquareCDF(H, df);
-    const rejectH0 = H > criticalValue;
+    const rejectH0 = pValue < alpha;
     
     let conclusion = rejectH0 ? "REJECT the null hypothesis" : "FAIL TO REJECT the null hypothesis";
     let interpretation = rejectH0 ?
@@ -261,7 +261,7 @@ function computeKruskalWallisTest(inputText, alpha) {
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}<br>
-                ${H > criticalValue ? '✓ H > Critical value → Reject H₀' : '✗ H < Critical value → Cannot reject H₀'}
+                ${rejectH0 ? '✓ p-value < α → Reject H₀' : '✗ p-value ≥ α → Cannot reject H₀'}
             </div>
         </div>
     </div>`;

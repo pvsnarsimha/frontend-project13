@@ -17,7 +17,7 @@ function renderBinningInterface() {
                 labelAttrs: { style: FIELD_GAP },
                 select: {
                     id: "binningMethod",
-                    style: "width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #cbdde9; margin-bottom: 15px;"
+                    style: FIELD_STYLE_BORDERED
                 },
                 options: [["equal_width", "Equal Width Bins"], ["custom", "Custom Breaks"]]
             },
@@ -190,4 +190,3 @@ function setupBinningLogic() {
     
     attachClearHandler("binningClearBtn", "binningInput", "binningResultArea");
 }
-// ========== CORRELATION & ASSOCIATION RENDER FUNCTIONS ==========

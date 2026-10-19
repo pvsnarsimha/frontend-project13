@@ -88,7 +88,7 @@ function computeChiSquareGoodnessTest(observed, expected, alpha) {
     const df = n - 1;
     const criticalValue = chiSquareCriticalValue(alpha, df);
     const pValue = 1 - chiSquareCDF(chiSquare, df);
-    const rejectH0 = chiSquare > criticalValue;
+    const rejectH0 = pValue < alpha;
     
     // Build table rows
     let tableRows = '';
@@ -213,6 +213,7 @@ function computeChiSquareGoodnessTest(observed, expected, alpha) {
                 <div><strong>p-value:</strong> ${pValue.toFixed(6)}</div>
                 <div style="margin-top: 8px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                     <strong>Comparison:</strong> ${chiSquare.toFixed(4)} ${chiSquare > criticalValue ? '>' : '<'} ${criticalValue.toFixed(4)}<br>
+                    <strong>Decision rule:</strong> p-value ${rejectH0 ? '<' : '≥'} α (${alpha})<br>
                     <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                     <strong>Conclusion:</strong> ${rejectH0 ? 'There is sufficient evidence that the observed distribution differs from the expected distribution.' : 'There is NOT sufficient evidence that the observed distribution differs from the expected distribution.'}
                 </div>

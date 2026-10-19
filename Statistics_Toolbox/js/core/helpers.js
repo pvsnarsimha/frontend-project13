@@ -121,7 +121,7 @@ function generateDistributionAnalysis(numbers) {
     const iqr = q3 - q1;
     
     // Determine skewness
-    const skewness = (mean - median) / stdDev;
+    const skewness = stdDev > 0 ? (mean - median) / stdDev : 0;   // constant data has no spread, so no skew
     let skewType = "";
     if (Math.abs(skewness) < 0.1) skewType = "Approximately symmetric";
     else if (skewness > 0) skewType = "Right-skewed (positive skew)";
@@ -129,7 +129,7 @@ function generateDistributionAnalysis(numbers) {
     
     // Determine kurtosis approximation
     const fourthMoment = numbers.reduce((a, b) => a + Math.pow(b - mean, 4), 0) / n;
-    const kurtosis = fourthMoment / Math.pow(variance, 2) - 3;
+    const kurtosis = variance > 0 ? fourthMoment / Math.pow(variance, 2) - 3 : 0;   // constant data: no spread, no tails
     let kurtosisType = "";
     if (Math.abs(kurtosis) < 0.5) kurtosisType = "Mesokurtic (normal-like peak)";
     else if (kurtosis > 0) kurtosisType = "Leptokurtic (heavy tails, sharp peak)";
@@ -159,7 +159,7 @@ function generateDistributionAnalysis(numbers) {
     analysis += `📌 DISPERSION (SPREAD):\n`;
     analysis += `• Population variance (÷ n): ${variance.toFixed(4)}\n`;
     analysis += `• Population standard deviation: ${stdDev.toFixed(4)}\n`;
-    analysis += `• Coefficient of Variation (population σ / mean): ${(cv * 100).toFixed(2)}%\n`;
+    analysis += `• Coefficient of Variation (population σ / mean): ${Number.isFinite(cv) ? (cv * 100).toFixed(2) + '%' : 'undefined (mean is 0)'}\n`;
     analysis += `• Q1 (25th percentile): ${q1.toFixed(4)}\n`;
     analysis += `• Q3 (75th percentile): ${q3.toFixed(4)}\n`;
     analysis += `• Interquartile Range (IQR): ${iqr.toFixed(4)}\n\n`;

@@ -229,7 +229,7 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
     </div>`;
     
     // the p-value uses the normal approximation, which is rough for small samples
-    return { U, z, pValue, rejectH0, conclusion, interpretation, steps, smallSample: Math.min(n1, n2) < 10 };
+    return { U, z, pValue, rejectH0, conclusion, interpretation, steps, smallSample: n1 * n2 < 20 };
 }
 
 // ========== MANN-WHITNEY SETUP ==========

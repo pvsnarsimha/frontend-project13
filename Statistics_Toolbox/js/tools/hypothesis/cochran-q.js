@@ -103,7 +103,7 @@ function computeCochranQTest(inputText, alpha) {
     const df = k - 1;
     const criticalValue = chiSquareCriticalValue(alpha, df);
     const pValue = 1 - chiSquareCDF(Q, df);
-    const rejectH0 = Q > criticalValue;
+    const rejectH0 = pValue < alpha;
     
     // Build data table
     let dataRows = '';
@@ -192,6 +192,7 @@ function computeCochranQTest(inputText, alpha) {
             <div><strong>Critical Value (α = ${alpha}):</strong> ${criticalValue.toFixed(4)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                <strong>Decision rule:</strong> p-value ${rejectH0 ? '<' : '≥'} α (${alpha})<br>
                 <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                 <strong>Conclusion:</strong> ${rejectH0 ? 'There IS sufficient evidence that the treatments have different effects (proportions are not equal).' : 'There is NOT sufficient evidence that the treatments differ in their effects.'}
             </div>

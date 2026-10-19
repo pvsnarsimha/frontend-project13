@@ -6,7 +6,7 @@ function renderTukeyHSDInterface() {
         id: "statTukeyHSDInterface",
         title: "📊 Tukey's HSD (Honestly Significant Difference)",
         card: [
-            { formula: "📌 HSD = q × √(MS<sub>within</sub> / n)" },
+            { formula: "📌 HSD = q × √[MS<sub>within</sub> × (1/n<sub>i</sub> + 1/n<sub>j</sub>) / 2]  (Tukey–Kramer; = q × √(MS<sub>within</sub> / n) when all n are equal)" },
             {
                 desc: "<strong>What is Tukey's HSD?</strong><br>\n                    A post-hoc test that compares all possible pairs of group means after a significant ANOVA result.\n                    Controls the family-wise error rate at α for all pairwise comparisons."
             },
@@ -142,7 +142,7 @@ function computeTukeyHSD(inputText, alpha) {
             <h1 style="margin: 0 0 10px 0;">📊 Tukey's HSD Test</h1>
             <p style="margin: 0; opacity: 0.95; font-size: 16px;">Honestly Significant Difference - Post-hoc Analysis After ANOVA</p>
             <div style="margin-top: 15px; background: rgba(255,255,255,0.15); padding: 12px; border-radius: 12px; font-family: monospace; font-size: 14px;">
-                <strong>📐 Formula:</strong> HSD = q<sub>α,k,df</sub> × √(MS<sub>within</sub> / n<sub>harmonic</sub>)
+                <strong>📐 Formula:</strong> HSD = q<sub>α,k,df</sub> × √[MS<sub>within</sub> × (1/n<sub>i</sub> + 1/n<sub>j</sub>) / 2] (Tukey–Kramer)
             </div>
         </div>
         
@@ -165,8 +165,8 @@ function computeTukeyHSD(inputText, alpha) {
                     <strong>Formula Breakdown:</strong><br>
                     • <strong>q</strong> = Studentized range statistic (from table, depends on k and df)<br>
                     • <strong>MS<sub>within</sub></strong> = Mean Square Within (error variance from ANOVA)<br>
-                    • <strong>n</strong> = Sample size per group (harmonic mean if unequal)<br><br>
-                    <strong>HSD = q × √(MS<sub>within</sub> / n)</strong>
+                    • <strong>n<sub>i</sub>, n<sub>j</sub></strong> = Sample sizes of the two groups being compared<br><br>
+                    <strong>HSD = q × √[MS<sub>within</sub> × (1/n<sub>i</sub> + 1/n<sub>j</sub>) / 2]</strong> (reduces to q × √(MS<sub>within</sub> / n) when group sizes are equal)
                 </div>
                 <p><strong>Key Advantage:</strong> Controls the <strong>family-wise error rate</strong> at α for ALL pairwise comparisons simultaneously.</p>
             </div>

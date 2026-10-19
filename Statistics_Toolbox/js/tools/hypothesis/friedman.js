@@ -295,7 +295,7 @@ function computeFriedmanTest(inputText, alpha) {
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}<br>
-                ${rejectH0 ? '✓ χ² > Critical value → Reject H₀, conditions differ significantly' : '✗ χ² < Critical value → Cannot reject H₀, conditions are similar'}
+                ${rejectH0 ? '✓ p-value < α → Reject H₀, conditions differ significantly' : '✗ p-value ≥ α → Cannot reject H₀, conditions are similar'}
                 ${pValue < alpha ? '✓ p-value < α → Statistically significant' : '✗ p-value > α → Not statistically significant'}
             </div>
         </div>

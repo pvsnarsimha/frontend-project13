@@ -223,7 +223,7 @@ function computeAndersonDarlingTest(data, alpha) {
             <div style="display: grid; gap: 12px;">
                 <div><strong>A² Statistic (adjusted):</strong> ${adjA2.toFixed(6)}</div>
                 <div><strong>Critical Value (α = ${alpha}):</strong> ${criticalValue}</div>
-                <div><strong>p-value:</strong> ${pValue.toFixed(6)}</div>
+                <div><strong>p-value:</strong> ${pValue.toPrecision(3)} (approximate, about 3 digits: D'Agostino–Stephens polynomial)</div>
                 <div style="margin-top: 8px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                     <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                     <strong>Conclusion:</strong> ${rejectH0 ? 'There is sufficient evidence that the data is NOT normally distributed.' : 'There is NOT sufficient evidence to reject normality. The data appears normally distributed.'}
@@ -270,7 +270,7 @@ function setupAndersonDarlingLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);
         } else {
-            setHtml(valueSpan, `A² = ${result.A2.toFixed(6)} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
+            setHtml(valueSpan, `A² = ${result.A2.toFixed(6)} | p ≈ ${result.pValue.toPrecision(3)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
             setHtml(stepsSpan, result.steps);
         }
     });
