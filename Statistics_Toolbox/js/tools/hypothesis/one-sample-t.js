@@ -68,6 +68,12 @@ function computeOneSampleTTest(data, mu0, alpha, alternative) {
     const sumSqDiffs = squaredDiffs.reduce((a, b) => a + b, 0);
     const variance = sumSqDiffs / (n - 1);
     const stdDev = Math.sqrt(variance);
+    if (!isFinite(mean) || !isFinite(stdDev)) {
+        return { error: true, message: "The values are too large to compute with (the sums overflow). Rescale the data and try again." };
+    }
+    if (!(stdDev > 0)) {
+        return { error: true, message: "All values are identical, so the sample standard deviation is 0 and the t statistic is undefined (the standard error is 0). Enter values that vary." };
+    }
     
     // Calculate t-statistic
     const standardError = stdDev / Math.sqrt(n);

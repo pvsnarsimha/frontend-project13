@@ -334,3 +334,16 @@ test('distribution fit, entropy, hazard and survival handle degenerate input', (
     assert.equal(withFields({ hazardDistribution: 'weibull', hazardXValues: '1', hazardShape: 0, hazardScale: 2 }, () => app.computeHazardWithSteps()).error, true);
     assert.equal(withFields({ survivalDistribution: 'weibull', survivalXValues: '1', survivalShape: 2, survivalScale: -1 }, () => app.computeSurvivalWithSteps()).error, true);
 });
+
+test('t tests and the overall F test report an error instead of a decision when the data has no variation or overflows', () => {
+    const same = [4, 4, 4, 4, 4, 4];
+    assert.equal(app.computePairedTTest(same, same, 0.05, 'two.sided').error, true, 'identical differences (sd = 0)');
+    assert.equal(app.computeOneSampleTTest(same, 0, 0.05, 'two.sided').error, true, 'constant sample (sd = 0)');
+    assert.equal(app.computeOneSampleTTest([1e308, 1e308, 1e308], 0, 0.05, 'two.sided').error, true, 'sums overflow');
+    assert.equal(app.computePairedTTest([1e308, 1e308, 1e308], [0, 1, 2], 0.05, 'two.sided').error, true);
+    assert.equal(app.computeFTestOverallWithSteps([1, 2, 3, 4, 5], [1, 2, 3, 4, 5], 0.05).error, true, 'perfect fit: MSE = 0');
+    assert.equal(app.computeFTestOverallWithSteps([1, 2, 3, 4, 5], [7, 7, 7, 7, 7], 0.05).error, true, 'constant Y');
+    // ordinary data is unaffected
+    close(app.computeOneSampleTTest([1, 2, 3, 4, 5], 2, 0.05, 'two.sided').tStatistic, Math.sqrt(2), 1e-12);
+    assert.ok(Number.isFinite(app.computeFTestOverallWithSteps([1, 2, 3, 4, 5], [2, 4, 5, 4, 5], 0.05).fStatistic));
+});

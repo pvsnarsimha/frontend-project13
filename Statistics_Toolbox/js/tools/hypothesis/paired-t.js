@@ -92,6 +92,12 @@ function computePairedTTest(before, after, alpha, alternative) {
     
     const varianceDiff = sumSqDiffs / (n - 1);
     const stdDevDiff = Math.sqrt(varianceDiff);
+    if (!isFinite(meanDiff) || !isFinite(stdDevDiff)) {
+        return { error: true, message: "The differences are too large to compute with (the sums overflow). Rescale the data and try again." };
+    }
+    if (!(stdDevDiff > 0)) {
+        return { error: true, message: "All the paired differences are identical, so their standard deviation is 0 and the t statistic is undefined (the standard error is 0). Enter data where the differences vary." };
+    }
     const standardError = stdDevDiff / Math.sqrt(n);
     const tStatistic = meanDiff / standardError;
     const df = n - 1;
