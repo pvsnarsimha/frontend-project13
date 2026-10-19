@@ -4,6 +4,7 @@
 function renderExpectedValueInterface() {
     return buildInterface({
         id: "statExpectedValueInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "📊 Expected Value E[X] (Mean of Distribution)",
         formula: "📌 E[X] = ∫ x·f(x) dx (continuous) or Σ x·P(X=x) (discrete)",
         desc: "The expected value is the theoretical mean of a probability distribution.",

@@ -95,6 +95,9 @@ function computeSimpleLinearRegression(xValues, yValues) {
         residualDetails.push({ x: xValues[i], y: yValues[i], yPred, residual, squaredRes: residual * residual });
     }
     
+    if (!(ssTot > 0)) {
+        return { error: true, message: "All Y values are identical, so the total sum of squares is 0 and R² is undefined (0 / 0). Enter Y values that vary." };
+    }
     const rSquared = 1 - (ssRes / ssTot);
     const adjRSquared = 1 - ((1 - rSquared) * (n - 1) / (n - 2));
     

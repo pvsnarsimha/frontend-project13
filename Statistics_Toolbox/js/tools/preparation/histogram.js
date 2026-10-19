@@ -8,27 +8,11 @@ function createHistogram(numbers, chartTitle) {
     
     // Create bins for histogram (using Sturges' rule)
     const numBins = Math.min(Math.ceil(Math.log2(numbers.length) + 1), 15);
-    const min = Math.min(...numbers);
-    const max = Math.max(...numbers);
-    const binWidth = (max - min) / numBins;
-    
-    // Create bins
-    let bins = Array(numBins).fill(0);
-    let binLabels = [];
-    
-    for (let i = 0; i < numBins; i++) {
-        let lower = min + (i * binWidth);
-        let upper = lower + binWidth;
-        binLabels.push(`${lower.toFixed(2)}-${upper.toFixed(2)}`);
-        
-        numbers.forEach(num => {
-            if (i === numBins - 1) {
-                if (num >= lower && num <= upper) bins[i]++;
-            } else {
-                if (num >= lower && num < upper) bins[i]++;
-            }
-        });
-    }
+    // One histogram implementation: the bins come from the Histogram tool's computeHistogramWithSteps
+    const histogram = computeHistogramWithSteps(numbers, numBins);
+    if (histogram.error) return;
+    const bins = histogram.bins;
+    const binLabels = histogram.binLabels;
     
     // Destroy existing chart if it exists
     if (currentChart) {

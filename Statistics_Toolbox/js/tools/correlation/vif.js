@@ -434,7 +434,7 @@ function setupVIFLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);  // ← innerHTML
         } else {
-            const vifSummary = result.vifs.map(v => `X${v.variable}: ${v.vif.toFixed(2)}`).join(' | ');
+            const vifSummary = result.vifs.map(v => `X${v.variable}: ${isFinite(v.vif) ? v.vif.toFixed(2) : '∞'}`).join(' | ');
             setHtml(valueSpan, vifSummary);
             setHtml(stepsSpan, result.steps);  // ← CRITICAL: use innerHTML not innerText
         }

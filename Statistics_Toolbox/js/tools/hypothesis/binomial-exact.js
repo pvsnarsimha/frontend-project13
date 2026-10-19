@@ -4,6 +4,7 @@
 function renderBinomialExactInterface() {
     return buildInterface({
         id: "statBinomialExactInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "B Binomial Exact Test",
         formula: "📌 P(X = k) = C(n,k) × p^k × (1-p)^(n-k)",
         desc: "Exact test for binomial proportion using the binomial distribution (not approximation).",

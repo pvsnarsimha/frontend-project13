@@ -90,7 +90,7 @@ function computeZOutlierWithSteps(numbers) {
         const d = zScoreDetails[i];
         const marker = d.status === "OUTLIER" ? "⚠️" : "✓";
         const absDiff = Math.abs(d.value - mean);
-        steps += `   │ ${(i+1).toString().padStart(2)} │ ${d.value.toString().padStart(6)} │ ${absDiff.toFixed(6).padStart(12)} │ ${d.zScore.toFixed(4).padStart(8)} │ ${marker} ${d.status.padEnd(6)} (${d.reason})${' '.repeat(30 - d.reason.length)}│\n`;
+        steps += `   │ ${(i+1).toString().padStart(2)} │ ${d.value.toString().padStart(6)} │ ${absDiff.toFixed(6).padStart(12)} │ ${d.zScore.toFixed(4).padStart(8)} │ ${marker} ${d.status.padEnd(6)} (${d.reason})${' '.repeat(Math.max(0, 30 - d.reason.length))}│\n`;
     }
     steps += `   └──────┴──────────┴────────────────┴────────────┴────────────────────────────────┘\n\n`;
     

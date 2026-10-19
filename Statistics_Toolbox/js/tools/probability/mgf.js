@@ -4,6 +4,7 @@
 function renderMGFInterface() {
     return buildInterface({
         id: "statMGFInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "🔢 Moment Generating Function M_X(t) = E[e^{tX}]",
         formula: "📌 M_X(t) = E[e^{tX}] = Σ e^{tx}·P(X=x) or ∫ e^{tx}·f(x) dx",
         desc: "The MGF uniquely determines the distribution and generates moments via derivatives.",

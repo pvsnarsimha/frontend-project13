@@ -4,6 +4,7 @@
 function renderDistKurtosisInterface() {
     return buildInterface({
         id: "statDistKurtosisInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "🎯 Distribution Kurtosis γ₂",
         formula: "📌 γ₂ = E[(X-μ)⁴]/σ⁴ - 3 (Excess Kurtosis)",
         desc: "Kurtosis measures tail heaviness. 0 = mesokurtic (normal), >0 = leptokurtic (heavy tails), <0 = platykurtic (light tails).",

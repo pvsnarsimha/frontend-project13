@@ -276,3 +276,12 @@ test('parseSolution: a boxed ASCII line becomes a chapter and is followed by an 
     assert.ok(sol.items[idx + 1].lines.some(l => l.t.includes('first line of work')));
     assert.ok(sol.items[idx + 2].step);
 });
+
+test('parseSolution: "📌 FINAL RESULTS:" starts the finals, and a bare "Interpretation:" / "Note:" is a highlight line, not a section', () => {
+    const sol = UI.parseSolution(['TITLE HERE', 'Step 1: Add', '   2 + 4 = 6', 'Interpretation:', '   The result is six', 'Note:', '   careful', '📌 FINAL RESULTS:', 'Mean = 3'].join('\n'));
+    deepEqual(sol.items.map(i => i.title), ['Add'], 'only the step is a section');
+    const lines = sol.items[0].lines.map(l => l.t.trim());
+    assert.ok(lines.includes('Interpretation:') && lines.includes('Note:'), 'the keywords stay as lines of the step');
+    assert.ok(sol.finals.some(f => f.includes('Mean = 3')), 'the finals were split off');
+    assert.ok(!sol.finals.some(f => /FINAL RESULTS/.test(f)), 'the heading itself is not a final result');
+});

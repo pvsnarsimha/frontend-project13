@@ -158,8 +158,11 @@ function computeCooksDistance(xValues, yValues) {
     }
     
     // Build complete HTML
-    const steps = stepsHtmlCooksDistance({ cookDetails, influentialCount, intercept, leverageDetails, meanX, meanY, moderateCount, mse, n, predictionDetails, slope, sortedD, ssRes, sxx, tableRows, xxDetails, xxSum, xyDetails, xySum });
-    return { cooksDistances: cookDetails.map(d => d.cooksD), leverages: cookDetails.map(d => d.leverage), residuals, mse, steps, cookDetails };
+    // A perfect fit has MSE = 0, so every Cook's D is 0 / 0. It is shown as 0 (no point moves a line that already passes through all of them), and the page says so.
+    const perfectFit = mse < 1e-15;
+    const perfectFitNote = perfectFit ? `<div class="tp-warn-6 tp-perfect-note">⚠️ The line fits the data perfectly: all residuals are 0, so MSE = 0 and Cook's D = e²/(p·MSE) · h/(1−h)² is 0/0 for every point. D is shown as 0 here (no point is influential), but the measure is not informative for a perfect fit.</div>` : '';
+    const steps = perfectFitNote + stepsHtmlCooksDistance({ cookDetails, influentialCount, intercept, leverageDetails, meanX, meanY, moderateCount, mse, n, predictionDetails, slope, sortedD, ssRes, sxx, tableRows, xxDetails, xxSum, xyDetails, xySum });
+    return { cooksDistances: cookDetails.map(d => d.cooksD), leverages: cookDetails.map(d => d.leverage), residuals, mse, perfectFit, steps, cookDetails };
 }
 
 // ========== COOK'S DISTANCE SETUP FUNCTION (FIXED) ==========

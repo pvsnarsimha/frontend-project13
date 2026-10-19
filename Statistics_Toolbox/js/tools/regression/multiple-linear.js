@@ -170,7 +170,7 @@ function computeMultipleLinearRegression(dataMatrix) {
             // Make diagonal 1
             const pivot = augmented[i][i];
             if (Math.abs(pivot) < 1e-10 * matrixScale) {
-                throw new Error("Matrix is singular, cannot compute inverse");
+                throw Object.assign(new Error("Matrix is singular, cannot compute inverse"), { kind: "pivot" });
             }
             
             stepLog += `<div style="margin: 8px 0;">📐 Make pivot at (${i+1},${i+1}) = 1: Divide row ${i+1} by ${pivot.toFixed(4)}</div>`;
@@ -197,7 +197,7 @@ function computeMultipleLinearRegression(dataMatrix) {
         const inv = augmented.map(row => row.slice(size));
         const cond = norm1(matrix) * norm1(inv);
         if (cond > 1e12) {
-            throw new Error(`X'X is numerically singular (condition number ≈ ${cond.toExponential(1)})`);
+            throw Object.assign(new Error(`X'X is numerically singular (condition number ≈ ${cond.toExponential(1)})`), { kind: "condition" });
         }
         if (cond > 1e6) {
             stepLog += `<div style="margin: 8px 0; padding: 8px 12px; background: #fff3cd; border-radius: 6px; color: #856404;">⚠️ Near-collinearity: the condition number of X'X is ≈ ${cond.toExponential(1)}. Two or more predictors are almost linearly dependent, so individual coefficients may be unreliable even though the fit looks fine. Consider removing or combining correlated predictors (see VIF).</div>`;
@@ -388,9 +388,13 @@ function computeMultipleLinearRegression(dataMatrix) {
                 </div>`;
                 
     } catch (error) {
+        // say what actually went wrong: an exactly dependent predictor, or a design that is only numerically ill-conditioned
+        const failureAdvice = error.kind === "condition"
+            ? "The design is numerically ill-conditioned: two or more predictors are almost linearly dependent, the predictors are on very different scales, or there are barely more observations than parameters (n is close to p + 1). Remove or combine highly correlated predictors (see VIF), rescale the predictors, or add more observations."
+            : "At least one predictor is an exact copy or linear combination of the others (perfect multicollinearity), or there are fewer observations than parameters. Remove or combine the redundant predictor, or add more observations.";
         steps += `
                 <div style="background: #f8d7da; border-radius: 8px; padding: 12px; color: #721c24;">
-                    ⚠️ Cannot compute coefficients: ${error.message}. At least one predictor is an exact copy or linear combination of the others (perfect multicollinearity), or there are fewer observations than parameters. Remove or combine the redundant predictor, or add more observations.
+                    ⚠️ Cannot compute coefficients: ${error.message}. ${failureAdvice}
                 </div>
             </div>
         </div>`;

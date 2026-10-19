@@ -4,6 +4,7 @@
 function renderOneProportionZInterface() {
     return buildInterface({
         id: "statOneProportionZInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "p One-Sample Proportion z-test",
         formula: "📌 z = (p̂ - p₀) / √[p₀(1-p₀)/n]",
         desc: "Tests whether the sample proportion differs from a hypothesized population proportion.",

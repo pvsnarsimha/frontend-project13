@@ -3,6 +3,7 @@
 function renderRandomInterface() {
     return buildInterface({
         id: "statRandomInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "🎲 Random Number Generation",
         formula: "📌 Generate random samples from specified distributions",
         desc: "Generate random numbers following specific probability distributions.",
@@ -84,9 +85,17 @@ function sampleGamma(shape, source) {
     }
 }
 
+// log of a Gamma(shape, 1) draw. For small shapes U^(1/a) underflows to 0 (a = 0.001: almost every draw), so the boost is
+// applied to the logarithm: log G(a) = log G(a + 1) + log(U) / a, which stays finite.
+function sampleLogGamma(shape, source) {
+    if (shape < 1) return Math.log(sampleGamma(shape + 1, source)) + Math.log(1 - source.uniform()) / shape;
+    return Math.log(sampleGamma(shape, source));
+}
+
+// Beta(α, β) = X / (X + Y) with X ~ Gamma(α), Y ~ Gamma(β), evaluated from the logs: 1 / (1 + e^(log Y - log X))
 function sampleBeta(alpha, beta, source) {
-    const x = sampleGamma(alpha, source), y = sampleGamma(beta, source);
-    return x / (x + y);
+    const logX = sampleLogGamma(alpha, source), logY = sampleLogGamma(beta, source);
+    return 1 / (1 + Math.exp(logY - logX));
 }
 
 function generateRandomNumbers(count, dist, params, source) {

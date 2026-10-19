@@ -347,3 +347,90 @@ test('t tests and the overall F test report an error instead of a decision when 
     close(app.computeOneSampleTTest([1, 2, 3, 4, 5], 2, 0.05, 'two.sided').tStatistic, Math.sqrt(2), 1e-12);
     assert.ok(Number.isFinite(app.computeFTestOverallWithSteps([1, 2, 3, 4, 5], [2, 4, 5, 4, 5], 0.05).fStatistic));
 });
+
+test('binomialPMF is accurate at n = 1000 (direct product) and just above it (log space), against SciPy', () => {
+    close(app.binomialPMF(1000, 500, 0.5), 0.025225018178360804, 1e-12);      // scipy.stats.binom.pmf(500, 1000, 0.5)
+    close(app.binomialPMF(1000, 300, 0.3), 0.027521003821268382, 1e-12);
+    close(app.binomialPMF(800, 400, 0.5), 0.028200665094712345, 1e-12);
+    // C(1001, 500) / C(1000, 500) = 1001 / 501, so the pmf ratio across the switch between the two methods is exactly (1001 / 501) / 2
+    close(app.binomialPMF(1001, 500, 0.5) / app.binomialPMF(1000, 500, 0.5), 1001 / 501 / 2, 1e-10, 'the two methods join smoothly');
+});
+
+test('setHtml without a real <template> (no DOM) still strips event handlers', () => {
+    const doc = app.document, original = doc.createElement;
+    doc.createElement = tag => tag === 'template' ? { innerHTML: '', content: null } : original(tag);
+    try {
+        const el = { innerHTML: '' };
+        app.setHtml(el, '<a href="#" onclick="steal()" class="k">x</a><img src=x onerror=boom()>');
+        assert.ok(!/onclick|onerror/i.test(el.innerHTML), el.innerHTML);
+        assert.match(el.innerHTML, /class="k"/);
+    } finally { doc.createElement = original; }
+});
+
+test('no tool string contains double-encoded UTF-8 (mojibake) sequences', () => {
+    const fs = require('fs'), path = require('path');
+    const ROOT = path.join(__dirname, '..');
+    const bad = /рџ|в”Ѓ|ОЈ|в€љ|М„|Ã¢â|â€[™œ“”¦]|Ã[©¨ ]|Â[²°·]/;
+    const walk = d => fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }).flatMap(e => e.isDirectory() ? (e.name === 'node_modules' || e.name === 'vendor' ? [] : walk(d + '/' + e.name)) : [d + '/' + e.name]);
+    const offenders = ['js', 'css', 'tests'].flatMap(walk).filter(f => /\.(js|css|html|md)$/.test(f) && !f.endsWith('review-fixes.test.js') && bad.test(fs.readFileSync(path.join(ROOT, f), 'utf8')));
+    assert.deepEqual(offenders, [], 'files with garbled text (re-save as UTF-8)');
+});
+
+test('parseValueGroupInput keeps digits that belong to a group name', () => {
+    const a = app.parseValueGroupInput('1:Group 2, 2:Group 2, 3:Group 10');
+    assert.deepEqual([...a.groups.keys()], ['Group 2', 'Group 10']);
+    assert.deepEqual([...a.groups.get('Group 2')], [1, 2]);
+    const b = app.parseValueGroupInput('1:A 1 2:A 1');
+    assert.deepEqual([...b.groups.keys()], ['A 1']);
+    assert.deepEqual([...b.groups.get('A 1')], [1, 2]);
+});
+
+test('third review: entropy never negative for discrete distributions, Beta draws never underflow, summaries never print Infinity', () => {
+    for (const [dist, params] of [['binomial', { n: 1, p: 1e-300 }], ['binomial', { n: 5, p: 1e-200 }], ['poisson', { lambda: 1e-12 }]]) {
+        const h = app.computeEntropyWithSteps(dist, params);
+        assert.ok(h.entropy >= 0 && !Object.is(h.entropy, -0), `${dist}: ${h.entropy}`);
+        assert.ok(!/-0\.00000000/.test(h.steps), 'no "-0.00000000" in the worked solution');
+    }
+    assert.ok(app.computeEntropyWithSteps('normal', { stdDev: 0.01 }).entropy < 0, 'a differential entropy may be negative');
+    const source = app.createRandomSource(2024);
+    for (const [alpha, beta] of [[0.001, 0.001], [0.001, 5], [0.3, 0.3], [2, 5]]) {
+        const xs = app.generateRandomNumbers(2000, 'beta', { alpha, beta }, source);
+        assert.ok(xs.every(v => Number.isFinite(v) && v >= 0 && v <= 1), `Beta(${alpha}, ${beta}) produced a non-finite draw`);
+        close(xs.reduce((s, v) => s + v, 0) / xs.length, alpha / (alpha + beta), 0.03, `Beta(${alpha}, ${beta}) mean`);
+    }
+    const cooks = app.computeCooksDistance([1, 2, 3, 4, 20], [2, 4, 5, 4, 30]);
+    assert.ok(!/Infinity|NaN/.test(cooks.steps), "Cook's D summary rows show ∞ instead of Infinity");
+});
+
+test('third review: perfect fits and constant Y are reported, not turned into t = Infinity or a bogus decision', () => {
+    const x = [1, 2, 3, 4, 5], perfect = [2, 4, 6, 8, 10], constant = [7, 7, 7, 7, 7];
+    for (const fn of ['computeStdErrorsWithSteps', 'computeTStatsWithSteps']) {
+        assert.equal(app[fn](x, perfect).error, true, `${fn}: perfect fit`);
+        assert.equal(app[fn](x, constant).error, true, `${fn}: constant Y`);
+    }
+    assert.equal(app.computeSimpleLinearRegression(x, constant).error, true);
+    const ok = app.computeSimpleLinearRegression(x, perfect);
+    assert.ok(!ok.error && Math.abs(ok.slope - 2) < 1e-12, 'a perfect line still has a well-defined slope');
+    const cooks = app.computeCooksDistance(x, perfect);
+    assert.equal(cooks.perfectFit, true);
+    assert.ok(/fits the data perfectly/.test(cooks.steps));
+    assert.equal(app.computeCooksDistance(x, [2, 4, 5, 4, 5]).perfectFit, false);
+});
+
+test('third review: multiple regression explains why a design failed', () => {
+    const exact = [[10, 1, 2], [12, 2, 4], [15, 3, 6], [14, 4, 8], [18, 5, 10], [21, 6, 12], [22, 7, 14], [25, 8, 16]];
+    const r = app.computeMultipleLinearRegression(exact);
+    assert.ok(r.error && /exact copy or linear combination/.test(r.steps), 'an exactly dependent predictor gets the multicollinearity advice');
+});
+
+test('third review: legacy "Visualize Data" charts use the Boxplot and Histogram tools\' statistics', () => {
+    const fs = require('fs'), path = require('path');
+    const ROOT = path.join(__dirname, '..');
+    const boxplot = fs.readFileSync(path.join(ROOT, 'js/tools/preparation/boxplot-chart.js'), 'utf8');
+    const histogram = fs.readFileSync(path.join(ROOT, 'js/tools/preparation/histogram.js'), 'utf8');
+    assert.match(boxplot, /computeBoxplotWithSteps\(numbers\)/);
+    assert.match(histogram, /computeHistogramWithSteps\(numbers, numBins\)/);
+    assert.ok(!/q1 - 1\.5 \* iqr\)/.test(boxplot.slice(0, boxplot.indexOf('function renderBoxplotChart'))), 'no second whisker formula in the legacy box plot');
+    assert.ok(!/← CHANGE/.test(boxplot), 'no leftover debug comments');
+    assert.ok(!/ - 15,|\+ 15\s*$/m.test(boxplot.slice(boxplot.indexOf('min: Math.min(minVal'), boxplot.indexOf('min: Math.min(minVal') + 200)), 'y-axis padding is a share of the range, not 15 data units');
+});

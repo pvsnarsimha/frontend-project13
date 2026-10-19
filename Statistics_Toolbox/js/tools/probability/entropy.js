@@ -8,6 +8,7 @@ function betaFunction(alpha, beta) {
 function renderEntropyInterface() {
     return buildInterface({
         id: "statEntropyInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "📊 Distribution Entropy H(X)",
         formula: "📌 Continuous: H(X) = -∫ f(x)·ln(f(x)) dx | Discrete: H(X) = -Σ P(x)·ln(P(x))",
         desc: "Entropy measures the uncertainty or randomness in a probability distribution. Higher entropy = more uncertainty/randomness.",
@@ -131,6 +132,8 @@ function computeEntropyWithSteps(distType, params) {
             }
         }
         
+        entropy = Math.max(0, entropy);   // a discrete entropy is never negative; floating-point cancellation can leave -0.00000000
+        
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      POISSON DISTRIBUTION ENTROPY                ║\n`;
         steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
@@ -150,6 +153,8 @@ function computeEntropyWithSteps(distType, params) {
             const logP = logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1) + (k > 0 ? k * Math.log(p) : 0) + (n - k > 0 ? (n - k) * Math.log(1 - p) : 0);
             if (isFinite(logP)) entropy -= Math.exp(logP) * logP;
         }
+        
+        entropy = Math.max(0, entropy);   // a discrete entropy is never negative; floating-point cancellation can leave -0.00000000
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                     BINOMIAL DISTRIBUTION ENTROPY                ║\n`;

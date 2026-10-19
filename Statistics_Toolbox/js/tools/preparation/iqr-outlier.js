@@ -94,7 +94,7 @@ function computeIQROutlierWithSteps(numbers) {
     for (let i = 0; i < outlierDetails.length; i++) {
         const d = outlierDetails[i];
         const marker = d.status === "OUTLIER" ? "⚠️" : "✓";
-        steps += `   │ ${(i+1).toString().padStart(2)} │ ${d.value.toString().padStart(6)} │ ${marker} ${d.status.padEnd(6)} (${d.reason})${' '.repeat(45 - d.reason.length)}│\n`;
+        steps += `   │ ${(i+1).toString().padStart(2)} │ ${d.value.toString().padStart(6)} │ ${marker} ${d.status.padEnd(6)} (${d.reason})${' '.repeat(Math.max(0, 45 - d.reason.length))}│\n`;
     }
     steps += `   └──────┴──────────┴────────────────────────────────────────────┘\n\n`;
     

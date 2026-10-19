@@ -81,6 +81,12 @@ function computeStdErrorsWithSteps(xValues, yValues) {
         return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
     }
     const core = simpleRegressionCore(xValues, yValues);   // the shared formulas (core/helpers.js); the loops below only build the display tables
+    if (!(core.ssTot > 0)) {
+        return { error: true, message: "All Y values are identical, so the slope is 0 and there is no variation to test (R² is undefined). Enter Y values that vary." };
+    }
+    if (core.ssRes <= 1e-12 * core.ssTot) {
+        return { error: true, message: "The line fits the data perfectly (residual sum of squares ≈ 0), so the standard errors are 0 and the t statistics are infinite. Inference needs some scatter around the line." };
+    }
     const slope = core.slope;
     const intercept = core.intercept;
     

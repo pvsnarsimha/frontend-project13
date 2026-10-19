@@ -4,6 +4,7 @@
 function renderDistSkewnessInterface() {
     return buildInterface({
         id: "statDistSkewnessInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "📈 Distribution Skewness γ₁",
         formula: "📌 γ₁ = E[(X-μ)³]/σ³ = μ₃/σ³",
         desc: "Skewness measures asymmetry of a distribution. 0 = symmetric, >0 = right-skewed, <0 = left-skewed.",

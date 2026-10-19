@@ -4,6 +4,7 @@
 function renderDistributionVarianceInterface() {
     return buildInterface({
         id: "statDistributionVarianceInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "📏 Variance Var[X] of Distribution",
         formula: "📌 Var[X] = E[(X - μ)²] = E[X²] - (E[X])²",
         desc: "Variance measures the spread of a distribution around its mean.",
