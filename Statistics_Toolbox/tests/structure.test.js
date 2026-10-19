@@ -232,3 +232,12 @@ test('the HTML sanitiser treats ping like the other URL attributes', () => {
     const src = fs.readFileSync(path.join(ROOT, 'js', 'core', 'toolkit.js'), 'utf8');
     assert.match(src.match(/HTML_URL_ATTRIBUTES = new Set\(\[([^\]]*)\]/)[1], /'ping'/);
 });
+
+test('every accent colour the tools use inline is mapped onto the result-panel palette tokens', () => {
+    const css = fs.readFileSync(path.join(ROOT, 'css', 'statlab.css'), 'utf8');
+    assert.match(css, /--tp-accent:/);
+    for (const hex of ['#1a5490', '#d4380d', '#e65100', '#2e7d32', '#6a1b9a']) {
+        assert.ok(css.includes(`color: ${hex}"]`), `no re-theme rule for text colour ${hex}`);
+        assert.ok(css.includes(`background: ${hex}"]`), `no re-theme rule for background ${hex}`);
+    }
+});

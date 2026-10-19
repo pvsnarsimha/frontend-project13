@@ -209,18 +209,33 @@ textarea:focus, input:focus, select:focus { outline: none; border-color: var(--b
 /* legacy rich-HTML solutions: keep their layout, unify the palette */
 .calculation-steps.rich { overflow-x: auto; }
 .calculation-steps.rich h2 { letter-spacing: -.3px; }
-.calculation-steps.rich [style*="linear-gradient(135deg, #1a5490"] { background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%) !important; box-shadow: 0 18px 30px -20px rgba(30,27,75,.9) !important; }
-.calculation-steps.rich h3[style*="#1a5490"] { color: var(--brand) !important; }
-.calculation-steps.rich h3[style*="background: #1a5490"] { background: linear-gradient(90deg, #4338ca, #6366f1) !important; color: #fff !important; }
-.calculation-steps.rich [style*="border-left: 4px solid #1a5490"] { border-left-color: var(--brand) !important; }
-.calculation-steps.rich [style*="color: #1a5490"] { color: var(--brand) !important; }
-.calculation-steps.rich [style*="background: #f8f9fa"] { background: #f8fafc !important; border: 1px solid var(--line) !important; }
-.calculation-steps.rich [style*="linear-gradient(135deg, #e8f4f8"] { background: linear-gradient(135deg, #eef2ff, #f5f3ff) !important; border: 1px solid #e0e7ff !important; }
+/* Result-panel palette: tools still style themselves inline, so each accent colour they use is mapped back onto these
+   tokens. #1a5490 is the original blue; #d4380d / #e65100 (orange), #2e7d32 (green) and #6a1b9a (purple) are the newer
+   per-tool accents. Migrating a tool to classes means using the tokens directly and deleting its selectors here. */
+.calculation-steps.rich {
+    --tp-accent: var(--brand);
+    --tp-banner: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+    --tp-banner-shadow: 0 18px 30px -20px rgba(30,27,75,.9);
+    --tp-head: linear-gradient(90deg, #3730a3, #6366f1);
+    --tp-head-soft: linear-gradient(90deg, #4338ca, #6366f1);
+    --tp-tint: linear-gradient(135deg, #eef2ff, #f5f3ff);
+    --tp-tint-line: #e0e7ff;
+    --tp-card: #f8fafc;
+}
+.calculation-steps.rich [style*="linear-gradient(135deg, #1a5490"], .calculation-steps.rich [style*="linear-gradient(135deg, #d4380d"], .calculation-steps.rich [style*="linear-gradient(135deg, #e65100"], .calculation-steps.rich [style*="linear-gradient(135deg, #2e7d32"], .calculation-steps.rich [style*="linear-gradient(135deg, #6a1b9a"] { background: var(--tp-banner) !important; box-shadow: var(--tp-banner-shadow) !important; }
+.calculation-steps.rich [style*="color: #1a5490"], .calculation-steps.rich [style*="color: #d4380d"], .calculation-steps.rich [style*="color: #e65100"], .calculation-steps.rich [style*="color: #2e7d32"], .calculation-steps.rich [style*="color: #6a1b9a"] { color: var(--tp-accent) !important; }
+.calculation-steps.rich h3[style*="background: #1a5490"], .calculation-steps.rich h3[style*="background: #d4380d"], .calculation-steps.rich h3[style*="background: #e65100"], .calculation-steps.rich h3[style*="background: #2e7d32"], .calculation-steps.rich h3[style*="background: #6a1b9a"] { background: var(--tp-head-soft) !important; color: #fff !important; }
+.calculation-steps.rich [style*="solid #1a5490"], .calculation-steps.rich [style*="solid #d4380d"], .calculation-steps.rich [style*="solid #e65100"], .calculation-steps.rich [style*="solid #2e7d32"], .calculation-steps.rich [style*="solid #6a1b9a"] { border-color: var(--tp-accent) !important; }
+.calculation-steps.rich div[style*="background: #d4380d"], .calculation-steps.rich div[style*="background: #e65100"], .calculation-steps.rich div[style*="background: #2e7d32"], .calculation-steps.rich div[style*="background: #6a1b9a"] { background: var(--tp-head-soft) !important; color: #fff !important; }
+.calculation-steps.rich [style*="background: #f8f9fa"] { background: var(--tp-card) !important; border: 1px solid var(--line) !important; }
+.calculation-steps.rich [style*="background: #f3e5f5"], .calculation-steps.rich [style*="background: #fff3e0"], .calculation-steps.rich [style*="background: #e8f5e9"] { background: var(--tp-tint) !important; border-color: var(--tp-tint-line); }
+.calculation-steps.rich [style*="linear-gradient(135deg, #e8f4f8"] { background: var(--tp-tint) !important; border: 1px solid var(--tp-tint-line) !important; }
 .calculation-steps.rich table { width: 100%; font-size: .85rem; }
 .calculation-steps.rich th { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; }
-.calculation-steps.rich tr[style*="#1a5490"], .calculation-steps.rich thead[style*="#1a5490"] { background: linear-gradient(90deg, #3730a3, #6366f1) !important; color: #fff !important; }
-.calculation-steps.rich tr[style*="#1a5490"] th, .calculation-steps.rich thead[style*="#1a5490"] th { color: #fff !important; background: transparent !important; }
-.calculation-steps.rich th[style*="background: #1a5490"] { background: linear-gradient(90deg, #3730a3, #6366f1) !important; color: #fff !important; }
+.calculation-steps.rich tr[style*="#1a5490"], .calculation-steps.rich tr[style*="#d4380d"], .calculation-steps.rich tr[style*="#e65100"], .calculation-steps.rich tr[style*="#2e7d32"], .calculation-steps.rich tr[style*="#6a1b9a"], .calculation-steps.rich thead[style*="#1a5490"], .calculation-steps.rich thead[style*="#d4380d"], .calculation-steps.rich thead[style*="#e65100"], .calculation-steps.rich thead[style*="#2e7d32"], .calculation-steps.rich thead[style*="#6a1b9a"] { background: var(--tp-head) !important; color: #fff !important; }
+.calculation-steps.rich tr[style*="#1a5490"] th, .calculation-steps.rich tr[style*="#d4380d"] th, .calculation-steps.rich tr[style*="#e65100"] th, .calculation-steps.rich tr[style*="#2e7d32"] th, .calculation-steps.rich tr[style*="#6a1b9a"] th, .calculation-steps.rich thead[style*="#1a5490"] th, .calculation-steps.rich thead[style*="#d4380d"] th, .calculation-steps.rich thead[style*="#e65100"] th, .calculation-steps.rich thead[style*="#2e7d32"] th, .calculation-steps.rich thead[style*="#6a1b9a"] th { color: #fff !important; background: transparent !important; }
+.calculation-steps.rich th[style*="background: #1a5490"], .calculation-steps.rich th[style*="background: #d4380d"], .calculation-steps.rich th[style*="background: #e65100"], .calculation-steps.rich th[style*="background: #2e7d32"], .calculation-steps.rich th[style*="background: #6a1b9a"] { background: var(--tp-head) !important; color: #fff !important; }
+.calculation-steps.rich td[style*="background: #d4380d"], .calculation-steps.rich td[style*="background: #e65100"], .calculation-steps.rich td[style*="background: #2e7d32"], .calculation-steps.rich td[style*="background: #6a1b9a"] { background: var(--tp-head) !important; color: #fff !important; }
 .calculation-steps.rich td, .calculation-steps.rich th { border-color: var(--line) !important; font-variant-numeric: tabular-nums; }
 .calculation-steps.rich tbody tr:nth-child(even) { background: #f8fafc; }
 
