@@ -121,77 +121,77 @@ function computePPPlotWithSteps(numbers, distType = 'normal') {
     // Build calculation table
     let calcRows = '';
     for (let d of calculationDetails) {
-        calcRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${d.i}</td>
-            <td style="padding: 8px; text-align: center;">${d.value.toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center; background: #e8f4f8; font-weight: bold;">${d.empiricalCDF.toFixed(6)}</td>
-            <td style="padding: 8px; text-align: center;">${d.theoreticalCDF.toFixed(6)}</td>
-            <td style="padding: 8px; text-align: center; font-family: monospace; font-size: 11px;">${d.formula}</td>
+        calcRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${d.i}</td>
+            <td class="s-a7c3f4">${d.value.toFixed(4)}</td>
+            <td class="s-b01296">${d.empiricalCDF.toFixed(6)}</td>
+            <td class="s-a7c3f4">${d.theoreticalCDF.toFixed(6)}</td>
+            <td class="s-fc9227">${d.formula}</td>
         </tr>`;
     }
     
     let distName = distType === 'normal' ? 'Normal' : (distType === 'uniform' ? 'Uniform' : 'Exponential');
     
     let steps = `
-<div style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;">
+<div class="s-3097a8">
     
     <!-- Header -->
-    <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 30px; border-radius: 20px; margin-bottom: 25px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+    <div class="s-aedb37">
+        <div class="s-b15718 gen-flex">
             <div>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <span style="font-size: 48px;">📊</span>
+                <div class="s-e9f44b gen-flex">
+                    <span class="s-93df4f gen-big">📊</span>
                     <div>
-                        <h1 style="margin: 0; font-size: 28px;">P-P Plot Analysis</h1>
-                        <p style="margin: 8px 0 0 0; opacity: 0.9;">Probability-Probability Plot vs ${distName} Distribution</p>
+                        <h1 class="s-b80b8c">P-P Plot Analysis</h1>
+                        <p class="s-259079">Probability-Probability Plot vs ${distName} Distribution</p>
                     </div>
                 </div>
             </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 15px 25px; border-radius: 16px; text-align: center;">
-                <div style="font-size: 11px; opacity: 0.8;">SAMPLE SIZE</div>
-                <div style="font-size: 36px; font-weight: 700;">${n}</div>
+            <div class="s-f85ed7">
+                <div class="s-7ce57c">SAMPLE SIZE</div>
+                <div class="s-ae9e1c gen-big">${n}</div>
             </div>
         </div>
     </div>
     
     <!-- KPI Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px;">
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #28a745;">
-            <div style="font-size: 11px; color: #6c757d;">MEAN</div>
-            <div style="font-size: 24px; font-weight: 700; color: #28a745;">${mean.toFixed(4)}</div>
+    <div class="s-3d837c gen-grid">
+        <div class="s-9ca8be">
+            <div class="s-033765">MEAN</div>
+            <div class="s-d3b644">${mean.toFixed(4)}</div>
         </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #17a2b8;">
-            <div style="font-size: 11px; color: #6c757d;">STD DEVIATION</div>
-            <div style="font-size: 24px; font-weight: 700; color: #17a2b8;">${stdDev.toFixed(4)}</div>
+        <div class="s-0b060f">
+            <div class="s-033765">STD DEVIATION</div>
+            <div class="s-3c6f5f">${stdDev.toFixed(4)}</div>
         </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #ffc107;">
-            <div style="font-size: 11px; color: #6c757d;">CORRELATION</div>
-            <div style="font-size: 24px; font-weight: 700; color: #ffc107;">${correlation.toFixed(4)}</div>
+        <div class="s-f94899">
+            <div class="s-033765">CORRELATION</div>
+            <div class="s-7fdc7a">${correlation.toFixed(4)}</div>
         </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #1a5490;">
-            <div style="font-size: 11px; color: #6c757d;">RANGE</div>
-            <div style="font-size: 24px; font-weight: 700;">${(Math.max(...numbers) - Math.min(...numbers)).toFixed(4)}</div>
+        <div class="s-fd7545">
+            <div class="s-033765">RANGE</div>
+            <div class="s-c2434f">${(Math.max(...numbers) - Math.min(...numbers)).toFixed(4)}</div>
         </div>
     </div>
     
     <!-- Step 1: Understanding P-P Plot -->
-    <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #1a5490; color: white; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px;">1</span>
+    <div class="s-bfd155 gen-pad">
+        <h2 class="s-13101f gen-flex">
+            <span class="s-09767f gen-sized">1</span>
             📖 Understanding P-P Plots
         </h2>
         
-        <div style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="s-6fab3a gen-pad">
             <p><strong>What is a P-P Plot?</strong> A Probability-Probability plot compares the empirical CDF of your data against the theoretical CDF of a specified distribution.</p>
             
-            <div style="margin: 15px 0; padding: 12px; background: #e8f4f8; border-radius: 8px;">
+            <div class="s-efcf63">
                 <strong>📐 How to interpret:</strong><br>
-                • <span style="color: #28a745;">Points follow the diagonal line</span> → Data follows the theoretical distribution<br>
-                • <span style="color: #dc3545;">S-shaped pattern</span> → Distribution shape differs in the tails<br>
-                • <span style="color: #ffc107;">Curved above/below diagonal</span> → Systematic bias in probabilities
+                • <span class="s-7773e9">Points follow the diagonal line</span> → Data follows the theoretical distribution<br>
+                • <span class="s-81c63c">S-shaped pattern</span> → Distribution shape differs in the tails<br>
+                • <span class="s-2673ca">Curved above/below diagonal</span> → Systematic bias in probabilities
             </div>
             
-            <div style="background: #fff3cd; padding: 12px; border-radius: 8px;">
+            <div class="s-6da5f7">
                 <strong>💡 Formula for empirical CDF (Blom's method):</strong><br>
                 Fₙ(x) = (i - 0.375) / (n + 0.25)<br>
                 where i = rank (1 to n), n = sample size
@@ -200,20 +200,20 @@ function computePPPlotWithSteps(numbers, distType = 'normal') {
     </div>
     
     <!-- Step 2: Calculation Table -->
-    <div style="background: white; border-radius: 16px; margin-bottom: 25px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-        <div style="background: #1a5490; color: white; padding: 14px 20px;">
-            <h2 style="margin: 0; font-size: 16px;">🔢 Step 2: Calculate Empirical vs Theoretical CDF</h2>
-            <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">For each data point: Fₙ(x) = (i - 0.375)/(n + 0.25)</p>
+    <div class="s-802cd7">
+        <div class="s-63fd4e">
+            <h2 class="s-123848">🔢 Step 2: Calculate Empirical vs Theoretical CDF</h2>
+            <p class="s-92c601">For each data point: Fₙ(x) = (i - 0.375)/(n + 0.25)</p>
         </div>
-        <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+        <div class="s-317679">
+            <table class="s-776a1d gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef; position: sticky; top: 0;">
-                        <th style="padding: 10px;">Rank (i)</th>
-                        <th style="padding: 10px;">Value (x)</th>
-                        <th style="padding: 10px;">Empirical CDF (Fₙ)</th>
-                        <th style="padding: 10px;">Theoretical CDF (F)</th>
-                        <th style="padding: 10px;">Calculation</th>
+                    <tr class="s-ad98e5">
+                        <th class="s-a756db">Rank (i)</th>
+                        <th class="s-a756db">Value (x)</th>
+                        <th class="s-a756db">Empirical CDF (Fₙ)</th>
+                        <th class="s-a756db">Theoretical CDF (F)</th>
+                        <th class="s-a756db">Calculation</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -224,14 +224,14 @@ function computePPPlotWithSteps(numbers, distType = 'normal') {
     </div>
     
     <!-- Step 3: Correlation Calculation -->
-    <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #1a5490; color: white; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px;">3</span>
+    <div class="s-95d04a gen-pad">
+        <h2 class="s-13101f gen-flex">
+            <span class="s-09767f gen-sized">3</span>
             📊 Correlation Between Empirical and Theoretical CDF
         </h2>
         
-        <div style="background: white; border-radius: 12px; padding: 20px;">
-            <div style="margin: 15px 0; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+        <div class="s-6fab3a gen-pad">
+            <div class="s-d517aa">
                 <strong>r = ${correlation.toFixed(8)}</strong><br>
                 <strong>Interpretation:</strong> ${Math.abs(correlation) > 0.98 ? '✅ Very strong agreement → Data follows the theoretical distribution' : (Math.abs(correlation) > 0.95 ? '⚠️ Moderate agreement → Possible mild deviation' : '❌ Poor agreement → Data likely does NOT follow the distribution')}
             </div>
@@ -239,38 +239,38 @@ function computePPPlotWithSteps(numbers, distType = 'normal') {
     </div>
     
     <!-- Step 4: P-P Plot Visualization -->
-    <div style="background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); border-radius: 20px; padding: 25px; margin-top: 20px;">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #4fc3f7; padding-bottom: 15px;">
-            <span style="font-size: 28px;">📊</span>
-            <h3 style="margin: 0; color: #4fc3f7;">P-P PLOT VISUALIZATION</h3>
-            <p style="margin: 5px 0 0 0; font-size: 11px; color: #b39ddb;">💡 Hover over points to see values | Points should follow the diagonal line for good fit</p>
+    <div class="s-117739 gen-pad">
+        <div class="s-74360b gen-flex">
+            <span class="s-da9be8">📊</span>
+            <h3 class="s-e89f6f">P-P PLOT VISUALIZATION</h3>
+            <p class="s-79cb4e">💡 Hover over points to see values | Points should follow the diagonal line for good fit</p>
         </div>
         
-        <canvas id="ppplotChartCanvas" style="max-height: 500px; width: 100%; margin-top: 10px;"></canvas>
+        <canvas class="s-0e19d6 gen-sized" id="ppplotChartCanvas"></canvas>
         
-        <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
-            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 12px; height: 12px; background: #4fc3f7; border-radius: 50%;"></div><span style="color: #e6edf3; font-size: 11px;">(Fₙ, F) Points</span></div>
-            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 20px; height: 2px; background: #ef5350;"></div><span style="color: #e6edf3; font-size: 11px;">Diagonal Line (y = x)</span></div>
+        <div class="s-4eeef9 gen-flex">
+            <div class="s-6d12cd gen-flex"><div class="s-be0df3 gen-sized"></div><span class="s-205a8c">(Fₙ, F) Points</span></div>
+            <div class="s-6d12cd gen-flex"><div class="s-b547cb gen-sized"></div><span class="s-205a8c">Diagonal Line (y = x)</span></div>
         </div>
     </div>
     
     <!-- Step 5: Interpretation -->
-    <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-top: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0;">📌 Final Interpretation</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
-            <div style="background: white; border-radius: 12px; padding: 15px;">
+    <div class="s-284793 gen-pad">
+        <h2 class="s-2ce3ad">📌 Final Interpretation</h2>
+        <div class="s-9ee21a gen-grid">
+            <div class="s-6fdce2">
                 <strong>Distribution Fit Assessment:</strong><br>
                 • ${distName} distribution<br>
                 • Correlation: ${(correlation * 100).toFixed(1)}%<br>
                 • ${Math.abs(correlation) > 0.98 ? '✅ Data follows the theoretical distribution' : (Math.abs(correlation) > 0.95 ? '⚠️ Data shows mild deviation' : '❌ Data likely does NOT follow the distribution')}
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px;">
+            <div class="s-6fdce2">
                 <strong>What to look for in the plot:</strong><br>
                 • Points close to diagonal → Good fit<br>
                 • S-curve → Differences in spread<br>
                 • Consistent offset → Systematic bias
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px;">
+            <div class="s-6fdce2">
                 <strong>Recommended next steps:</strong><br>
                 ${Math.abs(correlation) > 0.98 ? '✓ Use parametric tests with confidence' : '⚠️ Consider data transformation or non-parametric alternatives'}
             </div>

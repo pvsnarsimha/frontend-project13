@@ -114,168 +114,168 @@ function computeTStatsWithSteps(xValues, yValues) {
     const pIntercept = 2 * (1 - tCDF(Math.abs(tIntercept), df));
     
     // ========== Build complete HTML with all steps ==========
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    let steps = `<div class="s-9217e5">
         
         <!-- HEADER -->
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 30px;">
-            <h1 style="margin: 0 0 10px 0;">t-Statistics for Regression Coefficients</h1>
-            <p style="margin: 0; opacity: 0.95;">t = β̂ / SE(β̂) | H₀: β = 0 | H₁: β ≠ 0</p>
-            <p style="margin: 8px 0 0 0; font-size: 14px;">df = n - 2 = ${df} | Critical t (α=0.05, two-tailed) = ±${criticalT.toFixed(4)}</p>
+        <div class="s-954e6d gen-pad">
+            <h1 class="s-b82e54">t-Statistics for Regression Coefficients</h1>
+            <p class="s-cf6932">t = β̂ / SE(β̂) | H₀: β = 0 | H₁: β ≠ 0</p>
+            <p class="s-b5eb65">df = n - 2 = ${df} | Critical t (α=0.05, two-tailed) = ±${criticalT.toFixed(4)}</p>
         </div>
         
         <!-- ========== PART 1: CALCULATE β̂ (REGRESSION COEFFICIENTS) ========== -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📐 PART 1: Calculate Regression Coefficients (β̂₀, β̂₁)</h2>
+        <div class="s-bfd155 gen-pad">
+            <h2 class="s-2ce3ad">📐 PART 1: Calculate Regression Coefficients (β̂₀, β̂₁)</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">Step 1.1: Calculate Means</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+            <div class="s-2a0883 gen-pad">
+                <h3 class="s-6efabd">Step 1.1: Calculate Means</h3>
+                <div class="s-87555e gen-grid">
+                    <div class="s-ee59d6">
                         <strong>x̄ (Mean of X):</strong><br>
                         x̄ = Σx / n = ${sumX} / ${n} = <strong>${meanX.toFixed(6)}</strong>
                     </div>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <div class="s-ee59d6">
                         <strong>ȳ (Mean of Y):</strong><br>
                         ȳ = Σy / n = ${sumY} / ${n} = <strong>${meanY.toFixed(6)}</strong>
                     </div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">Step 1.2: Calculate Deviations and Cross-Products</h3>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <div class="s-2a0883 gen-pad">
+                <h3 class="s-6efabd">Step 1.2: Calculate Deviations and Cross-Products</h3>
+                <div class="s-01a9b9">
+                    <table class="s-306b2c gen-sized">
                         <thead>
-                            <tr style="background: #1a5490; color: white;">
-                                <th style="padding: 10px;">i</th>
-                                <th style="padding: 10px;">x</th>
-                                <th style="padding: 10px;">y</th>
-                                <th style="padding: 10px;">x - x̄</th>
-                                <th style="padding: 10px;">y - ȳ</th>
-                                <th style="padding: 10px;">(x - x̄)(y - ȳ)</th>
-                                <th style="padding: 10px;">(x - x̄)²</th>
+                            <tr class="s-e7b83b">
+                                <th class="s-a756db">i</th>
+                                <th class="s-a756db">x</th>
+                                <th class="s-a756db">y</th>
+                                <th class="s-a756db">x - x̄</th>
+                                <th class="s-a756db">y - ȳ</th>
+                                <th class="s-a756db">(x - x̄)(y - ȳ)</th>
+                                <th class="s-a756db">(x - x̄)²</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${deviationRows}
-                            <tr style="background: #e9ecef; font-weight: 700;">
-                                <td colspan="5" style="padding: 10px; text-align: right;">SUM →</td>
-                                <td style="padding: 10px; text-align: center; background: #1a5490; color: white;">${numerator.toFixed(4)}</td>
-                                <td style="padding: 10px; text-align: center; background: #1a5490; color: white;">${denominator.toFixed(4)}</td>
+                            <tr class="s-767496">
+                                <td class="s-c1430c" colspan="5">SUM →</td>
+                                <td class="s-ec616e">${numerator.toFixed(4)}</td>
+                                <td class="s-ec616e">${denominator.toFixed(4)}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <h3 style="color: #1a5490;">Step 1.3: Calculate Slope (β̂₁) and Intercept (β̂₀)</h3>
+            <div class="s-6fab3a gen-pad">
+                <h3 class="s-6efabd">Step 1.3: Calculate Slope (β̂₁) and Intercept (β̂₀)</h3>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <div class="s-71ba82">
                     <strong>📐 Formula for Slope (β̂₁):</strong><br>
                     β̂₁ = Σ(xᵢ - x̄)(yᵢ - ȳ) / Σ(xᵢ - x̄)²<br><br>
                     β̂₁ = ${numerator.toFixed(4)} / ${denominator.toFixed(4)}<br>
-                    <strong style="color: #1a5490; font-size: 18px;">β̂₁ = ${slope.toFixed(8)}</strong>
+                    <strong class="s-bbce95">β̂₁ = ${slope.toFixed(8)}</strong>
                 </div>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <div class="s-ee59d6">
                     <strong>📐 Formula for Intercept (β̂₀):</strong><br>
                     β̂₀ = ȳ - β̂₁·x̄<br><br>
                     β̂₀ = ${meanY.toFixed(4)} - (${slope.toFixed(4)} × ${meanX.toFixed(4)})<br>
                     β̂₀ = ${meanY.toFixed(4)} - ${(slope * meanX).toFixed(4)}<br>
-                    <strong style="color: #1a5490; font-size: 18px;">β̂₀ = ${intercept.toFixed(8)}</strong>
+                    <strong class="s-bbce95">β̂₀ = ${intercept.toFixed(8)}</strong>
                 </div>
                 
-                <div style="margin-top: 15px; background: #d4edda; padding: 12px; border-radius: 8px; text-align: center;">
+                <div class="s-6d6368">
                     <strong>Regression Equation:</strong> ŷ = ${intercept.toFixed(4)} + ${slope.toFixed(4)}·x
                 </div>
             </div>
         </div>
         
         <!-- ========== PART 2: CALCULATE STANDARD ERRORS ========== -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📐 PART 2: Calculate Standard Errors</h2>
+        <div class="s-95d04a gen-pad">
+            <h2 class="s-2ce3ad">📐 PART 2: Calculate Standard Errors</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">Step 2.1: Calculate Predictions and Residuals</h3>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <div class="s-2a0883 gen-pad">
+                <h3 class="s-6efabd">Step 2.1: Calculate Predictions and Residuals</h3>
+                <div class="s-01a9b9">
+                    <table class="s-306b2c gen-sized">
                         <thead>
-                            <tr style="background: #1a5490; color: white;">
-                                <th style="padding: 10px;">i</th>
-                                <th style="padding: 10px;">x</th>
-                                <th style="padding: 10px;">y</th>
-                                <th style="padding: 10px;">ŷ = β̂₀ + β̂₁·x</th>
-                                <th style="padding: 10px;">e = y - ŷ</th>
-                                <th style="padding: 10px;">e²</th>
+                            <tr class="s-e7b83b">
+                                <th class="s-a756db">i</th>
+                                <th class="s-a756db">x</th>
+                                <th class="s-a756db">y</th>
+                                <th class="s-a756db">ŷ = β̂₀ + β̂₁·x</th>
+                                <th class="s-a756db">e = y - ŷ</th>
+                                <th class="s-a756db">e²</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${predictionsRows}
-                            <tr style="background: #e9ecef; font-weight: 700;">
-                                <td colspan="5" style="padding: 10px; text-align: right;">SS<sub>res</sub> = Σe² →</td>
-                                <td style="padding: 10px; text-align: center; background: #1a5490; color: white;">${ssRes.toFixed(4)}</td>
+                            <tr class="s-767496">
+                                <td class="s-c1430c" colspan="5">SS<sub>res</sub> = Σe² →</td>
+                                <td class="s-ec616e">${ssRes.toFixed(4)}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">Step 2.2: Calculate Mean Squared Error (MSE)</h3>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+            <div class="s-2a0883 gen-pad">
+                <h3 class="s-6efabd">Step 2.2: Calculate Mean Squared Error (MSE)</h3>
+                <div class="s-ee59d6">
                     <strong>Formula:</strong> MSE = SS<sub>res</sub> / (n - 2)<br>
                     MSE = ${ssRes.toFixed(4)} / ${n-2}<br>
-                    <strong style="color: #1a5490;">MSE = ${mse.toFixed(8)}</strong>
+                    <strong class="s-f342b5">MSE = ${mse.toFixed(8)}</strong>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <h3 style="color: #1a5490;">Step 2.3: Calculate Standard Errors</h3>
+            <div class="s-6fab3a gen-pad">
+                <h3 class="s-6efabd">Step 2.3: Calculate Standard Errors</h3>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <div class="s-71ba82">
                     <strong>📐 Standard Error of Slope [SE(β̂₁)]:</strong><br>
                     SE(β̂₁) = √[MSE / Σ(x - x̄)²]<br>
                     SE(β̂₁) = √[${mse.toFixed(6)} / ${denominator.toFixed(4)}]<br>
                     SE(β̂₁) = √${(mse/denominator).toFixed(6)}<br>
-                    <strong style="color: #1a5490;">SE(β̂₁) = ${seSlope.toFixed(8)}</strong>
+                    <strong class="s-f342b5">SE(β̂₁) = ${seSlope.toFixed(8)}</strong>
                 </div>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <div class="s-ee59d6">
                     <strong>📐 Standard Error of Intercept [SE(β̂₀)]:</strong><br>
                     SE(β̂₀) = √[MSE × (1/n + x̄²/Σ(x - x̄)²)]<br>
                     SE(β̂₀) = √[${mse.toFixed(6)} × (1/${n} + ${Math.pow(meanX,2).toFixed(4)}/${denominator.toFixed(4)})]<br>
                     SE(β̂₀) = √[${mse.toFixed(6)} × ${(1/n + Math.pow(meanX,2)/denominator).toFixed(6)}]<br>
-                    <strong style="color: #1a5490;">SE(β̂₀) = ${seIntercept.toFixed(8)}</strong>
+                    <strong class="s-f342b5">SE(β̂₀) = ${seIntercept.toFixed(8)}</strong>
                 </div>
             </div>
         </div>
         
         <!-- ========== PART 3: CALCULATE T-STATISTICS ========== -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📐 PART 3: Calculate t-Statistics</h2>
+        <div class="s-95d04a gen-pad">
+            <h2 class="s-2ce3ad">📐 PART 3: Calculate t-Statistics</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
-                <h3 style="color: #1a5490;">For Intercept (β̂₀):</h3>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace;">
+            <div class="s-41df42 gen-pad">
+                <h3 class="s-6efabd">For Intercept (β̂₀):</h3>
+                <div class="s-75b18d">
                     <strong>Formula:</strong> t = β̂₀ / SE(β̂₀)<br>
                     t = ${intercept.toFixed(6)} / ${seIntercept.toFixed(6)}<br>
-                    <strong style="color: #1a5490; font-size: 18px;">t = ${tIntercept.toFixed(8)}</strong>
+                    <strong class="s-bbce95">t = ${tIntercept.toFixed(8)}</strong>
                 </div>
-                <div style="margin-top: 10px;">
+                <div class="s-7fd1d1">
                     <strong>p-value = ${pIntercept.toFixed(6)}</strong><br>
                     ${pIntercept < 0.05 ? '✓ p < 0.05 → Statistically significant (reject H₀)' : '✗ p > 0.05 → Not statistically significant (fail to reject H₀)'}
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <h3 style="color: #1a5490;">For Slope (β̂₁):</h3>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace;">
+            <div class="s-6fab3a gen-pad">
+                <h3 class="s-6efabd">For Slope (β̂₁):</h3>
+                <div class="s-75b18d">
                     <strong>Formula:</strong> t = β̂₁ / SE(β̂₁)<br>
                     t = ${slope.toFixed(6)} / ${seSlope.toFixed(6)}<br>
-                    <strong style="color: #1a5490; font-size: 18px;">t = ${tSlope.toFixed(8)}</strong>
+                    <strong class="s-bbce95">t = ${tSlope.toFixed(8)}</strong>
                 </div>
-                <div style="margin-top: 10px;">
+                <div class="s-7fd1d1">
                     <strong>p-value = ${pSlope.toFixed(6)}</strong><br>
                     ${pSlope < 0.05 ? '✓ p < 0.05 → Statistically significant (reject H₀)' : '✗ p > 0.05 → Not statistically significant (fail to reject H₀)'}
                 </div>
@@ -283,36 +283,36 @@ function computeTStatsWithSteps(xValues, yValues) {
         </div>
         
         <!-- ========== PART 4: RESULTS SUMMARY TABLE ========== -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; overflow-x: auto; border: 2px solid #1a5490;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white; text-align: center;">📊 Summary: Regression Coefficients with t-Statistics</h3>
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-5b0d25">
+            <h3 class="s-ba9de1">📊 Summary: Regression Coefficients with t-Statistics</h3>
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef;">
-                        <th style="padding: 12px;">Coefficient</th>
-                        <th style="padding: 12px;">Estimate (β̂)</th>
-                        <th style="padding: 12px;">Standard Error (SE)</th>
-                        <th style="padding: 12px;">t-statistic</th>
-                        <th style="padding: 12px;">p-value</th>
-                        <th style="padding: 12px;">Significant at α=0.05?</th>
+                    <tr class="s-bfd0ae">
+                        <th class="s-d66e1c">Coefficient</th>
+                        <th class="s-d66e1c">Estimate (β̂)</th>
+                        <th class="s-d66e1c">Standard Error (SE)</th>
+                        <th class="s-d66e1c">t-statistic</th>
+                        <th class="s-d66e1c">p-value</th>
+                        <th class="s-d66e1c">Significant at α=0.05?</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px; font-weight: bold;">Intercept (β₀)</td>
-                        <td style="text-align: center;">${intercept.toFixed(6)}</td>
-                        <td style="text-align: center;">${seIntercept.toFixed(6)}</td>
-                        <td style="text-align: center; font-weight: 700; color: #1a5490;">${tIntercept.toFixed(6)}</td>
-                        <td style="text-align: center;">${pIntercept.toFixed(6)}</td>
+                    <tr class="s-b490b8">
+                        <td class="s-8136fa">Intercept (β₀)</td>
+                        <td class="s-02528c">${intercept.toFixed(6)}</td>
+                        <td class="s-02528c">${seIntercept.toFixed(6)}</td>
+                        <td class="s-21d431">${tIntercept.toFixed(6)}</td>
+                        <td class="s-02528c">${pIntercept.toFixed(6)}</td>
                         <td style="text-align: center; ${Math.abs(tIntercept) > criticalT ? 'color: #28a745; font-weight: bold;' : 'color: #dc3545;'}">
                             ${Math.abs(tIntercept) > criticalT ? '✓ Yes' : '✗ No'}
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding: 12px; font-weight: bold;">Slope (β₁)</td>
-                        <td style="text-align: center;">${slope.toFixed(6)}</td>
-                        <td style="text-align: center;">${seSlope.toFixed(6)}</td>
-                        <td style="text-align: center; font-weight: 700; color: #1a5490;">${tSlope.toFixed(6)}</td>
-                        <td style="text-align: center;">${pSlope.toFixed(6)}</td>
+                        <td class="s-8136fa">Slope (β₁)</td>
+                        <td class="s-02528c">${slope.toFixed(6)}</td>
+                        <td class="s-02528c">${seSlope.toFixed(6)}</td>
+                        <td class="s-21d431">${tSlope.toFixed(6)}</td>
+                        <td class="s-02528c">${pSlope.toFixed(6)}</td>
                         <td style="text-align: center; ${Math.abs(tSlope) > criticalT ? 'color: #28a745; font-weight: bold;' : 'color: #dc3545;'}">
                             ${Math.abs(tSlope) > criticalT ? '✓ Yes' : '✗ No'}
                         </td>
@@ -323,25 +323,25 @@ function computeTStatsWithSteps(xValues, yValues) {
         
         <!-- ========== PART 5: CONCLUSION ========== -->
         <div style="border-radius: 16px; padding: 20px; ${Math.abs(tSlope) > criticalT ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Conclusion</h3>
+            <h3 class="s-c7f0b4">📌 Conclusion</h3>
             <p><strong>Null Hypothesis (H₀):</strong> β = 0 (The coefficient is not significantly different from zero)</p>
             <p><strong>Alternative Hypothesis (H₁):</strong> β ≠ 0 (The coefficient is significantly different from zero)</p>
             <p><strong>Decision Rule:</strong> Reject H₀ if |t| > ${criticalT.toFixed(4)}</p>
             
-            <div style="margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-ab6715">
                 <strong>Intercept (β₀):</strong> |t| = ${Math.abs(tIntercept).toFixed(4)} ${Math.abs(tIntercept) > criticalT ? '>' : '<'} ${criticalT.toFixed(4)}<br>
                 → ${Math.abs(tIntercept) > criticalT ? '✓ Reject H₀: The intercept is significantly different from zero' : '✗ Fail to reject H₀: The intercept is not significantly different from zero'}
             </div>
-            <div style="margin-top: 10px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-f0f227">
                 <strong>Slope (β₁):</strong> |t| = ${Math.abs(tSlope).toFixed(4)} ${Math.abs(tSlope) > criticalT ? '>' : '<'} ${criticalT.toFixed(4)}<br>
                 → ${Math.abs(tSlope) > criticalT ? '✓ Reject H₀: The slope is significantly different from zero → X has a significant effect on Y' : '✗ Fail to reject H₀: The slope is not significantly different from zero → X does not predict Y'}
             </div>
         </div>
         
         <!-- ========== FORMULA REFERENCE ========== -->
-        <div style="margin-top: 20px; background: #e8f4f8; border-radius: 12px; padding: 15px;">
-            <h4 style="margin: 0 0 8px 0; color: #1a5490;">📖 Formula Reference</h4>
-            <div style="font-family: monospace; font-size: 12px;">
+        <div class="s-119ec7">
+            <h4 class="s-bca61e">📖 Formula Reference</h4>
+            <div class="s-1b0f6a">
                 <strong>β̂₁ (Slope):</strong> Σ(xᵢ - x̄)(yᵢ - ȳ) / Σ(xᵢ - x̄)²<br>
                 <strong>β̂₀ (Intercept):</strong> ȳ - β̂₁·x̄<br>
                 <strong>SE(β̂₁):</strong> √[MSE / Σ(xᵢ - x̄)²]<br>

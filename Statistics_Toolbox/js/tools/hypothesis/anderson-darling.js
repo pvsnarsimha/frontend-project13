@@ -106,143 +106,143 @@ function computeAndersonDarlingTest(data, alpha) {
     // Build calculation table
     let tableRows = '';
     for (let d of calcDetails) {
-        tableRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${d.i}</td>
-            <td style="padding: 10px; text-align: center;">${d.value.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">z = (${d.value.toFixed(4)} - ${mean.toFixed(4)})/${stdDev.toFixed(4)} = ${d.zScore.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">F(x) = Φ(${d.zScore.toFixed(4)}) = ${d.Fx.toFixed(6)}</td>
-            <td style="padding: 10px; text-align: center;">(2×${d.i}−1)ln F(x<sub>${d.i}</sub>) = ${d.term1.toFixed(6)}</td>
-            <td style="padding: 10px; text-align: center;">(2×${d.i}−1)ln(1−F(x<sub>${n+1-d.i}</sub>)) = ${d.term2.toFixed(6)}</td>
+        tableRows += `<tr class="s-00049c">
+            <td class="s-618bb3">${d.i}</td>
+            <td class="s-618bb3">${d.value.toFixed(4)}</td>
+            <td class="s-618bb3">z = (${d.value.toFixed(4)} - ${mean.toFixed(4)})/${stdDev.toFixed(4)} = ${d.zScore.toFixed(4)}</td>
+            <td class="s-618bb3">F(x) = Φ(${d.zScore.toFixed(4)}) = ${d.Fx.toFixed(6)}</td>
+            <td class="s-618bb3">(2×${d.i}−1)ln F(x<sub>${d.i}</sub>) = ${d.term1.toFixed(6)}</td>
+            <td class="s-618bb3">(2×${d.i}−1)ln(1−F(x<sub>${n+1-d.i}</sub>)) = ${d.term2.toFixed(6)}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">A²</span>
-                <h2 style="margin: 0;">Anderson-Darling Test (Normality)</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">A²</span>
+                <h2 class="s-f8a94d">Anderson-Darling Test (Normality)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">A powerful normality test with emphasis on tail behavior</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">H₀: Data is normally distributed | H₁: Data is NOT normally distributed</p>
+            <p class="s-259079">A powerful normality test with emphasis on tail behavior</p>
+            <p class="s-20a400">H₀: Data is normally distributed | H₁: Data is NOT normally distributed</p>
         </div>
         
-        <div style="background: #f0f4fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📖 Understanding the Anderson-Darling Test</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <p style="margin: 0 0 12px 0;"><strong>How it works:</strong></p>
-                <ul style="margin-left: 20px; line-height: 1.6;">
+        <div class="s-42ccf7 gen-pad">
+            <h3 class="s-ed0bb5">📖 Understanding the Anderson-Darling Test</h3>
+            <div class="s-6025fc">
+                <p class="s-7dacb1"><strong>How it works:</strong></p>
+                <ul class="s-c1e0ca">
                     <li>Compares empirical distribution to normal distribution</li>
                     <li>Gives MORE weight to tails than KS test</li>
                     <li>Better at detecting deviations at distribution extremes</li>
                 </ul>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-family: monospace; text-align: center; margin-top: 12px;">
+                <div class="s-0f748e">
                     <strong>A² = -n - (1/n) Σ (2i-1)[ln(F(xᵢ)) + ln(1-F(xₙ₋ᵢ₊₁))]</strong>
                 </div>
-                <div style="margin-top: 12px; background: #fff3cd; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-28c132">
                     💡 <strong>Interpretation:</strong> Small A² = good fit to normal | Large A² = poor fit
                 </div>
             </div>
         </div>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px;">
-            <div style="background: white; border-radius: 12px; padding: 16px; border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Sample Size (n)</div>
-                <div style="font-size: 32px; font-weight: 700; color: #1a5490;">${n}</div>
+        <div class="s-5d9fe4 gen-grid">
+            <div class="s-a739ec">
+                <div class="s-42da0a">Sample Size (n)</div>
+                <div class="s-abfdfd gen-big">${n}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px; border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Sample Mean (x̄)</div>
-                <div style="font-size: 20px; font-weight: 700;">${mean.toFixed(4)}</div>
+            <div class="s-a739ec">
+                <div class="s-42da0a">Sample Mean (x̄)</div>
+                <div class="s-9d1896">${mean.toFixed(4)}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px; border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Sample Std Dev (s)</div>
-                <div style="font-size: 20px; font-weight: 700;">${stdDev.toFixed(4)}</div>
+            <div class="s-a739ec">
+                <div class="s-42da0a">Sample Std Dev (s)</div>
+                <div class="s-9d1896">${stdDev.toFixed(4)}</div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto; border: 1px solid #e9ecef;">
-            <h3 style="margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #1a5490; color: #1a5490;">
+        <div class="s-90b704">
+            <h3 class="s-c7276c">
                 📊 Step 1: Calculate A² Statistic Components
             </h3>
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <table class="s-776a1d gen-sized">
                 <thead>
-                    <tr style="background: #1a5490; color: white;">
-                        <th style="padding: 8px;">i</th>
-                        <th style="padding: 8px;">xᵢ</th>
-                        <th style="padding: 8px;">z = (x-μ)/σ</th>
-                        <th style="padding: 8px;">F(x) = Φ(z)</th>
-                        <th style="padding: 8px;">(2i-1)ln(F)</th>
-                        <th style="padding: 8px;">(2(n-i)+1)ln(1-F)</th>
+                    <tr class="s-e7b83b">
+                        <th class="s-939795">i</th>
+                        <th class="s-939795">xᵢ</th>
+                        <th class="s-939795">z = (x-μ)/σ</th>
+                        <th class="s-939795">F(x) = Φ(z)</th>
+                        <th class="s-939795">(2i-1)ln(F)</th>
+                        <th class="s-939795">(2(n-i)+1)ln(1-F)</th>
                     </tr>
                 </thead>
                 <tbody>${tableRows}</tbody>
             </table>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 2: Calculate A² Statistic</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace; margin-bottom: 12px;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 2: Calculate A² Statistic</h3>
+            <div class="s-6025fc">
+                <div class="s-5ec686">
                     Σ = ${sum.toFixed(6)}<br>
                     A² = -n - (1/n) × Σ<br>
                     A² = -${n} - (1/${n}) × ${sum.toFixed(6)}<br>
                     A² = -${n} - ${(sum/n).toFixed(6)}<br>
-                    <strong style="font-size: 18px;">A² = ${A2.toFixed(6)}</strong>
+                    <strong class="s-b72ae1">A² = ${A2.toFixed(6)}</strong>
                 </div>
                 
-                <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #dee2e6;">
+                <div class="s-93e3f3">
                     <strong>Adjusted A² (Stephens, 1974):</strong><br>
                     A²<sub>adj</sub> = A² × (1 + 0.75/n + 2.25/n²)<br>
                     A²<sub>adj</sub> = ${A2.toFixed(6)} × (1 + 0.75/${n} + 2.25/${n*n})<br>
                     A²<sub>adj</sub> = ${A2.toFixed(6)} × ${(1 + 0.75/n + 2.25/(n*n)).toFixed(4)}<br>
-                    <strong style="font-size: 18px; color: #1a5490;">A²<sub>adj</sub> = ${adjA2.toFixed(6)}</strong>
+                    <strong class="s-acbeaf">A²<sub>adj</sub> = ${adjA2.toFixed(6)}</strong>
                 </div>
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Step 3: Compare with Critical Value</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 12px; color: #6c757d;">Significance Level (α)</div>
-                        <div style="font-size: 28px; font-weight: 700;">${alpha}</div>
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">📊 Step 3: Compare with Critical Value</h3>
+            <div class="s-6025fc">
+                <div class="s-800734 gen-grid">
+                    <div class="s-546056">
+                        <div class="s-42da0a">Significance Level (α)</div>
+                        <div class="s-93c0a8">${alpha}</div>
                     </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 12px; color: #6c757d;">Critical Value</div>
-                        <div style="font-size: 28px; font-weight: 700; color: #dc3545;">${criticalValue}</div>
+                    <div class="s-546056">
+                        <div class="s-42da0a">Critical Value</div>
+                        <div class="s-a516d1">${criticalValue}</div>
                     </div>
                 </div>
-                <div style="margin-top: 16px; text-align: center;">
+                <div class="s-64c1da">
                     ${adjA2 > criticalValue ? `A²<sub>adj</sub> (${adjA2.toFixed(4)}) > Critical (${criticalValue})` : `A²<sub>adj</sub> (${adjA2.toFixed(4)}) < Critical (${criticalValue})`}
                 </div>
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; margin-bottom: 24px; ${rejectH0 ? 'background: #f8d7da; border-left: 6px solid #dc3545;' : 'background: #d4edda; border-left: 6px solid #28a745;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Step 4: Make Decision</h3>
-            <div style="display: grid; gap: 12px;">
+        <div class="${rejectH0 ? 's-830a4f gen-pad' : 's-28eb84 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Step 4: Make Decision</h3>
+            <div class="s-f27585">
                 <div><strong>A² Statistic (adjusted):</strong> ${adjA2.toFixed(6)}</div>
                 <div><strong>Critical Value (α = ${alpha}):</strong> ${criticalValue}</div>
                 <div><strong>p-value:</strong> ${pValue.toPrecision(3)} (approximate, about 3 digits: D'Agostino–Stephens polynomial)</div>
-                <div style="margin-top: 8px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                <div class="s-c6645b">
                     <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                     <strong>Conclusion:</strong> ${rejectH0 ? 'There is sufficient evidence that the data is NOT normally distributed.' : 'There is NOT sufficient evidence to reject normality. The data appears normally distributed.'}
                 </div>
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📊 A² Statistic Scale</h3>
-            <div style="text-align: center;">
-                <div style="height: 8px; background: linear-gradient(to right, #28a745, #ffc107, #dc3545); border-radius: 4px; margin: 12px 0;"></div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="font-size: 11px;">Good Fit (A²<0.5)</span>
-                    <span style="font-size: 11px;">Borderline (0.5-0.75)</span>
-                    <span style="font-size: 11px;">Poor Fit (>0.75)</span>
+        <div class="s-44d7a2 gen-pad">
+            <h3 class="s-ed0bb5">📊 A² Statistic Scale</h3>
+            <div class="s-546056">
+                <div class="s-654dc6"></div>
+                <div class="s-e19eba gen-flex">
+                    <span class="s-fb8dcc">Good Fit (A²<0.5)</span>
+                    <span class="s-fb8dcc">Borderline (0.5-0.75)</span>
+                    <span class="s-fb8dcc">Poor Fit (>0.75)</span>
                 </div>
-                <div style="background: white; border-radius: 12px; padding: 16px; margin-top: 16px; display: inline-block; min-width: 200px;">
-                    <div style="font-size: 48px; font-weight: 700; color: ${rejectH0 ? '#dc3545' : '#28a745'};">${adjA2.toFixed(4)}</div>
-                    <div style="font-size: 14px;">A² Statistic</div>
+                <div class="s-703843 gen-sized">
+                    <div class="${rejectH0 ? 's-1fd66a gen-big' : 's-c5b75d gen-big'}">${adjA2.toFixed(4)}</div>
+                    <div class="s-67e5d5">A² Statistic</div>
                 </div>
             </div>
         </div>

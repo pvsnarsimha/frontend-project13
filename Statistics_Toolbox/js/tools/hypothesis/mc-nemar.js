@@ -68,74 +68,74 @@ function computeMcNemarTest(inputText, alpha) {
     
     // Build HTML table
     let tableHtml = `
-    <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; overflow-x: auto;">
-        <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Contingency Table</h3>
-        <table style="border-collapse: collapse; width: 100%; margin: 0 auto;">
+    <div class="s-907186 gen-pad">
+        <h3 class="s-d163b6">📊 Contingency Table</h3>
+        <table class="s-07201c gen-sized">
             <thead>
-                <tr style="background: #1a5490; color: white;">
-                    <th style="border: 1px solid #ddd; padding: 12px;"></th>
-                    <th style="border: 1px solid #ddd; padding: 12px;">After: No</th>
-                    <th style="border: 1px solid #ddd; padding: 12px;">After: Yes</th>
-                    <th style="border: 1px solid #ddd; padding: 12px;">Total</th>
+                <tr class="s-e7b83b">
+                    <th class="s-7d7706"></th>
+                    <th class="s-7d7706">After: No</th>
+                    <th class="s-7d7706">After: Yes</th>
+                    <th class="s-7d7706">Total</th>
                 </tr>
             </thead>
             <tbody>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <th style="border: 1px solid #ddd; padding: 12px; background: #e8f4f8;">Before: No</th>
-                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">a = ${a}</td>
-                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">b = ${b}</td>
-                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${a+b}</td>
+                <tr class="s-e467f0">
+                    <th class="s-32c0c9">Before: No</th>
+                    <td class="s-8a7755">a = ${a}</td>
+                    <td class="s-8a7755">b = ${b}</td>
+                    <td class="s-8a7755">${a+b}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <th style="border: 1px solid #ddd; padding: 12px; background: #e8f4f8;">Before: Yes</th>
-                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">c = ${c}</td>
-                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">d = ${d}</td>
-                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${c+d}</td>
+                <tr class="s-e467f0">
+                    <th class="s-32c0c9">Before: Yes</th>
+                    <td class="s-8a7755">c = ${c}</td>
+                    <td class="s-8a7755">d = ${d}</td>
+                    <td class="s-8a7755">${c+d}</td>
                 </tr>
-                <tr style="background: #e9ecef;">
-                    <th style="border: 1px solid #ddd; padding: 12px;">Total</th>
-                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${a+c}</td>
-                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${b+d}</td>
-                    <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${n}</td>
+                <tr class="s-bfd0ae">
+                    <th class="s-7d7706">Total</th>
+                    <td class="s-8a7755">${a+c}</td>
+                    <td class="s-8a7755">${b+d}</td>
+                    <td class="s-8a7755">${n}</td>
                 </tr>
             </tbody>
         </table>
     </div>`;
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 25px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">📊</span>
+    let steps = `<div class="s-9217e5">
+        <div class="s-6d8291 gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">📊</span>
                 <div>
-                    <h1 style="margin: 0; font-size: 28px;">McNemar's Test</h1>
-                    <p style="margin: 8px 0 0 0; opacity: 0.9;">Paired Categorical Data Analysis</p>
+                    <h1 class="s-b80b8c">McNemar's Test</h1>
+                    <p class="s-259079">Paired Categorical Data Analysis</p>
                 </div>
             </div>
         </div>
         
         ${tableHtml}
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📐 Step-by-Step Calculation</h3>
+        <div class="s-2f2db9 gen-pad">
+            <h3 class="s-d163b6">📐 Step-by-Step Calculation</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div class="s-ca9e5c">
                 <strong>Step 1: Identify discordant pairs</strong><br>
                 • b = number where Before: No, After: Yes = ${b}<br>
                 • c = number where Before: Yes, After: No = ${c}<br>
                 • Discordant pairs = b + c = ${b + c}
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div class="s-ca9e5c">
                 <strong>Step 2: Calculate McNemar's chi-square statistic</strong><br>
                 Formula: χ² = (|b - c| - 1)² / (b + c) [with continuity correction]<br>
                 = (|${b} - ${c}| - 1)² / (${b} + ${c})<br>
                 = (${Math.abs(b - c)} - 1)² / ${b + c}<br>
                 = (${Math.abs(b - c) - 1})² / ${b + c}<br>
                 = ${Math.pow(Math.abs(b - c) - 1, 2)} / ${b + c}<br>
-                = <strong style="color: #1a5490; font-size: 18px;">χ² = ${chiSquare.toFixed(6)}</strong>
+                = <strong class="s-bbce95">χ² = ${chiSquare.toFixed(6)}</strong>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+            <div class="s-6025fc">
                 <strong>Step 3: Compare with critical value</strong><br>
                 Degrees of freedom = 1<br>
                 Critical value (α = ${alpha}) = ${criticalValue.toFixed(4)}<br>

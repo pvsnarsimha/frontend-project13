@@ -22,10 +22,10 @@ function renderBinningInterface() {
                 options: [["equal_width", "Equal Width Bins"], ["custom", "Custom Breaks"]]
             },
             {
-                html: "<div id=\"equalWidthOptions\">\n                    <label>📊 Number of Bins:</label>\n                    <input type=\"number\" id=\"numBins\" value=\"5\" min=\"2\" max=\"20\" style=\"width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #cbdde9; margin-bottom: 15px;\">\n                </div>"
+                html: "<div id=\"equalWidthOptions\">\n                    <label>📊 Number of Bins:</label>\n                    <input class=\"s-1e15d3\" type=\"number\" id=\"numBins\" value=\"5\" min=\"2\" max=\"20\">\n                </div>"
             },
             {
-                html: "<div id=\"customOptions\" style=\"display: none;\">\n                    <label>✂️ Custom Break Points (comma-separated):</label>\n                    <textarea id=\"customBreaks\" rows=\"2\" placeholder=\"Example: 20, 30, 40, 50\"></textarea>\n                    <div class=\"desc\" style=\"font-size: 0.75rem; margin-top: 5px;\">Values will be grouped into intervals based on these break points.</div>\n                </div>"
+                html: "<div id=\"customOptions\" style=\"display: none;\">\n                    <label>✂️ Custom Break Points (comma-separated):</label>\n                    <textarea id=\"customBreaks\" rows=\"2\" placeholder=\"Example: 20, 30, 40, 50\"></textarea>\n                    <div class=\"desc s-aba94b\">Values will be grouped into intervals based on these break points.</div>\n                </div>"
             }
         ],
         run: { id: "binningComputeBtn", text: "📦 Apply Binning + Steps" },

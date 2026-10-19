@@ -125,152 +125,152 @@ function computeChisquareWithSteps(inputText, alpha = 0.05) {
     }
     
     // Build steps HTML
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">🔬</span>
-                <h2 style="margin: 0;">Chi-Square Test of Independence</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">🔬</span>
+                <h2 class="s-f8a94d">Chi-Square Test of Independence</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Formula: χ² = Σ (Oᵢⱼ - Eᵢⱼ)² / Eᵢⱼ</p>
+            <p class="s-259079">Formula: χ² = Σ (Oᵢⱼ - Eᵢⱼ)² / Eᵢⱼ</p>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Data Summary</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #1a5490;">
-                    <div style="font-size: 12px; color: #6c757d;">Total Observations</div>
-                    <div style="font-size: 28px; font-weight: 700;">${grandTotal}</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📊 Data Summary</h3>
+            <div class="s-a7ffd4 gen-grid">
+                <div class="s-6ead76">
+                    <div class="s-42da0a">Total Observations</div>
+                    <div class="s-93c0a8">${grandTotal}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #28a745;">
-                    <div style="font-size: 12px; color: #6c757d;">Row Categories</div>
-                    <div style="font-size: 20px;">${rowCategories.length}</div>
-                    <div style="font-size: 11px;">${rowCategories.join(', ')}</div>
+                <div class="s-a31255">
+                    <div class="s-42da0a">Row Categories</div>
+                    <div class="s-23ee8e">${rowCategories.length}</div>
+                    <div class="s-d52d0d">${rowCategories.join(', ')}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #17a2b8;">
-                    <div style="font-size: 12px; color: #6c757d;">Column Categories</div>
-                    <div style="font-size: 20px;">${colCategories.length}</div>
-                    <div style="font-size: 11px;">${colCategories.join(', ')}</div>
+                <div class="s-d2b9d3">
+                    <div class="s-42da0a">Column Categories</div>
+                    <div class="s-23ee8e">${colCategories.length}</div>
+                    <div class="s-d52d0d">${colCategories.join(', ')}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #ffc107;">
-                    <div style="font-size: 12px; color: #6c757d;">Degrees of Freedom</div>
-                    <div style="font-size: 28px; font-weight: 700;">${df}</div>
-                    <div style="font-size: 11px;">= (${rowCategories.length}-1) × (${colCategories.length}-1)</div>
+                <div class="s-647a92">
+                    <div class="s-42da0a">Degrees of Freedom</div>
+                    <div class="s-93c0a8">${df}</div>
+                    <div class="s-d52d0d">= (${rowCategories.length}-1) × (${colCategories.length}-1)</div>
                 </div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; border: 1px solid #e9ecef; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #1a5490;">📋 Observed Frequencies (Oᵢⱼ)</h3>
-            <table style="border-collapse: collapse; width: 100%;">
+        <div class="s-8b4bbf">
+            <h3 class="s-f1a16d">📋 Observed Frequencies (Oᵢⱼ)</h3>
+            <table class="s-fb047b gen-sized">
                 <thead>
-                    <tr style="background: #1a5490; color: white;">
-                        <th style="padding: 10px; border: 1px solid #ddd;"></th>`;
+                    <tr class="s-e7b83b">
+                        <th class="s-35e61a"></th>`;
     for (let col of colCategories) {
-        steps += `<th style="padding: 10px; border: 1px solid #ddd;">${col}</th>`;
+        steps += `<th class="s-35e61a">${col}</th>`;
     }
-    steps += `<th style="padding: 10px; border: 1px solid #ddd;">Row Total</th>
+    steps += `<th class="s-35e61a">Row Total</th>
                     </tr>
                 </thead>
                 <tbody>`;
     for (let row of rowCategories) {
         steps += `<tr>
-            <th style="padding: 10px; border: 1px solid #ddd; background: #e8f4f8;">${row}</th>`;
+            <th class="s-784ef0">${row}</th>`;
         for (let col of colCategories) {
-            steps += `<td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${observed[row][col]}</td>`;
+            steps += `<td class="s-1caf01">${observed[row][col]}</td>`;
         }
-        steps += `<td style="padding: 10px; border: 1px solid #ddd; text-align: center; background: #e8f4f8;">${rowTotals[row]}</td>
+        steps += `<td class="s-959cae">${rowTotals[row]}</td>
         </tr>`;
     }
     steps += `<tr>
-        <th style="padding: 10px; border: 1px solid #ddd; background: #e8f4f8;">Column Total</th>`;
+        <th class="s-784ef0">Column Total</th>`;
     for (let col of colCategories) {
-        steps += `<td style="padding: 10px; border: 1px solid #ddd; text-align: center; background: #e8f4f8;">${colTotals[col]}</td>`;
+        steps += `<td class="s-959cae">${colTotals[col]}</td>`;
     }
-    steps += `<td style="padding: 10px; border: 1px solid #ddd; text-align: center; background: #e8f4f8;">${grandTotal}</td>
+    steps += `<td class="s-959cae">${grandTotal}</td>
     </tr>
                 </tbody>
             </table>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step-by-Step Calculation</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</div>
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step-by-Step Calculation</h3>
+            <div class="s-ca9e5c">
+                <div class="s-578789 gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">1</div>
                     <div><strong>Calculate Expected Frequencies</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-size: 13px;">Formula: Eᵢⱼ = (Row Total × Column Total) / Grand Total</div>`;
+                <div class="s-dd65a8">Formula: Eᵢⱼ = (Row Total × Column Total) / Grand Total</div>`;
     
     for (let row of rowCategories) {
         for (let col of colCategories) {
             const expected = (rowTotals[row] * colTotals[col]) / grandTotal;
-            steps += `<div style="margin-left: 40px; font-family: monospace; margin-top: 8px;">
+            steps += `<div class="s-cce988">
                 E(${row},${col}) = (${rowTotals[row]} × ${colTotals[col]}) / ${grandTotal} = ${expected.toFixed(4)}
             </div>`;
         }
     }
     
     steps += `</div>
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">2</div>
+            <div class="s-ca9e5c">
+                <div class="s-578789 gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">2</div>
                     <div><strong>Calculate Chi-Square Contributions</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-size: 13px;">Formula: (Oᵢⱼ - Eᵢⱼ)² / Eᵢⱼ</div>`;
+                <div class="s-dd65a8">Formula: (Oᵢⱼ - Eᵢⱼ)² / Eᵢⱼ</div>`;
     
     for (let row of rowCategories) {
         for (let col of colCategories) {
             const expected = (rowTotals[row] * colTotals[col]) / grandTotal;
             const observedVal = observed[row][col];
             const contribution = Math.pow(observedVal - expected, 2) / expected;
-            steps += `<div style="margin-left: 40px; font-family: monospace; margin-top: 8px;">
+            steps += `<div class="s-cce988">
                 (${observedVal} - ${expected.toFixed(4)})² / ${expected.toFixed(4)} = ${contribution.toFixed(6)}
             </div>`;
         }
     }
     
     steps += `</div>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</div>
+            <div class="s-6025fc">
+                <div class="s-578789 gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">3</div>
                     <div><strong>Sum All Contributions</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace; font-size: 18px; font-weight: 700;">
+                <div class="s-2f80ad">
                     χ² = ${chiSquare.toFixed(6)}
                 </div>
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Hypothesis Test Decision</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">Significance Level (α)</div>
-                    <div style="font-size: 20px; font-weight: 700;">${alpha} (${(1-alpha)*100}% Confidence)</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📊 Hypothesis Test Decision</h3>
+            <div class="s-0ad64d gen-grid">
+                <div class="s-63afdf">
+                    <div class="s-42da0a">Significance Level (α)</div>
+                    <div class="s-9d1896">${alpha} (${(1-alpha)*100}% Confidence)</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">Critical Value</div>
-                    <div style="font-size: 20px; font-weight: 700;">χ²_critical = ${criticalValue.toFixed(4)}</div>
+                <div class="s-63afdf">
+                    <div class="s-42da0a">Critical Value</div>
+                    <div class="s-9d1896">χ²_critical = ${criticalValue.toFixed(4)}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">p-value</div>
-                    <div style="font-size: 20px; font-weight: 700;">${pValue.toFixed(6)}</div>
+                <div class="s-63afdf">
+                    <div class="s-42da0a">p-value</div>
+                    <div class="s-9d1896">${pValue.toFixed(6)}</div>
                 </div>
             </div>
         </div>
         
         <div style="border-radius: 16px; padding: 20px; ${chiSquare > criticalValue ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
+            <h3 class="s-c7f0b4">📌 Test Conclusion</h3>
             <div><strong>Chi-Square Statistic:</strong> χ² = ${chiSquare.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> df = ${df}</div>
             <div><strong>Critical Value (α = ${alpha}):</strong> ${criticalValue.toFixed(4)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(6)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}<br>
                 <strong>Recommendation:</strong> ${recommendation}
             </div>
-            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+            <div class="s-8d2e44">
                 💡 <strong>Null Hypothesis (H₀):</strong> The row and column variables are independent (no association).<br>
                 💡 <strong>Alternative Hypothesis (H₁):</strong> The row and column variables are dependent (there is an association).
             </div>

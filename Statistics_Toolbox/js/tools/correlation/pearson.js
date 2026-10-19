@@ -86,111 +86,111 @@ function computePearsonWithSteps(xValues, yValues) {
     // Build table rows with perfect alignment
     let tableRows = '';
     for (let d of deviations) {
-        tableRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px 8px; text-align: center; font-weight: 500;">${d.i}</td>
-            <td style="padding: 10px 8px; text-align: center;">${d.x}</td>
-            <td style="padding: 10px 8px; text-align: center;">${d.y}</td>
-            <td style="padding: 10px 8px; text-align: center; color: #dc3545;">${d.devX.toFixed(4)}</td>
-            <td style="padding: 10px 8px; text-align: center; color: #dc3545;">${d.devY.toFixed(4)}</td>
-            <td style="padding: 10px 8px; text-align: center; color: #28a745;">${d.sqDevX.toFixed(4)}</td>
-            <td style="padding: 10px 8px; text-align: center; color: #28a745;">${d.sqDevY.toFixed(4)}</td>
-            <td style="padding: 10px 8px; text-align: center; background: #e8f4f8; font-weight: 600; color: #1f6392;">${d.product.toFixed(4)}</td>
+        tableRows += `<tr class="s-00049c">
+            <td class="s-508417">${d.i}</td>
+            <td class="s-dd18f4">${d.x}</td>
+            <td class="s-dd18f4">${d.y}</td>
+            <td class="s-f74f20">${d.devX.toFixed(4)}</td>
+            <td class="s-f74f20">${d.devY.toFixed(4)}</td>
+            <td class="s-ff4a94">${d.sqDevX.toFixed(4)}</td>
+            <td class="s-ff4a94">${d.sqDevY.toFixed(4)}</td>
+            <td class="s-2da758">${d.product.toFixed(4)}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 100%;">
+    let steps = `<div class="s-3c49f1">
         <!-- Header Section -->
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                <span style="font-size: 32px;">📐</span>
-                <h2 style="margin: 0; font-size: 24px; font-weight: 600;">Pearson Correlation Coefficient (r)</h2>
+        <div class="s-97b34b gen-pad">
+            <div class="s-94fb6b gen-flex">
+                <span class="s-1f18a8 gen-big">📐</span>
+                <h2 class="s-66423b">Pearson Correlation Coefficient (r)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">Formula: r = Σ[(xᵢ - x̄)(yᵢ - ȳ)] / √[Σ(xᵢ - x̄)² × Σ(yᵢ - ȳ)²]</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75; font-size: 13px;">Range: -1 to +1 | -1 = perfect negative, 0 = no linear, +1 = perfect positive</p>
+            <p class="s-3d1a65">Formula: r = Σ[(xᵢ - x̄)(yᵢ - ȳ)] / √[Σ(xᵢ - x̄)² × Σ(yᵢ - ȳ)²]</p>
+            <p class="s-1eab71">Range: -1 to +1 | -1 = perfect negative, 0 = no linear, +1 = perfect positive</p>
         </div>
         
         <!-- Data Summary Grid -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px; border: 1px solid #e9ecef;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490; font-size: 18px; display: flex; align-items: center; gap: 8px;"><span>📊</span> Data Summary</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-                <div style="background: white; padding: 12px 16px; border-radius: 12px; border-left: 4px solid #1a5490;">
-                    <div style="font-size: 12px; color: #6c757d;">Number of Pairs</div>
-                    <div style="font-size: 24px; font-weight: 700; color: #1a5490;">${n}</div>
+        <div class="s-d9cff0 gen-pad">
+            <h3 class="s-4b9a54 gen-flex"><span>📊</span> Data Summary</h3>
+            <div class="s-0ad64d gen-grid">
+                <div class="s-2b3ed5">
+                    <div class="s-42da0a">Number of Pairs</div>
+                    <div class="s-fad2be">${n}</div>
                 </div>
-                <div style="background: white; padding: 12px 16px; border-radius: 12px; border-left: 4px solid #28a745;">
-                    <div style="font-size: 12px; color: #6c757d;">Σx (Sum of X)</div>
-                    <div style="font-size: 20px; font-weight: 600;">${sumX.toFixed(4)}</div>
+                <div class="s-768837">
+                    <div class="s-42da0a">Σx (Sum of X)</div>
+                    <div class="s-0f4638">${sumX.toFixed(4)}</div>
                 </div>
-                <div style="background: white; padding: 12px 16px; border-radius: 12px; border-left: 4px solid #28a745;">
-                    <div style="font-size: 12px; color: #6c757d;">Σy (Sum of Y)</div>
-                    <div style="font-size: 20px; font-weight: 600;">${sumY.toFixed(4)}</div>
+                <div class="s-768837">
+                    <div class="s-42da0a">Σy (Sum of Y)</div>
+                    <div class="s-0f4638">${sumY.toFixed(4)}</div>
                 </div>
-                <div style="background: white; padding: 12px 16px; border-radius: 12px; border-left: 4px solid #17a2b8;">
-                    <div style="font-size: 12px; color: #6c757d;">Mean of X (x̄)</div>
-                    <div style="font-size: 18px; font-weight: 600;">${meanX.toFixed(6)}</div>
+                <div class="s-446f0e">
+                    <div class="s-42da0a">Mean of X (x̄)</div>
+                    <div class="s-e28abf">${meanX.toFixed(6)}</div>
                 </div>
-                <div style="background: white; padding: 12px 16px; border-radius: 12px; border-left: 4px solid #17a2b8;">
-                    <div style="font-size: 12px; color: #6c757d;">Mean of Y (ȳ)</div>
-                    <div style="font-size: 18px; font-weight: 600;">${meanY.toFixed(6)}</div>
+                <div class="s-446f0e">
+                    <div class="s-42da0a">Mean of Y (ȳ)</div>
+                    <div class="s-e28abf">${meanY.toFixed(6)}</div>
                 </div>
             </div>
         </div>
         
         <!-- Calculations Table -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; border: 1px solid #e9ecef; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #1a5490; color: #1a5490; font-size: 16px; display: flex; align-items: center; gap: 8px;"><span>📋</span> Deviation Calculations</h3>
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <div class="s-8b4bbf">
+            <h3 class="s-19a112 gen-flex"><span>📋</span> Deviation Calculations</h3>
+            <table class="s-306b2c gen-sized">
                 <thead>
-                    <tr style="background: #1a5490; color: white;">
-                        <th style="padding: 12px 8px; text-align: center;">i</th>
-                        <th style="padding: 12px 8px; text-align: center;">xᵢ</th>
-                        <th style="padding: 12px 8px; text-align: center;">yᵢ</th>
-                        <th style="padding: 12px 8px; text-align: center;">(xᵢ - x̄)</th>
-                        <th style="padding: 12px 8px; text-align: center;">(yᵢ - ȳ)</th>
-                        <th style="padding: 12px 8px; text-align: center;">(xᵢ - x̄)²</th>
-                        <th style="padding: 12px 8px; text-align: center;">(yᵢ - ȳ)²</th>
-                        <th style="padding: 12px 8px; text-align: center;">(xᵢ - x̄)(yᵢ - ȳ)</th>
+                    <tr class="s-e7b83b">
+                        <th class="s-b5a9ed">i</th>
+                        <th class="s-b5a9ed">xᵢ</th>
+                        <th class="s-b5a9ed">yᵢ</th>
+                        <th class="s-b5a9ed">(xᵢ - x̄)</th>
+                        <th class="s-b5a9ed">(yᵢ - ȳ)</th>
+                        <th class="s-b5a9ed">(xᵢ - x̄)²</th>
+                        <th class="s-b5a9ed">(yᵢ - ȳ)²</th>
+                        <th class="s-b5a9ed">(xᵢ - x̄)(yᵢ - ȳ)</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${tableRows}
-                    <tr style="background: #e9ecef; font-weight: 700; border-top: 2px solid #dee2e6;">
-                        <td colspan="5" style="padding: 12px 8px; text-align: right;">SUM →</td>
-                        <td style="padding: 12px 8px; text-align: center; color: #28a745;">${sumDevX.toFixed(4)}</td>
-                        <td style="padding: 12px 8px; text-align: center; color: #28a745;">${sumDevY.toFixed(4)}</td>
-                        <td style="padding: 12px 8px; text-align: center; background: #e8f4f8; color: #1a5490;">${sumProduct.toFixed(4)}</td>
+                    <tr class="s-859e2b">
+                        <td class="s-e629ee" colspan="5">SUM →</td>
+                        <td class="s-622a05">${sumDevX.toFixed(4)}</td>
+                        <td class="s-622a05">${sumDevY.toFixed(4)}</td>
+                        <td class="s-b19ffa">${sumProduct.toFixed(4)}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <!-- Calculation Steps -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490; font-size: 18px; display: flex; align-items: center; gap: 8px;"><span>🔢</span> Step-by-Step Calculation</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">1</div>
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-4b9a54 gen-flex"><span>🔢</span> Step-by-Step Calculation</h3>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-a4a5e4 gen-flex gen-sized">1</div>
                     <div><strong>Calculate Covariance Sum (Numerator)</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace; font-size: 14px;">
+                <div class="s-59ef88">
                     Σ(xᵢ - x̄)(yᵢ - ȳ) = ${sumProduct.toFixed(6)}
                 </div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">2</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-a4a5e4 gen-flex gen-sized">2</div>
                     <div><strong>Calculate Denominator</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace; font-size: 14px;">
+                <div class="s-59ef88">
                     √[Σ(xᵢ - x̄)² × Σ(yᵢ - ȳ)²] = √(${sumDevX.toFixed(6)} × ${sumDevY.toFixed(6)}) = ${denominator.toFixed(6)}
                 </div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">3</div>
+            <div class="s-6025fc">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-a4a5e4 gen-flex gen-sized">3</div>
                     <div><strong>Calculate Pearson r</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace; font-size: 16px; font-weight: 700; color: #1a5490;">
+                <div class="s-a17211">
                     r = ${sumProduct.toFixed(6)} / ${denominator.toFixed(6)} = ${r.toFixed(8)}
                 </div>
             </div>
@@ -198,12 +198,12 @@ function computePearsonWithSteps(xValues, yValues) {
         
         <!-- Interpretation Section -->
         <div style="border-radius: 16px; padding: 20px; ${Math.abs(r) >= 0.7 ? 'background: #d4edda; border-left: 6px solid #28a745;' : (Math.abs(r) >= 0.3 ? 'background: #fff3cd; border-left: 6px solid #ffc107;' : 'background: #f8d7da; border-left: 6px solid #dc3545;')}">
-            <h3 style="margin: 0 0 12px 0; font-size: 18px; display: flex; align-items: center; gap: 8px;"><span>📌</span> Interpretation</h3>
-            <div style="display: grid; gap: 10px;">
+            <h3 class="s-b140c2 gen-flex"><span>📌</span> Interpretation</h3>
+            <div class="s-45b8b7">
                 <div><strong>Correlation Coefficient:</strong> r = ${r.toFixed(6)} → <strong style="color: ${r > 0 ? '#28a745' : '#dc3545'};">${r > 0 ? 'Positive' : 'Negative'}</strong> correlation</div>
                 <div><strong>Strength:</strong> ${Math.abs(r) >= 0.9 ? '🔥 Very Strong' : (Math.abs(r) >= 0.7 ? '✅ Strong' : (Math.abs(r) >= 0.5 ? '📊 Moderate' : (Math.abs(r) >= 0.3 ? '⚠️ Weak' : '💨 Very Weak or No')))} ${Math.abs(r) >= 0.3 ? 'linear relationship' : 'linear correlation'}</div>
                 <div><strong>Coefficient of Determination (r²):</strong> ${(r*r).toFixed(6)} → ${((r*r)*100).toFixed(1)}% of variance in Y is explained by X</div>
-                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; color: #555;">
+                <div class="s-0d79c9">
                     💡 <strong>Practical Meaning:</strong> ${r > 0.7 ? 'Strong positive relationship - as X increases, Y tends to increase significantly.' : (r < -0.7 ? 'Strong negative relationship - as X increases, Y tends to decrease significantly.' : (Math.abs(r) > 0.3 ? 'Moderate relationship exists between X and Y.' : 'Little to no linear relationship between X and Y.'))}
                 </div>
             </div>

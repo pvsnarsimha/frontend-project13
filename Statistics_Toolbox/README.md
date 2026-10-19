@@ -9,7 +9,7 @@ browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offl
 ```
 Statistics.html            Page shell only: header, tabs, sidebars (static, accessible markup), script tags
 css/statlab.css            Styles, and the --tp-* palette tokens for result panels
-css/tool-panels.css        Classes generated from the inline styles of the largest tools (MANOVA, ANCOVA, Levene, Bartlett, Cook's distance, Bonferroni, Scheffe)
+css/tool-panels.css        s-xxxxxx classes generated from the inline styles of every tool (scripts/extract-styles.js), plus the hand-written tp-* state classes
 css/responsive.css         Phone / tablet rules (breakpoints 1100, 900, 640, 420)
 vendor/                    Chart.js and web fonts, self-hosted (see vendor/README.md for versions and licenses)
 js/core/numerics.js        Special functions, CDFs and exact critical values (normal, t, F, chi-square, beta,
@@ -22,12 +22,14 @@ js/core/charts.js          One variable per plotting tool for its Chart.js insta
 js/core/helpers.js         Input parsing (parseNumbersFromInput, parseValueGroupInput), parameter validation (validateDistributionParams),
                            binomialPMF, simpleRegressionCore and other helpers shared by several tools
 js/core/distributions.js   Mean, variance, skewness and kurtosis of the six distributions, defined once (distributionMoments)
+js/tools/preparation/distribution-analysis.js  generateDistributionAnalysis(): the "Visualize Data" text under the Histogram and Box Plot charts
 js/tools/<module>/*.js     One file per tool (about 100): renderXInterface(), computeX(), setupXLogic(); big tools add <tool>-steps.js (worked-solution HTML);
                            js/tools/regression/regression-html.js holds table rows shared by the simple-regression tools
                            modules: descriptive, preparation, probability, correlation, hypothesis, regression
 js/app.js                  Route table (STAT_ROUTES), tab/sidebar navigation, chart controls
 js/ui/*.js                 Presentation layer: navigation + search, answer tiles and worked-solution layout, form a11y
 scripts/sync-script-tags.js  Regenerates the <script> list in Statistics.html from the files under js/
+scripts/extract-styles.js  Moves static inline styles in js/tools into css/tool-panels.css (npm run sync:styles; --check is run by the tests)
 tests/                     Node tests (no dependencies) and a Playwright browser test
 ```
 
@@ -103,9 +105,14 @@ Rules for all tools:
   no DOM tree to walk), and there is no browser to execute the markup anyway; it exists only so calculation code can be tested in Node and must
   never be relied on for untrusted input. In a browser the sanitised path is always used, and a unit test checks that the fallback still strips handlers.
 * **One breakpoint file.** `css/responsive.css` is the only place that sets media-query breakpoints (including 900 px). Generated result markup
-  carries inline styles; `tagGeneratedLayout()` in `js/ui/solution.js` turns the layout-relevant ones into classes (`.gen-grid`,
-  `.gen-flex`, ...) and the responsive CSS targets those classes. The colour re-theming rules in `statlab.css` still match substrings of the
-  inline `style` attribute; replacing them means changing the tools that emit the inline colours (long-term clean-up).
+  carries layout in classes (`.gen-grid`, `.gen-flex`, `.gen-pad`, ...) and the responsive CSS targets those. `scripts/extract-styles.js` adds them
+  statically when it converts a tool's inline style; `tagGeneratedLayout()` in `js/ui/solution.js` still adds them to the few inline styles that
+  remain (colours chosen from the data at run time).
+* **Tool markup is styled by classes, not inline styles.** Run `npm run sync:styles` after writing a tool: every static `style="..."` in
+  `js/tools` becomes `class="s-xxxxxx"` and the rule is written to `css/tool-panels.css` (with the old palette re-theming applied through the
+  `--tp-*` tokens, so `statlab.css` no longer matches substrings of style attributes). Styles that depend on data (`style="color: ${color}"`) stay
+  inline; a style of the form `${cond ? 'css' : 'css'}` becomes `class="${cond ? 's-a' : 's-b'}"`. `display: none` stays inline because scripts toggle it.
+  The tests fail if a convertible inline style remains, a class has no rule, a rule is unused, or an inline style uses one of the old accent colours.
 * **Answer tiles keep a live value.** When the answer is split into tiles (`.kpi-row`, hidden from assistive technology), the plain value stays
   in the page, visually clipped, as the `role="status"` live region that announces "Answer: ...".
 

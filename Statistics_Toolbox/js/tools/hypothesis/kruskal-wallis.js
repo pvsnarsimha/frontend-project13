@@ -121,7 +121,7 @@ function computeKruskalWallisTest(inputText, alpha) {
         tieCorrection = 1 - (tieSum / (Math.pow(N, 3) - N));
         let oldH = H;
         H = H / tieCorrection;
-        tieCorrectionText = `<div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-top: 12px;">
+        tieCorrectionText = `<div class="s-85e0bb">
             <strong>⚠️ Tie Correction Applied:</strong><br>
             Ties detected: ${tieCounts.map(t => `${t} values`).join(', ')}<br>
             Correction factor = 1 - [Σ(t³ - t)] / (N³ - N)<br>
@@ -144,10 +144,10 @@ function computeKruskalWallisTest(inputText, alpha) {
     let rankTableRows = '';
     for (let idx = 0; idx < allValues.length; idx++) {
         rankTableRows += `<tr>
-            <td style="padding: 8px; text-align: center;">${idx + 1}</td>
-            <td style="padding: 8px; text-align: center;">${allValues[idx].value}</td>
-            <td style="padding: 8px; text-align: center;">${allValues[idx].group}</td>
-            <td style="padding: 8px; text-align: center; font-weight: bold;">${allValues[idx].rank}</td>
+            <td class="s-a7c3f4">${idx + 1}</td>
+            <td class="s-a7c3f4">${allValues[idx].value}</td>
+            <td class="s-a7c3f4">${allValues[idx].group}</td>
+            <td class="s-f8719c">${allValues[idx].rank}</td>
         </tr>`;
     }
     
@@ -156,41 +156,41 @@ function computeKruskalWallisTest(inputText, alpha) {
     for (let [group, sumRank] of rankSums) {
         let n_j = groupSizes.get(group);
         rankSumRows += `<tr>
-            <td style="padding: 8px;">${group}</td>
-            <td style="padding: 8px; text-align: center;">${n_j}</td>
-            <td style="padding: 8px; text-align: center;">${sumRank.toFixed(2)}</td>
-            <td style="padding: 8px; text-align: center;">${Math.pow(sumRank, 2).toFixed(2)}</td>
-            <td style="padding: 8px; text-align: center;">${Math.pow(sumRank, 2).toFixed(2)} / ${n_j} = ${(Math.pow(sumRank, 2) / n_j).toFixed(4)}</td>
+            <td class="s-641001">${group}</td>
+            <td class="s-a7c3f4">${n_j}</td>
+            <td class="s-a7c3f4">${sumRank.toFixed(2)}</td>
+            <td class="s-a7c3f4">${Math.pow(sumRank, 2).toFixed(2)}</td>
+            <td class="s-a7c3f4">${Math.pow(sumRank, 2).toFixed(2)} / ${n_j} = ${(Math.pow(sumRank, 2) / n_j).toFixed(4)}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">H</span>
-                <h2 style="margin: 0;">Kruskal-Wallis H Test</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">H</span>
+                <h2 class="s-f8a94d">Kruskal-Wallis H Test</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Non-parametric alternative to one-way ANOVA</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">H₀: All groups come from the same distribution | H₁: At least one group differs</p>
+            <p class="s-259079">Non-parametric alternative to one-way ANOVA</p>
+            <p class="s-20a400">H₀: All groups come from the same distribution | H₁: At least one group differs</p>
         </div>
         
         <!-- Formula Explanation Section -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📖 Understanding the Kruskal-Wallis H Formula</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace; font-size: 16px; text-align: center; margin-bottom: 20px;">
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📖 Understanding the Kruskal-Wallis H Formula</h3>
+            <div class="s-6025fc">
+                <div class="s-da7e8e">
                     <strong>H = (12 / [N(N+1)]) × Σ(Rⱼ²/nⱼ) - 3(N+1)</strong>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div style="background: #e8f4f8; padding: 12px; border-radius: 8px;">
+                <div class="s-800734 gen-grid">
+                    <div class="s-b93f03">
                         <strong>📊 Variables:</strong><br>
                         • <strong>N</strong> = Total number of observations across all groups<br>
                         • <strong>k</strong> = Number of groups<br>
                         • <strong>Rⱼ</strong> = Sum of ranks for group j<br>
                         • <strong>nⱼ</strong> = Number of observations in group j
                     </div>
-                    <div style="background: #e8f4f8; padding: 12px; border-radius: 8px;">
+                    <div class="s-b93f03">
                         <strong>🔢 Step-by-Step:</strong><br>
                         1. Rank ALL values together (smallest = rank 1)<br>
                         2. Sum ranks for each group (Rⱼ)<br>
@@ -200,32 +200,32 @@ function computeKruskalWallisTest(inputText, alpha) {
                     </div>
                 </div>
                 
-                <div style="margin-top: 16px; background: #d4edda; padding: 12px; border-radius: 8px;">
+                <div class="s-319ae0">
                     <strong>💡 Intuition:</strong> If groups are similar, ranks will be evenly distributed → H is small.<br>
                     If groups differ, ranks will cluster within groups → H is large.
                 </div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white;">📋 Step 1: Rank All Values Together</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead><tr style="background: #e9ecef;"><th>Position</th><th>Value</th><th>Group</th><th>Rank</th></tr></thead>
+        <div class="s-2311e6">
+            <h3 class="s-10bf27">📋 Step 1: Rank All Values Together</h3>
+            <table class="s-897d74 gen-sized">
+                <thead><tr class="s-bfd0ae"><th>Position</th><th>Value</th><th>Group</th><th>Rank</th></tr></thead>
                 <tbody>${rankTableRows}</tbody>
             </table>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white;">📋 Step 2: Calculate Rank Sums per Group (Rⱼ)</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead><tr style="background: #e9ecef;"><th>Group</th><th>nⱼ</th><th>Rⱼ (Sum of Ranks)</th><th>Rⱼ²</th><th>Rⱼ²/nⱼ</th></tr></thead>
+        <div class="s-2311e6">
+            <h3 class="s-10bf27">📋 Step 2: Calculate Rank Sums per Group (Rⱼ)</h3>
+            <table class="s-897d74 gen-sized">
+                <thead><tr class="s-bfd0ae"><th>Group</th><th>nⱼ</th><th>Rⱼ (Sum of Ranks)</th><th>Rⱼ²</th><th>Rⱼ²/nⱼ</th></tr></thead>
                 <tbody>${rankSumRows}</tbody>
             </table>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 3: Calculate H Statistic</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 3: Calculate H Statistic</h3>
+            <div class="s-6025fc">
                 <strong>Formula:</strong> H = (12 / [N(N+1)]) × Σ(Rⱼ²/nⱼ) - 3(N+1)<br><br>
                 
                 <strong>Step 3a: Calculate Σ(Rⱼ²/nⱼ)</strong><br>
@@ -241,11 +241,11 @@ function computeKruskalWallisTest(inputText, alpha) {
                 3(${N}+1) = 3 × ${N+1} = ${3 * (N+1)}<br><br>
                 
                 <strong>Step 3e: Final H</strong><br>
-                H = ${((12 / (N * (N+1))) * rawH).toFixed(4)} - ${3 * (N+1)} = <strong style="color: #1a5490; font-size: 18px;">${H.toFixed(6)}</strong>
+                H = ${((12 / (N * (N+1))) * rawH).toFixed(4)} - ${3 * (N+1)} = <strong class="s-bbce95">${H.toFixed(6)}</strong>
                 
                 ${tieCorrectionText}
                 
-                <div style="margin-top: 16px;">
+                <div class="s-c803e1">
                     <strong>Degrees of Freedom:</strong> df = k - 1 = ${k} - 1 = ${df}<br>
                     <strong>Critical value (α = ${alpha}):</strong> ${criticalValue.toFixed(6)}<br>
                     <strong>p-value:</strong> ${pValue.toFixed(8)}
@@ -253,12 +253,12 @@ function computeKruskalWallisTest(inputText, alpha) {
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
+        <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Test Conclusion</h3>
             <div><strong>H Statistic:</strong> ${H.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> ${df}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}<br>
                 ${rejectH0 ? '✓ p-value < α → Reject H₀' : '✗ p-value ≥ α → Cannot reject H₀'}

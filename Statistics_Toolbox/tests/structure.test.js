@@ -239,30 +239,51 @@ test('the HTML sanitiser treats ping like the other URL attributes', () => {
     assert.match(src.match(/HTML_URL_ATTRIBUTES = new Set\(\[([^\]]*)\]/)[1], /'ping'/);
 });
 
-test('every accent colour the tools use inline is mapped onto the result-panel palette tokens', () => {
+test('result-panel palette tokens exist and no inline style in a tool still uses a retired accent colour', () => {
     const css = fs.readFileSync(path.join(ROOT, 'css', 'statlab.css'), 'utf8');
-    assert.match(css, /--tp-accent:/);
-    for (const hex of ['#1a5490', '#d4380d', '#e65100', '#2e7d32', '#6a1b9a']) {
-        assert.ok(css.includes(`color: ${hex}"]`), `no re-theme rule for text colour ${hex}`);
-        assert.ok(css.includes(`background: ${hex}"]`), `no re-theme rule for background ${hex}`);
+    for (const token of ['--tp-accent', '--tp-banner', '--tp-head', '--tp-head-soft', '--tp-tint', '--tp-tint-line', '--tp-card']) assert.ok(css.includes(token + ':'), `${token} is not defined`);
+    assert.ok(!/\[style\*=/.test(css), 'statlab.css must not match substrings of style attributes (use classes from css/tool-panels.css)');
+    const { toolFiles } = require('../scripts/extract-styles');
+    const offenders = toolFiles().filter(f => /\sstyle\s*=\s*\\?["'][^"']*#(1a5490|d4380d|e65100|2e7d32|6a1b9a)/i.test(fs.readFileSync(f, 'utf8'))).map(f => path.relative(ROOT, f));
+    assert.deepEqual(offenders, [], 'these inline styles use an accent colour that only a class can re-theme');
+});
+
+// Tool markup is styled by classes in css/tool-panels.css. scripts/extract-styles.js converts inline styles and keeps the CSS in step.
+test('tool files carry no convertible inline style, every s-xxxxxx class has a rule and every rule is used (npm run sync:styles)', () => {
+    const { check } = require('../scripts/extract-styles');
+    const r = check();
+    assert.deepEqual(r.inline, [], 'run: node scripts/extract-styles.js');
+    assert.deepEqual(r.missingRule, [], 'a class is used but css/tool-panels.css has no rule for it');
+    assert.deepEqual(r.orphanRule, [], 'css/tool-panels.css has rules no tool uses; run: node scripts/extract-styles.js');
+    assert.ok(html.includes('css/tool-panels.css'), 'Statistics.html must load css/tool-panels.css');
+});
+
+test('every generated rule in css/tool-panels.css is one well-formed declaration block (no leaked JavaScript)', () => {
+    const rules = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8').split('\n').filter(l => l.startsWith('#interfaceRoot'));
+    assert.ok(rules.length > 500);
+    const bad = rules.filter(l => !/^[^{}]*\{[^{}]*\}$/.test(l) || /\+|\$|"|\\|`/.test(l.replace(/font-family:[^;]*/g, '')) || /[^\w\s]'|'[^\w\s]/.test(l.replace(/font-family:[^;]*/g, '')));
+    assert.deepEqual(bad.slice(0, 5), []);
+});
+
+test('every tp-* class a tool names has a hand-written rule in css/tool-panels.css', () => {
+    const css = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8');
+    const defined = new Set([...css.matchAll(/#interfaceRoot \.([\w-]+)/g)].map(m => m[1]));
+    const { toolFiles } = require('../scripts/extract-styles');
+    for (const f of toolFiles()) {
+        const src = fs.readFileSync(f, 'utf8');
+        const used = [...src.matchAll(/'(tp-[\w-]+)'/g)].map(m => m[1]);
+        assert.deepEqual(used.filter(c => !defined.has(c)), [], `${path.relative(ROOT, f)} uses tp-* classes with no CSS rule`);
     }
 });
 
-// The largest tools were migrated from inline style="…" attributes to classes defined in css/tool-panels.css.
-const MIGRATED_TOOLS = ['hypothesis/manova', 'hypothesis/ancova', 'hypothesis/levene', 'hypothesis/bartlett', 'correlation/cooks-distance', 'hypothesis/bonferroni', 'hypothesis/scheffe'];
-
-test('migrated tools carry no inline styles and every class they use is defined in css/tool-panels.css', () => {
-    const css = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8');
-    const defined = new Set([...css.matchAll(/#interfaceRoot \.([\w-]+)/g)].map(m => m[1]));
-    assert.ok(html.includes('css/tool-panels.css'), 'Statistics.html must load css/tool-panels.css');
-    for (const tool of MIGRATED_TOOLS) {
-        // a tool may be split into <tool>.js (interface, calculation, setup) and <tool>-steps.js (worked-solution HTML)
-        const src = ['.js', '-steps.js'].map(ext => path.join(ROOT, 'js', 'tools', tool + ext)).filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8')).join('\n');
-        assert.ok(!/\sstyle\s*=/.test(src), `${tool} still has an inline style attribute`);
-        const used = [...src.matchAll(/\b(s-[0-9a-f]{6})\b/g)].map(m => m[1]).concat([...src.matchAll(/'(tp-[\w-]+)'/g)].map(m => m[1]));
-        const missing = used.filter(c => !defined.has(c));
-        assert.deepEqual(missing, [], `${tool}.js uses classes with no CSS rule`);
-    }
+test('the extractor reproduces the old statlab.css re-theming when it writes a rule', () => {
+    const { buildRule } = require('../scripts/extract-styles');
+    const banner = buildRule('div', 'background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white;').css.join('\n');
+    assert.match(banner, /var\(--tp-banner\) !important/);
+    const head = buildRule('tr', 'background: #1a5490;').css.join('\n');
+    assert.match(head, /background: var\(--tp-head\) !important/);
+    assert.match(head, / th \{ color: #fff !important; background: transparent !important; \}/);
+    assert.equal(buildRule('p', 'margin: 0;').css.length, 1, 'a style with no palette colour gets a plain rule');
 });
 
 test('split tools keep the calculation and the worked-solution HTML in separate files', () => {

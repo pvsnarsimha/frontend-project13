@@ -67,14 +67,14 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
         numerator += xDev * yDev;
         denominator += xDev * xDev;
         
-        deviationRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]} - ${meanX.toFixed(4)} = ${xDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]} - ${meanY.toFixed(4)} = ${yDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${xDev.toFixed(4)} × ${yDev.toFixed(4)} = ${(xDev * yDev).toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">(${xDev.toFixed(4)})² = ${(xDev * xDev).toFixed(4)}</td>
+        deviationRows += `<tr class="s-00049c">
+            <td class="s-618bb3">${i+1}</td>
+            <td class="s-618bb3">${xValues[i]}</td>
+            <td class="s-618bb3">${yValues[i]}</td>
+            <td class="s-618bb3">${xValues[i]} - ${meanX.toFixed(4)} = ${xDev.toFixed(4)}</td>
+            <td class="s-618bb3">${yValues[i]} - ${meanY.toFixed(4)} = ${yDev.toFixed(4)}</td>
+            <td class="s-618bb3">${xDev.toFixed(4)} × ${yDev.toFixed(4)} = ${(xDev * yDev).toFixed(4)}</td>
+            <td class="s-618bb3">(${xDev.toFixed(4)})² = ${(xDev * xDev).toFixed(4)}</td>
         </tr>`;
     }
     
@@ -104,17 +104,17 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
         ssRes += resContribution;
         ssTot += totContribution;
         
-        predictionsRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center; font-family: monospace;">${intercept.toFixed(4)} + ${slope.toFixed(4)}×${xValues[i]} = ${yPred.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${yPred.toFixed(4)} - ${meanY.toFixed(4)} = ${regDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">(${regDev.toFixed(4)})² = ${regContribution.toFixed(4)}</td>
+        predictionsRows += `<tr class="s-00049c">
+            <td class="s-618bb3">${i+1}</td>
+            <td class="s-618bb3">${xValues[i]}</td>
+            <td class="s-618bb3">${yValues[i]}</td>
+            <td class="s-d9b386">${intercept.toFixed(4)} + ${slope.toFixed(4)}×${xValues[i]} = ${yPred.toFixed(4)}</td>
+            <td class="s-618bb3">${yPred.toFixed(4)} - ${meanY.toFixed(4)} = ${regDev.toFixed(4)}</td>
+            <td class="s-618bb3">(${regDev.toFixed(4)})² = ${regContribution.toFixed(4)}</td>
             <td style="padding: 10px; text-align: center; ${resDev >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">${resDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">(${resDev.toFixed(4)})² = ${resContribution.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]} - ${meanY.toFixed(4)} = ${totDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">(${totDev.toFixed(4)})² = ${totContribution.toFixed(4)}</td>
+            <td class="s-618bb3">(${resDev.toFixed(4)})² = ${resContribution.toFixed(4)}</td>
+            <td class="s-618bb3">${yValues[i]} - ${meanY.toFixed(4)} = ${totDev.toFixed(4)}</td>
+            <td class="s-618bb3">(${totDev.toFixed(4)})² = ${totContribution.toFixed(4)}</td>
         </tr>`;
     }
     
@@ -150,107 +150,107 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
     const rejectH0 = fStatistic > criticalValue;
     
     // ========== Build complete HTML with all detailed steps ==========
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    let steps = `<div class="s-9217e5">
         
         <!-- HEADER -->
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 30px;">
-            <h1 style="margin: 0 0 10px 0;">F-Test for Overall Model Significance</h1>
-            <p style="margin: 0; opacity: 0.95;">F = (SS<sub>reg</sub> / k) / (SS<sub>res</sub> / (n - k - 1))</p>
-            <p style="margin: 8px 0 0 0; font-size: 14px;">H₀: β₁ = 0 (Model explains no variance) | H₁: β₁ ≠ 0 (Model is useful)</p>
+        <div class="s-954e6d gen-pad">
+            <h1 class="s-b82e54">F-Test for Overall Model Significance</h1>
+            <p class="s-cf6932">F = (SS<sub>reg</sub> / k) / (SS<sub>res</sub> / (n - k - 1))</p>
+            <p class="s-b5eb65">H₀: β₁ = 0 (Model explains no variance) | H₁: β₁ ≠ 0 (Model is useful)</p>
         </div>
         
         <!-- ========== PART 1: CALCULATE REGRESSION COEFFICIENTS ========== -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📐 PART 1: Calculate Regression Coefficients (β̂₀, β̂₁)</h2>
+        <div class="s-bfd155 gen-pad">
+            <h2 class="s-2ce3ad">📐 PART 1: Calculate Regression Coefficients (β̂₀, β̂₁)</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">Step 1.1: Calculate Means</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+            <div class="s-2a0883 gen-pad">
+                <h3 class="s-6efabd">Step 1.1: Calculate Means</h3>
+                <div class="s-87555e gen-grid">
+                    <div class="s-ee59d6">
                         <strong>x̄ (Mean of X):</strong><br>
                         x̄ = Σx / n = ${sumX} / ${n} = <strong>${meanX.toFixed(6)}</strong>
                     </div>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <div class="s-ee59d6">
                         <strong>ȳ (Mean of Y):</strong><br>
                         ȳ = Σy / n = ${sumY} / ${n} = <strong>${meanY.toFixed(6)}</strong>
                     </div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">Step 1.2: Calculate Deviations and Cross-Products</h3>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <div class="s-2a0883 gen-pad">
+                <h3 class="s-6efabd">Step 1.2: Calculate Deviations and Cross-Products</h3>
+                <div class="s-01a9b9">
+                    <table class="s-776a1d gen-sized">
                         <thead>
-                            <tr style="background: #1a5490; color: white;">
-                                <th style="padding: 8px;">i</th>
-                                <th style="padding: 8px;">x</th>
-                                <th style="padding: 8px;">y</th>
-                                <th style="padding: 8px;">x - x̄</th>
-                                <th style="padding: 8px;">y - ȳ</th>
-                                <th style="padding: 8px;">(x - x̄)(y - ȳ)</th>
-                                <th style="padding: 8px;">(x - x̄)²</th>
+                            <tr class="s-e7b83b">
+                                <th class="s-939795">i</th>
+                                <th class="s-939795">x</th>
+                                <th class="s-939795">y</th>
+                                <th class="s-939795">x - x̄</th>
+                                <th class="s-939795">y - ȳ</th>
+                                <th class="s-939795">(x - x̄)(y - ȳ)</th>
+                                <th class="s-939795">(x - x̄)²</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${deviationRows}
-                            <tr style="background: #e9ecef; font-weight: 700;">
-                                <td colspan="5" style="padding: 8px; text-align: right;">SUM →</td>
-                                <td style="padding: 8px; text-align: center; background: #1a5490; color: white;">${numerator.toFixed(4)}</td>
-                                <td style="padding: 8px; text-align: center; background: #1a5490; color: white;">${denominator.toFixed(4)}</td>
+                            <tr class="s-767496">
+                                <td class="s-ebe99d" colspan="5">SUM →</td>
+                                <td class="s-8cdb56">${numerator.toFixed(4)}</td>
+                                <td class="s-8cdb56">${denominator.toFixed(4)}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <h3 style="color: #1a5490;">Step 1.3: Calculate Slope and Intercept</h3>
+            <div class="s-6fab3a gen-pad">
+                <h3 class="s-6efabd">Step 1.3: Calculate Slope and Intercept</h3>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <div class="s-71ba82">
                     <strong>📐 Slope (β̂₁) = Σ(x - x̄)(y - ȳ) / Σ(x - x̄)²</strong><br>
                     β̂₁ = ${numerator.toFixed(4)} / ${denominator.toFixed(4)}<br>
-                    <strong style="color: #1a5490;">β̂₁ = ${slope.toFixed(8)}</strong>
+                    <strong class="s-f342b5">β̂₁ = ${slope.toFixed(8)}</strong>
                 </div>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <div class="s-ee59d6">
                     <strong>📐 Intercept (β̂₀) = ȳ - β̂₁·x̄</strong><br>
                     β̂₀ = ${meanY.toFixed(4)} - (${slope.toFixed(4)} × ${meanX.toFixed(4)})<br>
                     β̂₀ = ${meanY.toFixed(4)} - ${(slope * meanX).toFixed(4)}<br>
-                    <strong style="color: #1a5490;">β̂₀ = ${intercept.toFixed(8)}</strong>
+                    <strong class="s-f342b5">β̂₀ = ${intercept.toFixed(8)}</strong>
                 </div>
                 
-                <div style="margin-top: 15px; background: #d4edda; padding: 12px; border-radius: 8px; text-align: center;">
+                <div class="s-6d6368">
                     <strong>Regression Equation:</strong> ŷ = ${intercept.toFixed(4)} + ${slope.toFixed(4)}·x
                 </div>
             </div>
         </div>
         
         <!-- ========== PART 2: ANOVA DECOMPOSITION (ŷ, SSreg, SSres, SStot) ========== -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📐 PART 2: ANOVA Decomposition</h2>
+        <div class="s-95d04a gen-pad">
+            <h2 class="s-2ce3ad">📐 PART 2: ANOVA Decomposition</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">Step 2.1: Calculate Predicted Values (ŷ), Residuals, and Sums of Squares</h3>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+            <div class="s-2a0883 gen-pad">
+                <h3 class="s-6efabd">Step 2.1: Calculate Predicted Values (ŷ), Residuals, and Sums of Squares</h3>
+                <div class="s-01a9b9">
+                    <table class="s-1d014b gen-sized">
                         <thead>
-                            <tr style="background: #1a5490; color: white;">
-                                <th rowspan="2" style="padding: 8px;">i</th>
-                                <th rowspan="2" style="padding: 8px;">x</th>
-                                <th rowspan="2" style="padding: 8px;">y</th>
-                                <th rowspan="2" style="padding: 8px;">ŷ = β₀ + β₁·x</th>
-                                <th colspan="2" style="padding: 8px;">Explained (ŷ - ȳ)</th>
-                                <th colspan="2" style="padding: 8px;">Residual (y - ŷ)</th>
-                                <th colspan="2" style="padding: 8px;">Total (y - ȳ)</th>
+                            <tr class="s-e7b83b">
+                                <th class="s-939795" rowspan="2">i</th>
+                                <th class="s-939795" rowspan="2">x</th>
+                                <th class="s-939795" rowspan="2">y</th>
+                                <th class="s-939795" rowspan="2">ŷ = β₀ + β₁·x</th>
+                                <th class="s-939795" colspan="2">Explained (ŷ - ȳ)</th>
+                                <th class="s-939795" colspan="2">Residual (y - ŷ)</th>
+                                <th class="s-939795" colspan="2">Total (y - ȳ)</th>
                             </tr>
-                            <tr style="background: #1a5490; color: white;">
-                                <th style="padding: 8px;">Deviation</th>
-                                <th style="padding: 8px;">(Deviation)²</th>
-                                <th style="padding: 8px;">Deviation</th>
-                                <th style="padding: 8px;">(Deviation)²</th>
-                                <th style="padding: 8px;">Deviation</th>
-                                <th style="padding: 8px;">(Deviation)²</th>
+                            <tr class="s-e7b83b">
+                                <th class="s-939795">Deviation</th>
+                                <th class="s-939795">(Deviation)²</th>
+                                <th class="s-939795">Deviation</th>
+                                <th class="s-939795">(Deviation)²</th>
+                                <th class="s-939795">Deviation</th>
+                                <th class="s-939795">(Deviation)²</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -260,27 +260,27 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <h3 style="color: #1a5490;">Step 2.2: Sum of Squares Summary</h3>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+            <div class="s-6fab3a gen-pad">
+                <h3 class="s-6efabd">Step 2.2: Sum of Squares Summary</h3>
+                <div class="s-97d0e6 gen-grid gen-grid-many">
+                    <div class="s-380180">
                         <strong>SS<sub>reg</sub> (Explained)</strong><br>
                         = Σ(ŷ - ȳ)²<br>
-                        = <strong style="color: #1a5490;">${ssReg.toFixed(6)}</strong>
+                        = <strong class="s-f342b5">${ssReg.toFixed(6)}</strong>
                     </div>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="s-380180">
                         <strong>SS<sub>res</sub> (Residual)</strong><br>
                         = Σ(y - ŷ)²<br>
-                        = <strong style="color: #dc3545;">${ssRes.toFixed(6)}</strong>
+                        = <strong class="s-c451e2">${ssRes.toFixed(6)}</strong>
                     </div>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div class="s-380180">
                         <strong>SS<sub>tot</sub> (Total)</strong><br>
                         = Σ(y - ȳ)²<br>
-                        = <strong style="color: #1a5490;">${ssTot.toFixed(6)}</strong>
+                        = <strong class="s-f342b5">${ssTot.toFixed(6)}</strong>
                     </div>
                 </div>
                 
-                <div style="margin-top: 15px; background: #d4edda; padding: 12px; border-radius: 8px; text-align: center;">
+                <div class="s-6d6368">
                     <strong>Check: SS<sub>tot</sub> = SS<sub>reg</sub> + SS<sub>res</sub></strong><br>
                     ${ssTot.toFixed(4)} = ${ssReg.toFixed(4)} + ${ssRes.toFixed(4)} = ${(ssReg + ssRes).toFixed(4)} ✅
                 </div>
@@ -288,159 +288,159 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
         </div>
         
         <!-- ========== PART 3: DEGREES OF FREEDOM ========== -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📐 PART 3: Degrees of Freedom</h2>
+        <div class="s-bfd155 gen-pad">
+            <h2 class="s-2ce3ad">📐 PART 3: Degrees of Freedom</h2>
             
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                <div style="background: white; border-radius: 12px; padding: 15px; text-align: center;">
+            <div class="s-97d0e6 gen-grid gen-grid-many">
+                <div class="s-64b6dd">
                     <strong>df<sub>reg</sub> (Regression)</strong><br>
                     = k = number of predictors<br>
-                    = <strong style="color: #1a5490;">${dfReg}</strong>
+                    = <strong class="s-f342b5">${dfReg}</strong>
                 </div>
-                <div style="background: white; border-radius: 12px; padding: 15px; text-align: center;">
+                <div class="s-64b6dd">
                     <strong>df<sub>res</sub> (Residual)</strong><br>
                     = n - k - 1<br>
-                    = ${n} - 1 - 1 = <strong style="color: #1a5490;">${dfRes}</strong>
+                    = ${n} - 1 - 1 = <strong class="s-f342b5">${dfRes}</strong>
                 </div>
-                <div style="background: white; border-radius: 12px; padding: 15px; text-align: center;">
+                <div class="s-64b6dd">
                     <strong>df<sub>tot</sub> (Total)</strong><br>
                     = n - 1<br>
-                    = ${n} - 1 = <strong style="color: #1a5490;">${dfTot}</strong>
+                    = ${n} - 1 = <strong class="s-f342b5">${dfTot}</strong>
                 </div>
             </div>
             
-            <div style="margin-top: 15px; background: #fff3cd; padding: 12px; border-radius: 8px;">
+            <div class="s-656c80">
                 <strong>Check: df<sub>tot</sub> = df<sub>reg</sub> + df<sub>res</sub></strong><br>
                 ${dfTot} = ${dfReg} + ${dfRes} = ${dfReg + dfRes} ✅
             </div>
         </div>
         
         <!-- ========== PART 4: MEAN SQUARES ========== -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📐 PART 4: Mean Squares</h2>
+        <div class="s-95d04a gen-pad">
+            <h2 class="s-2ce3ad">📐 PART 4: Mean Squares</h2>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div style="background: white; border-radius: 12px; padding: 20px; text-align: center;">
+            <div class="s-87555e gen-grid">
+                <div class="s-20865b gen-pad">
                     <strong>MS<sub>reg</sub> (Mean Square Regression)</strong><br>
                     = SS<sub>reg</sub> / df<sub>reg</sub><br>
                     = ${ssReg.toFixed(4)} / ${dfReg}<br>
-                    = <strong style="color: #1a5490;">${msReg.toFixed(6)}</strong>
+                    = <strong class="s-f342b5">${msReg.toFixed(6)}</strong>
                 </div>
-                <div style="background: white; border-radius: 12px; padding: 20px; text-align: center;">
+                <div class="s-20865b gen-pad">
                     <strong>MS<sub>res</sub> (Mean Square Residual)</strong><br>
                     = SS<sub>res</sub> / df<sub>res</sub><br>
                     = ${ssRes.toFixed(4)} / ${dfRes}<br>
-                    = <strong style="color: #1a5490;">${msRes.toFixed(6)}</strong>
+                    = <strong class="s-f342b5">${msRes.toFixed(6)}</strong>
                 </div>
             </div>
         </div>
         
         <!-- ========== PART 5: R² AND ADJUSTED R² ========== -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📐 PART 5: R² and Adjusted R²</h2>
+        <div class="s-bfd155 gen-pad">
+            <h2 class="s-2ce3ad">📐 PART 5: R² and Adjusted R²</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+            <div class="s-41df42 gen-pad">
                 <strong>📐 R² (Coefficient of Determination)</strong><br>
                 R² = SS<sub>reg</sub> / SS<sub>tot</sub><br>
                 R² = ${ssReg.toFixed(4)} / ${ssTot.toFixed(4)}<br>
-                <strong style="color: #1a5490;">R² = ${rSquared.toFixed(8)} (${(rSquared * 100).toFixed(2)}%)</strong><br>
-                <span style="font-size: 13px;">→ ${(rSquared * 100).toFixed(1)}% of the variance in Y is explained by X</span>
+                <strong class="s-f342b5">R² = ${rSquared.toFixed(8)} (${(rSquared * 100).toFixed(2)}%)</strong><br>
+                <span class="s-a2bbfd">→ ${(rSquared * 100).toFixed(1)}% of the variance in Y is explained by X</span>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
+            <div class="s-6fab3a gen-pad">
                 <strong>📐 Adjusted R² (Penalized for number of predictors)</strong><br>
                 R²<sub>adj</sub> = 1 - (1 - R²) × (n - 1) / (n - k - 1)<br>
                 R²<sub>adj</sub> = 1 - (1 - ${rSquared.toFixed(6)}) × (${n} - 1) / (${n} - 2)<br>
                 R²<sub>adj</sub> = 1 - (${(1 - rSquared).toFixed(6)}) × ${(n-1)} / ${(n-2)}<br>
                 R²<sub>adj</sub> = 1 - ${((1 - rSquared) * (n-1) / (n-2)).toFixed(6)}<br>
-                <strong style="color: #1a5490;">R²<sub>adj</sub> = ${adjRSquared.toFixed(8)}</strong>
+                <strong class="s-f342b5">R²<sub>adj</sub> = ${adjRSquared.toFixed(8)}</strong>
             </div>
         </div>
         
         <!-- ========== PART 6: F-STATISTIC CALCULATION ========== -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📐 PART 6: F-Statistic Calculation</h2>
+        <div class="s-95d04a gen-pad">
+            <h2 class="s-2ce3ad">📐 PART 6: F-Statistic Calculation</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <div style="font-family: monospace; font-size: 16px; text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            <div class="s-6fab3a gen-pad">
+                <div class="s-22da77 gen-pad">
                     <strong>F = MS<sub>reg</sub> / MS<sub>res</sub></strong><br>
                     F = ${msReg.toFixed(6)} / ${msRes.toFixed(6)}<br>
-                    <strong style="color: #1a5490; font-size: 28px;">F = ${fStatistic.toFixed(8)}</strong>
+                    <strong class="s-6fccf1">F = ${fStatistic.toFixed(8)}</strong>
                 </div>
             </div>
         </div>
         
         <!-- ========== PART 7: ANOVA SUMMARY TABLE ========== -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; overflow-x: auto; border: 2px solid #1a5490;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white; text-align: center;">📊 ANOVA Summary Table</h3>
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-5b0d25">
+            <h3 class="s-ba9de1">📊 ANOVA Summary Table</h3>
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef;">
-                        <th style="padding: 12px;">Source</th>
-                        <th style="padding: 12px;">Sum of Squares (SS)</th>
-                        <th style="padding: 12px;">df</th>
-                        <th style="padding: 12px;">Mean Square (MS)</th>
-                        <th style="padding: 12px;">F-statistic</th>
-                        <th style="padding: 12px;">p-value</th>
+                    <tr class="s-bfd0ae">
+                        <th class="s-d66e1c">Source</th>
+                        <th class="s-d66e1c">Sum of Squares (SS)</th>
+                        <th class="s-d66e1c">df</th>
+                        <th class="s-d66e1c">Mean Square (MS)</th>
+                        <th class="s-d66e1c">F-statistic</th>
+                        <th class="s-d66e1c">p-value</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px; font-weight: bold;">Regression (Explained)</td>
-                        <td style="text-align: center;">${ssReg.toFixed(4)}</td>
-                        <td style="text-align: center;">${dfReg}</td>
-                        <td style="text-align: center;">${msReg.toFixed(4)}</td>
-                        <td rowspan="2" style="text-align: center; vertical-align: middle; font-weight: 700; font-size: 20px; background: #e8f4f8;">${fStatistic.toFixed(6)}</td>
-                        <td rowspan="2" style="text-align: center; vertical-align: middle;">${pValue.toFixed(6)}</td>
+                    <tr class="s-b490b8">
+                        <td class="s-8136fa">Regression (Explained)</td>
+                        <td class="s-02528c">${ssReg.toFixed(4)}</td>
+                        <td class="s-02528c">${dfReg}</td>
+                        <td class="s-02528c">${msReg.toFixed(4)}</td>
+                        <td class="s-3baba2" rowspan="2">${fStatistic.toFixed(6)}</td>
+                        <td class="s-02f22d" rowspan="2">${pValue.toFixed(6)}</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px; font-weight: bold;">Residual (Error)</td>
-                        <td style="text-align: center;">${ssRes.toFixed(4)}</td>
-                        <td style="text-align: center;">${dfRes}</td>
-                        <td style="text-align: center;">${msRes.toFixed(4)}</td>
+                    <tr class="s-b490b8">
+                        <td class="s-8136fa">Residual (Error)</td>
+                        <td class="s-02528c">${ssRes.toFixed(4)}</td>
+                        <td class="s-02528c">${dfRes}</td>
+                        <td class="s-02528c">${msRes.toFixed(4)}</td>
                     </tr>
-                    <tr style="background: #e9ecef;">
-                        <td style="padding: 12px; font-weight: bold;">Total</td>
-                        <td style="text-align: center;">${ssTot.toFixed(4)}</td>
-                        <td style="text-align: center;">${dfTot}</td>
-                        <td style="text-align: center;">—</td>
-                        <td style="text-align: center;">—</td>
-                        <td style="text-align: center;">—</td>
+                    <tr class="s-bfd0ae">
+                        <td class="s-8136fa">Total</td>
+                        <td class="s-02528c">${ssTot.toFixed(4)}</td>
+                        <td class="s-02528c">${dfTot}</td>
+                        <td class="s-02528c">—</td>
+                        <td class="s-02528c">—</td>
+                        <td class="s-02528c">—</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <!-- ========== PART 8: CONCLUSION ========== -->
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Conclusion</h3>
+        <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Conclusion</h3>
             
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
-                <div style="background: white; border-radius: 8px; padding: 10px; text-align: center;">
+            <div class="s-7aca59 gen-grid gen-grid-many">
+                <div class="s-7de73c">
                     <strong>F-statistic:</strong><br>${fStatistic.toFixed(4)}
                 </div>
-                <div style="background: white; border-radius: 8px; padding: 10px; text-align: center;">
+                <div class="s-7de73c">
                     <strong>Critical F (α=${alpha}):</strong><br>${criticalValue.toFixed(4)}
                 </div>
-                <div style="background: white; border-radius: 8px; padding: 10px; text-align: center;">
+                <div class="s-7de73c">
                     <strong>p-value:</strong><br>${pValue.toFixed(8)}
                 </div>
             </div>
             
-            <div style="background: rgba(0,0,0,0.05); border-radius: 10px; padding: 15px;">
+            <div class="s-6a2df1">
                 <strong>Null Hypothesis (H₀):</strong> β₁ = 0 (The model explains no variance)<br>
                 <strong>Alternative Hypothesis (H₁):</strong> β₁ ≠ 0 (The model is useful)<br>
                 <strong>Decision Rule:</strong> Reject H₀ if F > ${criticalValue.toFixed(4)}<br>
                 <strong>Comparison:</strong> ${fStatistic.toFixed(4)} ${fStatistic > criticalValue ? '>' : '<'} ${criticalValue.toFixed(4)}<br><br>
                 
-                <strong style="font-size: 18px;">Decision: ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}</strong><br><br>
+                <strong class="s-b72ae1">Decision: ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}</strong><br><br>
                 
                 <strong>Interpretation:</strong> ${rejectH0 ? 
                     'The regression model is statistically significant. The independent variable (X) explains a significant portion of variance in the dependent variable (Y).' : 
                     'The regression model is NOT statistically significant. The independent variable (X) does not predict the dependent variable (Y).'}
             </div>
             
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+            <div class="s-bb8f69">
                 💡 <strong>Practical Meaning:</strong> The F-test tells us whether our model is better than just using the mean of Y. 
                 ${rejectH0 ? 
                     'Here, the model is useful and the X variable significantly predicts Y. The explained variance (SSreg) is large relative to the unexplained variance (SSres).' : 
@@ -449,9 +449,9 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
         </div>
         
         <!-- ========== FORMULA REFERENCE ========== -->
-        <div style="margin-top: 20px; background: #e8f4f8; border-radius: 12px; padding: 15px;">
-            <h4 style="margin: 0 0 8px 0; color: #1a5490;">📖 Complete Formula Reference</h4>
-            <div style="font-family: monospace; font-size: 12px;">
+        <div class="s-119ec7">
+            <h4 class="s-bca61e">📖 Complete Formula Reference</h4>
+            <div class="s-1b0f6a">
                 <strong>ŷ (Predicted Value):</strong> ŷ = β̂₀ + β̂₁·x<br>
                 <strong>SS<sub>reg</sub> (Explained):</strong> Σ(ŷ - ȳ)²<br>
                 <strong>SS<sub>res</sub> (Residual):</strong> Σ(y - ŷ)²<br>

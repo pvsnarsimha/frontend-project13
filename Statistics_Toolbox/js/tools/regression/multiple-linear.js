@@ -119,7 +119,7 @@ function computeMultipleLinearRegression(dataMatrix) {
             for (let k = 0; k < n; k++) {
                 terms.push(`(${X[k][i]} × ${X[k][j]})`);
             }
-            xtxDetails += `<div style="margin: 8px 0; font-size: 13px;">
+            xtxDetails += `<div class="s-72ef09">
                 <strong>(X<sup>T</sup>X)<sub>${i+1},${j+1}</sub></strong> = ${terms.join(' + ')} = ${XtX[i][j].toFixed(2)}
             </div>`;
         }
@@ -132,7 +132,7 @@ function computeMultipleLinearRegression(dataMatrix) {
         for (let k = 0; k < n; k++) {
             terms.push(`(${X[k][i]} × ${y[k]})`);
         }
-        xtyDetails += `<div style="margin: 8px 0; font-size: 13px;">
+        xtyDetails += `<div class="s-72ef09">
             <strong>(X<sup>T</sup>y)<sub>${i+1}</sub></strong> = ${terms.join(' + ')} = ${Xty[i].toFixed(2)}
         </div>`;
     }
@@ -150,7 +150,7 @@ function computeMultipleLinearRegression(dataMatrix) {
             }
         }
         
-        let stepLog = '<div style="font-size: 13px;">';
+        let stepLog = '<div class="s-9fdf0e">';
         
         // Gaussian elimination
         for (let i = 0; i < size; i++) {
@@ -164,7 +164,7 @@ function computeMultipleLinearRegression(dataMatrix) {
             
             if (maxRow !== i) {
                 [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
-                stepLog += `<div style="margin: 8px 0; color: #856404;">↔️ Swap row ${i+1} with row ${maxRow+1}</div>`;
+                stepLog += `<div class="s-c4e3d2">↔️ Swap row ${i+1} with row ${maxRow+1}</div>`;
             }
             
             // Make diagonal 1
@@ -173,7 +173,7 @@ function computeMultipleLinearRegression(dataMatrix) {
                 throw Object.assign(new Error("Matrix is singular, cannot compute inverse"), { kind: "pivot" });
             }
             
-            stepLog += `<div style="margin: 8px 0;">📐 Make pivot at (${i+1},${i+1}) = 1: Divide row ${i+1} by ${pivot.toFixed(4)}</div>`;
+            stepLog += `<div class="s-a08134">📐 Make pivot at (${i+1},${i+1}) = 1: Divide row ${i+1} by ${pivot.toFixed(4)}</div>`;
             for (let j = 0; j < 2 * size; j++) {
                 augmented[i][j] /= pivot;
             }
@@ -183,7 +183,7 @@ function computeMultipleLinearRegression(dataMatrix) {
                 if (k !== i) {
                     const factor = augmented[k][i];
                     if (Math.abs(factor) > 1e-10) {
-                        stepLog += `<div style="margin: 8px 0;">➖ Eliminate column ${i+1} in row ${k+1}: R${k+1} ← R${k+1} - ${factor.toFixed(4)} × R${i+1}</div>`;
+                        stepLog += `<div class="s-a08134">➖ Eliminate column ${i+1} in row ${k+1}: R${k+1} ← R${k+1} - ${factor.toFixed(4)} × R${i+1}</div>`;
                         for (let j = 0; j < 2 * size; j++) {
                             augmented[k][j] -= factor * augmented[i][j];
                         }
@@ -200,7 +200,7 @@ function computeMultipleLinearRegression(dataMatrix) {
             throw Object.assign(new Error(`X'X is numerically singular (condition number ≈ ${cond.toExponential(1)})`), { kind: "condition" });
         }
         if (cond > 1e6) {
-            stepLog += `<div style="margin: 8px 0; padding: 8px 12px; background: #fff3cd; border-radius: 6px; color: #856404;">⚠️ Near-collinearity: the condition number of X'X is ≈ ${cond.toExponential(1)}. Two or more predictors are almost linearly dependent, so individual coefficients may be unreliable even though the fit looks fine. Consider removing or combining correlated predictors (see VIF).</div>`;
+            stepLog += `<div class="s-847a0d">⚠️ Near-collinearity: the condition number of X'X is ≈ ${cond.toExponential(1)}. Two or more predictors are almost linearly dependent, so individual coefficients may be unreliable even though the fit looks fine. Consider removing or combining correlated predictors (see VIF).</div>`;
         }
         
         stepLog += '</div>';
@@ -220,113 +220,113 @@ function computeMultipleLinearRegression(dataMatrix) {
     let inverseSteps = '';
     let XtX_inv;
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">📊</span>
-                <h2 style="margin: 0;">Multiple Linear Regression</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">📊</span>
+                <h2 class="s-f8a94d">Multiple Linear Regression</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Formula: ŷ = β₀ + β₁x₁ + β₂x₂ + ... + βₖxₖ</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">Estimates the linear relationship between multiple predictors and one outcome</p>
+            <p class="s-259079">Formula: ŷ = β₀ + β₁x₁ + β₂x₂ + ... + βₖxₖ</p>
+            <p class="s-20a400">Estimates the linear relationship between multiple predictors and one outcome</p>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Data Summary</h3>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px;">Observations (n)</div>
-                    <div style="font-size: 24px; font-weight: 700;">${n}</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📊 Data Summary</h3>
+            <div class="s-9f129a gen-grid gen-grid-many">
+                <div class="s-63afdf">
+                    <div class="s-137d30">Observations (n)</div>
+                    <div class="s-c2434f">${n}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px;">Predictors (k)</div>
-                    <div style="font-size: 24px; font-weight: 700;">${p}</div>
+                <div class="s-63afdf">
+                    <div class="s-137d30">Predictors (k)</div>
+                    <div class="s-c2434f">${p}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px;">Mean of Y (ȳ)</div>
-                    <div style="font-size: 18px;">${yMean.toFixed(4)}</div>
+                <div class="s-63afdf">
+                    <div class="s-137d30">Mean of Y (ȳ)</div>
+                    <div class="s-2ba433">${yMean.toFixed(4)}</div>
                 </div>
             </div>
             
-            <h4 style="margin: 16px 0 8px 0;">Input Data</h4>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead><tr style="background: #1a5490; color: white;">
-                        <th style="padding: 8px;">Obs</th>
-                        <th style="padding: 8px;">Y</th>
-                        ${Array(p).fill().map((_, j) => `<th style="padding: 8px;">X<sub>${j+1}</sub></th>`).join('')}
+            <h4 class="s-eea75b">Input Data</h4>
+            <div class="s-01a9b9">
+                <table class="s-897d74 gen-sized">
+                    <thead><tr class="s-e7b83b">
+                        <th class="s-939795">Obs</th>
+                        <th class="s-939795">Y</th>
+                        ${Array(p).fill().map((_, j) => `<th class="s-939795">X<sub>${j+1}</sub></th>`).join('')}
                        </tr></thead>
                     <tbody>
-                        ${dataMatrix.map((row, i) => `<tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 8px; text-align: center;">${i+1}</td>
-                            ${row.map(val => `<td style="padding: 8px; text-align: center;">${val}</td>`).join('')}
+                        ${dataMatrix.map((row, i) => `<tr class="s-00049c">
+                            <td class="s-a7c3f4">${i+1}</td>
+                            ${row.map(val => `<td class="s-a7c3f4">${val}</td>`).join('')}
                         </tr>`).join('')}
                     </tbody>
                 </table>
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📐 Step 1: The Regression Equation</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">📐 Step 1: The Regression Equation</h3>
+            <div class="s-6025fc">
                 <p>The multiple linear regression model is written as:</p>
-                <div style="background: #f0f4f8; padding: 12px; border-radius: 8px; font-family: monospace; text-align: center; margin: 12px 0;">
+                <div class="s-dc84cb">
                     <strong>y = β₀ + β₁x₁ + β₂x₂ + ... + βₖxₖ + ε</strong>
                 </div>
                 <p>The goal is to find β coefficients that minimize the sum of squared errors: <strong>Σ(yᵢ - ŷᵢ)²</strong></p>
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🧮 Step 2: Matrix Formulation</h3>
-            ${centred ? `<div style="background: #fff3cd; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; color: #856404;">ℹ️ Numerical stability: the predictors ${shift.map((v, j) => v !== 0 ? 'X' + (j + 1) + ' (mean ' + +v.toFixed(6) + ')' : null).filter(Boolean).join(', ')} are far from 0 relative to their spread, so the matrices below use the centred values (x − mean). The intercept is converted back to the original scale in the result; the slopes are the same either way.</div>` : ''}
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🧮 Step 2: Matrix Formulation</h3>
+            ${centred ? `<div class="s-03c7e3">ℹ️ Numerical stability: the predictors ${shift.map((v, j) => v !== 0 ? 'X' + (j + 1) + ' (mean ' + +v.toFixed(6) + ')' : null).filter(Boolean).join(', ')} are far from 0 relative to their spread, so the matrices below use the centred values (x − mean). The intercept is converted back to the original scale in the result; the slopes are the same either way.</div>` : ''}
+            <div class="s-6025fc">
                 <p>For all n observations, we write the system in matrix form:</p>
-                <div style="background: #f0f4f8; padding: 12px; border-radius: 8px; font-family: monospace; text-align: center; margin: 12px 0;">
+                <div class="s-dc84cb">
                     <strong>y = Xβ + ε</strong>
                 </div>
                 
-                <h4 style="margin: 20px 0 10px 0;">Design Matrix X (with intercept column):</h4>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; overflow-x: auto; font-family: monospace;">
+                <h4 class="s-cb85f3">Design Matrix X (with intercept column):</h4>
+                <div class="s-38dd74">
                     X = 
-                    <table style="display: inline-table; border-collapse: collapse; margin-left: 10px;">
-                        ${X.map(row => `<tr>${row.map(val => `<td style="padding: 4px 8px; border: 1px solid #dee2e6;">${val}</td>`).join('')}</tr>`).join('')}
+                    <table class="s-1fe640">
+                        ${X.map(row => `<tr>${row.map(val => `<td class="s-ae9ee2">${val}</td>`).join('')}</tr>`).join('')}
                     </table>
                 </div>
                 
-                <h4 style="margin: 20px 0 10px 0;">Y vector:</h4>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-family: monospace;">
+                <h4 class="s-cb85f3">Y vector:</h4>
+                <div class="s-ab1ee9">
                     y = [${y.join(', ')}]<sup>T</sup>
                 </div>
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">⚙️ Step 3: Solving for β (Normal Equation)</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">⚙️ Step 3: Solving for β (Normal Equation)</h3>
+            <div class="s-6025fc">
                 <p>The OLS estimator is:</p>
-                <div style="background: #f0f4f8; padding: 12px; border-radius: 8px; font-family: monospace; text-align: center; margin: 12px 0;">
+                <div class="s-dc84cb">
                     <strong>β = (X<sup>T</sup>X)<sup>-1</sup> X<sup>T</sup>y</strong>
                 </div>
                 
-                <h4 style="margin: 20px 0 10px 0;">Step 3.1: Calculate X<sup>T</sup>X (the moment matrix)</h4>
-                <div style="background: #fff8e1; padding: 12px; border-radius: 8px; border-left: 4px solid #ffc107;">
-                    <div style="font-weight: bold; margin-bottom: 12px;">📝 Detailed Calculation:</div>
+                <h4 class="s-cb85f3">Step 3.1: Calculate X<sup>T</sup>X (the moment matrix)</h4>
+                <div class="s-65e8e0">
+                    <div class="s-9506eb">📝 Detailed Calculation:</div>
                     ${xtxDetails}
                 </div>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-top: 12px; overflow-x: auto;">
-                    <div style="font-family: monospace; font-size: 14px; font-weight: bold;">Result: X<sup>T</sup>X = </div>
-                    <table style="border-collapse: collapse; margin-top: 8px;">
-                        ${Array(p+1).fill().map((_, i) => `<tr>${Array(p+1).fill().map((_, j) => `<td style="padding: 8px 12px; border: 1px solid #dee2e6; text-align: center;">${XtX[i][j].toFixed(2)}</td>`).join('')}</tr>`).join('')}
+                <div class="s-70ea45">
+                    <div class="s-c34ee8">Result: X<sup>T</sup>X = </div>
+                    <table class="s-db1a34">
+                        ${Array(p+1).fill().map((_, i) => `<tr>${Array(p+1).fill().map((_, j) => `<td class="s-d58239">${XtX[i][j].toFixed(2)}</td>`).join('')}</tr>`).join('')}
                     </table>
                 </div>
                 
-                <h4 style="margin: 20px 0 10px 0;">Step 3.2: Calculate X<sup>T</sup>y</h4>
-                <div style="background: #fff8e1; padding: 12px; border-radius: 8px; border-left: 4px solid #ffc107;">
-                    <div style="font-weight: bold; margin-bottom: 12px;">📝 Detailed Calculation:</div>
+                <h4 class="s-cb85f3">Step 3.2: Calculate X<sup>T</sup>y</h4>
+                <div class="s-65e8e0">
+                    <div class="s-9506eb">📝 Detailed Calculation:</div>
                     ${xtyDetails}
                 </div>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-top: 12px;">
-                    <div style="font-family: monospace;">
+                <div class="s-7db613">
+                    <div class="s-1a4440">
                         X<sup>T</sup>y = [${Xty.map(v => v.toFixed(2)).join(', ')}]<sup>T</sup>
                     </div>
                 </div>`;
@@ -348,7 +348,7 @@ function computeMultipleLinearRegression(dataMatrix) {
                 terms.push(`(${XtX_inv[i][j].toFixed(4)} × ${Xty[j].toFixed(2)})`);
             }
             coefficients.push(sum);
-            coeffDetails += `<div style="margin: 8px 0;">
+            coeffDetails += `<div class="s-a08134">
                 <strong>β<sub>${i}</sub></strong> = ${terms.join(' + ')} = ${sum.toFixed(6)}
             </div>`;
         }
@@ -356,32 +356,32 @@ function computeMultipleLinearRegression(dataMatrix) {
             // β₀ for the original x: ȳ-form intercept minus the slopes times the amounts the predictors were shifted by
             const centredIntercept = coefficients[0];
             coefficients[0] = centredIntercept - shift.reduce((sum, v, jx) => sum + coefficients[jx + 1] * v, 0);
-            coeffDetails += `<div style="margin: 8px 0; color: #856404;">Intercept converted back to the original scale: β₀ = ${centredIntercept.toFixed(6)} − Σ βⱼ × (shift of Xⱼ) = ${coefficients[0].toFixed(6)}</div>`;
+            coeffDetails += `<div class="s-c4e3d2">Intercept converted back to the original scale: β₀ = ${centredIntercept.toFixed(6)} − Σ βⱼ × (shift of Xⱼ) = ${coefficients[0].toFixed(6)}</div>`;
         }
         
         steps += `
-                <h4 style="margin: 20px 0 10px 0;">Step 3.3: Calculate (X<sup>T</sup>X)<sup>-1</sup> using Gaussian Elimination</h4>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                <h4 class="s-cb85f3">Step 3.3: Calculate (X<sup>T</sup>X)<sup>-1</sup> using Gaussian Elimination</h4>
+                <div class="s-f573c2">
                     <details open>
-                        <summary style="cursor: pointer; font-weight: bold; margin-bottom: 12px;">🔍 Click to see matrix inversion steps</summary>
+                        <summary class="s-ba392c">🔍 Click to see matrix inversion steps</summary>
                         ${inverseSteps}
                     </details>
-                    <div style="margin-top: 16px; overflow-x: auto;">
-                        <div style="font-family: monospace; font-size: 14px; font-weight: bold;">Result: (X<sup>T</sup>X)<sup>-1</sup> = </div>
-                        <table style="border-collapse: collapse; margin-top: 8px;">
-                            ${Array(p+1).fill().map((_, i) => `<tr>${Array(p+1).fill().map((_, j) => `<td style="padding: 8px 12px; border: 1px solid #dee2e6; text-align: center;">${XtX_inv[i][j].toFixed(4)}</td>`).join('')}</tr>`).join('')}
+                    <div class="s-417688">
+                        <div class="s-c34ee8">Result: (X<sup>T</sup>X)<sup>-1</sup> = </div>
+                        <table class="s-db1a34">
+                            ${Array(p+1).fill().map((_, i) => `<tr>${Array(p+1).fill().map((_, j) => `<td class="s-d58239">${XtX_inv[i][j].toFixed(4)}</td>`).join('')}</tr>`).join('')}
                         </table>
                     </div>
                 </div>
                 
-                <h4 style="margin: 20px 0 10px 0;">Step 3.4: Calculate β = (X<sup>T</sup>X)<sup>-1</sup> X<sup>T</sup>y</h4>
-                <div style="background: #fff8e1; padding: 12px; border-radius: 8px; border-left: 4px solid #ffc107;">
-                    <div style="font-weight: bold; margin-bottom: 12px;">📝 Detailed Coefficient Calculation:</div>
+                <h4 class="s-cb85f3">Step 3.4: Calculate β = (X<sup>T</sup>X)<sup>-1</sup> X<sup>T</sup>y</h4>
+                <div class="s-65e8e0">
+                    <div class="s-9506eb">📝 Detailed Coefficient Calculation:</div>
                     ${coeffDetails}
                 </div>
-                <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; margin-top: 12px;">
-                    <div style="font-family: monospace; font-size: 16px; font-weight: bold;">Results:</div>
-                    <div style="font-family: monospace; margin-top: 8px;">
+                <div class="s-328229">
+                    <div class="s-75073d">Results:</div>
+                    <div class="s-ba57d6">
                         β₀ (intercept) = ${coefficients[0].toFixed(6)}<br>
                         ${Array(p).fill().map((_, j) => `β<sub>${j+1}</sub> = ${coefficients[j+1].toFixed(6)}`).join('<br>')}
                     </div>
@@ -393,7 +393,7 @@ function computeMultipleLinearRegression(dataMatrix) {
             ? "The design is numerically ill-conditioned: two or more predictors are almost linearly dependent, the predictors are on very different scales, or there are barely more observations than parameters (n is close to p + 1). Remove or combine highly correlated predictors (see VIF), rescale the predictors, or add more observations."
             : "At least one predictor is an exact copy or linear combination of the others (perfect multicollinearity), or there are fewer observations than parameters. Remove or combine the redundant predictor, or add more observations.";
         steps += `
-                <div style="background: #f8d7da; border-radius: 8px; padding: 12px; color: #721c24;">
+                <div class="s-a1c250">
                     ⚠️ Cannot compute coefficients: ${error.message}. ${failureAdvice}
                 </div>
             </div>
@@ -411,14 +411,14 @@ function computeMultipleLinearRegression(dataMatrix) {
         }
         
         steps += `
-        <div style="border-radius: 16px; padding: 20px; margin-top: 24px; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-left: 6px solid #28a745;">
-            <h3 style="margin: 0 0 12px 0;">📈 Step 4: The Final Regression Equation</h3>
-            <div style="background: white; border-radius: 8px; padding: 16px; text-align: center; font-size: 18px; font-family: monospace;">
+        <div class="s-8ec84a gen-pad">
+            <h3 class="s-c7f0b4">📈 Step 4: The Final Regression Equation</h3>
+            <div class="s-c0f296">
                 ${equation}
             </div>
-            <div style="margin-top: 16px;">
+            <div class="s-c803e1">
                 <h4>📖 Interpretation:</h4>
-                <ul style="margin: 8px 0;">
+                <ul class="s-117dd0">
                     <li><strong>β₀ = ${coefficients[0].toFixed(4)}</strong>: When all predictors are 0, the predicted Y is ${coefficients[0].toFixed(4)}</li>
                     ${Array(p).fill().map((_, j) => `<li><strong>β<sub>${j+1}</sub> = ${coefficients[j+1].toFixed(4)}</strong>: For each 1-unit increase in x<sub>${j+1}</sub>, Y changes by ${coefficients[j+1].toFixed(4)} units, holding other predictors constant</li>`).join('')}
                 </ul>
@@ -427,8 +427,8 @@ function computeMultipleLinearRegression(dataMatrix) {
     }
     
     steps += `
-        <div style="border-radius: 16px; padding: 20px; margin-top: 24px; background: #fff3cd; border-left: 6px solid #ffc107;">
-            <h3 style="margin: 0 0 12px 0;">📌 Key Assumptions of Multiple Regression</h3>
+        <div class="s-4ee81e gen-pad">
+            <h3 class="s-c7f0b4">📌 Key Assumptions of Multiple Regression</h3>
             <ul>
                 <li><strong>Linearity:</strong> The relationship between predictors and outcome is linear</li>
                 <li><strong>Independence:</strong> Observations are independent of each other</li>
@@ -436,7 +436,7 @@ function computeMultipleLinearRegression(dataMatrix) {
                 <li><strong>Normality:</strong> Residuals are normally distributed</li>
                 <li><strong>No perfect multicollinearity:</strong> Predictors are not perfectly correlated</li>
             </ul>
-            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+            <div class="s-8d2e44">
                 💡 <strong>Note:</strong> The quality of the regression model should be assessed using R², adjusted R², F-test, and residual diagnostics.
             </div>
         </div>

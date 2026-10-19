@@ -135,12 +135,12 @@ function computePairedTTest(before, after, alpha, alternative) {
         let d = diffDetails[i];
         let diffColor = d.diff > 0 ? '#28a745' : (d.diff < 0 ? '#dc3545' : '#6c757d');
         let diffSign = d.diff > 0 ? '+' : (d.diff < 0 ? '' : '');
-        diffTable += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center; font-weight: 500;">${i+1}</td>
-            <td style="padding: 8px; text-align: center;">${d.before}</td>
-            <td style="padding: 8px; text-align: center;">${d.after}</td>
+        diffTable += `<tr class="s-00049c">
+            <td class="s-e784bc">${i+1}</td>
+            <td class="s-a7c3f4">${d.before}</td>
+            <td class="s-a7c3f4">${d.after}</td>
             <td style="padding: 8px; text-align: center; font-weight: 600; color: ${diffColor};">${diffSign}${d.diff.toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center; font-size: 12px; color: #6c757d;">${d.after} - ${d.before} = ${diffSign}${d.diff.toFixed(4)}</td>
+            <td class="s-804df9">${d.after} - ${d.before} = ${diffSign}${d.diff.toFixed(4)}</td>
         </tr>`;
     }
     
@@ -148,96 +148,96 @@ function computePairedTTest(before, after, alpha, alternative) {
     for (let i = 0; i < squaredDeviationDetails.length; i++) {
         let s = squaredDeviationDetails[i];
         let sign = s.deviation >= 0 ? '+' : '';
-        squaredDeviationRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${i+1}</td>
-            <td style="padding: 8px; text-align: center; font-weight: 500;">${s.diff.toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center;">${s.diff.toFixed(4)} - ${meanDiff.toFixed(4)} = ${sign}${s.deviation.toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center; font-weight: 600; color: #1a5490;">(${sign}${s.deviation.toFixed(4)})^2 = ${s.squaredDeviation.toFixed(4)}</td>
+        squaredDeviationRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${i+1}</td>
+            <td class="s-e784bc">${s.diff.toFixed(4)}</td>
+            <td class="s-a7c3f4">${s.diff.toFixed(4)} - ${meanDiff.toFixed(4)} = ${sign}${s.deviation.toFixed(4)}</td>
+            <td class="s-b33403">(${sign}${s.deviation.toFixed(4)})^2 = ${s.squaredDeviation.toFixed(4)}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">t</span>
-                <h2 style="margin: 0;">Paired t-test (Before-After Comparison)</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">t</span>
+                <h2 class="s-f8a94d">Paired t-test (Before-After Comparison)</h2>
             </div>
-            <div style="margin-top: 12px; font-family: monospace; font-size: 14px;">
+            <div class="s-55b017">
                 <div>Formula: <strong>t = \u0304d / (s<sub>d</sub> / √n)</strong></div>
-                <div style="margin-top: 8px;">Where:</div>
+                <div class="s-af5894">Where:</div>
                 <div>• \u0304d = Mean of the differences = (Σ dᵢ) / n</div>
                 <div>• s<sub>d</sub> = Standard deviation of the differences</div>
                 <div>• n = Number of pairs</div>
             </div>
-            <p style="margin: 12px 0 0 0; opacity: 0.9;">H₀: μ<sub>d</sub> = 0 | H₁: μ<sub>d</sub> ${alternative === 'two.sided' ? '≠' : (alternative === 'greater' ? '>' : '<')} 0</p>
+            <p class="s-98fe52">H₀: μ<sub>d</sub> = 0 | H₁: μ<sub>d</sub> ${alternative === 'two.sided' ? '≠' : (alternative === 'greater' ? '>' : '<')} 0</p>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">Data Summary</h3>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">Number of Pairs (n)</div>
-                    <div style="font-size: 24px; font-weight: 700;">${n}</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">Data Summary</h3>
+            <div class="s-86cc67 gen-grid gen-grid-many">
+                <div class="s-63afdf">
+                    <div class="s-42da0a">Number of Pairs (n)</div>
+                    <div class="s-c2434f">${n}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">Mean Difference (\u0304d)</div>
+                <div class="s-63afdf">
+                    <div class="s-42da0a">Mean Difference (\u0304d)</div>
                     <div style="font-size: 20px; font-weight: 600; color: ${meanDiff > 0 ? '#28a745' : (meanDiff < 0 ? '#dc3545' : '#6c757d')};">${meanDiff > 0 ? '+' : ''}${meanDiff.toFixed(6)}</div>
-                    <div style="font-size: 11px;">= Average(After - Before)</div>
+                    <div class="s-d52d0d">= Average(After - Before)</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">Std Dev of Differences (s<sub>d</sub>)</div>
-                    <div style="font-size: 20px; font-weight: 600;">${stdDevDiff.toFixed(6)}</div>
+                <div class="s-63afdf">
+                    <div class="s-42da0a">Std Dev of Differences (s<sub>d</sub>)</div>
+                    <div class="s-0f4638">${stdDevDiff.toFixed(6)}</div>
                 </div>
             </div>
             
-            <h4 style="margin: 16px 0 8px 0;">Individual Pair Differences (dᵢ = Afterᵢ - Beforeᵢ)</h4>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden;">
+            <h4 class="s-eea75b">Individual Pair Differences (dᵢ = Afterᵢ - Beforeᵢ)</h4>
+            <div class="s-01a9b9">
+                <table class="s-f29cc6 gen-sized">
                     <thead>
-                        <tr style="background: #1a5490; color: white;">
-                            <th style="padding: 10px;">Pair # (i)</th>
-                            <th style="padding: 10px;">Before (xᵢ)</th>
-                            <th style="padding: 10px;">After (yᵢ)</th>
-                            <th style="padding: 10px;">Difference dᵢ = yᵢ - xᵢ</th>
-                            <th style="padding: 10px;">Calculation</th>
+                        <tr class="s-e7b83b">
+                            <th class="s-a756db">Pair # (i)</th>
+                            <th class="s-a756db">Before (xᵢ)</th>
+                            <th class="s-a756db">After (yᵢ)</th>
+                            <th class="s-a756db">Difference dᵢ = yᵢ - xᵢ</th>
+                            <th class="s-a756db">Calculation</th>
                         </tr>
                     </thead>
                     <tbody>${diffTable}</tbody>
                  </table>
             </div>
             
-            <div style="margin-top: 16px; padding: 12px; background: #e9ecef; border-radius: 8px; text-align: center;">
+            <div class="s-1cc498">
                 <strong>Sum of Differences (Σ dᵢ):</strong> ${sumDiffs.toFixed(6)} &nbsp;|&nbsp;
                 <strong>Mean Difference (\u0304d = Σ dᵢ / n):</strong> ${meanDiff.toFixed(6)}
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">Step-by-Step Calculation</h3>
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">Step-by-Step Calculation</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">1</div>
                     <div><strong>Calculate the Mean Difference (\u0304d)</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     \u0304d = (Σ dᵢ) / n<br>
                     \u0304d = (${diffDetails.map(d => d.diff.toFixed(4)).join(' + ')}) / ${n}<br>
                     \u0304d = ${sumDiffs.toFixed(6)} / ${n}<br>
-                    <strong style="color: #1a5490; font-size: 16px;">\u0304d = ${meanDiff.toFixed(8)}</strong>
+                    <strong class="s-16e930">\u0304d = ${meanDiff.toFixed(8)}</strong>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">2</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">2</div>
                     <div><strong>Calculate the Standard Deviation of Differences (s<sub>d</sub>)</strong></div>
                 </div>
-                <div style="margin-left: 40px;">
-                    <div style="margin-bottom: 12px; font-family: monospace;">
+                <div class="s-78a84b">
+                    <div class="s-c32d5b">
                         Formula: <strong>s<sub>d</sub> = √[ Σ(dᵢ - \u0304d)² / (n - 1) ]</strong>
                     </div>
-                    <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                    <div class="s-f6a2e8">
                         <strong>Explanation of each step:</strong><br><br>
                         • First, find how far each difference (dᵢ) deviates from the mean difference (\u0304d)<br>
                         • Calculate (dᵢ - \u0304d) for each pair - this is the deviation from the mean<br>
@@ -247,40 +247,40 @@ function computePairedTTest(before, after, alpha, alternative) {
                         • Take the square root to get back to original units: s<sub>d</sub> = √(variance)
                     </div>
                     
-                    <h5 style="margin: 12px 0 8px 0; color: #1a5490;">Step 2a: Calculate deviations from mean and squared deviations</h5>
-                    <div style="overflow-x: auto;">
-                        <table style="width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden;">
+                    <h5 class="s-53211d">Step 2a: Calculate deviations from mean and squared deviations</h5>
+                    <div class="s-01a9b9">
+                        <table class="s-92a0fb gen-sized">
                             <thead>
-                                <tr style="background: #1a5490; color: white;">
-                                    <th style="padding: 8px;">Pair i</th>
-                                    <th style="padding: 8px;">dᵢ</th>
-                                    <th style="padding: 8px;">dᵢ - \u0304d (Deviation)</th>
-                                    <th style="padding: 8px;">(dᵢ - \u0304d)² (Squared Deviation)</th>
+                                <tr class="s-e7b83b">
+                                    <th class="s-939795">Pair i</th>
+                                    <th class="s-939795">dᵢ</th>
+                                    <th class="s-939795">dᵢ - \u0304d (Deviation)</th>
+                                    <th class="s-939795">(dᵢ - \u0304d)² (Squared Deviation)</th>
                                 </tr>
                             </thead>
                             <tbody>${squaredDeviationRows}</tbody>
                         </table>
                     </div>
                     
-                    <div style="margin-top: 12px; font-family: monospace;">
+                    <div class="s-e2f823">
                         Σ(dᵢ - \u0304d)² = ${sumSqDiffs.toFixed(6)}<br><br>
                         Step 2b: Calculate variance = Σ(dᵢ - \u0304d)² / (n - 1)<br>
                         Variance = ${sumSqDiffs.toFixed(6)} / ${n - 1} = ${varianceDiff.toFixed(8)}<br><br>
                         Step 2c: Take square root to get standard deviation<br>
-                        s<sub>d</sub> = √(${varianceDiff.toFixed(8)}) = <strong style="color: #1a5490;">${stdDevDiff.toFixed(8)}</strong>
+                        s<sub>d</sub> = √(${varianceDiff.toFixed(8)}) = <strong class="s-f342b5">${stdDevDiff.toFixed(8)}</strong>
                     </div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</div>
+            <div class="s-6025fc">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">3</div>
                     <div><strong>Calculate the t-statistic</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     Standard Error (SE) = s<sub>d</sub> / √n = ${stdDevDiff.toFixed(6)} / √${n} = ${standardError.toFixed(6)}<br><br>
                     t = \u0304d / SE = ${meanDiff.toFixed(6)} / ${standardError.toFixed(6)}<br>
-                    <div style="font-size: 20px; font-weight: 700; color: #1a5490; margin-top: 8px;">t = ${tStatistic.toFixed(8)}</div>
+                    <div class="s-505d41">t = ${tStatistic.toFixed(8)}</div>
                     <div>Degrees of Freedom (df) = n - 1 = ${df}</div>
                     <div>Critical value (α = ${alpha}) = ${criticalValueText(criticalValue, alternative)}</div>
                     <div>p-value = ${pValue.toFixed(8)}</div>
@@ -288,27 +288,27 @@ function computePairedTTest(before, after, alpha, alternative) {
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">Test Conclusion</h3>
+        <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
+            <h3 class="s-c7f0b4">Test Conclusion</h3>
             <div><strong>t-statistic:</strong> ${tStatistic.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> ${df}</div>
             <div><strong>Critical Value (${alternative === 'two.sided' ? 'two-tailed' : 'one-tailed'}):</strong> ${criticalValueText(criticalValue, alternative)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}
             </div>
         </div>
         
-        <div style="margin-top: 20px; padding: 16px; background: #e8f4f8; border-radius: 12px;">
-            <h4 style="margin: 0 0 8px 0; color: #1a5490;">${(1-alpha)*100}% Confidence Interval for Mean Difference (μ<sub>d</sub>)</h4>
-            <div style="font-family: monospace; font-size: 14px;">
+        <div class="s-0b1c41">
+            <h4 class="s-bca61e">${(1-alpha)*100}% Confidence Interval for Mean Difference (μ<sub>d</sub>)</h4>
+            <div class="s-4b0e48">
                 CI = \u0304d ± t<sub>critical</sub> × SE<br>
                 CI = ${meanDiff.toFixed(4)} ± ${ciT.toFixed(4)} × ${standardError.toFixed(4)}<br>
                 CI = ${meanDiff.toFixed(4)} ± ${(ciT * standardError).toFixed(4)}<br>
-                <strong style="font-size: 16px;">CI = [${(meanDiff - ciT * standardError).toFixed(4)}, ${(meanDiff + ciT * standardError).toFixed(4)}]</strong>
+                <strong class="s-afebce">CI = [${(meanDiff - ciT * standardError).toFixed(4)}, ${(meanDiff + ciT * standardError).toFixed(4)}]</strong>
             </div>
-            <div style="margin-top: 8px; font-size: 13px; color: #555;">
+            <div class="s-e4020c">
                 ${(meanDiff - ciT * standardError) > 0 ? '✓ The entire confidence interval is above zero, indicating a significant increase after the intervention.' : 
                   (meanDiff + ciT * standardError) < 0 ? '✓ The entire confidence interval is below zero, indicating a significant decrease after the intervention.' :
                   (meanDiff - ciT * standardError) < 0 && (meanDiff + ciT * standardError) > 0 ? '⚠ The confidence interval contains zero, indicating the change may not be statistically significant.' :

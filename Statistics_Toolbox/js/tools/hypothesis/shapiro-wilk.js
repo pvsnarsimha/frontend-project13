@@ -94,166 +94,166 @@ function computeShapiroWilkTest(data, alpha) {
     let sqDevRows = '';
     for (let i = 0; i < squaredDeviations.length; i++) {
         const d = squaredDeviations[i];
-        sqDevRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${i+1}</td>
-            <td style="padding: 8px; text-align: center;">${d.value.toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center;">${d.value.toFixed(4)} - ${mean.toFixed(4)} = ${d.deviation.toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center;">(${d.deviation.toFixed(4)})² = ${d.squaredDeviation.toFixed(4)}</td>
+        sqDevRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${i+1}</td>
+            <td class="s-a7c3f4">${d.value.toFixed(4)}</td>
+            <td class="s-a7c3f4">${d.value.toFixed(4)} - ${mean.toFixed(4)} = ${d.deviation.toFixed(4)}</td>
+            <td class="s-a7c3f4">(${d.deviation.toFixed(4)})² = ${d.squaredDeviation.toFixed(4)}</td>
          </tr>`;
     }
     
     // Build coefficients table with formula
     let coeffRows = '';
     for (let c of aCoeffs) {
-        coeffRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${c.i}</td>
-            <td style="padding: 8px; text-align: center;">
+        coeffRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${c.i}</td>
+            <td class="s-a7c3f4">
                 <div><strong>${c.a_i.toFixed(4)}</strong></div>
-                <div style="font-size: 10px; color: #666;">${c.formula}</div>
+                <div class="s-994a3a">${c.formula}</div>
             </td>
-            <td style="padding: 8px; text-align: center;">${c.upperValue.toFixed(4)} - ${c.lowerValue.toFixed(4)} = ${c.diff.toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center; font-weight: 600; color: #1a5490;">${c.product.toFixed(4)}</td>
+            <td class="s-a7c3f4">${c.upperValue.toFixed(4)} - ${c.lowerValue.toFixed(4)} = ${c.diff.toFixed(4)}</td>
+            <td class="s-b33403">${c.product.toFixed(4)}</td>
          </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    let steps = `<div class="s-9217e5">
         <!-- Header -->
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">W</span>
-                <h2 style="margin: 0;">Shapiro-Wilk Test (Normality)</h2>
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">W</span>
+                <h2 class="s-f8a94d">Shapiro-Wilk Test (Normality)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">The most powerful test for normality</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">H₀: Data is normally distributed | H₁: Data is NOT normally distributed</p>
+            <p class="s-259079">The most powerful test for normality</p>
+            <p class="s-20a400">H₀: Data is normally distributed | H₁: Data is NOT normally distributed</p>
         </div>
         
         <!-- Understanding the Test - How aᵢ is calculated -->
-        <div style="background: #f0f4fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📖 How are the Coefficients aᵢ Calculated?</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <p style="margin: 0 0 12px 0;"><strong>The coefficients aᵢ are calculated using the formula:</strong></p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; text-align: center;">
+        <div class="s-42ccf7 gen-pad">
+            <h3 class="s-ed0bb5">📖 How are the Coefficients aᵢ Calculated?</h3>
+            <div class="s-3a063a">
+                <p class="s-7dacb1"><strong>The coefficients aᵢ are calculated using the formula:</strong></p>
+                <div class="s-000adc">
                     <strong>mᵢ = Φ⁻¹((i − 0.375)/(n + 0.25)), then aᵢ = mᵢ/√(Σmⱼ²) with Royston's polynomial correction for the two largest coefficients</strong>
                 </div>
-                <p style="margin-top: 12px;">Where:</p>
-                <ul style="margin-left: 20px;">
+                <p class="s-5e70e1">Where:</p>
+                <ul class="s-d06bdc">
                     <li><strong>i</strong> = the pair number (from 1 to floor(n/2))</li>
                     <li><strong>n</strong> = total sample size = <strong>${n}</strong></li>
                     <li><strong>mᵢ</strong> = expected value of the i-th normal order statistic (Blom's approximation)</li>
                 </ul>
-                <div style="margin-top: 12px; background: #e8f4f8; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-f79949">
                     <strong>📌 Example for first pair (i=1):</strong><br>
                     m<sub>${n}</sub> = Φ⁻¹((${n} − 0.375)/(${n} + 0.25)) = ${normInv((n - 0.375) / (n + 0.25)).toFixed(4)}<br>
                     a₁ = ${aCoeffs[0]?.a_i.toFixed(4) || 'N/A'}
                 </div>
             </div>
             
-            <h3 style="margin: 16px 0 12px 0; color: #1a5490;">📖 What is the Shapiro-Wilk Test?</h3>
-            <p style="margin: 0; line-height: 1.6;">The Shapiro-Wilk test compares the order statistics of your data to expected normal order statistics.</p>
-            <ul style="margin-top: 12px; margin-left: 20px; line-height: 1.6;">
+            <h3 class="s-47beab">📖 What is the Shapiro-Wilk Test?</h3>
+            <p class="s-d174a2">The Shapiro-Wilk test compares the order statistics of your data to expected normal order statistics.</p>
+            <ul class="s-bcb1fd">
                 <li><strong>W ≈ 1</strong> → Data is very close to normal</li>
                 <li><strong>W significantly < 1</strong> → Data deviates from normality</li>
             </ul>
-            <div style="margin-top: 12px; background: #fff3cd; padding: 10px; border-radius: 8px; font-size: 13px;">
+            <div class="s-bd7624">
                 💡 <strong>Formula:</strong> W = (Σ aᵢ × (xₙ₋ᵢ₊₁ - xᵢ))² / Σ(xᵢ - x̄)²
             </div>
         </div>
         
         <!-- Data Summary -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
-            <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Sample Size (n)</div>
-                <div style="font-size: 32px; font-weight: 700; color: #1a5490;">${n}</div>
+        <div class="s-11aa18 gen-grid">
+            <div class="s-edbb37">
+                <div class="s-42da0a">Sample Size (n)</div>
+                <div class="s-abfdfd gen-big">${n}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Sample Mean (x̄)</div>
-                <div style="font-size: 24px; font-weight: 700;">${mean.toFixed(4)}</div>
+            <div class="s-edbb37">
+                <div class="s-42da0a">Sample Mean (x̄)</div>
+                <div class="s-c2434f">${mean.toFixed(4)}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Number of Pairs (k)</div>
-                <div style="font-size: 24px; font-weight: 700;">${Math.floor(n/2)}</div>
+            <div class="s-edbb37">
+                <div class="s-42da0a">Number of Pairs (k)</div>
+                <div class="s-c2434f">${Math.floor(n/2)}</div>
             </div>
         </div>
         
         <!-- Step 1: Calculate Sum of Squares -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto; border: 1px solid #e9ecef;">
-            <h3 style="margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #1a5490; color: #1a5490;">
+        <div class="s-90b704">
+            <h3 class="s-c7276c">
                 📊 Step 1: Calculate SS = Σ(xᵢ - x̄)² (Denominator)
             </h3>
-            <div style="padding: 12px 20px; background: #e8f4f8; font-size: 13px;">
+            <div class="s-a35413">
                 <strong>This measures the total variability in the data.</strong> Each value's deviation from the mean is squared and summed.
             </div>
-            <table style="width: 100%; border-collapse: collapse;">
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #1a5490; color: white;">
-                        <th style="padding: 10px;">i</th>
-                        <th style="padding: 10px;">xᵢ</th>
-                        <th style="padding: 10px;">xᵢ - x̄</th>
-                        <th style="padding: 10px;">(xᵢ - x̄)²</th>
+                    <tr class="s-e7b83b">
+                        <th class="s-a756db">i</th>
+                        <th class="s-a756db">xᵢ</th>
+                        <th class="s-a756db">xᵢ - x̄</th>
+                        <th class="s-a756db">(xᵢ - x̄)²</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${sqDevRows}
-                    <tr style="background: #e9ecef; font-weight: 700;">
-                        <td colspan="3" style="padding: 10px; text-align: right;">SS = Σ(xᵢ - x̄)² →</td>
-                        <td style="padding: 10px; text-align: center; background: #1a5490; color: white;">${ss.toFixed(4)}</td>
+                    <tr class="s-767496">
+                        <td class="s-c1430c" colspan="3">SS = Σ(xᵢ - x̄)² →</td>
+                        <td class="s-ec616e">${ss.toFixed(4)}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <!-- Step 2: Calculate Numerator -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto; border: 1px solid #e9ecef;">
-            <h3 style="margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #1a5490; color: #1a5490;">
+        <div class="s-90b704">
+            <h3 class="s-c7276c">
                 📊 Step 2: Calculate Numerator = Σ aᵢ × (xₙ₋ᵢ₊₁ - xᵢ)
             </h3>
-            <div style="padding: 12px 20px; background: #e8f4f8; font-size: 13px;">
+            <div class="s-a35413">
                 <strong>How aᵢ is calculated:</strong> mᵢ = Φ⁻¹((n−i+1−0.375)/(n+0.25)) are approximate expected normal order statistics; aᵢ = mᵢ/√(Σmⱼ²), with Royston's (1992) polynomial correction for the largest coefficients.<br>
                 The coefficients are largest for the extreme pairs, which carry the most information about the tails.
             </div>
-            <table style="width: 100%; border-collapse: collapse;">
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #1a5490; color: white;">
-                        <th style="padding: 10px;">Pair (i)</th>
-                        <th style="padding: 10px;">Coefficient aᵢ (with formula)</th>
-                        <th style="padding: 10px;">xₙ₋ᵢ₊₁ - xᵢ</th>
-                        <th style="padding: 10px;">aᵢ × (xₙ₋ᵢ₊₁ - xᵢ)</th>
+                    <tr class="s-e7b83b">
+                        <th class="s-a756db">Pair (i)</th>
+                        <th class="s-a756db">Coefficient aᵢ (with formula)</th>
+                        <th class="s-a756db">xₙ₋ᵢ₊₁ - xᵢ</th>
+                        <th class="s-a756db">aᵢ × (xₙ₋ᵢ₊₁ - xᵢ)</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${coeffRows}
-                    <tr style="background: #e9ecef; font-weight: 700;">
-                        <td colspan="3" style="padding: 10px; text-align: right;">Sum = Σ aᵢ × (xₙ₋ᵢ₊₁ - xᵢ) →</td>
-                        <td style="padding: 10px; text-align: center; background: #1a5490; color: white;">${numerator.toFixed(4)}</td>
+                    <tr class="s-767496">
+                        <td class="s-c1430c" colspan="3">Sum = Σ aᵢ × (xₙ₋ᵢ₊₁ - xᵢ) →</td>
+                        <td class="s-ec616e">${numerator.toFixed(4)}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <!-- Step 3: Calculate W Statistic -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 3: Calculate W Statistic</h3>
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <div style="font-family: monospace; font-size: 16px; text-align: center;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 3: Calculate W Statistic</h3>
+            <div class="s-6fab3a gen-pad">
+                <div class="s-252832">
                     <strong>W = (Σ aᵢ × (xₙ₋ᵢ₊₁ - xᵢ))² / Σ(xᵢ - x̄)²</strong><br><br>
                     W = (${numerator.toFixed(4)})² / ${ss.toFixed(4)}<br>
                     W = ${(numerator * numerator).toFixed(4)} / ${ss.toFixed(4)}<br>
-                    <div style="font-size: 28px; font-weight: 700; color: #1a5490; margin-top: 12px;">W = ${w.toFixed(6)}</div>
+                    <div class="s-b63603">W = ${w.toFixed(6)}</div>
                 </div>
-                <div style="margin-top: 12px; font-size: 13px; color: #6c757d; text-align: center;">
+                <div class="s-45c6db">
                     W = 1 means perfect normality | Smaller W indicates deviation from normality
                 </div>
             </div>
         </div>
         
         <!-- Step 4: Decision -->
-        <div style="border-radius: 16px; padding: 20px; margin-bottom: 24px; ${rejectH0 ? 'background: #f8d7da; border-left: 6px solid #dc3545;' : 'background: #d4edda; border-left: 6px solid #28a745;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Step 4: Make Decision</h3>
-            <div style="display: grid; gap: 12px;">
+        <div class="${rejectH0 ? 's-830a4f gen-pad' : 's-28eb84 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Step 4: Make Decision</h3>
+            <div class="s-f27585">
                 <div><strong>W Statistic:</strong> ${w.toFixed(6)}</div>
                 <div><strong>p-value:</strong> ${pValue.toFixed(6)}</div>
                 <div><strong>Significance Level (α):</strong> ${alpha}</div>
-                <div style="margin-top: 8px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                <div class="s-c6645b">
                     <strong>Comparison:</strong> p-value ${pValue < alpha ? '<' : '>'} α = ${alpha}<br>
                     <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                     <strong>Conclusion:</strong> ${rejectH0 ? 'There is sufficient evidence that the data is NOT normally distributed.' : 'There is NOT sufficient evidence to reject normality. The data appears normally distributed.'}
@@ -262,20 +262,20 @@ function computeShapiroWilkTest(data, alpha) {
         </div>
         
         <!-- W Statistic Scale -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📊 W Statistic Interpretation Scale</h3>
-            <div style="text-align: center;">
-                <div style="height: 12px; background: linear-gradient(to right, #28a745, #ffc107, #dc3545); border-radius: 6px; margin: 16px 0;"></div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="font-size: 12px;">0.90</span>
-                    <span style="font-size: 12px;">0.95</span>
-                    <span style="font-size: 12px;">0.98</span>
-                    <span style="font-size: 12px;">1.00</span>
+        <div class="s-44d7a2 gen-pad">
+            <h3 class="s-ed0bb5">📊 W Statistic Interpretation Scale</h3>
+            <div class="s-546056">
+                <div class="s-49b675"></div>
+                <div class="s-3d85f1 gen-flex">
+                    <span class="s-888a4b">0.90</span>
+                    <span class="s-888a4b">0.95</span>
+                    <span class="s-888a4b">0.98</span>
+                    <span class="s-888a4b">1.00</span>
                 </div>
-                <div style="background: white; border-radius: 12px; padding: 16px; margin-top: 12px; display: inline-block; min-width: 200px;">
-                    <div style="font-size: 48px; font-weight: 700; color: ${rejectH0 ? '#dc3545' : '#28a745'};">${w.toFixed(4)}</div>
-                    <div style="font-size: 14px;">W Statistic</div>
-                    <div style="margin-top: 8px;">
+                <div class="s-d7f923 gen-sized">
+                    <div class="${rejectH0 ? 's-1fd66a gen-big' : 's-c5b75d gen-big'}">${w.toFixed(4)}</div>
+                    <div class="s-67e5d5">W Statistic</div>
+                    <div class="s-af5894">
                         ${w > 0.95 ? '✓ Strong evidence of normality' : (w > 0.90 ? '⚠️ Moderate evidence of normality' : '❌ Weak evidence of normality')}
                     </div>
                 </div>
@@ -283,14 +283,14 @@ function computeShapiroWilkTest(data, alpha) {
         </div>
         
         <!-- Quick Reference -->
-        <div style="margin-top: 24px; padding: 16px; background: #e8f4f8; border-radius: 12px;">
-            <h4 style="margin: 0 0 8px 0; color: #1a5490;">💡 Quick Interpretation Guide</h4>
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                <thead><tr style="background: #1a5490; color: white;"><th style="padding: 8px;">W Value</th><th style="padding: 8px;">Interpretation</th><th style="padding: 8px;">Action</th></tr></thead>
+        <div class="s-d7d007">
+            <h4 class="s-bca61e">💡 Quick Interpretation Guide</h4>
+            <table class="s-306b2c gen-sized">
+                <thead><tr class="s-e7b83b"><th class="s-939795">W Value</th><th class="s-939795">Interpretation</th><th class="s-939795">Action</th></tr></thead>
                 <tbody>
-                    <tr style="background: white;"><td style="padding: 8px;">> 0.95</td><td style="padding: 8px;">Data is approximately normal</td><td style="padding: 8px;">Use parametric tests</td></tr>
-                    <tr style="background: #f8f9fa;"><td style="padding: 8px;">0.90 - 0.95</td><td style="padding: 8px;">Mild deviation from normality</td><td style="padding: 8px;">Proceed with caution</td></tr>
-                    <tr style="background: white;"><td style="padding: 8px;">< 0.90</td><td style="padding: 8px;">Significant deviation from normality</td><td style="padding: 8px;">Use non-parametric tests</td></tr>
+                    <tr class="s-67f264"><td class="s-641001">> 0.95</td><td class="s-641001">Data is approximately normal</td><td class="s-641001">Use parametric tests</td></tr>
+                    <tr class="s-6d64ad"><td class="s-641001">0.90 - 0.95</td><td class="s-641001">Mild deviation from normality</td><td class="s-641001">Proceed with caution</td></tr>
+                    <tr class="s-67f264"><td class="s-641001">< 0.90</td><td class="s-641001">Significant deviation from normality</td><td class="s-641001">Use non-parametric tests</td></tr>
                 </tbody>
             </table>
         </div>

@@ -6,14 +6,14 @@ function buildDeviationRows(xValues, yValues, meanX, meanY) {
     let rows = '';
     for (let i = 0; i < xValues.length; i++) {
         const xDev = xValues[i] - meanX, yDev = yValues[i] - meanY;
-        rows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]} - ${meanX.toFixed(4)} = ${xDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]} - ${meanY.toFixed(4)} = ${yDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; font-weight: 600; color: #1a5490;">${(xDev * yDev).toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${(xDev * xDev).toFixed(4)}</td>
+        rows += `<tr class="s-00049c">
+            <td class="s-618bb3">${i+1}</td>
+            <td class="s-618bb3">${xValues[i]}</td>
+            <td class="s-618bb3">${yValues[i]}</td>
+            <td class="s-618bb3">${xValues[i]} - ${meanX.toFixed(4)} = ${xDev.toFixed(4)}</td>
+            <td class="s-618bb3">${yValues[i]} - ${meanY.toFixed(4)} = ${yDev.toFixed(4)}</td>
+            <td class="s-ffb83a">${(xDev * yDev).toFixed(4)}</td>
+            <td class="s-618bb3">${(xDev * xDev).toFixed(4)}</td>
         </tr>`;
     }
     return rows;
@@ -25,13 +25,13 @@ function buildPredictionRows(xValues, yValues, slope, intercept) {
     for (let i = 0; i < xValues.length; i++) {
         const yPred = intercept + slope * xValues[i];
         const residual = yValues[i] - yPred;
-        rows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center; font-family: monospace;">${intercept.toFixed(4)} + ${slope.toFixed(4)}×${xValues[i]} = ${yPred.toFixed(4)}</td>
+        rows += `<tr class="s-00049c">
+            <td class="s-618bb3">${i+1}</td>
+            <td class="s-618bb3">${xValues[i]}</td>
+            <td class="s-618bb3">${yValues[i]}</td>
+            <td class="s-d9b386">${intercept.toFixed(4)} + ${slope.toFixed(4)}×${xValues[i]} = ${yPred.toFixed(4)}</td>
             <td style="padding: 10px; text-align: center; ${residual >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">${residual.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${(residual * residual).toFixed(4)}</td>
+            <td class="s-618bb3">${(residual * residual).toFixed(4)}</td>
         </tr>`;
     }
     return rows;

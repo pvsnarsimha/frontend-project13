@@ -135,33 +135,33 @@ function computeTukeyHSD(inputText, alpha) {
     }
     
     // Build comprehensive HTML output
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6;">
+    let steps = `<div class="s-0932fc">
         
         <!-- HEADER SECTION -->
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 30px;">
-            <h1 style="margin: 0 0 10px 0;">📊 Tukey's HSD Test</h1>
-            <p style="margin: 0; opacity: 0.95; font-size: 16px;">Honestly Significant Difference - Post-hoc Analysis After ANOVA</p>
-            <div style="margin-top: 15px; background: rgba(255,255,255,0.15); padding: 12px; border-radius: 12px; font-family: monospace; font-size: 14px;">
+        <div class="s-954e6d gen-pad">
+            <h1 class="s-b82e54">📊 Tukey's HSD Test</h1>
+            <p class="s-522e7c">Honestly Significant Difference - Post-hoc Analysis After ANOVA</p>
+            <div class="s-8b2ecd">
                 <strong>📐 Formula:</strong> HSD = q<sub>α,k,df</sub> × √[MS<sub>within</sub> × (1/n<sub>i</sub> + 1/n<sub>j</sub>) / 2] (Tukey–Kramer)
             </div>
         </div>
         
         <!-- 📚 CONCEPT EXPLANATION -->
-        <div style="background: linear-gradient(135deg, #f0f4fa 0%, #e8eef5 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📚 What is Tukey's HSD Test?</h2>
+        <div class="s-467ef9 gen-pad">
+            <h2 class="s-2ce3ad">📚 What is Tukey's HSD Test?</h2>
             
-            <div style="background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">🎯 The Problem It Solves</h3>
+            <div class="s-09a0b8 gen-pad">
+                <h3 class="s-6efabd">🎯 The Problem It Solves</h3>
                 <p>After a significant ANOVA result (which tells us that <strong>at least one group differs</strong>), we need to know <strong>WHICH specific groups</strong> are different from each other.</p>
-                <div style="background: #e8f4f8; padding: 12px; border-radius: 10px; margin-top: 10px;">
+                <div class="s-4a5044">
                     💡 <strong>Analogy:</strong> ANOVA is like a fire alarm telling you there's a fire somewhere in the building. Tukey's HSD is like going room by room to find exactly which rooms are on fire!
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 15px; padding: 20px;">
-                <h3 style="color: #1a5490;">🔬 How Tukey's HSD Works</h3>
+            <div class="s-0d8f09 gen-pad">
+                <h3 class="s-6efabd">🔬 How Tukey's HSD Works</h3>
                 <p>The test calculates a <strong>critical difference value (HSD)</strong>. Any pair of group means that differ by more than this HSD value is considered statistically significant.</p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                <div class="s-915e13">
                     <strong>Formula Breakdown:</strong><br>
                     • <strong>q</strong> = Studentized range statistic (from table, depends on k and df)<br>
                     • <strong>MS<sub>within</sub></strong> = Mean Square Within (error variance from ANOVA)<br>
@@ -173,128 +173,128 @@ function computeTukeyHSD(inputText, alpha) {
         </div>
         
         <!-- 📊 STEP 1: INPUT DATA SUMMARY -->
-        <div style="background: #f8f9fa; border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📋 Step 1: Input Data Summary</h2>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden;">
-                    <thead><tr style="background: #1a5490; color: white;">
-                        <th style="padding: 12px;">Group</th>
-                        <th style="padding: 12px;">Sample Size (n)</th>
-                        <th style="padding: 12px;">Sum of Values (Σx)</th>
-                        <th style="padding: 12px;">Mean (x̄)</th>
-                        <th style="padding: 12px;">Values</th>
+        <div class="s-48543a gen-pad">
+            <h2 class="s-2ce3ad">📋 Step 1: Input Data Summary</h2>
+            <div class="s-01a9b9">
+                <table class="s-006f8c gen-sized">
+                    <thead><tr class="s-e7b83b">
+                        <th class="s-d66e1c">Group</th>
+                        <th class="s-d66e1c">Sample Size (n)</th>
+                        <th class="s-d66e1c">Sum of Values (Σx)</th>
+                        <th class="s-d66e1c">Mean (x̄)</th>
+                        <th class="s-d66e1c">Values</th>
                     </tr></thead>
                     <tbody>
                         ${groupData.map(g => `
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 10px; text-align: center; font-weight: bold;">${g.group}</td>
-                            <td style="padding: 10px; text-align: center;">${g.n}</td>
-                            <td style="padding: 10px; text-align: center;">${g.sum}</td>
-                            <td style="padding: 10px; text-align: center; background: #e8f4f8; font-weight: bold;">${g.mean.toFixed(4)}</td>
-                            <td style="padding: 10px;">${g.values.join(', ')}</td>
+                        <tr class="s-00049c">
+                            <td class="s-09833f">${g.group}</td>
+                            <td class="s-618bb3">${g.n}</td>
+                            <td class="s-618bb3">${g.sum}</td>
+                            <td class="s-e75df6">${g.mean.toFixed(4)}</td>
+                            <td class="s-aa3a8a">${g.values.join(', ')}</td>
                         </tr>
                         `).join('')}
                     </tbody>
                 </table>
             </div>
-            <div style="margin-top: 15px; background: #e8f4f8; padding: 12px; border-radius: 10px;">
+            <div class="s-37a19a">
                 <strong>📌 Summary:</strong> Total observations (N) = ${totalN} | Number of groups (k) = ${k}
             </div>
         </div>
         
         <!-- 🔢 STEP 2: ANOVA CALCULATIONS -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">🔢 Step 2: Calculate ANOVA Components</h2>
+        <div class="s-60475b gen-pad">
+            <h2 class="s-2ce3ad">🔢 Step 2: Calculate ANOVA Components</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">📊 Step 2a: Calculate Sum of Squares Within (SS<sub>within</sub>)</h3>
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+            <div class="s-2a0883 gen-pad">
+                <h3 class="s-6efabd">📊 Step 2a: Calculate Sum of Squares Within (SS<sub>within</sub>)</h3>
+                <div class="s-f6a2e8">
                     <strong>Formula:</strong> SS<sub>within</sub> = Σ(xᵢⱼ - x̄ⱼ)² = Sum of squared deviations within each group
                 </div>
                 ${ssWithinDetails.join('<br>')}
-                <div style="margin-top: 15px; padding: 10px; background: #1a5490; color: white; border-radius: 8px; text-align: center;">
+                <div class="s-d539cd">
                     <strong>SS<sub>within</sub> = ${ssWithin.toFixed(4)}</strong>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">📊 Step 2b: Calculate Degrees of Freedom Within</h3>
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px;">
-                    <strong>Formula:</strong> df<sub>within</sub> = N - k = ${totalN} - ${k} = <strong style="color: #1a5490;">${dfWithin}</strong>
+            <div class="s-2a0883 gen-pad">
+                <h3 class="s-6efabd">📊 Step 2b: Calculate Degrees of Freedom Within</h3>
+                <div class="s-063d6e">
+                    <strong>Formula:</strong> df<sub>within</sub> = N - k = ${totalN} - ${k} = <strong class="s-f342b5">${dfWithin}</strong>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <h3 style="color: #1a5490;">📊 Step 2c: Calculate Mean Square Within (MS<sub>within</sub>)</h3>
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px;">
+            <div class="s-6fab3a gen-pad">
+                <h3 class="s-6efabd">📊 Step 2c: Calculate Mean Square Within (MS<sub>within</sub>)</h3>
+                <div class="s-063d6e">
                     <strong>Formula:</strong> MS<sub>within</sub> = SS<sub>within</sub> / df<sub>within</sub><br>
-                    MS<sub>within</sub> = ${ssWithin.toFixed(4)} / ${dfWithin} = <strong style="color: #1a5490; font-size: 18px;">${msWithin.toFixed(6)}</strong>
+                    MS<sub>within</sub> = ${ssWithin.toFixed(4)} / ${dfWithin} = <strong class="s-bbce95">${msWithin.toFixed(6)}</strong>
                 </div>
-                <div style="margin-top: 12px; background: #fff3cd; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-28c132">
                     💡 <strong>What is MS<sub>within</sub>?</strong> It's the average variance within groups — our estimate of the "noise" or random error.
                 </div>
             </div>
         </div>
         
         <!-- 🔢 STEP 3: STUDENTIZED RANGE STATISTIC (q) -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">🔢 Step 3: Find the Studentized Range Statistic (q)</h2>
+        <div class="s-60475b gen-pad">
+            <h2 class="s-2ce3ad">🔢 Step 3: Find the Studentized Range Statistic (q)</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <div class="s-6fab3a gen-pad">
+                <div class="s-7d57aa">
                     <strong>📖 What is the Studentized Range (q)?</strong><br>
                     The studentized range distribution is used for multiple comparisons. The q-value depends on:
-                    <ul style="margin-top: 8px; margin-bottom: 0;">
+                    <ul class="s-bfa798">
                         <li><strong>α</strong> = Significance level (${alpha})</li>
                         <li><strong>k</strong> = Number of groups (${k})</li>
                         <li><strong>df<sub>within</sub></strong> = Degrees of freedom (${dfWithin})</li>
                     </ul>
                 </div>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <div class="s-ee59d6">
                     <strong>From q-table lookup:</strong><br>
-                    q<sub>${alpha}, ${k}, ${dfWithin}</sub> = <strong style="color: #1a5490; font-size: 18px;">${q.toFixed(4)}</strong>
+                    q<sub>${alpha}, ${k}, ${dfWithin}</sub> = <strong class="s-bbce95">${q.toFixed(4)}</strong>
                 </div>
                 
-                <div style="margin-top: 15px; background: #d4edda; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-10ba7a">
                     💡 <strong>Interpretation:</strong> This q-value is the critical threshold. Larger q means more conservative test (harder to find significance).
                 </div>
             </div>
         </div>
         
         <!-- 🔢 STEP 4: CALCULATE HSD FOR EACH COMPARISON -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">🔢 Step 4: Calculate HSD for Each Pairwise Comparison</h2>
+        <div class="s-60475b gen-pad">
+            <h2 class="s-2ce3ad">🔢 Step 4: Calculate HSD for Each Pairwise Comparison</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px;">
+            <div class="s-2a0883 gen-pad">
+                <div class="s-063d6e">
                     <strong>Formula:</strong> HSD = q × √[MS<sub>within</sub> × (1/n<sub>i</sub> + 1/n<sub>j</sub>) / 2]
                 </div>
-                <div style="margin-top: 12px; font-size: 13px; color: #666;">
+                <div class="s-fe253b">
                     Note: When sample sizes are unequal, we use the harmonic mean or the specific n for each pair.
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
+            <div class="s-fff633 gen-pad">
+                <table class="s-897d74 gen-sized">
                     <thead>
-                        <tr style="background: #1a5490; color: white;">
-                            <th style="padding: 12px;">Comparison</th>
-                            <th style="padding: 12px;">Mean₁ - Mean₂</th>
-                            <th style="padding: 12px;">HSD Calculation</th>
-                            <th style="padding: 12px;">HSD Critical Value</th>
-                            <th style="padding: 12px;">Result</th>
+                        <tr class="s-e7b83b">
+                            <th class="s-d66e1c">Comparison</th>
+                            <th class="s-d66e1c">Mean₁ - Mean₂</th>
+                            <th class="s-d66e1c">HSD Calculation</th>
+                            <th class="s-d66e1c">HSD Critical Value</th>
+                            <th class="s-d66e1c">Result</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${comparisons.map(c => {
                             const hsdCalc = `${q.toFixed(4)} × √[${msWithin.toFixed(4)} × (1/${c.n1} + 1/${c.n2}) / 2]`;
-                            return `<tr style="border-bottom: 1px solid #e9ecef;">
-                                <td style="padding: 12px; font-weight: bold;">${c.group1} vs ${c.group2}</td>
-                                <td style="padding: 12px; text-align: center;">|${c.mean1.toFixed(4)} - ${c.mean2.toFixed(4)}| = ${c.diff.toFixed(4)}</td>
-                                <td style="padding: 12px; font-family: monospace; font-size: 12px;">${hsdCalc}</td>
-                                <td style="padding: 12px; text-align: center; font-weight: bold;">${c.hsd.toFixed(4)}</td>
-                                <td style="padding: 12px; text-align: center; color: ${c.significant ? '#28a745' : '#dc3545'}; font-weight: bold;">
+                            return `<tr class="s-00049c">
+                                <td class="s-8136fa">${c.group1} vs ${c.group2}</td>
+                                <td class="s-3294d6">|${c.mean1.toFixed(4)} - ${c.mean2.toFixed(4)}| = ${c.diff.toFixed(4)}</td>
+                                <td class="s-f6b2e1">${hsdCalc}</td>
+                                <td class="s-3873ce">${c.hsd.toFixed(4)}</td>
+                                <td class="${c.significant ? 's-62e092' : 's-3eda47'}">
                                     ${c.significant ? '✓ Significant (Reject H₀)' : '✗ Not Significant (Fail to Reject H₀)'}
                                 </td>
                             </tr>`;
@@ -305,18 +305,18 @@ function computeTukeyHSD(inputText, alpha) {
         </div>
         
         <!-- 📊 STEP 5: RESULTS SUMMARY TABLE -->
-        <div style="background: white; border-radius: 20px; margin-bottom: 30px; border: 2px solid #1a5490; overflow-x: auto;">
-            <h2 style="margin: 0; padding: 20px; background: #1a5490; color: white; text-align: center;">📊 Tukey HSD Summary Table</h2>
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-2dc07c">
+            <h2 class="s-01214e gen-pad">📊 Tukey HSD Summary Table</h2>
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef;">
-                        <th style="padding: 12px;">Comparison</th>
-                        <th style="padding: 12px;">Mean Difference</th>
-                        <th style="padding: 12px;">Standard Error</th>
-                        <th style="padding: 12px;">HSD Critical</th>
-                        <th style="padding: 12px;">95% CI Lower</th>
-                        <th style="padding: 12px;">95% CI Upper</th>
-                        <th style="padding: 12px;">Significant?</th>
+                    <tr class="s-bfd0ae">
+                        <th class="s-d66e1c">Comparison</th>
+                        <th class="s-d66e1c">Mean Difference</th>
+                        <th class="s-d66e1c">Standard Error</th>
+                        <th class="s-d66e1c">HSD Critical</th>
+                        <th class="s-d66e1c">95% CI Lower</th>
+                        <th class="s-d66e1c">95% CI Upper</th>
+                        <th class="s-d66e1c">Significant?</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -324,14 +324,14 @@ function computeTukeyHSD(inputText, alpha) {
                         const se = Math.sqrt(msWithin * (1/c.n1 + 1/c.n2) / 2);
                         const ciLower = c.diff - c.hsd;
                         const ciUpper = c.diff + c.hsd;
-                        return `<tr style="border-bottom: 1px solid #dee2e6;">
-                            <td style="padding: 12px; font-weight: bold;">${c.group1} - ${c.group2}</td>
-                            <td style="text-align: center;">${c.diff.toFixed(4)}</td>
-                            <td style="text-align: center;">${se.toFixed(4)}</td>
-                            <td style="text-align: center; font-weight: bold;">${c.hsd.toFixed(4)}</td>
-                            <td style="text-align: center;">${ciLower.toFixed(4)}</td>
-                            <td style="text-align: center;">${ciUpper.toFixed(4)}</td>
-                            <td style="text-align: center; color: ${c.significant ? '#28a745' : '#dc3545'};">
+                        return `<tr class="s-b490b8">
+                            <td class="s-8136fa">${c.group1} - ${c.group2}</td>
+                            <td class="s-02528c">${c.diff.toFixed(4)}</td>
+                            <td class="s-02528c">${se.toFixed(4)}</td>
+                            <td class="s-f91e25">${c.hsd.toFixed(4)}</td>
+                            <td class="s-02528c">${ciLower.toFixed(4)}</td>
+                            <td class="s-02528c">${ciUpper.toFixed(4)}</td>
+                            <td class="${c.significant ? 's-2dc3e3' : 's-a0f714'}">
                                 ${c.significant ? '✓ Yes' : '✗ No'}
                             </td>
                         </tr>`;
@@ -342,13 +342,13 @@ function computeTukeyHSD(inputText, alpha) {
         
         <!-- 📌 CONCLUSION SECTION -->
         <div style="border-radius: 20px; padding: 25px; ${comparisons.some(c => c.significant) ? 'background: #d4edda; border-left: 8px solid #28a745;' : 'background: #f8d7da; border-left: 8px solid #dc3545;'} margin-bottom: 30px;">
-            <h2 style="margin-top: 0;">📌 Step 5: Statistical Conclusion</h2>
+            <h2 class="s-984cf4">📌 Step 5: Statistical Conclusion</h2>
             
-            <div style="background: rgba(0,0,0,0.05); border-radius: 10px; padding: 20px;">
+            <div class="s-e1300b gen-pad">
                 <h3>Decision Rule:</h3>
                 <p>If |x̄<sub>i</sub> - x̄<sub>j</sub>| > HSD → Reject H₀ (means are significantly different)</p>
                 
-                <div style="margin: 15px 0; padding: 12px; background: white; border-radius: 8px;">
+                <div class="s-5c898f">
                     <strong>Results Summary:</strong><br>
                     • Total pairwise comparisons: ${comparisons.length}<br>
                     • Significant differences found: ${comparisons.filter(c => c.significant).length}<br>
@@ -356,14 +356,14 @@ function computeTukeyHSD(inputText, alpha) {
                 </div>
                 
                 <h3>Final Interpretation:</h3>
-                <p style="font-size: 16px;">
+                <p class="s-e56c5e">
                     ${comparisons.filter(c => c.significant).length > 0 ? 
                         `✅ <strong>Significant differences detected.</strong> The following pairs show statistically significant differences at α = ${alpha}:<br>
                         ${comparisons.filter(c => c.significant).map(c => `&nbsp;&nbsp;• <strong>${c.group1} vs ${c.group2}</strong> (difference = ${c.diff.toFixed(4)}, HSD = ${c.hsd.toFixed(4)})`).join('<br>')}` : 
                         `❌ <strong>No significant differences detected.</strong> None of the pairwise comparisons exceeded the HSD critical value at α = ${alpha}.`}
                 </p>
                 
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+                <div class="s-bb8f69">
                     💡 <strong>Practical Meaning:</strong> Tukey's HSD test controls the family-wise error rate. 
                     ${comparisons.filter(c => c.significant).length > 0 ? 
                         'The significant comparisons indicate that those groups have truly different population means.' : 
@@ -373,21 +373,21 @@ function computeTukeyHSD(inputText, alpha) {
         </div>
         
         <!-- 💡 QUICK REFERENCE -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px;">
-            <h3 style="color: #1a5490; margin-top: 0;">💡 Quick Reference: When to Use Tukey HSD</h3>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                <div style="background: white; border-radius: 10px; padding: 12px;">
+        <div class="s-44d7a2 gen-pad">
+            <h3 class="s-862845">💡 Quick Reference: When to Use Tukey HSD</h3>
+            <div class="s-cb5968 gen-grid">
+                <div class="s-2ca928">
                     <strong>✅ Use Tukey HSD when:</strong>
-                    <ul style="margin-top: 8px; margin-bottom: 0;">
+                    <ul class="s-bfa798">
                         <li>ANOVA is significant</li>
                         <li>Equal or similar sample sizes</li>
                         <li>Want to compare ALL pairs</li>
                         <li>Homogeneity of variance holds</li>
                     </ul>
                 </div>
-                <div style="background: white; border-radius: 10px; padding: 12px;">
+                <div class="s-2ca928">
                     <strong>❌ Consider alternatives when:</strong>
-                    <ul style="margin-top: 8px; margin-bottom: 0;">
+                    <ul class="s-bfa798">
                         <li>Sample sizes are very unequal (use Games-Howell)</li>
                         <li>Only comparing to control group (use Dunnett's)</li>
                         <li>Testing complex contrasts (use Scheffé)</li>

@@ -130,29 +130,29 @@ function computeMoodsMedianTest(inputText, alpha) {
     // Build contingency table
     let contingencyRows = '';
     for (let c of contributions) {
-        contingencyRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; font-weight: bold;">${c.group}</td>
-            <td style="padding: 10px; text-align: center;">${c.n}</td>
-            <td style="padding: 10px; text-align: center; background: #e8f4f8;">${c.above} (exp: ${c.expectedAbove.toFixed(2)})</td>
-            <td style="padding: 10px; text-align: center; background: #f8f9fa;">${c.below} (exp: ${c.expectedBelow.toFixed(2)})</td>
-            <td style="padding: 10px; text-align: center;">${c.contribAbove.toFixed(4)} + ${c.contribBelow.toFixed(4)} = ${(c.contribAbove + c.contribBelow).toFixed(4)}</td>
+        contingencyRows += `<tr class="s-00049c">
+            <td class="s-31373e">${c.group}</td>
+            <td class="s-618bb3">${c.n}</td>
+            <td class="s-e1ff77">${c.above} (exp: ${c.expectedAbove.toFixed(2)})</td>
+            <td class="s-93617e">${c.below} (exp: ${c.expectedBelow.toFixed(2)})</td>
+            <td class="s-618bb3">${c.contribAbove.toFixed(4)} + ${c.contribBelow.toFixed(4)} = ${(c.contribAbove + c.contribBelow).toFixed(4)}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 25px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">📊</span>
+    let steps = `<div class="s-9217e5">
+        <div class="s-6d8291 gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">📊</span>
                 <div>
-                    <h1 style="margin: 0; font-size: 28px;">Mood's Median Test</h1>
-                    <p style="margin: 8px 0 0 0; opacity: 0.9;">Non-parametric test for comparing medians across groups</p>
+                    <h1 class="s-b80b8c">Mood's Median Test</h1>
+                    <p class="s-259079">Non-parametric test for comparing medians across groups</p>
                 </div>
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Understanding Mood's Median Test</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+        <div class="s-2f2db9 gen-pad">
+            <h3 class="s-d163b6">📊 Understanding Mood's Median Test</h3>
+            <div class="s-6025fc">
                 <p><strong>What it does:</strong> Tests whether multiple groups have the same median.</p>
                 <p><strong>How it works:</strong></p>
                 <ol>
@@ -165,70 +165,70 @@ function computeMoodsMedianTest(inputText, alpha) {
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📋 Data Summary</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 15px;">
+        <div class="s-2f2db9 gen-pad">
+            <h3 class="s-d163b6">📋 Data Summary</h3>
+            <div class="s-6025fc">
+                <div class="s-ad02c5 gen-grid">
                     <div><strong>Total observations:</strong> ${n}</div>
                     <div><strong>Number of groups (k):</strong> ${k}</div>
                     <div><strong>Overall Median:</strong> ${overallMedian.toFixed(4)}</div>
                 </div>
-                <div style="background: #fff3cd; padding: 12px; border-radius: 8px;">
+                <div class="s-6da5f7">
                     💡 Values <strong>equal to the median</strong> are excluded from the above/below counts: ${excluded} of ${totalValues} value${totalValues === 1 ? '' : 's'} ${excluded === 1 ? 'was' : 'were'} excluded, so each group's n (valid) can be smaller than the number you entered.
                 </div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 20px; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white;">🔢 Step 1: Count Above/Below Median by Group</h3>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-3bb957">
+            <h3 class="s-10bf27">🔢 Step 1: Count Above/Below Median by Group</h3>
+            <div class="s-01a9b9">
+                <table class="s-897d74 gen-sized">
                     <thead>
-                        <tr style="background: #e9ecef;">
-                            <th style="padding: 10px;">Group</th>
-                            <th style="padding: 10px;">n (valid)</th>
-                            <th style="padding: 10px;">Above Median<br>(> ${overallMedian.toFixed(2)})</th>
-                            <th style="padding: 10px;">Below Median<br>(< ${overallMedian.toFixed(2)})</th>
-                            <th style="padding: 10px;">Chi-square Contribution</th>
+                        <tr class="s-bfd0ae">
+                            <th class="s-a756db">Group</th>
+                            <th class="s-a756db">n (valid)</th>
+                            <th class="s-a756db">Above Median<br>(> ${overallMedian.toFixed(2)})</th>
+                            <th class="s-a756db">Below Median<br>(< ${overallMedian.toFixed(2)})</th>
+                            <th class="s-a756db">Chi-square Contribution</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${contingencyRows}
-                        <tr style="background: #e9ecef; font-weight: bold;">
-                            <td style="padding: 10px;">TOTAL</td>
-                            <td style="padding: 10px; text-align: center;">${totalAbove + totalBelow}</td>
-                            <td style="padding: 10px; text-align: center;">${totalAbove}</td>
-                            <td style="padding: 10px; text-align: center;">${totalBelow}</td>
-                            <td style="padding: 10px; text-align: center;">${chiSquare.toFixed(4)}</td>
+                        <tr class="s-17b154">
+                            <td class="s-aa3a8a">TOTAL</td>
+                            <td class="s-618bb3">${totalAbove + totalBelow}</td>
+                            <td class="s-618bb3">${totalAbove}</td>
+                            <td class="s-618bb3">${totalBelow}</td>
+                            <td class="s-618bb3">${chiSquare.toFixed(4)}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 2: Calculate Chi-Square Statistic</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+        <div class="s-4b5ce2 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 2: Calculate Chi-Square Statistic</h3>
+            <div class="s-6025fc">
                 <strong>Formula:</strong> χ² = Σ (O - E)² / E<br><br>
                 <strong>χ² = ${chiSquare.toFixed(6)}</strong><br>
                 <strong>Degrees of Freedom:</strong> df = k - 1 = ${k} - 1 = ${df}
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #f8d7da; border-left: 6px solid #dc3545;' : 'background: #d4edda; border-left: 6px solid #28a745;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
+        <div class="${rejectH0 ? 's-a314d9 gen-pad' : 's-d45b93 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Test Conclusion</h3>
             <div><strong>Chi-square statistic:</strong> ${chiSquare.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> ${df}</div>
             <div><strong>Critical value (α = ${alpha}):</strong> ${criticalValue.toFixed(4)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-34b24f">
                 <strong>Decision rule:</strong> p-value ${rejectH0 ? '<' : '≥'} α (${alpha})<br>
                 <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                 <strong>Conclusion:</strong> ${rejectH0 ? 'There IS sufficient evidence that at least one group median differs from others.' : 'There is NOT sufficient evidence that the group medians differ.'}
             </div>
         </div>
         
-        <div style="margin-top: 20px; padding: 16px; background: #e8f4f8; border-radius: 12px;">
+        <div class="s-0b1c41">
             <strong>💡 When to use Mood's Median Test:</strong><br>
             • Data is ordinal or not normally distributed<br>
             • You want a robust test that's less sensitive to outliers than Kruskal-Wallis<br>
