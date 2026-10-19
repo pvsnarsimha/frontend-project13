@@ -55,13 +55,13 @@ function computeContingencyTableWithSteps(inputText) {
     const colCategories = [...new Set(pairs.map(p => p.col))].sort();
     
     // Create contingency table
-    const table = {};
-    const rowTotals = {};
-    const colTotals = {};
+    const table = Object.create(null);
+    const rowTotals = Object.create(null);
+    const colTotals = Object.create(null);
     
     // Initialize table
     for (let row of rowCategories) {
-        table[row] = {};
+        table[row] = Object.create(null);
         rowTotals[row] = 0;
         for (let col of colCategories) {
             table[row][col] = 0;
@@ -146,7 +146,7 @@ function setupContingencyLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = result.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
             setHtml(valueSpan, `${result.rowCategories.length} rows × ${result.colCategories.length} columns | Total: ${result.grandTotal} observations`);
             setHtml(stepsSpan, result.steps);

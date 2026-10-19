@@ -148,7 +148,7 @@ function computeQuantileWithSteps() {
     steps += `\n🔍 CALCULATING THE MEDIAN (50th percentile):\n`;
     steps += `   The median requires solving I_x(α,β) = 0.5\n`;
     const median = betaQuantile(0.5, alpha, beta);
-    steps += `   Using Newton-Raphson iteration:\n`;
+    steps += `   Solved numerically (betaQuantile: Newton-Raphson steps safeguarded by bisection):\n`;
     steps += `   • Initial guess: x₀ = mean = ${mean.toFixed(6)}\n`;
     steps += `   • After iterations: median = ${median.toFixed(8)}\n`;
     steps += `   • Mean - Median = ${(mean - median).toFixed(6)} `;
@@ -182,7 +182,8 @@ function computeQuantileWithSteps() {
             steps += `\n🔬 PROBLEM: Solve I_x(${alpha},${beta}) = ${p}\n`;
             steps += `   Where I_x(α,β) is the Regularized Incomplete Beta function\n\n`;
             
-            steps += `⚙️ SOLUTION METHOD: Newton-Raphson Iteration\n`;
+            steps += `⚙️ SOLUTION METHOD: Newton-Raphson Iteration (first 5 steps shown for illustration)\n`;
+            steps += `   The reported quantile comes from betaQuantile, which uses the same Newton-Raphson idea\n   but falls back to bisection so it always converges; the steps below show how the iteration approaches it.\n`;
             steps += `   Formula: x_{n+1} = x_n - [F(x_n) - p] / f(x_n)\n`;
             steps += `   Where: F(x) = CDF, f(x) = PDF\n\n`;
             
@@ -286,7 +287,7 @@ function setupQuantileLogic() {
             if (result.error) {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = 'Error';
-                stepsSpan.innerText = result.message;
+                setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
             } else {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = result.resultStr;

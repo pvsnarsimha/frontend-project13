@@ -152,14 +152,17 @@ function computeCooksDistance(xValues, yValues) {
             <td class="s-69c02e">${d.yPred.toFixed(4)}</td>
             <td class="s-69c02e ${d.residual >= 0 ? 'tp-text-ok' : 'tp-text-bad'}">${d.residual.toFixed(4)}</td>
             <td class="s-69c02e">${d.leverage.toFixed(4)}</td>
-            <td class="s-34f862 tp-infl-${d.influenceClass}-bg">${d.cooksD.toFixed(6)}</td>
+            <td class="s-34f862 tp-infl-${d.influenceClass}-bg">${isFinite(d.cooksD) ? d.cooksD.toFixed(6) : "∞"}</td>
             <td class="s-e73169 tp-infl-${d.influenceClass}">${d.influence}</td>
         </tr>`;
     }
     
     // Build complete HTML
-    const steps = stepsHtmlCooksDistance({ cookDetails, influentialCount, intercept, leverageDetails, meanX, meanY, moderateCount, mse, n, predictionDetails, slope, sortedD, ssRes, sxx, tableRows, xxDetails, xxSum, xyDetails, xySum });
-    return { cooksDistances: cookDetails.map(d => d.cooksD), leverages: cookDetails.map(d => d.leverage), residuals, mse, steps, cookDetails };
+    // A perfect fit has MSE = 0, so every Cook's D is 0 / 0. It is shown as 0 (no point moves a line that already passes through all of them), and the page says so.
+    const perfectFit = mse < 1e-15;
+    const perfectFitNote = perfectFit ? `<div class="tp-warn-6 tp-perfect-note">⚠️ The line fits the data perfectly: all residuals are 0, so MSE = 0 and Cook's D = e²/(p·MSE) · h/(1−h)² is 0/0 for every point. D is shown as 0 here (no point is influential), but the measure is not informative for a perfect fit.</div>` : '';
+    const steps = perfectFitNote + stepsHtmlCooksDistance({ cookDetails, influentialCount, intercept, leverageDetails, meanX, meanY, moderateCount, mse, n, predictionDetails, slope, sortedD, ssRes, sxx, tableRows, xxDetails, xxSum, xyDetails, xySum });
+    return { cooksDistances: cookDetails.map(d => d.cooksD), leverages: cookDetails.map(d => d.leverage), residuals, mse, perfectFit, steps, cookDetails };
 }
 
 // ========== COOK'S DISTANCE SETUP FUNCTION (FIXED) ==========
@@ -184,7 +187,9 @@ function setupCooksDistanceLogic() {
             setHtml(stepsSpan, result.message);  // ← innerHTML
         } else {
             const influential = result.cooksDistances.filter(d => d >= 1).length;
-            setHtml(valueSpan, `${influential} influential obs | Max D = ${Math.max(...result.cooksDistances).toFixed(4)}`);
+            const maxD = Math.max(...result.cooksDistances);
+            // Cook's D is Infinity when a point has leverage 1 (it alone determines the line); say so instead of printing "Infinity"
+            setHtml(valueSpan, `${influential} influential obs | Max D = ${isFinite(maxD) ? maxD.toFixed(4) : '∞ (leverage = 1)'}`);
             setHtml(stepsSpan, result.steps);  // ← CRITICAL: use innerHTML not innerText
         }
     });

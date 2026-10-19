@@ -40,19 +40,10 @@ function renderMoodsMedianInterface() {
 
 // ========== MOOD'S MEDIAN TEST COMPUTATION ==========
 function computeMoodsMedianTest(inputText, alpha) {
-    const lines = inputText.trim().split(/[,\s\n]+/);
-    let groups = new Map();
-    
-    for (let entry of lines) {
-        entry = entry.trim();
-        if (entry === "") continue;
-        let [valStr, groupName] = entry.split(':');
-        let val = parseFloat(valStr);
-        if (!isNaN(val) && isFinite(val) && groupName) {
-            groupName = escapeHtml(groupName.trim());
-            if (!groups.has(groupName)) groups.set(groupName, []);
-            groups.get(groupName).push(val);
-        }
+    const parsed = parseValueGroupInput(inputText);
+    const groups = parsed.groups;
+    if (parsed.skipped.length) {
+        return { error: true, message: `Could not read: ${parsed.skipped.slice(0, 5).map(x => escapeHtml(x)).join(', ')}${parsed.skipped.length > 5 ? ', …' : ''}. Each entry must look like value:group (for example 12.5:Control).` };
     }
     
     if (groups.size < 2) {
@@ -70,12 +61,7 @@ function computeMoodsMedianTest(inputText, alpha) {
     
     allValues.sort((a, b) => a - b);
     const n = allValues.length;
-    let overallMedian;
-    if (n % 2 === 0) {
-        overallMedian = (allValues[n/2 - 1] + allValues[n/2]) / 2;
-    } else {
-        overallMedian = allValues[Math.floor(n/2)];
-    }
+    const overallMedian = quantileType7(allValues, 0.5);
     
     // Create 2×k contingency table (Above/Below Median × Groups)
     let aboveCount = new Map();
@@ -98,6 +84,10 @@ function computeMoodsMedianTest(inputText, alpha) {
         totalAbove += above;
         totalBelow += below;
     }
+    
+    // Values exactly equal to the overall median are in neither count; say how many there were
+    const totalValues = [...groups.values()].reduce((sum, v) => sum + v.length, 0);
+    const excluded = totalValues - totalAbove - totalBelow;
     
     // Check if we have enough data
     if (totalAbove === 0 || totalBelow === 0) {
@@ -184,7 +174,7 @@ function computeMoodsMedianTest(inputText, alpha) {
                     <div><strong>Overall Median:</strong> ${overallMedian.toFixed(4)}</div>
                 </div>
                 <div style="background: #fff3cd; padding: 12px; border-radius: 8px;">
-                    💡 Values <strong>equal to the median</strong> are excluded from analysis (shown as 0).
+                    💡 Values <strong>equal to the median</strong> are excluded from the above/below counts: ${excluded} of ${totalValues} value${totalValues === 1 ? '' : 's'} ${excluded === 1 ? 'was' : 'were'} excluded, so each group's n (valid) can be smaller than the number you entered.
                 </div>
             </div>
         </div>
@@ -246,7 +236,7 @@ function computeMoodsMedianTest(inputText, alpha) {
         </div>
     </div>`;
     
-    return { chiSquare, df, pValue, criticalValue, rejectH0, overallMedian, steps };
+    return { chiSquare, df, pValue, criticalValue, rejectH0, overallMedian, excluded, steps };
 }
 
 function setupMoodsMedianLogic() {

@@ -49,19 +49,10 @@ function renderTukeyHSDInterface() {
 // ========== TUKEY HSD COMPUTATION ==========
 // ========== TUKEY HSD COMPUTATION (DETAILED) ==========
 function computeTukeyHSD(inputText, alpha) {
-    const lines = inputText.trim().split(/[,\s\n]+/);
-    let groups = new Map();
-    
-    for (let entry of lines) {
-        entry = entry.trim();
-        if (entry === "") continue;
-        let [valStr, groupName] = entry.split(':');
-        let val = parseFloat(valStr);
-        if (!isNaN(val) && isFinite(val) && groupName) {
-            groupName = escapeHtml(groupName.trim());
-            if (!groups.has(groupName)) groups.set(groupName, []);
-            groups.get(groupName).push(val);
-        }
+    const parsed = parseValueGroupInput(inputText);
+    const groups = parsed.groups;
+    if (parsed.skipped.length) {
+        return { error: true, message: `Could not read: ${parsed.skipped.slice(0, 5).map(x => escapeHtml(x)).join(', ')}${parsed.skipped.length > 5 ? ', …' : ''}. Each entry must look like value:group (for example 12.5:Control).` };
     }
     
     if (groups.size < 2) {
@@ -406,7 +397,9 @@ function computeTukeyHSD(inputText, alpha) {
         </div>
     </div>`;
     
-    return { comparisons, hsd: comparisons[0]?.hsd, msWithin, q, steps };
+    // One HSD exists only when every pair has the same sample sizes; with unequal n (Tukey-Kramer) each pair has its own
+    const sameHsd = comparisons.length > 0 && comparisons.every(c => Math.abs(c.hsd - comparisons[0].hsd) < 1e-9 * Math.max(1, comparisons[0].hsd));
+    return { comparisons, hsd: sameHsd ? comparisons[0].hsd : null, msWithin, q, steps };
 }
 
 // ========== TUKEY HSD SETUP ==========
@@ -436,7 +429,7 @@ function setupTukeyHSDLogic() {
             setHtml(stepsSpan, result.message);
         } else {
             const sigCount = result.comparisons.filter(c => c.significant).length;
-            setHtml(valueSpan, `${sigCount}/${result.comparisons.length} comparisons significant | HSD = ${result.hsd?.toFixed(4) || 'N/A'}`);
+            setHtml(valueSpan, `${sigCount}/${result.comparisons.length} comparisons significant | ${result.hsd !== null && result.hsd !== undefined ? 'HSD = ' + result.hsd.toFixed(4) : 'HSD differs by pair (unequal n)'}`);
             setHtml(stepsSpan, result.steps);
         }
     });

@@ -50,6 +50,10 @@ function computeShapiroWilkTest(data, alpha) {
         ss += sqDev;
     }
     
+    if (!(ss > 0)) {
+        return { error: true, message: "All values are identical, so the normality test is undefined (zero variance)." };
+    }
+    
     // Calculate Shapiro-Wilk W statistic
     let numerator = 0;
     let aCoeffs = [];

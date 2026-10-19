@@ -171,7 +171,7 @@ function setupSumSquaresLogic() {
         if (ssRes.error) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = ssRes.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(ssRes.message));
             return;
         }
         

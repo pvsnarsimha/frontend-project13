@@ -73,7 +73,7 @@ function computeRankingWithSteps(numbers) {
     steps += `📊 ORDER STATISTICS:\n`;
     steps += `   • Minimum (1st order): ${sortedValues[0]}\n`;
     steps += `   • 2nd smallest: ${sortedValues[1] || 'N/A'}\n`;
-    steps += `   • Median: ${sortedValues[Math.floor(sortedValues.length/2)]}\n`;
+    steps += `   • Median: ${quantileType7(sortedValues, 0.5)}\n`;
     steps += `   • 2nd largest: ${sortedValues[sortedValues.length-2] || 'N/A'}\n`;
     steps += `   • Maximum (nth order): ${sortedValues[sortedValues.length-1]}\n`;
     
@@ -107,7 +107,7 @@ function setupRankingLogic() {
         if (rankRes.error) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = rankRes.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(rankRes.message));
             return;
         }
         

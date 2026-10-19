@@ -55,7 +55,7 @@ function computeStdErrorsWithSteps(xValues, yValues) {
     const meanY = yValues.reduce((a,b) => a+b, 0) / n;
     
     // Build deviation table
-    let deviationRows = '';
+    const deviationRows = buildDeviationRows(xValues, yValues, meanX, meanY);
     let numerator = 0, denominator = 0;
     
     for (let i = 0; i < n; i++) {
@@ -66,22 +66,23 @@ function computeStdErrorsWithSteps(xValues, yValues) {
         numerator += product;
         denominator += xSq;
         
-        deviationRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]} - ${meanX.toFixed(4)} = ${xDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]} - ${meanY.toFixed(4)} = ${yDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; font-weight: 600; color: #1a5490;">${product.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${xSq.toFixed(4)}</td>
-        </tr>`;
     }
     
-    const slope = numerator / denominator;
-    const intercept = meanY - slope * meanX;
+    if (!(denominator > 0)) {
+        return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
+    }
+    const core = simpleRegressionCore(xValues, yValues);   // the shared formulas (core/helpers.js); the loops below only build the display tables
+    if (!(core.ssTot > 0)) {
+        return { error: true, message: "All Y values are identical, so the slope is 0 and there is no variation to test (R² is undefined). Enter Y values that vary." };
+    }
+    if (core.ssRes <= 1e-12 * core.ssTot) {
+        return { error: true, message: "The line fits the data perfectly (residual sum of squares ≈ 0), so the standard errors are 0 and the t statistics are infinite. Inference needs some scatter around the line." };
+    }
+    const slope = core.slope;
+    const intercept = core.intercept;
     
     // Build predictions and residuals table
-    let predictionsRows = '';
+    const predictionsRows = buildPredictionRows(xValues, yValues, slope, intercept);
     let ssRes = 0;
     
     for (let i = 0; i < n; i++) {
@@ -89,20 +90,12 @@ function computeStdErrorsWithSteps(xValues, yValues) {
         const residual = yValues[i] - yPred;
         ssRes += residual * residual;
         
-        predictionsRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center; font-family: monospace;">${intercept.toFixed(4)} + ${slope.toFixed(4)}×${xValues[i]} = ${yPred.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; ${residual >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">${residual.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${(residual * residual).toFixed(4)}</td>
-        </tr>`;
     }
     
-    const mse = ssRes / (n - 2);
+    const mse = core.mse;
     const tCrit = n > 2 ? tCriticalValue(0.025, n - 2) : NaN;   // 95% CI uses the t quantile with n - 2 df
-    const seSlope = Math.sqrt(mse / denominator);
-    const seIntercept = Math.sqrt(mse * (1/n + Math.pow(meanX, 2) / denominator));
+    const seSlope = core.seSlope;
+    const seIntercept = core.seIntercept;
     
     let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
         

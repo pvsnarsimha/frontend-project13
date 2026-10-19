@@ -4,6 +4,7 @@
 function renderDistributionVarianceInterface() {
     return buildInterface({
         id: "statDistributionVarianceInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "📏 Variance Var[X] of Distribution",
         formula: "📌 Var[X] = E[(X - μ)²] = E[X²] - (E[X])²",
         desc: "Variance measures the spread of a distribution around its mean.",
@@ -65,6 +66,10 @@ function setupDistributionVarianceLogic() {
                 params.p = parseFloat(document.getElementById("varianceDistP").value);
             }
             
+            const paramError = validateDistributionParams(dist, params);
+            
+            if (paramError) { showToolError('varianceDist', paramError); return; }
+            
             const result = computeDistributionVarianceWithSteps(dist, params);
             const resultDiv = document.getElementById("varianceDistResultArea");
             const valueSpan = document.getElementById("varianceDistValueDisplay");
@@ -76,7 +81,7 @@ function setupDistributionVarianceLogic() {
         });
     }
     
-    attachClearHandler("varianceDistClearBtn", "", "varianceDistResultArea");
+    attachClearHandler("varianceDistClearBtn", ["varianceDistStd", "varianceDistRate", "varianceDistMin", "varianceDistMax", "varianceDistAlpha", "varianceDistBeta", "varianceDistLambda", "varianceDistN", "varianceDistP"], "varianceDistResultArea");
 }
 
 // ========== DISTRIBUTION VARIANCE COMPUTATION - DETAILED ==========
@@ -108,7 +113,7 @@ function computeDistributionVarianceWithSteps(distType, params) {
     
     if (distType === 'normal') {
         const stdDev = params.stdDev;
-        variance = stdDev * stdDev;
+        variance = distributionMoments(distType, params).variance;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      NORMAL DISTRIBUTION                         ║\n`;
@@ -143,7 +148,7 @@ function computeDistributionVarianceWithSteps(distType, params) {
         
     } else if (distType === 'exponential') {
         const rate = params.rate;
-        variance = 1 / (rate * rate);
+        variance = distributionMoments(distType, params).variance;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                    EXPONENTIAL DISTRIBUTION                      ║\n`;
@@ -187,7 +192,7 @@ function computeDistributionVarianceWithSteps(distType, params) {
     } else if (distType === 'uniform') {
         const min = params.min;
         const max = params.max;
-        variance = Math.pow(max - min, 2) / 12;
+        variance = distributionMoments(distType, params).variance;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      UNIFORM DISTRIBUTION                        ║\n`;
@@ -227,7 +232,7 @@ function computeDistributionVarianceWithSteps(distType, params) {
     } else if (distType === 'beta') {
         const alpha = params.alpha;
         const beta = params.beta;
-        variance = (alpha * beta) / (Math.pow(alpha + beta, 2) * (alpha + beta + 1));
+        variance = distributionMoments(distType, params).variance;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                       BETA DISTRIBUTION                          ║\n`;
@@ -274,7 +279,7 @@ function computeDistributionVarianceWithSteps(distType, params) {
         
     } else if (distType === 'poisson') {
         const lambda = params.lambda;
-        variance = lambda;
+        variance = distributionMoments(distType, params).variance;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      POISSON DISTRIBUTION                        ║\n`;
@@ -310,7 +315,7 @@ function computeDistributionVarianceWithSteps(distType, params) {
     } else if (distType === 'binomial') {
         const n = params.n;
         const p = params.p;
-        variance = n * p * (1 - p);
+        variance = distributionMoments(distType, params).variance;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                     BINOMIAL DISTRIBUTION                        ║\n`;

@@ -3,6 +3,7 @@
 function renderRandomInterface() {
     return buildInterface({
         id: "statRandomInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "🎲 Random Number Generation",
         formula: "📌 Generate random samples from specified distributions",
         desc: "Generate random numbers following specific probability distributions.",
@@ -84,24 +85,32 @@ function sampleGamma(shape, source) {
     }
 }
 
-function sampleBeta(alpha, beta, source) {
-    const x = sampleGamma(alpha, source), y = sampleGamma(beta, source);
-    return x / (x + y);
+// log of a Gamma(shape, 1) draw. For small shapes U^(1/a) underflows to 0 (a = 0.001: almost every draw), so the boost is
+// applied to the logarithm: log G(a) = log G(a + 1) + log(U) / a, which stays finite.
+function sampleLogGamma(shape, source) {
+    if (shape < 1) return Math.log(sampleGamma(shape + 1, source)) + Math.log(1 - source.uniform()) / shape;
+    return Math.log(sampleGamma(shape, source));
 }
 
+// Beta(α, β) = X / (X + Y) with X ~ Gamma(α), Y ~ Gamma(β), evaluated from the logs: 1 / (1 + e^(log Y - log X))
+function sampleBeta(alpha, beta, source) {
+    const logX = sampleLogGamma(alpha, source), logY = sampleLogGamma(beta, source);
+    return 1 / (1 + Math.exp(logY - logX));
+}
+
+// One generator per distribution: adding a distribution to the form means adding its entry here (and nothing else can be selected)
+const RANDOM_GENERATORS = {
+    normal: (params, source) => params.mean + params.std * source.normal(),
+    uniform: (params, source) => params.min + source.uniform() * (params.max - params.min),
+    exponential: (params, source) => -Math.log(1 - source.uniform()) / params.rate,
+    beta: (params, source) => sampleBeta(params.alpha, params.beta, source)
+};
+
 function generateRandomNumbers(count, dist, params, source) {
+    if (!Object.prototype.hasOwnProperty.call(RANDOM_GENERATORS, dist)) throw new Error(`No random generator for the distribution "${dist}"`);
+    const generate = RANDOM_GENERATORS[dist];
     const numbers = [];
-    for (let i = 0; i < count; i++) {
-        if (dist === 'normal') {
-            numbers.push(params.mean + params.std * source.normal());
-        } else if (dist === 'uniform') {
-            numbers.push(params.min + source.uniform() * (params.max - params.min));
-        } else if (dist === 'exponential') {
-            numbers.push(-Math.log(1 - source.uniform()) / params.rate);
-        } else if (dist === 'beta') {
-            numbers.push(sampleBeta(params.alpha, params.beta, source));
-        }
-    }
+    for (let i = 0; i < count; i++) numbers.push(generate(params, source));
     return numbers;
 }
 
@@ -109,6 +118,9 @@ function computeRandomWithSteps() {
     const dist = document.getElementById('randomDistribution').value;
     const count = parseInt(document.getElementById('randomCount').value);
     
+    if (!Object.prototype.hasOwnProperty.call(RANDOM_GENERATORS, dist)) {
+        return { error: true, message: "Choose one of the available distributions." };
+    }
     if (isNaN(count) || count < 1) {
         return { error: true, message: "Please enter a valid number of values to generate (minimum 1)." };
     }
@@ -129,6 +141,7 @@ function computeRandomWithSteps() {
     
     // DECLARE randomNumbers HERE (in outer scope)
     let randomNumbers = [];
+    let rejectionCapped = false;   // set when Beta rejection sampling gave up on some values (reported in the result tile)
     
     if (dist === 'normal') {
         params.mean = parseFloat(document.getElementById('randomMean').value);
@@ -207,6 +220,7 @@ function computeRandomWithSteps() {
             steps += `🔢 GENERATION PROCESS (showing first 5 samples in detail):\n`;
             steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
             
+            const MAX_REJECTION_ATTEMPTS = 100000;   // a very peaked Beta accepts rarely; never loop forever
             let samplesShown = 0;
             const maxShowDetails = Math.min(5, count);
             
@@ -216,7 +230,8 @@ function computeRandomWithSteps() {
                     x = source.uniform();
                     y = source.uniform() * maxDensity;
                     attempts++;
-                } while (y > betaPDF(x, params.alpha, params.beta));
+                } while (y > betaPDF(x, params.alpha, params.beta) && attempts < MAX_REJECTION_ATTEMPTS);
+                if (attempts >= MAX_REJECTION_ATTEMPTS) { rejectionCapped = true; x = mode; }
                 randomNumbers.push(x);
                 
                 if (samplesShown < maxShowDetails) {
@@ -299,10 +314,14 @@ function computeRandomWithSteps() {
         
         steps += `\n💡 QUALITY CHECK:\n`;
         const meanDiff = Math.abs(sampleMean - theoreticalMean);
-        if (meanDiff < 0.05 * theoreticalStd) {
-            steps += `✓ Sample mean is close to theoretical mean → Good approximation\n`;
+        // compare with the standard error of a sample mean, not with σ itself (which a sample of 10 can never meet)
+        const meanTolerance = 3 * theoreticalStd / Math.sqrt(randomNumbers.length);
+        if (rejectionCapped) {
+            steps += `⚠ Rejection sampling hit its attempt limit for some values (the distribution is very peaked); those values were set to the mode.\n`;
+        } else if (meanDiff < meanTolerance) {
+            steps += `✓ Sample mean is within 3 standard errors (±${meanTolerance.toFixed(6)}) of the theoretical mean → consistent with Beta(${params.alpha},${params.beta})\n`;
         } else {
-            steps += `⚠ Sample mean differs from theoretical mean. Try generating more samples.\n`;
+            steps += `⚠ Sample mean is more than 3 standard errors from the theoretical mean (unusual; try generating again or more values).\n`;
         }
         
         steps += `\n🎯 PRACTICAL APPLICATIONS:\n`;
@@ -335,7 +354,8 @@ function computeRandomWithSteps() {
     steps += `  Maximum: ${max.toFixed(6)}\n`;
     steps += `  Range: ${(max - min).toFixed(6)}\n`;
     
-    return { randomNumbers, steps, resultStr: randomNumbers.map(n => n.toFixed(4)).join(', ') };
+    const warning = rejectionCapped ? ' | Warning: some values were set to the mode because this Beta is too peaked for rejection sampling; generate fewer values or use less extreme parameters' : '';
+    return { randomNumbers, steps, rejectionCapped, resultStr: randomNumbers.map(n => n.toFixed(4)).join(', ') + warning };
 }
 
 function setupRandomLogic() {
@@ -356,7 +376,7 @@ function setupRandomLogic() {
             if (result.error) {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = 'Error';
-                stepsSpan.innerText = result.message;
+                setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
             } else {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = result.resultStr;

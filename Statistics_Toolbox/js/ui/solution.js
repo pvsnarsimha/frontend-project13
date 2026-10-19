@@ -48,7 +48,7 @@
         const lines = raw.split('\n').map(l => l.replace(/\s+$/, ''));
         const cleanOf = l => l.replace(BOX, ' ').replace(/\s+/g, ' ').trim();
         const okFin = lines.findIndex(l => /^\s*(✅|✔|☑)/u.test(l));
-        const chFin = lines.findIndex(l => /^(FINAL (ANSWERS?|RESULTS?)|SUMMARY)$/.test(cleanOf(l).replace(/^[^A-Za-z]+/, '')));
+        const chFin = lines.findIndex(l => /^(FINAL (ANSWERS?|RESULTS?)|SUMMARY):?$/.test(cleanOf(l).replace(/^[^A-Za-z]+/, '')));
         let fin = -1, skip = 0;
         if (chFin >= 0 && (okFin < 0 || chFin < okFin)) { fin = chFin; skip = 1; } else if (okFin >= 0) fin = okFin;
         const body = fin < 0 ? lines : lines.slice(0, fin);
@@ -89,7 +89,7 @@
                 return;
             }
             if (boxed && !/[=<>≤≥≈]/.test(clean) && clean.length < 80) { open({ no: '', title: clean, lines: [], chapter: true }); open({ no: '', title: '', lines: [], anon: true }); return; }
-            if (!boxed && (m = bare.match(/^(.{2,70}):$/)) && !/^[•\-*]/.test(bare)) { open({ no: '', title: m[1], lines: [] }); return; }
+            if (!boxed && (m = bare.match(/^(.{2,70}):$/)) && !/^[•\-*]/.test(bare) && !/^(Interpretation|Conclusion|Note|Therefore|Result|Answer|Decision|Meaning)$/i.test(m[1])) { open({ no: '', title: m[1], lines: [] }); return; }
             if (!cur && (m = bare.match(/^([A-Za-zΑ-ωμσ][\w ()\/.\-]{0,28}):\s+(.+)$/)) && !/^(Note|Interpretation)/i.test(m[1])) { sol.meta.push([m[1], m[2]]); return; }
             if (cur && (m = bare.match(/^(?:FORMULA|Formula)\s*:\s*(.+)$/))) { push(m[1], { cls: 'formula' }); lastBlank = false; return; }
             push(line.replace(/[║│┃]/g, ' ').replace(/\s+$/, ''), { cls: boxed ? 'box' : '', gap: lastBlank });

@@ -4,6 +4,7 @@
 function renderDistKurtosisInterface() {
     return buildInterface({
         id: "statDistKurtosisInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "🎯 Distribution Kurtosis γ₂",
         formula: "📌 γ₂ = E[(X-μ)⁴]/σ⁴ - 3 (Excess Kurtosis)",
         desc: "Kurtosis measures tail heaviness. 0 = mesokurtic (normal), >0 = leptokurtic (heavy tails), <0 = platykurtic (light tails).",
@@ -63,7 +64,7 @@ function computeDistKurtosisWithSteps(distType, params) {
     let kurtosis = 0;
     
     if (distType === 'normal') {
-        kurtosis = 0;
+        kurtosis = distributionMoments(distType, params).kurtosis;
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      NORMAL DISTRIBUTION KURTOSIS                ║\n`;
         steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
@@ -72,7 +73,7 @@ function computeDistKurtosisWithSteps(distType, params) {
         steps += `   γ₂ = 0 (mesokurtic)\n\n`;
         
     } else if (distType === 'exponential') {
-        kurtosis = 6;
+        kurtosis = distributionMoments(distType, params).kurtosis;
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                   EXPONENTIAL DISTRIBUTION KURTOSIS              ║\n`;
         steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
@@ -81,7 +82,7 @@ function computeDistKurtosisWithSteps(distType, params) {
         steps += `   γ₂ = 6 (leptokurtic, heavy tails)\n\n`;
         
     } else if (distType === 'uniform') {
-        kurtosis = -1.2;
+        kurtosis = distributionMoments(distType, params).kurtosis;
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                     UNIFORM DISTRIBUTION KURTOSIS                ║\n`;
         steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
@@ -93,7 +94,7 @@ function computeDistKurtosisWithSteps(distType, params) {
         const beta = params.beta;
         const numerator = 6 * (Math.pow(alpha - beta, 2) * (alpha + beta + 1) - alpha * beta * (alpha + beta + 2));
         const denominator = alpha * beta * (alpha + beta + 2) * (alpha + beta + 3);
-        kurtosis = numerator / denominator;
+        kurtosis = distributionMoments(distType, params).kurtosis;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                       BETA DISTRIBUTION KURTOSIS                 ║\n`;
@@ -104,7 +105,7 @@ function computeDistKurtosisWithSteps(distType, params) {
         
     } else if (distType === 'poisson') {
         const lambda = params.lambda;
-        kurtosis = 1 / lambda;
+        kurtosis = distributionMoments(distType, params).kurtosis;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      POISSON DISTRIBUTION KURTOSIS               ║\n`;
@@ -116,7 +117,7 @@ function computeDistKurtosisWithSteps(distType, params) {
     } else if (distType === 'binomial') {
         const n = params.n;
         const p = params.p;
-        kurtosis = (1 - 6 * p * (1 - p)) / (n * p * (1 - p));
+        kurtosis = distributionMoments(distType, params).kurtosis;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                     BINOMIAL DISTRIBUTION KURTOSIS               ║\n`;
@@ -165,6 +166,10 @@ function setupDistKurtosisLogic() {
                 params.p = parseFloat(document.getElementById('distKurtosisP').value);
             }
             
+            const paramError = validateDistributionParams(dist, params, { openProbability: true });
+            
+            if (paramError) { showToolError('distKurtosis', paramError); return; }
+            
             const result = computeDistKurtosisWithSteps(dist, params);
             const resultDiv = document.getElementById('distKurtosisResultArea');
             const valueSpan = document.getElementById('distKurtosisValueDisplay');
@@ -176,5 +181,5 @@ function setupDistKurtosisLogic() {
         });
     }
     
-    attachClearHandler('distKurtosisClearBtn', '', 'distKurtosisResultArea');
+    attachClearHandler("distKurtosisClearBtn", ["distKurtosisRate", "distKurtosisAlpha", "distKurtosisBeta", "distKurtosisLambda", "distKurtosisN", "distKurtosisP"], "distKurtosisResultArea");
 }

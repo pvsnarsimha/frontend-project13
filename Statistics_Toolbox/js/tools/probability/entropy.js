@@ -8,6 +8,7 @@ function betaFunction(alpha, beta) {
 function renderEntropyInterface() {
     return buildInterface({
         id: "statEntropyInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "📊 Distribution Entropy H(X)",
         formula: "📌 Continuous: H(X) = -∫ f(x)·ln(f(x)) dx | Discrete: H(X) = -Σ P(x)·ln(P(x))",
         desc: "Entropy measures the uncertainty or randomness in a probability distribution. Higher entropy = more uncertainty/randomness.",
@@ -118,11 +119,20 @@ function computeEntropyWithSteps(distType, params) {
         const lambda = params.lambda;
         // Exact: H = -Σ P(k) ln P(k), summed until the remaining tail is negligible
         entropy = 0;
-        const kMax = Math.ceil(lambda + 40 * Math.sqrt(lambda) + 50);
-        for (let k = 0; k <= kMax; k++) {
-            const logP = -lambda + k * Math.log(lambda) - logGamma(k + 1);
-            entropy -= Math.exp(logP) * logP;
+        if (lambda > 1e7) {
+            // Beyond ~1e7 the sum has millions of terms; the asymptotic expansion is exact to far more digits than shown
+            entropy = 0.5 * Math.log(2 * Math.PI * Math.E * lambda) - 1 / (12 * lambda) - 1 / (24 * lambda * lambda);
+        } else {
+            // only the window around the mean carries probability: 40 standard deviations each side is far past double precision
+            const spreadK = 40 * Math.sqrt(lambda) + 50;
+            const kMin = Math.max(0, Math.floor(lambda - spreadK)), kMax = Math.ceil(lambda + spreadK);
+            for (let k = kMin; k <= kMax; k++) {
+                const logP = -lambda + k * Math.log(lambda) - logGamma(k + 1);
+                entropy -= Math.exp(logP) * logP;
+            }
         }
+        
+        entropy = Math.max(0, entropy);   // a discrete entropy is never negative; floating-point cancellation can leave -0.00000000
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      POISSON DISTRIBUTION ENTROPY                ║\n`;
@@ -136,10 +146,15 @@ function computeEntropyWithSteps(distType, params) {
         const p = params.p;
         // Exact: H = -Σ P(k) ln P(k) over k = 0..n
         entropy = 0;
-        for (let k = 0; k <= n; k++) {
+        // only the window around n·p carries probability (40 standard deviations each side), so a huge n costs the same
+        const spreadK = 40 * Math.sqrt(n * p * (1 - p)) + 50;
+        const kLo = Math.max(0, Math.floor(n * p - spreadK)), kHi = Math.min(n, Math.ceil(n * p + spreadK));
+        for (let k = kLo; k <= kHi; k++) {
             const logP = logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1) + (k > 0 ? k * Math.log(p) : 0) + (n - k > 0 ? (n - k) * Math.log(1 - p) : 0);
             if (isFinite(logP)) entropy -= Math.exp(logP) * logP;
         }
+        
+        entropy = Math.max(0, entropy);   // a discrete entropy is never negative; floating-point cancellation can leave -0.00000000
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                     BINOMIAL DISTRIBUTION ENTROPY                ║\n`;
@@ -201,6 +216,10 @@ function setupEntropyLogic() {
                 params.p = parseFloat(document.getElementById('entropyP').value);
             }
             
+            const paramError = validateDistributionParams(dist, params, { openProbability: true });
+            
+            if (paramError) { showToolError('entropy', paramError); return; }
+            
             const result = computeEntropyWithSteps(dist, params);
             const resultDiv = document.getElementById('entropyResultArea');
             const valueSpan = document.getElementById('entropyValueDisplay');
@@ -212,5 +231,5 @@ function setupEntropyLogic() {
         });
     }
     
-    attachClearHandler('entropyClearBtn', '', 'entropyResultArea');
+    attachClearHandler("entropyClearBtn", ["entropyStd", "entropyRate", "entropyMin", "entropyMax", "entropyAlpha", "entropyBeta", "entropyLambda", "entropyN", "entropyP"], "entropyResultArea");
 }

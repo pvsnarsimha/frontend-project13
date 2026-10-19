@@ -33,17 +33,12 @@ function computeFiveNumWithSteps(numbers) {
     let min = sorted[0];
     let max = sorted[n-1];
     
-    let getMedian = (arr) => {
-        let m = arr.length;
-        if (m % 2 === 0) return (arr[m/2 - 1] + arr[m/2]) / 2;
-        else return arr[Math.floor(m/2)];
-    };
     
     // Type 7 quantiles (linear interpolation at (n - 1)p), the same method as every other quantile in the app
     const q1 = quantileType7(sorted, 0.25);
     const q3 = quantileType7(sorted, 0.75);
     
-    let median = getMedian(sorted);
+    let median = quantileType7(sorted, 0.5);
     let iqr = q3 - q1;
     
     let steps = `📦 FORMULA: Five-Number Summary = {Min, Q₁, Median, Q₃, Max}\n`;

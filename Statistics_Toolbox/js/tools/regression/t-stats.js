@@ -51,7 +51,7 @@ function computeTStatsWithSteps(xValues, yValues) {
     const meanY = yValues.reduce((a,b) => a+b, 0) / n;
     
     // ========== STEP 1: Build complete deviation table ==========
-    let deviationRows = '';
+    const deviationRows = buildDeviationRows(xValues, yValues, meanX, meanY);
     let numerator = 0, denominator = 0;
     let sumX = 0, sumY = 0;
     let xyProducts = [], xxSquares = [];
@@ -68,23 +68,24 @@ function computeTStatsWithSteps(xValues, yValues) {
         xyProducts.push(product);
         xxSquares.push(xSq);
         
-        deviationRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]} - ${meanX.toFixed(4)} = ${xDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]} - ${meanY.toFixed(4)} = ${yDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; font-weight: 600; color: #1a5490;">${product.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${xSq.toFixed(4)}</td>
-        </tr>`;
     }
     
     // ========== STEP 2: Calculate β̂ coefficients ==========
-    const slope = numerator / denominator;
-    const intercept = meanY - slope * meanX;
+    if (!(denominator > 0)) {
+        return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
+    }
+    const core = simpleRegressionCore(xValues, yValues);   // the shared formulas (core/helpers.js); the loops below only build the display tables
+    if (!(core.ssTot > 0)) {
+        return { error: true, message: "All Y values are identical, so the slope is 0 and there is no variation to test (R² is undefined). Enter Y values that vary." };
+    }
+    if (core.ssRes <= 1e-12 * core.ssTot) {
+        return { error: true, message: "The line fits the data perfectly (residual sum of squares ≈ 0), so the standard errors are 0 and the t statistics are infinite. Inference needs some scatter around the line." };
+    }
+    const slope = core.slope;
+    const intercept = core.intercept;
     
     // ========== STEP 3: Build predictions and residuals table ==========
-    let predictionsRows = '';
+    const predictionsRows = buildPredictionRows(xValues, yValues, slope, intercept);
     let ssRes = 0;
     let residuals = [];
     let predictions = [];
@@ -96,20 +97,12 @@ function computeTStatsWithSteps(xValues, yValues) {
         residuals.push(residual);
         ssRes += residual * residual;
         
-        predictionsRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center; font-family: monospace;">${intercept.toFixed(4)} + ${slope.toFixed(4)}×${xValues[i]} = ${yPred.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; ${residual >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">${residual.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${(residual * residual).toFixed(4)}</td>
-        </tr>`;
     }
     
     // ========== STEP 4: Calculate Standard Errors ==========
-    const mse = ssRes / (n - 2);
-    const seSlope = Math.sqrt(mse / denominator);
-    const seIntercept = Math.sqrt(mse * (1/n + Math.pow(meanX, 2) / denominator));
+    const mse = core.mse;
+    const seSlope = core.seSlope;
+    const seIntercept = core.seIntercept;
     
     // ========== STEP 5: Calculate t-statistics ==========
     const tSlope = slope / seSlope;

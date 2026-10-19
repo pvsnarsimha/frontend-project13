@@ -239,7 +239,8 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
         </div>
     </div>`;
     
-    return { W, Wpos, Wneg, z, pValue, rejectH0, conclusion, interpretation, steps };
+    // the p-value uses the normal approximation, which is rough for fewer than ~10 non-zero pairs
+    return { W, Wpos, Wneg, z, pValue, rejectH0, conclusion, interpretation, steps, smallSample: nEff < 10 };
 }
 
 // ========== WILCOXON SETUP ==========
@@ -272,7 +273,7 @@ function setupWilcoxonLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);
         } else {
-            setHtml(valueSpan, `W = ${result.W.toFixed(2)} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
+            setHtml(valueSpan, `W = ${result.W.toFixed(2)} | p${result.smallSample ? ' (normal approx.)' : ''} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
             setHtml(stepsSpan, result.steps);
         }
     });

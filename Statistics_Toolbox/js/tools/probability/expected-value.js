@@ -4,6 +4,7 @@
 function renderExpectedValueInterface() {
     return buildInterface({
         id: "statExpectedValueInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "📊 Expected Value E[X] (Mean of Distribution)",
         formula: "📌 E[X] = ∫ x·f(x) dx (continuous) or Σ x·P(X=x) (discrete)",
         desc: "The expected value is the theoretical mean of a probability distribution.",
@@ -62,6 +63,10 @@ function setupExpectedValueLogic() {
                 params.p = parseFloat(document.getElementById("expectedP").value);
             }
             
+            const paramError = validateDistributionParams(dist, params);
+            
+            if (paramError) { showToolError('expected', paramError); return; }
+            
             const result = computeExpectedValueWithSteps(dist, params);
             const resultDiv = document.getElementById("expectedResultArea");
             const valueSpan = document.getElementById("expectedValueDisplay");
@@ -73,7 +78,7 @@ function setupExpectedValueLogic() {
         });
     }
     
-    attachClearHandler("expectedClearBtn", "", "expectedResultArea");
+    attachClearHandler("expectedClearBtn", ["expectedMean", "expectedStd", "expectedRate", "expectedMin", "expectedMax", "expectedAlpha", "expectedBeta", "expectedLambda", "expectedN", "expectedP"], "expectedResultArea");
 }
 
 // ========== PARAMETER UPDATE FUNCTIONS ==========
@@ -114,7 +119,7 @@ function computeExpectedValueWithSteps(distType, params) {
     if (distType === 'normal') {
         const mean = params.mean;
         const stdDev = params.stdDev;
-        expectedValue = mean;
+        expectedValue = distributionMoments(distType, params).mean;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      NORMAL DISTRIBUTION                         ║\n`;
@@ -166,7 +171,7 @@ function computeExpectedValueWithSteps(distType, params) {
         
     } else if (distType === 'exponential') {
         const rate = params.rate;
-        expectedValue = 1 / rate;
+        expectedValue = distributionMoments(distType, params).mean;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                    EXPONENTIAL DISTRIBUTION                      ║\n`;
@@ -222,7 +227,7 @@ function computeExpectedValueWithSteps(distType, params) {
     } else if (distType === 'uniform') {
         const min = params.min;
         const max = params.max;
-        expectedValue = (min + max) / 2;
+        expectedValue = distributionMoments(distType, params).mean;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      UNIFORM DISTRIBUTION                        ║\n`;
@@ -264,7 +269,7 @@ function computeExpectedValueWithSteps(distType, params) {
     } else if (distType === 'beta') {
         const alpha = params.alpha;
         const beta = params.beta;
-        expectedValue = alpha / (alpha + beta);
+        expectedValue = distributionMoments(distType, params).mean;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                       BETA DISTRIBUTION                          ║\n`;
@@ -310,7 +315,7 @@ function computeExpectedValueWithSteps(distType, params) {
         
     } else if (distType === 'poisson') {
         const lambda = params.lambda;
-        expectedValue = lambda;
+        expectedValue = distributionMoments(distType, params).mean;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      POISSON DISTRIBUTION                        ║\n`;
@@ -357,7 +362,7 @@ function computeExpectedValueWithSteps(distType, params) {
     } else if (distType === 'binomial') {
         const n = params.n;
         const p = params.p;
-        expectedValue = n * p;
+        expectedValue = distributionMoments(distType, params).mean;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                     BINOMIAL DISTRIBUTION                        ║\n`;

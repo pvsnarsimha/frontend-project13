@@ -4,6 +4,7 @@
 function renderMGFInterface() {
     return buildInterface({
         id: "statMGFInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "🔢 Moment Generating Function M_X(t) = E[e^{tX}]",
         formula: "📌 M_X(t) = E[e^{tX}] = Σ e^{tx}·P(X=x) or ∫ e^{tx}·f(x) dx",
         desc: "The MGF uniquely determines the distribution and generates moments via derivatives.",
@@ -74,6 +75,11 @@ function setupMGFLogic() {
                 params.p = parseFloat(document.getElementById("mgfP").value);
             }
             
+            const paramError = validateDistributionParams(dist, params);
+            
+            if (paramError) { showToolError('mgf', paramError); return; }
+            if (!isFinite(t)) { showToolError('mgf', 'Enter a numeric value for t.'); return; }
+            
             const result = computeMGFWithSteps(dist, params, t);
             const resultDiv = document.getElementById("mgfResultArea");
             const valueSpan = document.getElementById("mgfValueDisplay");
@@ -85,7 +91,7 @@ function setupMGFLogic() {
         });
     }
     
-    attachClearHandler("mgfClearBtn", ["mgfTValue"], "mgfResultArea");
+    attachClearHandler("mgfClearBtn", ["mgfTValue", "mgfMean", "mgfStd", "mgfRate", "mgfMin", "mgfMax", "mgfLambda", "mgfN", "mgfP"], "mgfResultArea");
 }
 
 function updateMGFParams() {

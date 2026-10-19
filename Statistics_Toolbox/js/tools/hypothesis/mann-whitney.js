@@ -228,7 +228,8 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
         </div>
     </div>`;
     
-    return { U, z, pValue, rejectH0, conclusion, interpretation, steps };
+    // the p-value uses the normal approximation, which is rough for small samples
+    return { U, z, pValue, rejectH0, conclusion, interpretation, steps, smallSample: Math.min(n1, n2) < 10 };
 }
 
 // ========== MANN-WHITNEY SETUP ==========
@@ -261,7 +262,7 @@ function setupMannWhitneyLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);
         } else {
-            setHtml(valueSpan, `U = ${result.U.toFixed(2)} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
+            setHtml(valueSpan, `U = ${result.U.toFixed(2)} | p${result.smallSample ? ' (normal approx.)' : ''} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
             setHtml(stepsSpan, result.steps);
         }
     });

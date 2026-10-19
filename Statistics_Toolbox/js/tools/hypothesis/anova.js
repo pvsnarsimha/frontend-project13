@@ -56,19 +56,10 @@ function renderANOVAInterface() {
 // ========== ANOVA COMPUTATION ==========
 // ========== ANOVA COMPUTATION (WITH DETAILED EXPLANATIONS) ==========
 function computeANOVA(inputText, alpha) {
-    const lines = inputText.trim().split(/[,\s\n]+/);
-    let groups = new Map();
-    
-    for (let entry of lines) {
-        entry = entry.trim();
-        if (entry === "") continue;
-        let [valStr, groupName] = entry.split(':');
-        let val = parseFloat(valStr);
-        if (!isNaN(val) && isFinite(val) && groupName) {
-            groupName = escapeHtml(groupName.trim());
-            if (!groups.has(groupName)) groups.set(groupName, []);
-            groups.get(groupName).push(val);
-        }
+    const parsed = parseValueGroupInput(inputText);
+    const groups = parsed.groups;
+    if (parsed.skipped.length) {
+        return { error: true, message: `Could not read: ${parsed.skipped.slice(0, 5).map(x => escapeHtml(x)).join(', ')}${parsed.skipped.length > 5 ? ', …' : ''}. Each entry must look like value:group (for example 12.5:Control).` };
     }
     
     if (groups.size < 2) {

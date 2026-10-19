@@ -31,7 +31,7 @@ function renderPPPlotInterface() {
                 ]
             },
             {
-                html: "<div id=\"ppplotParams\" style=\"display: none;\">\n                    <!-- Dynamic params for distributions -->\n                </div>"
+                html: `<p style="${HINT_STYLE}">Distribution parameters are estimated from your data: mean and standard deviation (normal), minimum and maximum (uniform), 1/mean (exponential).</p>`
             }
         ],
         run: { id: "ppplotComputeBtn", text: "📊 Generate P-P Plot + Full Steps" },
@@ -47,6 +47,12 @@ function renderPPPlotInterface() {
 
 function computePPPlotWithSteps(numbers, distType = 'normal') {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
+    
+    if (numbers.length < 3) return { error: true, message: "A P-P plot needs at least 3 values (with 2 points the correlation is always 1)." };
+    if (!(Math.max(...numbers) - Math.min(...numbers) > 0)) return { error: true, message: "All values are identical, so the P-P plot is undefined (zero spread)." };
+    if (distType === 'exponential' && (numbers.some(v => v < 0) || !(numbers.reduce((a, b) => a + b, 0) > 0))) {
+        return { error: true, message: "The exponential P-P plot needs non-negative values with a positive mean (the rate is 1 / mean)." };
+    }
     
     const n = numbers.length;
     const sorted = [...numbers].sort((a, b) => a - b);
@@ -421,6 +427,11 @@ function setupPPPlotLogic() {
         
         const result = computePPPlotWithSteps(numbers, distType);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.innerText = "Error";
+            setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
+            return;
+        }
         setHtml(valueSpan, `📊 P-P Plot | n = ${result.n} | Correlation = ${result.correlation.toFixed(4)} | ${Math.abs(result.correlation) > 0.98 ? 'Good fit' : (Math.abs(result.correlation) > 0.95 ? 'Mild deviation' : 'Poor fit')}`);
         setHtml(stepsSpan, result.steps);
         

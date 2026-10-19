@@ -42,7 +42,7 @@ function computeStemLeafWithSteps(numbers) {
         stemUnit = 100;
         leafDigits = 2;
         unitName = "hundreds";
-        stemFormula = `Stem = floor(value / 100), Leaf = floor((value % 100) / 10)`;
+        stemFormula = `Stem = floor(value / 100), Leaf = value - 100 × stem (two digits, so the units digit is kept)`;
     } else if (range >= 100) {
         stemUnit = 10;
         leafDigits = 1;
@@ -69,18 +69,20 @@ function computeStemLeafWithSteps(numbers) {
         let val = sorted[i];
         let stem, leaf;
         
+        // leaf = value - stem × unit, so stem and leaf always rebuild the value (also for negatives, where % would not)
         if (stemUnit === 100) {
             stem = Math.floor(val / 100);
-            leaf = Math.floor((val % 100) / 10);
+            leaf = Math.floor(val - stem * 100);
         } else if (stemUnit === 10) {
             stem = Math.floor(val / 10);
-            leaf = Math.floor(val % 10);
+            leaf = Math.floor(val - stem * 10);
         } else if (stemUnit === 0.1) {
-            stem = Math.floor(val);
-            leaf = Math.round((val - stem) * 10);
+            const tenths = Math.round(val * 10);      // rounded to the tenth first, so a leaf can never be 10
+            stem = Math.floor(tenths / 10);
+            leaf = tenths - stem * 10;
         } else {
             stem = Math.floor(val / 10);
-            leaf = Math.floor(val % 10);
+            leaf = Math.floor(val - stem * 10);
         }
         
         calculationDetails.push({
@@ -120,7 +122,7 @@ function computeStemLeafWithSteps(numbers) {
     for (let i = 0; i < stems.length; i++) {
         const stem = stems[i];
         const leaves = stemMap.get(stem).sort((a, b) => a - b);
-        const leafStr = leaves.join(' ');
+        const leafStr = leaves.map(l => String(l).padStart(leafDigits, '0')).join(' ');
         const depth = depths[i];
         const depthStr = depth.toString().padStart(5, ' ');
         const stemStr = stem.toString().padStart(4, ' ');
@@ -132,7 +134,7 @@ function computeStemLeafWithSteps(numbers) {
     
     plotLines.push('╚══════════════════════════════════════════════════════════════════════════════╝');
     plotLines.push('');
-    plotLines.push(`Key: Stem represents ${stemUnit}s place | Leaf represents units place`);
+    plotLines.push(leafDigits === 2 ? `Key: ${stems.length ? stems[0] : 0} | ${'05'} means ${stems.length ? stems[0] * 100 + 5 : 5} (stem = hundreds, leaf = last two digits)` : `Key: Stem represents ${stemUnit}s place | Leaf represents units place`);
     plotLines.push(`Stem unit: ${unitName} (${stemFormula})`);
     plotLines.push(`Depth: Cumulative frequency from the nearest extreme`);
     
@@ -381,7 +383,7 @@ function renderStemLeafScatterChart(scatterData, numbers) {
                             return [
                                 `Original Value: ${context.parsed.x}`,
                                 `Leaf Value: ${context.parsed.y}`,
-                                `Stem: ${Math.floor(context.parsed.x / 10)} | Leaf: ${context.parsed.y}`
+                                `Stem: ${context.raw.stem} | Leaf: ${context.raw.y}`
                             ];
                         }
                     },

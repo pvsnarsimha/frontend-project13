@@ -8,7 +8,8 @@ browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offl
 
 ```
 Statistics.html            Page shell only: header, tabs, sidebars (static, accessible markup), script tags
-css/statlab.css            Styles
+css/statlab.css            Styles, and the --tp-* palette tokens for result panels
+css/tool-panels.css        Classes generated from the inline styles of the largest tools (MANOVA, ANCOVA, Levene, Bartlett, Cook's distance, Bonferroni, Scheffe)
 css/responsive.css         Phone / tablet rules (breakpoints 1100, 900, 640, 420)
 vendor/                    Chart.js and web fonts, self-hosted (see vendor/README.md for versions and licenses)
 js/core/numerics.js        Special functions, CDFs and exact critical values (normal, t, F, chi-square, beta,
@@ -18,8 +19,11 @@ js/core/numerics.js        Special functions, CDFs and exact critical values (no
 js/core/toolkit.js         buildInterface(), defineListTool(), setHtml() (sanitised HTML insertion), escapeHtml()
 js/core/charts.js          One variable per plotting tool for its Chart.js instance, lazy loading of Chart.js, labelChart() (accessible chart names)
                            and the shared canvas hover tooltip
-js/core/helpers.js         Input parsing and helpers shared by several tools
-js/tools/<module>/*.js     One file per tool (about 100): renderXInterface(), computeX(), setupXLogic()
+js/core/helpers.js         Input parsing (parseNumbersFromInput, parseValueGroupInput), parameter validation (validateDistributionParams),
+                           binomialPMF, simpleRegressionCore and other helpers shared by several tools
+js/core/distributions.js   Mean, variance, skewness and kurtosis of the six distributions, defined once (distributionMoments)
+js/tools/<module>/*.js     One file per tool (about 100): renderXInterface(), computeX(), setupXLogic(); big tools add <tool>-steps.js (worked-solution HTML);
+                           js/tools/regression/regression-html.js holds table rows shared by the simple-regression tools
                            modules: descriptive, preparation, probability, correlation, hypothesis, regression
 js/app.js                  Route table (STAT_ROUTES), tab/sidebar navigation, chart controls
 js/ui/*.js                 Presentation layer: navigation + search, answer tiles and worked-solution layout, form a11y
@@ -94,9 +98,10 @@ Rules for all tools:
 ## Design notes
 
 * **`setHtml()` fallback.** `setHtml(element, html)` parses into an inert `<template>`, strips anything that can run code and attaches the
-  result. If the environment has no real `<template>` (the unit tests run the scripts against a stub DOM), it falls back to assigning
-  the string to the element unsanitised, because there is no browser to execute it. In a browser the sanitised path is always used;
-  the fallback exists only so calculation code can be tested in Node, and must never be relied on for untrusted input.
+  result. If the environment has no real `<template>` (the unit tests run the scripts against a stub DOM, and take this path), it falls back to
+  assigning the string to the element after removing every `on*="…"` handler attribute from its tags. That is not a full sanitiser (there is
+  no DOM tree to walk), and there is no browser to execute the markup anyway; it exists only so calculation code can be tested in Node and must
+  never be relied on for untrusted input. In a browser the sanitised path is always used, and a unit test checks that the fallback still strips handlers.
 * **One breakpoint file.** `css/responsive.css` is the only place that sets media-query breakpoints (including 900 px). Generated result markup
   carries inline styles; `tagGeneratedLayout()` in `js/ui/solution.js` turns the layout-relevant ones into classes (`.gen-grid`,
   `.gen-flex`, ...) and the responsive CSS targets those classes. The colour re-theming rules in `statlab.css` still match substrings of the
@@ -138,7 +143,11 @@ These tools give a close answer, not an exact one, and say so in their worked so
   average ranks, so ties are handled; **Friedman** divides by the tie correction C.
 * **Box-Cox** maximises the profile log-likelihood by a grid scan on [-5, 5] plus golden-section refinement (lambda to about 1e-8); data must be positive.
 * **VIF** regresses each predictor on all the others by least squares (normal equations). Perfectly collinear predictors give an infinite VIF.
-* **Random numbers** use `Math.random` (or a seeded 32-bit generator when a seed is given). Normals come from Box-Muller (both values of each
+* **Model summary (MAPE, adjusted R²).** MAPE leaves out points whose actual value is 0 (a percentage error is undefined there) and says how many
+  it used. Adjusted R² uses the number of predictors k you enter (1 for simple regression).
+* **Beta random numbers for tiny shapes.** They are drawn in log space, so they never underflow, but for α or β around 0.001 the true distribution is
+  almost two spikes at 0 and 1, and many draws are exactly 0 or 1 in double precision. Means are still correct.
+* **Random numbers** use `Math.random` (or a seeded 32-bit generator when a seed is given: the seed is read as an integer and only its low 32 bits matter). Normals come from Box-Muller (both values of each
   pair are used), Gamma from Marsaglia-Tsang, Beta as a Gamma ratio (or rejection sampling when both shapes exceed 1). They are for teaching
   and simulation, not cryptography.
 * **Entropy** of Normal, Exponential, Uniform and Beta is closed form; Poisson and Binomial are summed exactly; the Beta entropy uses a series digamma (about 1e-12).
@@ -163,14 +172,14 @@ These tools give a close answer, not an exact one, and say so in their worked so
 ## Tests
 
 ```
-npm test            # unit tests, no dependencies (Node 18+)
+npm test            # unit tests, no dependencies (Node 20+)
 npm install         # once, for the browser test
 npx playwright install chromium
 npm run test:e2e    # opens every tool in a real browser, loads sample data, presses Calculate
 npm run test:all    # both
 ```
 
-* `.github/workflows/ci.yml` runs the unit tests on Node 18/20/22 and the browser test on every pull request
+* `.github/workflows/ci.yml` runs the unit tests on Node 20 and 22 and the browser test on every pull request
 * `tests/e2e/edge-cases.js`: every tool with one value, identical values, zeros, negatives and huge numbers: no freeze, no script error, and any NaN/Infinity comes with an explanation
 * `tests/e2e/responsive.js`: no tool makes the page scroll sideways at 360 px and 768 px
 * `tests/e2e/lazy-chartjs.js`: Chart.js is not fetched at page load, is fetched once on the first chart, and a failed fetch shows a message and can be retried

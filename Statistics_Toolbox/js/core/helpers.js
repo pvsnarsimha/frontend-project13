@@ -32,7 +32,62 @@ function attachClearHandler(clearBtnId, inputIds, resultAreaId) {
     });
 }
 
-// Function to generate detailed distribution analysis
+// Checks the parameters of a named distribution before a moment/entropy/MGF tool divides by them.
+// Returns a message for the first invalid parameter, or null. opts.openProbability: p must lie strictly inside (0, 1),
+// for statistics that are undefined for a degenerate binomial (skewness, kurtosis, entropy).
+function validateDistributionParams(dist, params, opts) {
+    const o = opts || {};
+    const bad = (name, cond) => cond ? null : `Invalid ${name}.`;
+    const ok = v => typeof v === 'number' && isFinite(v);
+    const checks = {
+        normal: () => (params.mean !== undefined && !ok(params.mean) ? 'The mean must be a number.' : null) || (ok(params.stdDev) && params.stdDev > 0 ? null : 'The standard deviation σ must be a number greater than 0.'),
+        exponential: () => ok(params.rate) && params.rate > 0 ? null : 'The rate λ must be a number greater than 0.',
+        uniform: () => ok(params.min) && ok(params.max) && params.min < params.max ? null : 'Uniform needs numbers with minimum a < maximum b.',
+        beta: () => ok(params.alpha) && ok(params.beta) && params.alpha > 0 && params.beta > 0 ? null : 'Beta needs α > 0 and β > 0.',
+        poisson: () => ok(params.lambda) && params.lambda > 0 ? null : 'The Poisson mean λ must be a number greater than 0.',
+        binomial: () => {
+            if (!ok(params.n) || params.n < 1 || Math.floor(params.n) !== params.n) return 'The number of trials n must be a whole number of at least 1.';
+            if (!ok(params.p) || params.p < 0 || params.p > 1) return 'The probability p must be a number between 0 and 1.';
+            if (o.openProbability && (params.p === 0 || params.p === 1)) return 'p must be strictly between 0 and 1 (for p = 0 or 1 the distribution is a single point and this statistic is undefined).';
+            return null;
+        }
+    };
+    return checks[dist] ? checks[dist]() : null;
+}
+
+// Shows a validation message in the standard result area of a tool whose element ids start with `prefix`
+function showToolError(prefix, message) {
+    const area = document.getElementById(prefix + 'ResultArea');
+    const value = document.getElementById(prefix + 'ValueDisplay');
+    const steps = document.getElementById(prefix + 'StepsDisplay');
+    if (area) area.style.display = 'block';
+    if (value) value.textContent = 'Error';
+    if (steps) setHtml(steps, '⚠️ ' + escapeHtml(message));
+}
+
+// Parses "value:group" input for the group-comparison tests (Levene, Bartlett, Bonferroni, Scheffe, Tukey).
+// Entries are separated by commas, semicolons or line breaks, and by spaces when a space is followed by another "number:";
+// so "2.5:Group A, 3.1:Group B" and "2.5:A 3.1:A 4:B" both work and a group name may contain spaces.
+// Returns { groups: Map(name -> numbers), skipped: [text that could not be read] }; group names are HTML-escaped.
+function parseValueGroupInput(inputText) {
+    const groups = new Map(), skipped = [];
+    const entry = /([-+−]?\d*\.?\d+(?:[eE][-+]?\d+)?)\s*:\s*([^,;\n]*?)(?=\s+[-+−]?\d*\.?\d+(?:[eE][-+]?\d+)?\s*:|[,;\n]|$)/g;
+    const text = String(inputText || '');
+    let last = 0, m;
+    const leftover = piece => piece.split(/[,;\n]+/).map(t => t.trim()).filter(Boolean).forEach(t => skipped.push(t));
+    while ((m = entry.exec(text)) !== null) {
+        leftover(text.slice(last, m.index));
+        last = entry.lastIndex;
+        const value = parseFloat(m[1].replace('−', '-')), name = m[2].trim();
+        if (!isFinite(value) || !name) { skipped.push(m[0].trim()); continue; }
+        const key = escapeHtml(name);
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(value);
+    }
+    leftover(text.slice(last));
+    return { groups, skipped };
+}
+
 // Function to generate detailed distribution analysis
 function generateDistributionAnalysis(numbers) {
     if (!numbers || numbers.length === 0) return "No data available for analysis.";
@@ -48,27 +103,10 @@ function generateDistributionAnalysis(numbers) {
     const mean = sum / n;
     
     // Calculate median
-    let median;
-    if (n % 2 === 0) {
-        median = (sorted[n/2 - 1] + sorted[n/2]) / 2;
-    } else {
-        median = sorted[Math.floor(n/2)];
-    }
+    const median = quantileType7(sorted, 0.5);       // the app's one quantile definition (core/numerics.js)
     
-    // Calculate mode
-    const freqMap = new Map();
-    numbers.forEach(num => freqMap.set(num, (freqMap.get(num) || 0) + 1));
-    let maxFreq = 0;
-    let modes = [];
-    for (let [num, freq] of freqMap) {
-        if (freq > maxFreq) {
-            maxFreq = freq;
-            modes = [num];
-        } else if (freq === maxFreq) {
-            modes.push(num);
-        }
-    }
-    const modeText = maxFreq === 1 ? "No mode (all values unique)" : modes.join(", ") + ` (appears ${maxFreq} time${maxFreq > 1 ? 's' : ''})`;
+    // Mode: the Mode tool's own rule and wording (one definition)
+    const modeText = computeModeWithSteps(numbers).display;
     
     // Calculate variance and standard deviation
     const variance = numbers.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
@@ -78,15 +116,8 @@ function generateDistributionAnalysis(numbers) {
     const cv = stdDev / mean;
     
     // Calculate quartiles
-    const getQ = (arr, percentile) => {
-        const pos = (arr.length - 1) * percentile;
-        const base = Math.floor(pos);
-        const rest = pos - base;
-        if (rest === 0) return arr[base];
-        return arr[base] + rest * (arr[base + 1] - arr[base]);
-    };
-    const q1 = getQ(sorted, 0.25);
-    const q3 = getQ(sorted, 0.75);
+    const q1 = quantileType7(sorted, 0.25);
+    const q3 = quantileType7(sorted, 0.75);
     const iqr = q3 - q1;
     
     // Determine skewness
@@ -126,21 +157,21 @@ function generateDistributionAnalysis(numbers) {
     analysis += `• Mean vs Median difference: ${Math.abs(mean - median).toFixed(4)}\n\n`;
     
     analysis += `📌 DISPERSION (SPREAD):\n`;
-    analysis += `• Variance: ${variance.toFixed(4)}\n`;
-    analysis += `• Standard Deviation: ${stdDev.toFixed(4)}\n`;
-    analysis += `• Coefficient of Variation (CV): ${(cv * 100).toFixed(2)}%\n`;
+    analysis += `• Population variance (÷ n): ${variance.toFixed(4)}\n`;
+    analysis += `• Population standard deviation: ${stdDev.toFixed(4)}\n`;
+    analysis += `• Coefficient of Variation (population σ / mean): ${(cv * 100).toFixed(2)}%\n`;
     analysis += `• Q1 (25th percentile): ${q1.toFixed(4)}\n`;
     analysis += `• Q3 (75th percentile): ${q3.toFixed(4)}\n`;
     analysis += `• Interquartile Range (IQR): ${iqr.toFixed(4)}\n\n`;
     
     analysis += `📌 DISTRIBUTION SHAPE:\n`;
-    analysis += `• Skewness: ${skewness.toFixed(4)} → ${skewType}\n`;
+    analysis += `• Pearson's median skewness (mean − median) / σ: ${skewness.toFixed(4)} → ${skewType}\n`;
     analysis += `  `;
     if (skewness > 0.1) analysis += `Mean > Median, tail extends to the right.\n`;
     else if (skewness < -0.1) analysis += `Mean < Median, tail extends to the left.\n`;
     else analysis += `Mean ≈ Median, roughly bell-shaped.\n`;
     
-    analysis += `• Kurtosis: ${kurtosis.toFixed(4)} → ${kurtosisType}\n`;
+    analysis += `• Excess kurtosis (population): ${kurtosis.toFixed(4)} → ${kurtosisType}\n`;
     analysis += `  `;
     if (kurtosis > 0.5) analysis += `Distribution has heavier tails and sharper peak than normal.\n`;
     else if (kurtosis < -0.5) analysis += `Distribution has lighter tails and flatter peak than normal.\n`;
@@ -196,7 +227,7 @@ function generateDistributionAnalysis(numbers) {
 // Enhanced visualization function
 function visualizeData(numbers, statType) {
     if (!numbers || numbers.length === 0) {
-        alert('Please enter numeric data first!');
+        notifyUser('Please enter numeric data first.');
         return false;
     }
     
@@ -253,6 +284,62 @@ function combination(n, k) {
     let result = 1;
     for (let i = 1; i <= k; i++) result = result * (n - k + i) / i;
     return result;
+}
+
+// P(X = k) for X ~ Binomial(n, p). C(n, k) overflows a double from about n = 1030, so large n is evaluated in log space
+// (a product of Infinity and a tiny power would be NaN); for n up to 1000 the direct product keeps full precision.
+function binomialPMF(n, k, p) {
+    if (k < 0 || k > n || !Number.isInteger(k)) return 0;
+    if (p <= 0) return k === 0 ? 1 : 0;
+    if (p >= 1) return k === n ? 1 : 0;
+    if (n <= 1000) return combination(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+    return Math.exp(logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1) + k * Math.log(p) + (n - k) * Math.log1p(-p));
+}
+
+// Simple linear regression y = b0 + b1·x: the formulas shared by the simple-linear, standard-error, t-statistic and F-test tools.
+// Returns null when x does not vary (Σ(x - x̄)² = 0), where the slope is undefined.
+function simpleRegressionCore(x, y) {
+    const n = x.length;
+    const meanX = x.reduce((a, b) => a + b, 0) / n, meanY = y.reduce((a, b) => a + b, 0) / n;
+    let sxx = 0, sxy = 0;
+    for (let i = 0; i < n; i++) {
+        sxx += (x[i] - meanX) * (x[i] - meanX);
+        sxy += (x[i] - meanX) * (y[i] - meanY);
+    }
+    if (!(sxx > 0)) return null;
+    const slope = sxy / sxx, intercept = meanY - slope * meanX;
+    let ssRes = 0, ssTot = 0;
+    for (let i = 0; i < n; i++) {
+        const residual = y[i] - (intercept + slope * x[i]);
+        ssRes += residual * residual;
+        ssTot += (y[i] - meanY) * (y[i] - meanY);
+    }
+    const mse = n > 2 ? ssRes / (n - 2) : NaN;
+    return { n, meanX, meanY, sxx, sxy, slope, intercept, ssRes, ssTot, mse,
+             seSlope: Math.sqrt(mse / sxx), seIntercept: Math.sqrt(mse * (1 / n + meanX * meanX / sxx)) };
+}
+
+// Critical value as text for the t and z tests, stating the rejection rule so a negative lower-tail value reads naturally:
+// two-sided "±1.96 (reject if |t| > 1.96)", greater "1.96 (reject if t > 1.96)", less "−1.96 (reject if t < −1.96)"
+function criticalValueText(criticalValue, alternative, statName) {
+    const st = statName || 't', c = Math.abs(criticalValue).toFixed(6);
+    if (alternative === 'two.sided') return `±${c} (reject H₀ if |${st}| > ${c})`;
+    if (alternative === 'less') return `−${c} (reject H₀ if ${st} < −${c})`;
+    return `${c} (reject H₀ if ${st} > ${c})`;
+}
+
+// k! as text for worked solutions: exact while it fits in a double (k <= 170), otherwise a power of ten
+function formatFactorial(k) {
+    if (k <= 170) return String(factorial(k));
+    return `≈ 10^${(logGamma(k + 1) / Math.LN10).toFixed(2)} (too large for a double)`;
+}
+
+// C(n, k) as text for worked solutions: the exact value when it fits in a double, otherwise a power of ten
+function formatCombination(n, k) {
+    const c = combination(n, k);
+    if (isFinite(c)) return String(c);
+    const log10 = (logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1)) / Math.LN10;
+    return `≈ 10^${log10.toFixed(2)} (too large for a double; probabilities are computed in log space)`;
 }
 
 // Expand/collapse a metric explanation in the model summary (called from the onclick of each metric header)

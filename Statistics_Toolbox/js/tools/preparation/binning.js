@@ -178,7 +178,7 @@ function setupBinningLogic() {
         if (binningRes.error) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = binningRes.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(binningRes.message));
             return;
         }
         

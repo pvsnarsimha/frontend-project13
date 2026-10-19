@@ -62,7 +62,7 @@ function setHtml(element, html) {
     const template = document.createElement('template');
     template.innerHTML = stripEventHandlerAttributes(html);
     if (!template.content || typeof template.content.querySelectorAll !== 'function') {
-        element.innerHTML = String(html);          // no real DOM (unit tests with a stub document)
+        element.innerHTML = stripEventHandlerAttributes(html);   // no real DOM (unit tests with a stub document): at least handlers never reach the stub
         return;
     }
     sanitizeHtmlTree(template.content);
@@ -148,6 +148,13 @@ const ALPHA_OPTIONS_3 = [ ["0.10", "α = 0.10 (90% Confidence)"], ["0.05", "α =
 //
 // Each input entry is an optional label plus one control (textarea / input / select / hint / raw html); attribute values
 // are emitted verbatim.
+// Two styles of worked solution, both rendered by buildSolution() in js/ui/solution.js:
+//   * plain text: set stepsSpan.innerText (as the list tools built with defineListTool do). The text is parsed into titled steps,
+//     formulas, sub-steps, tables (│ a │ b │ rows) and a "✅ …" / "FINAL RESULTS" block. Simple and safe, but it cannot hold a real table.
+//   * HTML: setHtml(stepsSpan, html) (as the two-sample, regression and plot tools do). Use it when the solution needs real tables,
+//     coloured cards or a canvas. Style it with classes from css/, not inline style attributes.
+// Copy a tool of the style you need; do not mix the two in one tool. Set parameterOnly: true for a form with no pasted data
+// (number fields and drop-downs only): it is rendered as data-parameter-only, and the tests then expect no "Try sample data" button.
 function buildInterface(cfg) {
     const attrs = a => Object.entries(a || {}).map(([k, v]) => (v === true ? ` ${k}` : ` ${k}="${v}"`)).join('');
     const control = item => {
@@ -170,7 +177,7 @@ function buildInterface(cfg) {
         .join('\n                    ');
     const r = cfg.result;
     return `
-            <div class="stat-interface"${cfg.id ? ` id="${cfg.id}"` : ''}>
+            <div class="stat-interface"${cfg.id ? ` id="${cfg.id}"` : ''}${cfg.parameterOnly ? ' data-parameter-only="true"' : ''}>
                 <div class="interface-title">${cfg.title}</div>
                 <div class="formula-card">
                     ${card}
@@ -245,7 +252,7 @@ function defineListTool(cfg) {
             const result = cfg.compute(numbers);
             if (result.error) {
                 valueSpan.innerText = cfg.errorValue || 'Error';
-                stepsSpan.innerText = result.message;
+                setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
                 return;
             }
             valueSpan.innerText = cfg.display(result);

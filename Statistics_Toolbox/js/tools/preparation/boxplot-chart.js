@@ -1,8 +1,6 @@
 /* Boxplot: chart drawing (createBoxPlot, custom plugin, renderBoxplotChart); split out of boxplot.js */
 
-// Function to create box plot
-// Function to create box plot (using bar chart with error bars)
-// Function to create box plot (using bar chart with error bars)
+// Legacy "Visualize Data" box plot (bar chart on #dataChart); its statistics come from the Boxplot tool
 function createBoxPlot(numbers, chartTitle) {
     if (!chartJsReady(createBoxPlot, arguments)) return;
     if (!numbers || numbers.length === 0) return;
@@ -13,21 +11,11 @@ function createBoxPlot(numbers, chartTitle) {
     const min = sorted[0];
     const max = sorted[n - 1];
     
-    // Calculate quartiles
-    const getMedian = (arr) => {
-        const m = arr.length;
-        if (m % 2 === 0) return (arr[m/2 - 1] + arr[m/2]) / 2;
-        else return arr[Math.floor(m/2)];
-    };
-    
-    // Type 7 quantiles (linear interpolation at (n - 1)p), the same method as every other quantile in the app
-    const q1 = quantileType7(sorted, 0.25);
-    const q3 = quantileType7(sorted, 0.75);
-    
-    const median = getMedian(sorted);
-    const iqr = q3 - q1;
-    const lowerWhisker = Math.max(min, q1 - 1.5 * iqr);
-    const upperWhisker = Math.min(max, q3 + 1.5 * iqr);
+    // One boxplot implementation: the quartiles, median and whiskers come from the Boxplot tool's computeBoxplotWithSteps
+    const stats = computeBoxplotWithSteps(numbers);
+    const q1 = stats.q1, q3 = stats.q3, median = stats.median, iqr = stats.iqr;
+    const lowerWhisker = stats.whiskerMin;     // smallest value inside the 1.5 × IQR fence
+    const upperWhisker = stats.whiskerMax;     // largest value inside the fence
     
     // Destroy existing chart
     if (currentChart) {
@@ -374,22 +362,22 @@ ctx.fillText(q3.toFixed(4), boxRight + 15, q3Y + 20);
 // Lower Whisker Label - move DOWN more (increase the negative offset)
 ctx.font = 'bold 11px "Segoe UI", Arial';
 ctx.fillStyle = '#81c784';
-ctx.fillText('Lower Whisker', xCenter, whiskerMinY - 28);      // ← CHANGE: -15 to -28
+ctx.fillText('Lower Whisker', xCenter, whiskerMinY - 28);
 ctx.font = '9px monospace';
 ctx.fillStyle = '#8b949e';
-ctx.fillText(whiskerMin.toFixed(4), xCenter, whiskerMinY - 12); // ← CHANGE: -3 to -12
+ctx.fillText(whiskerMin.toFixed(4), xCenter, whiskerMinY - 12);
 
 // Upper Whisker Label - move UP more (increase the positive offset)
 ctx.fillStyle = '#81c784';
-ctx.fillText('Upper Whisker', xCenter, whiskerMaxY + 38);       // ← CHANGE: +25 to +38
+ctx.fillText('Upper Whisker', xCenter, whiskerMaxY + 38);
 ctx.font = '9px monospace';
 ctx.fillStyle = '#8b949e';
-ctx.fillText(whiskerMax.toFixed(4), xCenter, whiskerMaxY + 52);  // ← CHANGE: +38 to +52
+ctx.fillText(whiskerMax.toFixed(4), xCenter, whiskerMaxY + 52);
         
         // IQR Box Label - above the box
         ctx.font = 'bold 11px "Segoe UI", Arial';
         ctx.fillStyle = '#4fc3f7';
-ctx.fillText('IQR Box', xCenter + 50, q3Y - 15);  // ← Moved to the right
+ctx.fillText('IQR Box', xCenter + 50, q3Y - 15);
         ctx.font = '9px monospace';
         ctx.fillStyle = '#8b949e';
         ctx.fillText(`IQR = ${(q3 - q1).toFixed(4)}`, xCenter, q1Y + 28);
@@ -397,10 +385,10 @@ ctx.fillText('IQR Box', xCenter + 50, q3Y - 15);  // ← Moved to the right
 // Min Value Label - move further right
 ctx.font = '9px monospace';
 ctx.fillStyle = '#8b949e';
-ctx.fillText(minVal.toFixed(4), xCenter + 35, minY + 12);  // ← 18 to 35
+ctx.fillText(minVal.toFixed(4), xCenter + 35, minY + 12);
 
 // Max Value Label - move further right
-ctx.fillText(maxVal.toFixed(4), xCenter + 35, maxY - 8);   // ← 18 to 35
+ctx.fillText(maxVal.toFixed(4), xCenter + 35, maxY - 8);
         
         // Outlier Label if any
         if (outliers && outliers.length > 0) {
@@ -430,6 +418,9 @@ function renderBoxplotChart(numbers, stats) {
     }
     
     const { minVal, q1, median, q3, maxVal, whiskerMin, whiskerMax, outliers } = stats;
+    // vertical padding: 8% of the data range (never 0, even for a single repeated value)
+    const dataRange = maxVal - minVal;
+    const yPad = dataRange > 0 ? dataRange * 0.08 : (Math.abs(maxVal) || 1) * 0.08;
     
     // Create a dummy scatter dataset just to set up the axes
     const dummyData = [
@@ -483,8 +474,8 @@ function renderBoxplotChart(numbers, stats) {
             stepSize: Math.ceil((maxVal - minVal) / 6),
             font: { size: 11 }
         },
-min: Math.min(minVal, whiskerMin) - 15,   // ← CHANGE: 3 to 12 (more space below)
-max: Math.max(maxVal, whiskerMax) + 15    // ← CHANGE: 3 to 12 (more space above)
+min: Math.min(minVal, whiskerMin) - yPad,   // padding is a share of the data range, so it works for 0.01 and for 1e6 alike
+max: Math.max(maxVal, whiskerMax) + yPad
     },
                 x: {
                     title: { 

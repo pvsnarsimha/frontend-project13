@@ -17,7 +17,12 @@ function renderModelSummaryInterface() {
                 }
             },
             {
-                hint: "First row: column headers (optional). Each row: Actual value, Predicted value",
+                label: "🔢 Number of predictors in the model (k):",
+                labelAttrs: { style: FIELD_GAP },
+                input: { type: "number", id: "modelSummaryK", value: "1", min: "1", step: "1", style: FIELD_STYLE }
+            },
+            {
+                hint: "First row: column headers (optional). Each row: Actual value, Predicted value. k is used for adjusted R² (1 for simple linear regression).",
                 hintAttrs: { style: HINT_STYLE }
             }
         ],
@@ -32,7 +37,7 @@ function renderModelSummaryInterface() {
     });
 }
 
-function computeModelSummary(actual, predicted) {
+function computeModelSummary(actual, predicted, k = 1) {
     if (!actual.length || !predicted.length) {
         return { error: true, message: "Please enter both actual and predicted values." };
     }
@@ -41,6 +46,9 @@ function computeModelSummary(actual, predicted) {
     }
     if (actual.length < 3) {
         return { error: true, message: "Need at least 3 observations." };
+    }
+    if (!Number.isInteger(k) || k < 1 || actual.length - k - 1 < 1) {
+        return { error: true, message: `The number of predictors k must be a whole number of at least 1 and smaller than n - 1 (n = ${actual.length}).` };
     }
     
     const n = actual.length;
@@ -69,11 +77,17 @@ function computeModelSummary(actual, predicted) {
     }
     
     // Calculate metrics
+    if (ssTot === 0) {
+        return { error: true, message: "R² is undefined when all actual values are identical (total sum of squares = 0)." };
+    }
     const rSquared = 1 - (ssRes / ssTot);
-    const adjRSquared = 1 - ((1 - rSquared) * (n - 1) / (n - 2));
+    const dfRes = n - k - 1;                       // residual degrees of freedom for k predictors
+    const adjRSquared = 1 - ((1 - rSquared) * (n - 1) / dfRes);
     const rmse = Math.sqrt(ssRes / n);
     const mae = residuals.reduce((sum, r) => sum + Math.abs(r), 0) / n;
-    const mape = residuals.reduce((sum, r, i) => sum + Math.abs(r / actual[i]) * 100, 0) / n;
+    // A percentage error is undefined where the actual value is 0, so those points are left out of MAPE (and the count says so)
+    const mapeCount = actual.filter(a => a !== 0).length;
+    const mape = mapeCount ? residuals.reduce((sum, r, i) => sum + (actual[i] === 0 ? 0 : Math.abs(r / actual[i]) * 100), 0) / mapeCount : NaN;
     
     // Determine performance colors and icons
     const getPerformanceColor = (value, type) => {
@@ -108,11 +122,11 @@ function computeModelSummary(actual, predicted) {
     }).join('\n');
     
     const mapeCalculation = residualDetails.map(function(r, idx) {
-        return '  ' + (idx+1) + '. |' + r.residual.toFixed(4) + '/' + r.actual + '| × 100 = ' + (Math.abs(r.residual/r.actual)*100).toFixed(2) + '%';
+        return r.actual === 0 ? '  ' + (idx+1) + '. actual = 0 → percentage error undefined, skipped' : '  ' + (idx+1) + '. |' + r.residual.toFixed(4) + '/' + r.actual + '| × 100 = ' + (Math.abs(r.residual/r.actual)*100).toFixed(2) + '%';
     }).join('\n');
     
     const sumAbsResiduals = residualDetails.reduce(function(s, r) { return s + Math.abs(r.residual); }, 0);
-    const sumMape = residualDetails.reduce(function(s, r) { return s + Math.abs(r.residual/r.actual)*100; }, 0);
+    const sumMape = residualDetails.reduce(function(s, r) { return s + (r.actual === 0 ? 0 : Math.abs(r.residual/r.actual)*100); }, 0);
     
     let steps = [
         '<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;">',
@@ -148,7 +162,7 @@ function computeModelSummary(actual, predicted) {
         '<span style="font-size: 24px;">⚙️</span>',
         '</div>',
         '<div style="font-size: 36px; font-weight: 800; color: #1f2937; margin-bottom: 8px;">' + (adjRSquared * 100).toFixed(1) + '<span style="font-size: 18px;">%</span></div>',
-        '<div style="font-size: 12px;">Penalized for ' + (n-2) + ' df</div></div>',
+        '<div style="font-size: 12px;">Penalized for ' + dfRes + ' df</div></div>',
         
         // RMSE Card
         '<div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);">',
@@ -267,9 +281,9 @@ function computeModelSummary(actual, predicted) {
     steps.push('<div class="metric-formula" style="background: #f1f5f9; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 12px; margin-top: 8px; display: none; border-left: 3px solid #1e3a5f;">');
     steps.push('<strong>Formula:</strong> R²<sub>adj</sub> = 1 - (1-R²)(n-1)/(n-k-1)<br><br>');
     steps.push('<strong>Step 1:</strong> 1 - R² = 1 - ' + rSquared.toFixed(6) + ' = ' + (1-rSquared).toFixed(6) + '<br>');
-    steps.push('<strong>Step 2:</strong> (n-1)/(n-k-1) = (' + n + '-1)/(' + n + '-2) = ' + ((n-1)/(n-2)).toFixed(4) + '<br>');
-    steps.push('<strong>Step 3:</strong> Multiply: ' + (1-rSquared).toFixed(6) + ' × ' + ((n-1)/(n-2)).toFixed(4) + ' = ' + ((1-rSquared)*(n-1)/(n-2)).toFixed(6) + '<br>');
-    steps.push('<strong>Step 4:</strong> 1 - ' + ((1-rSquared)*(n-1)/(n-2)).toFixed(6) + ' = <strong>' + adjRSquared.toFixed(6) + '</strong><br>');
+    steps.push('<strong>Step 2:</strong> (n-1)/(n-k-1) = (' + n + '-1)/(' + n + '-' + (k + 1) + ') = ' + ((n-1)/dfRes).toFixed(4) + '<br>');
+    steps.push('<strong>Step 3:</strong> Multiply: ' + (1-rSquared).toFixed(6) + ' × ' + ((n-1)/dfRes).toFixed(4) + ' = ' + ((1-rSquared)*(n-1)/dfRes).toFixed(6) + '<br>');
+    steps.push('<strong>Step 4:</strong> 1 - ' + ((1-rSquared)*(n-1)/dfRes).toFixed(6) + ' = <strong>' + adjRSquared.toFixed(6) + '</strong><br>');
     steps.push('</div></div>');
     
     // RMSE Expandable
@@ -311,7 +325,7 @@ function computeModelSummary(actual, predicted) {
     steps.push('<strong>Step 1 - Calculate percentage errors:</strong><br>' + mapeCalculation.replace(/\n/g, '<br>') + '<br>');
     steps.push('<strong>Sum of percentages = ' + sumMape.toFixed(2) + '%</strong><br><br>');
     steps.push('<strong>Step 2 - Divide by n:</strong><br>');
-    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + n + '<br>');
+    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + mapeCount + (mapeCount < n ? ' (points with actual = 0 are excluded)' : '') + '<br>');
     steps.push('<strong>MAPE = ' + mape.toFixed(2) + '%</strong>');
     steps.push('</div></div>');
     steps.push('</div></div>');
@@ -357,12 +371,12 @@ function computeModelSummary(actual, predicted) {
     // Adjusted R² Calculation
     steps.push('<div style="background: white; border-radius: 12px; padding: 16px;">');
     steps.push('<h4 style="margin: 0 0 8px 0; color: #1e3a5f;">⚙️ Adjusted R-Squared</h4>');
-    steps.push('<p style="font-family: monospace; font-size: 12px; margin: 0 0 8px 0;">R²<sub>adj</sub> = 1 - (1-R²)(n-1)/(n-2)</p>');
+    steps.push('<p style="font-family: monospace; font-size: 12px; margin: 0 0 8px 0;">R²<sub>adj</sub> = 1 - (1-R²)(n-1)/(n-k-1), k = ' + k + '</p>');
     steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px;">');
     steps.push('1 - R² = ' + (1-rSquared).toFixed(6) + '<br>');
-    steps.push('(n-1)/(n-2) = ' + (n-1) + '/' + (n-2) + ' = ' + ((n-1)/(n-2)).toFixed(4) + '<br>');
-    steps.push('Product = ' + (1-rSquared).toFixed(6) + ' × ' + ((n-1)/(n-2)).toFixed(4) + ' = ' + ((1-rSquared)*(n-1)/(n-2)).toFixed(6) + '<br>');
-    steps.push('R²<sub>adj</sub> = 1 - ' + ((1-rSquared)*(n-1)/(n-2)).toFixed(6) + '<br>');
+    steps.push('(n-1)/(n-k-1) = ' + (n-1) + '/' + dfRes + ' = ' + ((n-1)/dfRes).toFixed(4) + '<br>');
+    steps.push('Product = ' + (1-rSquared).toFixed(6) + ' × ' + ((n-1)/dfRes).toFixed(4) + ' = ' + ((1-rSquared)*(n-1)/dfRes).toFixed(6) + '<br>');
+    steps.push('R²<sub>adj</sub> = 1 - ' + ((1-rSquared)*(n-1)/dfRes).toFixed(6) + '<br>');
     steps.push('<strong>R²<sub>adj</sub> = ' + adjRSquared.toFixed(6) + '</strong> (' + (adjRSquared*100).toFixed(1) + '%)');
     steps.push('</div></div>');
     
@@ -393,7 +407,7 @@ function computeModelSummary(actual, predicted) {
     steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 11px;">');
     steps.push(mapeCalculation.replace(/\n/g, '<br>'));
     steps.push('<br><strong>Sum of % = ' + sumMape.toFixed(2) + '%</strong><br>');
-    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + n + ' = <strong>' + mape.toFixed(2) + '%</strong>');
+    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + mapeCount + ' = <strong>' + mape.toFixed(2) + '%</strong>');
     steps.push('</div></div>');
     
     steps.push('</div></div>');
@@ -464,7 +478,9 @@ function setupModelSummaryLogic() {
             return;
         }
         
-        const result = computeModelSummary(actual, predicted);
+        const kField = document.getElementById("modelSummaryK");
+        const k = kField ? parseInt(kField.value, 10) : 1;
+        const result = computeModelSummary(actual, predicted, k);
         resultDiv.style.display = "block";
         
         if (result.error) {

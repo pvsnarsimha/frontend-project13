@@ -72,6 +72,9 @@ function computeSimpleLinearRegression(xValues, yValues) {
         xyDetails.push({ x: xValues[i], y: yValues[i], xDev, yDev, product: xDev * yDev, xSq: xDev * xDev });
     }
     
+    if (!(denominator > 0)) {
+        return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
+    }
     const slope = numerator / denominator;
     const intercept = meanY - slope * meanX;
     
@@ -92,6 +95,9 @@ function computeSimpleLinearRegression(xValues, yValues) {
         residualDetails.push({ x: xValues[i], y: yValues[i], yPred, residual, squaredRes: residual * residual });
     }
     
+    if (!(ssTot > 0)) {
+        return { error: true, message: "All Y values are identical, so the total sum of squares is 0 and R² is undefined (0 / 0). Enter Y values that vary." };
+    }
     const rSquared = 1 - (ssRes / ssTot);
     const adjRSquared = 1 - ((1 - rSquared) * (n - 1) / (n - 2));
     

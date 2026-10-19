@@ -274,3 +274,41 @@ test('h() is defined once in toolkit.js and never assigned to innerHTML', () => 
     const body = src.slice(src.indexOf('function h(tag'), src.indexOf('// ---- Shared form constants'));
     assert.ok(!/innerHTML|insertAdjacentHTML|outerHTML/.test(body), 'h() must not parse HTML strings');
 });
+
+test('every element id a tool looks up with getElementById is defined by that tool (its form, its result markup or the page shell)', () => {
+    const offenders = [];
+    const toolFiles = scriptList().filter(rel => rel.startsWith('js/tools/'));
+    for (const rel of toolFiles) {
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        const renders = Object.values(routes).map(r => r[0]).filter(fn => src.includes(`function ${fn.name}(`));
+        if (!renders.length) continue;                       // helper files (steps, chart) are checked with their tool below
+        const family = toolFiles.filter(f => f.startsWith(rel.replace(/\.js$/, '')) || f === rel).map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+        const rendered = renders.map(fn => fn()).join('\n');
+        const prefixes = [...family.matchAll(/showDistributionParams\(\s*['"](\w+)['"]/g)].map(m => m[1]);
+        const ids = new Set([...src.matchAll(/getElementById\(\s*['"]([\w-]+)['"]\s*\)/g)].map(m => m[1]));
+        for (const id of ids) {
+            const defined = rendered.includes(`id="${id}"`) || new RegExp(`id\\s*[=:]\\s*\\\\?["'\`]${id}\\\\?["'\`]`).test(family) || html.includes(`id="${id}"`) || prefixes.some(p => id.startsWith(p));
+            if (!defined) offenders.push(`${rel}: #${id}`);
+        }
+    }
+    assert.deepEqual(offenders, [], 'getElementById for an id that nothing creates');
+});
+
+test('error messages are never assigned with innerText: they go through setHtml(escapeHtml(...)) or textContent', () => {
+    const offenders = [];
+    for (const rel of scriptList()) {
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        if (/\.innerText\s*=\s*\w+\.message\b/.test(src)) offenders.push(rel);
+    }
+    assert.deepEqual(offenders, []);
+});
+
+test('no blocking alert() outside notifyUser (messages go through the toast)', () => {
+    const offenders = [];
+    for (const rel of scriptList()) {
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/\/\/[^\n]*/g, '');
+        const hits = (src.match(/\balert\(/g) || []).length;
+        if (hits > (rel === 'js/core/charts.js' ? 1 : 0)) offenders.push(rel);
+    }
+    assert.deepEqual(offenders, []);
+});

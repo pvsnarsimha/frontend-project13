@@ -234,7 +234,7 @@ function setupPDFLogic() {
             if (result.error) {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = 'Error';
-                stepsSpan.innerText = result.message;
+                setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
             } else {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = result.resultStr;

@@ -24,10 +24,16 @@ function loadChartJs() {
     return plottingLibraryLoad;
 }
 
+// A short non-blocking message (the toast of the UI layer); alert() only if the UI layer is not loaded (unit tests, broken page)
+function notifyUser(message, ms) {
+    if (typeof window !== 'undefined' && window.StatLabUI && typeof window.StatLabUI.showToast === 'function') window.StatLabUI.showToast(message, ms || 5000);
+    else alert(message);
+}
+
 function chartJsReady(retry, args) {
     if (typeof Chart !== 'undefined') return true;
     loadChartJs().then(() => retry(...args)).catch(() => {
-        alert('Charts need the Chart.js library, which could not be loaded. Check your connection and try again.');
+        notifyUser('Charts need the Chart.js library, which could not be loaded. Check your connection and try again.', 7000);
     });
     return false;
 }
@@ -61,6 +67,7 @@ function getCanvasTooltipElement() {
         tip = document.createElement('div');
         tip.id = 'canvasChartTooltip';
         tip.setAttribute('role', 'tooltip');
+        tip.setAttribute('aria-hidden', 'true');   // mouse-only hint: the same values are in the worked solution's text and tables
         tip.style.cssText = 'position: fixed; background: #1a5490; color: white; padding: 8px 16px; border-radius: 8px; ' +
             'font-size: 12px; font-family: monospace; pointer-events: none; z-index: 1000; display: none; ' +
             'box-shadow: 0 2px 10px rgba(0,0,0,0.3); border-left: 4px solid;';
@@ -72,7 +79,12 @@ function getCanvasTooltipElement() {
 function setupCanvasTooltip(canvas, chart) {
     const tooltipDiv = getCanvasTooltipElement();
     tooltipDiv.style.display = 'none';
-    canvas.addEventListener('mousemove', (e) => {
+    // The same canvas can be redrawn many times: drop the previous listeners so they do not pile up or read a destroyed chart
+    if (canvas._tooltipHandlers) {
+        canvas.removeEventListener('mousemove', canvas._tooltipHandlers.move);
+        canvas.removeEventListener('mouseleave', canvas._tooltipHandlers.leave);
+    }
+    const onMove = (e) => {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
@@ -135,11 +147,13 @@ function setupCanvasTooltip(canvas, chart) {
         } else {
             tooltipDiv.style.display = 'none';
         }
-    });
-    
-    canvas.addEventListener('mouseleave', () => {
+    };
+    const onLeave = () => {
         tooltipDiv.style.display = 'none';
-    });
+    };
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('mouseleave', onLeave);
+    canvas._tooltipHandlers = { move: onMove, leave: onLeave };
 }
 
 // ---- Accessible names for charts ----

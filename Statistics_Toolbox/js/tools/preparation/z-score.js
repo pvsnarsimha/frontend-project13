@@ -5,8 +5,8 @@ function renderZScoreInterface() {
     return buildInterface({
         id: "statZScoreInterface",
         title: "📊 Standardization (Z-scores)",
-        formula: "📌 Z = (x - μ) / σ",
-        desc: "Z-score tells how many standard deviations a value is from the mean. Z = 0 means exactly at mean.",
+        formula: "📌 Z = (x - x̄) / s",
+        desc: "Z-score tells how many sample standard deviations (s, with n - 1) a value is from the mean. Z = 0 means exactly at the mean. The Z-score outlier tool uses the same s.",
         inputs: [
             {
                 label: "📋 Enter numeric values (comma, space, or line separated)",
@@ -32,31 +32,32 @@ function computeZScoreWithSteps(numbers) {
     let sum = numbers.reduce((a,b) => a+b, 0);
     let mean = sum / n;
     
-    // Calculate standard deviation (population)
+    // Sample standard deviation (n - 1), the same as the Z-score outlier tool, so both give the same z for the same data
     let squaredDiffs = numbers.map(x => (x - mean) ** 2);
     let sumSqDiffs = squaredDiffs.reduce((a,b) => a+b, 0);
-    let stdDev = Math.sqrt(sumSqDiffs / n);
+    if (n < 2) return { error: true, message: "Need at least 2 values for Z-score calculation." };
+    let stdDev = Math.sqrt(sumSqDiffs / (n - 1));
     
     if (stdDev === 0) {
-        return { error: true, message: "Standard deviation is zero. All values are identical, Z-scores are zero." };
+        return { error: true, message: "All values are identical, so the standard deviation is 0 and Z-scores are undefined (0 / 0)." };
     }
     
-    let steps = `📊 FORMULA: Z-score = (x - μ) / σ\n`;
+    let steps = `📊 FORMULA: Z-score = (x - x̄) / s   (sample standard deviation, n - 1)\n`;
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
-    steps += `Step 1: Calculate the mean (μ)\n`;
-    steps += `   μ = Σx / n = ${sum} / ${n} = ${mean.toFixed(6)}\n\n`;
+    steps += `Step 1: Calculate the mean (x̄)\n`;
+    steps += `   x̄ = Σx / n = ${sum} / ${n} = ${mean.toFixed(6)}\n\n`;
     
-    steps += `Step 2: Calculate the standard deviation (σ)\n`;
-    steps += `   σ = √[Σ(x - μ)² / n]\n`;
+    steps += `Step 2: Calculate the sample standard deviation (s)\n`;
+    steps += `   s = √[Σ(x - x̄)² / (n - 1)]\n`;
     squaredDiffs.forEach((sq, i) => {
         steps += `   (${numbers[i]} - ${mean.toFixed(6)})² = ${sq.toFixed(6)}\n`;
     });
-    steps += `   Σ(x - μ)² = ${sumSqDiffs.toFixed(6)}\n`;
-    steps += `   σ = √(${sumSqDiffs.toFixed(6)} / ${n}) = √${(sumSqDiffs/n).toFixed(6)} = ${stdDev.toFixed(6)}\n\n`;
+    steps += `   Σ(x - x̄)² = ${sumSqDiffs.toFixed(6)}\n`;
+    steps += `   s = √(${sumSqDiffs.toFixed(6)} / ${n - 1}) = √${(sumSqDiffs/(n - 1)).toFixed(6)} = ${stdDev.toFixed(6)}\n\n`;
     
     steps += `Step 3: Calculate Z-scores for each value\n`;
-    steps += `   Formula: Z = (x - μ) / σ\n`;
+    steps += `   Formula: Z = (x - x̄) / s\n`;
     
     let zScores = [];
     numbers.forEach(x => {
@@ -71,8 +72,8 @@ function computeZScoreWithSteps(numbers) {
     
     steps += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     steps += `✅ Z-SCORE RESULTS:\n`;
-    steps += `   Mean (μ) = ${mean.toFixed(6)}\n`;
-    steps += `   Standard Deviation (σ) = ${stdDev.toFixed(6)}\n`;
+    steps += `   Mean (x̄) = ${mean.toFixed(6)}\n`;
+    steps += `   Sample standard deviation (s) = ${stdDev.toFixed(6)}\n`;
     steps += `   Z-scores: ${zScores.map(z => z.toFixed(6)).join(', ')}\n`;
     steps += `\n📌 Interpretation:\n`;
     steps += `   • Z = 0: Value equals the mean\n`;
@@ -105,7 +106,7 @@ function setupZScoreLogic() {
         if (zscoreRes.error) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = zscoreRes.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(zscoreRes.message));
             return;
         }
         

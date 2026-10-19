@@ -78,6 +78,9 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
         </tr>`;
     }
     
+    if (!(denominator > 0)) {
+        return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
+    }
     const slope = numerator / denominator;
     const intercept = meanY - slope * meanX;
     
@@ -121,6 +124,16 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
     const dfTot = n - 1;       // n - 1
     
     // ========== STEP 4: Mean Squares ==========
+    if (!isFinite(ssTot) || !isFinite(ssRes)) {
+        return { error: true, message: "The values are too large to compute with (the sums of squares overflow). Rescale the data and try again." };
+    }
+    if (!(ssTot > 0)) {
+        return { error: true, message: "All Y values are identical, so the total sum of squares is 0 and the F test is undefined. Enter Y values that vary." };
+    }
+    if (ssRes <= 1e-12 * ssTot) {
+        return { error: true, message: "The line fits the data perfectly (residual sum of squares ≈ 0), so MSE = 0 and F is infinite. The F test needs some unexplained variation." };
+    }
+    
     const msReg = ssReg / dfReg;
     const msRes = ssRes / dfRes;
     

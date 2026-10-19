@@ -43,20 +43,16 @@ function computeCochranQTest(inputText, alpha) {
     const lines = inputText.trim().split(/\r?\n/);
     let data = [];
     
-    for (let line of lines) {
-        line = line.trim();
+    for (let r = 0; r < lines.length; r++) {
+        const line = lines[r].trim();
         if (line === "") continue;
         let values = parseNumbersFromInput(line);
         if (values.length > 0) {
-            // Validate binary values
-            let valid = true;
-            for (let val of values) {
-                if (val !== 0 && val !== 1) {
-                    valid = false;
-                    break;
-                }
+            // Every value must be 0 or 1: reject the input (naming the row) instead of silently dropping the row
+            if (values.some(val => val !== 0 && val !== 1)) {
+                return { error: true, message: `Row ${r + 1} ("${escapeHtml(line)}") contains a value other than 0 or 1. Cochran's Q needs binary data (0 = failure, 1 = success) in every row.` };
             }
-            if (valid) data.push(values);
+            data.push(values);
         }
     }
     

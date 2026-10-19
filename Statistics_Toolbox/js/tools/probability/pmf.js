@@ -27,6 +27,8 @@ function computePMFWithSteps() {
     
     if (dist === 'poisson') {
         const lambda = parseFloat(document.getElementById('pmfLambda').value);
+        const lambdaError = validateDistributionParams('poisson', { lambda });
+        if (lambdaError) return { error: true, message: lambdaError };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      POISSON DISTRIBUTION PMF                    ║\n`;
@@ -51,9 +53,9 @@ function computePMFWithSteps() {
                 
                 steps += `\nFor x = ${k}:\n`;
                 steps += `  Step 1: Calculate e^{-λ} = e^{-${lambda}} = ${Math.exp(-lambda).toFixed(8)}\n`;
-                steps += `  Step 2: Calculate λ^{k} = ${lambda}^${k} = ${Math.pow(lambda, k).toFixed(8)}\n`;
-                steps += `  Step 3: Calculate k! = ${k}! = ${factorial(k)}\n`;
-                steps += `  Step 4: Apply formula: (${Math.exp(-lambda).toFixed(8)} × ${Math.pow(lambda, k).toFixed(8)}) / ${factorial(k)}\n`;
+                steps += `  Step 2: Calculate λ^{k} = ${lambda}^${k} = ${powerText(lambda, k)}\n`;
+                steps += `  Step 3: Calculate k! = ${k}! = ${formatFactorial(k)}\n`;
+                steps += `  Step 4: Apply formula: (${Math.exp(-lambda).toFixed(8)} × ${powerText(lambda, k)}) / ${formatFactorial(k)}\n`;
                 steps += `  P(X=${k}) = ${pmf.toFixed(8)}\n`;
                 steps += `  Interpretation: ${(pmf * 100).toFixed(4)}% chance of exactly ${k} events\n\n`;
             }
@@ -62,6 +64,8 @@ function computePMFWithSteps() {
     } else if (dist === 'binomial') {
         const n = parseInt(document.getElementById('pmfN').value);
         const p = parseFloat(document.getElementById('pmfP').value);
+        const binomialError = validateDistributionParams('binomial', { n, p });
+        if (binomialError) return { error: true, message: binomialError };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      BINOMIAL DISTRIBUTION PMF                   ║\n`;
@@ -84,14 +88,14 @@ function computePMFWithSteps() {
                 steps += `  P(X=${k}) = 0\n\n`;
             } else {
                 const comb = combination(n, k);
-                const pmf = comb * Math.pow(p, k) * Math.pow(1-p, n-k);
+                const pmf = binomialPMF(n, k, p);
                 results.push(pmf);
                 
                 steps += `\nFor x = ${k}:\n`;
-                steps += `  Step 1: Calculate C(${n},${k}) = ${n}!/(${k}!·${n-k}!) = ${comb}\n`;
+                steps += `  Step 1: Calculate C(${n},${k}) = ${n}!/(${k}!·${n-k}!) = ${formatCombination(n, k)}\n`;
                 steps += `  Step 2: Calculate p^{k} = ${p}^${k} = ${Math.pow(p, k).toFixed(8)}\n`;
                 steps += `  Step 3: Calculate (1-p)^{n-k} = ${(1-p).toFixed(6)}^${n-k} = ${Math.pow(1-p, n-k).toFixed(8)}\n`;
-                steps += `  Step 4: Multiply: ${comb} × ${Math.pow(p, k).toFixed(8)} × ${Math.pow(1-p, n-k).toFixed(8)}\n`;
+                steps += `  Step 4: Multiply: ${combination(n, k) === comb && isFinite(comb) ? comb : 'C(n,k)'} × ${Math.pow(p, k).toFixed(8)} × ${Math.pow(1-p, n-k).toFixed(8)}\n`;
                 steps += `  P(X=${k}) = ${pmf.toFixed(8)}\n`;
                 steps += `  Interpretation: ${(pmf * 100).toFixed(4)}% chance of exactly ${k} successes in ${n} trials\n\n`;
             }
@@ -111,6 +115,12 @@ function computePMFWithSteps() {
 }
 
 // Helper functions for factorial and combinations
+// λ^k as text: the number when it fits in a double, otherwise a power of ten (200^200 is "Infinity" in floating point)
+function powerText(base, exponent) {
+    const value = Math.pow(base, exponent);
+    return isFinite(value) ? value.toFixed(8) : `≈ 10^${(exponent * Math.log10(base)).toFixed(2)}`;
+}
+
 function factorial(n) {
     if (n < 0) return 1;
     if (n > 170) return Infinity;           // 171! overflows a double; never loop up to a huge n
@@ -190,7 +200,7 @@ function setupPMFLogic() {
             if (result.error) {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = 'Error';
-                stepsSpan.innerText = result.message;
+                setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
             } else {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = result.resultStr;

@@ -55,7 +55,7 @@ function computeMcNemarTest(inputText, alpha) {
     
     if (b + c > 0) {
         // With continuity correction (recommended)
-        chiSquare = Math.pow(Math.abs(b - c) - 1, 2) / (b + c);
+        chiSquare = Math.pow(Math.max(Math.abs(b - c) - 1, 0), 2) / (b + c);   // never below 0: for b = c the corrected statistic is 0, not 1/(b + c)
         continuityCorrection = 1;
     } else {
         chiSquare = 0;

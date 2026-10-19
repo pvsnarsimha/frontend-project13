@@ -5,11 +5,12 @@ window.StatLabUI = window.StatLabUI || {};
     const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
     const toast = document.createElement('div');
     toast.className = 'toast';
+    toast.setAttribute('role', 'status');          // announced politely by screen readers
     document.body.appendChild(toast);
     let toastTimer;
-    function showToast(msg) {
+    function showToast(msg, ms) {
         toast.textContent = msg; toast.classList.add('show');
-        clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+        clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), ms || 1800);
     }
 
     function countTools() {

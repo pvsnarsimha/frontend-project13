@@ -4,6 +4,7 @@
 function renderBinomialExactInterface() {
     return buildInterface({
         id: "statBinomialExactInterface",
+        parameterOnly: true,   // number fields and drop-downs only: no pasted data, so no sample button
         title: "B Binomial Exact Test",
         formula: "📌 P(X = k) = C(n,k) × p^k × (1-p)^(n-k)",
         desc: "Exact test for binomial proportion using the binomial distribution (not approximation).",
@@ -67,6 +68,8 @@ function renderBinomialExactInterface() {
 // ========== BINOMIAL EXACT TEST COMPUTATION (COMPLETE WITH DETAILED STEPS) ==========
 function computeBinomialExactTest(successes, n, p0, alpha, alternative) {
     if (n < 1) return { error: true, message: "Sample size must be at least 1." };
+    if (!(p0 >= 0 && p0 <= 1)) return { error: true, message: "The hypothesized probability p₀ must be a number between 0 and 1." };
+    if (successes < 0 || successes > n) return { error: true, message: "Successes must be between 0 and n." };
     
     let pValue;
     let calculationDetails = "";
@@ -75,7 +78,7 @@ function computeBinomialExactTest(successes, n, p0, alpha, alternative) {
         pValue = 0;
         calculationDetails = `<div style="margin-top: 12px;"><strong>P(X ≥ ${successes}) =</strong><br>`;
         for (let k = successes; k <= n; k++) {
-            const prob = combination(n, k) * Math.pow(p0, k) * Math.pow(1 - p0, n - k);
+            const prob = binomialPMF(n, k, p0);
             pValue += prob;
             calculationDetails += `P(X = ${k}) = C(${n},${k}) × ${p0}^${k} × ${(1-p0).toFixed(4)}^${n-k} = ${prob.toFixed(8)}<br>`;
         }
@@ -84,7 +87,7 @@ function computeBinomialExactTest(successes, n, p0, alpha, alternative) {
         pValue = 0;
         calculationDetails = `<div style="margin-top: 12px;"><strong>P(X ≤ ${successes}) =</strong><br>`;
         for (let k = 0; k <= successes; k++) {
-            const prob = combination(n, k) * Math.pow(p0, k) * Math.pow(1 - p0, n - k);
+            const prob = binomialPMF(n, k, p0);
             pValue += prob;
             calculationDetails += `P(X = ${k}) = C(${n},${k}) × ${p0}^${k} × ${(1-p0).toFixed(4)}^${n-k} = ${prob.toFixed(8)}<br>`;
         }
@@ -92,13 +95,13 @@ function computeBinomialExactTest(successes, n, p0, alpha, alternative) {
     } else {
         // Two-tailed
         pValue = 0;
-        const observedProb = combination(n, successes) * Math.pow(p0, successes) * Math.pow(1 - p0, n - successes);
+        const observedProb = binomialPMF(n, successes, p0);
         calculationDetails = `<div style="margin-top: 12px;"><strong>Two-tailed p-value calculation:</strong><br>
         Observed probability = ${observedProb.toFixed(8)}<br>
         Including all outcomes with probability ≤ observed probability:<br>`;
         
         for (let k = 0; k <= n; k++) {
-            const prob = combination(n, k) * Math.pow(p0, k) * Math.pow(1 - p0, n - k);
+            const prob = binomialPMF(n, k, p0);
             if (prob <= observedProb + 1e-10) {
                 pValue += prob;
                 calculationDetails += `P(X = ${k}) = ${prob.toFixed(8)} ✓<br>`;
@@ -207,6 +210,11 @@ function setupBinomialExactLogic() {
         
         const result = computeBinomialExactTest(successes, n, p0, alpha, alternative);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.textContent = "Error";
+            setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
+            return;
+        }
         setHtml(valueSpan, `p = ${result.pValue?.toFixed(6) || 'Error'} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
         setHtml(stepsSpan, result.steps || "Calculation completed.");
     });

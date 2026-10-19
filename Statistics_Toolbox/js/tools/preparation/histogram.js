@@ -8,27 +8,11 @@ function createHistogram(numbers, chartTitle) {
     
     // Create bins for histogram (using Sturges' rule)
     const numBins = Math.min(Math.ceil(Math.log2(numbers.length) + 1), 15);
-    const min = Math.min(...numbers);
-    const max = Math.max(...numbers);
-    const binWidth = (max - min) / numBins;
-    
-    // Create bins
-    let bins = Array(numBins).fill(0);
-    let binLabels = [];
-    
-    for (let i = 0; i < numBins; i++) {
-        let lower = min + (i * binWidth);
-        let upper = lower + binWidth;
-        binLabels.push(`${lower.toFixed(2)}-${upper.toFixed(2)}`);
-        
-        numbers.forEach(num => {
-            if (i === numBins - 1) {
-                if (num >= lower && num <= upper) bins[i]++;
-            } else {
-                if (num >= lower && num < upper) bins[i]++;
-            }
-        });
-    }
+    // One histogram implementation: the bins come from the Histogram tool's computeHistogramWithSteps
+    const histogram = computeHistogramWithSteps(numbers, numBins);
+    if (histogram.error) return;
+    const bins = histogram.bins;
+    const binLabels = histogram.binLabels;
     
     // Destroy existing chart if it exists
     if (currentChart) {
@@ -117,34 +101,36 @@ function createHistogram(numbers, chartTitle) {
 }
 
 function renderHistogramInterface() {
-    return `
-        <div class="stat-interface">
-            <div class="interface-title">📊 Histogram with Professional Chart</div>
-            <div class="formula-card">
-                <div class="formula">📌 Bin Width = (Max - Min) / Number of Bins</div>
-                <div class="desc">Shows the frequency distribution of data using bars. Choose number of bins or use optimal rules (Sturges, Freedman-Diaconis).</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter numeric values:</label>
-                <textarea id="histogramInput" rows="4" placeholder="Example: 12, 15, 14, 16, 13, 25, 24, 22, 35, 34, 33"></textarea>
-                <label style="margin-top: 15px;">📊 Number of bins:</label>
-                <input type="number" id="histogramBins" value="5" min="1" max="30" step="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 15px;">
-                <div class="desc" style="font-size: 0.75rem;">💡 Tip: Sturges' rule suggests ${Math.ceil(Math.log2(10) + 1)} bins for 10 values | Freedman-Diaconis uses IQR</div>
-                <div class="action-row">
-                    <button class="primary-btn" id="histogramComputeBtn">📊 Generate Histogram + Chart</button>
-                    <button class="secondary-btn" id="histogramClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="histogramResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">🎯 HISTOGRAM</div>
-                    <div class="result-value" id="histogramValueDisplay">—</div>
-                    <div class="calculation-steps" id="histogramStepsDisplay"></div>
-                </div>
-                <canvas id="histogramChartCanvas" style="max-height: 400px; margin-top: 20px;"></canvas>
-            </div>
-        </div>
-    `;
+    return buildInterface({
+        id: "statHistogramInterface",
+        title: "📊 Histogram with Professional Chart",
+        formula: "📌 Bin Width = (Max - Min) / Number of Bins",
+        desc: "Shows the frequency distribution of data using bars. Choose number of bins or use optimal rules (Sturges, Freedman-Diaconis).",
+        inputs: [
+            {
+                label: "📋 Enter numeric values:",
+                textarea: { id: "histogramInput", rows: "4", placeholder: "Example: 12, 15, 14, 16, 13, 25, 24, 22, 35, 34, 33" }
+            },
+            {
+                label: "📊 Number of bins:",
+                labelAttrs: { style: FIELD_GAP },
+                input: { type: "number", id: "histogramBins", value: "5", min: "1", max: "30", step: "1", style: FIELD_STYLE }
+            },
+            {
+                hint: "💡 Tip: Sturges' rule gives ⌈log₂(n) + 1⌉ bins (5 bins for 10 values); Freedman-Diaconis uses the IQR.",
+                hintAttrs: { style: HINT_STYLE }
+            }
+        ],
+        run: { id: "histogramComputeBtn", text: "📊 Generate Histogram + Chart" },
+        clear: { id: "histogramClearBtn", text: "Clear" },
+        result: {
+            area: "histogramResultArea",
+            label: "🎯 HISTOGRAM",
+            value: "histogramValueDisplay",
+            steps: "histogramStepsDisplay",
+            extra: ['<canvas id="histogramChartCanvas" style="max-height: 400px; margin-top: 20px;"></canvas>']
+        }
+    });
 }
 
 function computeHistogramWithSteps(numbers, numBins) {
@@ -264,22 +250,12 @@ function computeHistogramWithSteps(numbers, numBins) {
     
     steps += `\n📌 STATISTICAL SUMMARY:\n`;
     steps += `   • Mean of data = ${(numbers.reduce((a,b)=>a+b,0)/n).toFixed(6)}\n`;
-    steps += `   • Median = ${sorted[Math.floor(n/2)].toFixed(6)}\n`;
-    steps += `   • Mode = ${getMode(numbers)}\n`;
-    steps += `   • Variance = ${(numbers.reduce((a,b)=>a+Math.pow(b - (numbers.reduce((a,b)=>a+b,0)/n),2),0)/n).toFixed(6)}\n`;
+    steps += `   • Median = ${quantileType7(sorted, 0.5).toFixed(6)}\n`;
+    steps += `   • Mode = ${computeModeWithSteps(numbers).display}\n`;   // the Mode tool's wording and rule
+
+    steps += `   • Population variance (÷ n) = ${(numbers.reduce((a,b)=>a+Math.pow(b - (numbers.reduce((a,b)=>a+b,0)/n),2),0)/n).toFixed(6)}\n`;
     
     return { steps, bins, binLabels, binWidth, binRanges, frequencies: bins };
-}
-
-function getMode(numbers) {
-    const freq = new Map();
-    numbers.forEach(n => freq.set(n, (freq.get(n) || 0) + 1));
-    let maxFreq = 0, modes = [];
-    for (let [val, f] of freq) {
-        if (f > maxFreq) { maxFreq = f; modes = [val]; }
-        else if (f === maxFreq && f > 1) modes.push(val);
-    }
-    return maxFreq === 1 ? "No unique mode" : modes.join(', ');
 }
 
 function renderHistogramChart(bins, binLabels, numbers) {

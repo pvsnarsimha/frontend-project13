@@ -37,7 +37,7 @@ test('defineListTool renders the expected form and wires one handler per button'
     assert.equal(els.demoValueDisplay.innerText, 'Need 2');
     els.demoInput.value = '99 1'; calls[0][1]();
     assert.equal(els.demoValueDisplay.innerText, 'Error');
-    assert.equal(els.demoStepsDisplay.innerText, 'bad');
+    assert.equal(els.demoStepsDisplay.innerHTML, '⚠️ bad', 'errors are escaped and shown through setHtml');
 });
 
 test('list tools converted to the toolkit still compute the same answers', () => {
@@ -95,6 +95,9 @@ test('sample-data contract: tools offering "Try sample data" declare an "Example
     const R = app.get('STAT_ROUTES');
     const withExample = Object.entries(R).filter(([, [render]]) => /placeholder="[^"]*(Example|e\.g\.)/i.test(render()));
     // Documented in README: this is how the sample button finds its data. Guard against regressions in coverage.
+    // every tool is either parameter-only (declared with data-parameter-only) or declares an Example placeholder
+    const missing = Object.entries(R).filter(([, [render]]) => { const html = render(); return !/data-parameter-only="true"/.test(html) && !/placeholder="[^"]*(Example|e\.g\.)/i.test(html); }).map(([name]) => name);
+    assert.deepEqual(missing, [], 'tools with neither an Example placeholder nor parameterOnly');
     assert.ok(withExample.length >= 85, `only ${withExample.length} tools declare an Example placeholder`);
 });
 

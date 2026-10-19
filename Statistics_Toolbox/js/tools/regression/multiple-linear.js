@@ -50,6 +50,10 @@ function computeMultipleLinearRegression(dataMatrix) {
     
     const n = dataMatrix.length;
     const p = dataMatrix[0].length - 1; // number of predictors
+    const ragged = dataMatrix.findIndex(row => row.length !== dataMatrix[0].length);
+    if (ragged >= 0) {
+        return { error: true, message: `Row ${ragged + 1} has ${dataMatrix[ragged].length} values but row 1 has ${dataMatrix[0].length}. Every row needs the same number of values (Y followed by each predictor).` };
+    }
     
     if (p < 1) {
         return { error: true, message: "Need at least one predictor variable." };
@@ -65,13 +69,21 @@ function computeMultipleLinearRegression(dataMatrix) {
     for (let j = 0; j < p; j++) {
         xMeans.push(x.reduce((sum, row) => sum + row[j], 0) / n);
     }
+    // A predictor that sits far from 0 relative to its spread (for example years, or values near 1,000,000) makes X'X so badly
+    // scaled that a perfectly valid design looks singular. Such predictors are centred (x - mean) before solving, and the
+    // intercept is converted back to the original scale afterwards; the other coefficients are unchanged by centring.
+    const shift = xMeans.map((m, j) => {
+        const sd = Math.sqrt(x.reduce((sum, row) => sum + (row[j] - m) ** 2, 0) / n);
+        return sd > 0 && Math.abs(m) > 100 * sd ? m : 0;
+    });
+    const centred = shift.some(v => v !== 0);
     
     // Build design matrix X (with column of 1's for intercept)
     const X = [];
     for (let i = 0; i < n; i++) {
         const row = [1]; // intercept term
         for (let j = 0; j < p; j++) {
-            row.push(x[i][j]);
+            row.push(x[i][j] - shift[j]);
         }
         X.push(row);
     }
@@ -158,7 +170,7 @@ function computeMultipleLinearRegression(dataMatrix) {
             // Make diagonal 1
             const pivot = augmented[i][i];
             if (Math.abs(pivot) < 1e-10 * matrixScale) {
-                throw new Error("Matrix is singular, cannot compute inverse");
+                throw Object.assign(new Error("Matrix is singular, cannot compute inverse"), { kind: "pivot" });
             }
             
             stepLog += `<div style="margin: 8px 0;">📐 Make pivot at (${i+1},${i+1}) = 1: Divide row ${i+1} by ${pivot.toFixed(4)}</div>`;
@@ -185,7 +197,7 @@ function computeMultipleLinearRegression(dataMatrix) {
         const inv = augmented.map(row => row.slice(size));
         const cond = norm1(matrix) * norm1(inv);
         if (cond > 1e12) {
-            throw new Error(`X'X is numerically singular (condition number ≈ ${cond.toExponential(1)})`);
+            throw Object.assign(new Error(`X'X is numerically singular (condition number ≈ ${cond.toExponential(1)})`), { kind: "condition" });
         }
         if (cond > 1e6) {
             stepLog += `<div style="margin: 8px 0; padding: 8px 12px; background: #fff3cd; border-radius: 6px; color: #856404;">⚠️ Near-collinearity: the condition number of X'X is ≈ ${cond.toExponential(1)}. Two or more predictors are almost linearly dependent, so individual coefficients may be unreliable even though the fit looks fine. Consider removing or combining correlated predictors (see VIF).</div>`;
@@ -204,6 +216,7 @@ function computeMultipleLinearRegression(dataMatrix) {
     
     // Calculate coefficients: β = (X'X)⁻¹ X'y
     let coefficients;
+    let failure = null;
     let inverseSteps = '';
     let XtX_inv;
     
@@ -265,6 +278,7 @@ function computeMultipleLinearRegression(dataMatrix) {
         
         <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
             <h3 style="margin: 0 0 16px 0; color: #1a5490;">🧮 Step 2: Matrix Formulation</h3>
+            ${centred ? `<div style="background: #fff3cd; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; color: #856404;">ℹ️ Numerical stability: the predictors ${shift.map((v, j) => v !== 0 ? 'X' + (j + 1) + ' (mean ' + +v.toFixed(6) + ')' : null).filter(Boolean).join(', ')} are far from 0 relative to their spread, so the matrices below use the centred values (x − mean). The intercept is converted back to the original scale in the result; the slopes are the same either way.</div>` : ''}
             <div style="background: white; border-radius: 12px; padding: 16px;">
                 <p>For all n observations, we write the system in matrix form:</p>
                 <div style="background: #f0f4f8; padding: 12px; border-radius: 8px; font-family: monospace; text-align: center; margin: 12px 0;">
@@ -338,6 +352,12 @@ function computeMultipleLinearRegression(dataMatrix) {
                 <strong>β<sub>${i}</sub></strong> = ${terms.join(' + ')} = ${sum.toFixed(6)}
             </div>`;
         }
+        if (centred) {
+            // β₀ for the original x: ȳ-form intercept minus the slopes times the amounts the predictors were shifted by
+            const centredIntercept = coefficients[0];
+            coefficients[0] = centredIntercept - shift.reduce((sum, v, jx) => sum + coefficients[jx + 1] * v, 0);
+            coeffDetails += `<div style="margin: 8px 0; color: #856404;">Intercept converted back to the original scale: β₀ = ${centredIntercept.toFixed(6)} − Σ βⱼ × (shift of Xⱼ) = ${coefficients[0].toFixed(6)}</div>`;
+        }
         
         steps += `
                 <h4 style="margin: 20px 0 10px 0;">Step 3.3: Calculate (X<sup>T</sup>X)<sup>-1</sup> using Gaussian Elimination</h4>
@@ -368,11 +388,18 @@ function computeMultipleLinearRegression(dataMatrix) {
                 </div>`;
                 
     } catch (error) {
+        // say what actually went wrong: an exactly dependent predictor, or a design that is only numerically ill-conditioned
+        const failureAdvice = error.kind === "condition"
+            ? "The design is numerically ill-conditioned: two or more predictors are almost linearly dependent, the predictors are on very different scales, or there are barely more observations than parameters (n is close to p + 1). Remove or combine highly correlated predictors (see VIF), rescale the predictors, or add more observations."
+            : "At least one predictor is an exact copy or linear combination of the others (perfect multicollinearity), or there are fewer observations than parameters. Remove or combine the redundant predictor, or add more observations.";
         steps += `
                 <div style="background: #f8d7da; border-radius: 8px; padding: 12px; color: #721c24;">
-                    ⚠️ Cannot compute coefficients: ${error.message}. At least one predictor is an exact copy or linear combination of the others (perfect multicollinearity), or there are fewer observations than parameters. Remove or combine the redundant predictor, or add more observations.
-                </div>`;
+                    ⚠️ Cannot compute coefficients: ${error.message}. ${failureAdvice}
+                </div>
+            </div>
+        </div>`;
         coefficients = null;
+        failure = error.message;
     }
     
     // Generate regression equation
@@ -416,6 +443,8 @@ function computeMultipleLinearRegression(dataMatrix) {
     </div>`;
     
     return { 
+        // set when X'X cannot be inverted: the tile must report the failure, with the explanation kept in `steps`
+        ...(failure ? { error: true, message: `Cannot compute coefficients: ${failure}.` } : {}),
         steps, 
         n, 
         p, 
@@ -468,7 +497,7 @@ function setupMultipleLinearLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            setHtml(stepsSpan, result.message);
+            setHtml(stepsSpan, result.steps || result.message);
         } else {
             setHtml(valueSpan, `${result.n} observations, ${result.p} predictors | Mean Y = ${result.yMean.toFixed(4)}`);
             setHtml(stepsSpan, result.steps);

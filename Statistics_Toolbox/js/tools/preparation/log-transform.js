@@ -112,7 +112,7 @@ function setupLogTransformLogic() {
         if (logRes.error) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = logRes.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(logRes.message));
             return;
         }
         

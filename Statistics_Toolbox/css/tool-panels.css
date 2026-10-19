@@ -273,3 +273,4 @@
 #interfaceRoot .tp-infl-warn-bg { background: #ffc10720; }
 #interfaceRoot .tp-infl-bad-bg { background: #dc354520; }
 #interfaceRoot .tp-warn-6 { background: #fff3cd; border-left: 6px solid #ffc107; }
+#interfaceRoot .tp-perfect-note { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; }

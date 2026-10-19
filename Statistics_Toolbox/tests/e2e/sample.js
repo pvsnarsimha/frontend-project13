@@ -6,8 +6,8 @@ const path = require('path');
 const { chromium } = require('playwright');
 
 const BAD_OUTPUT = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
-// Tools that legitimately offer no sample button: they are parameter-only forms (number fields and drop-downs, no pasted data)
-const NO_SAMPLE = new Set(['random', 'expectedvalue', 'variancedist', 'mgf', 'entropy', 'distSkewness', 'distKurtosis', 'oneproportionz', 'binomialexact']);
+// Tools that legitimately offer no sample button declare themselves parameter-only (parameterOnly: true in their buildInterface
+// config, rendered as data-parameter-only on the interface): number fields and drop-downs, no pasted data. No list to keep in sync here.
 
 (async () => {
     const file = process.argv[2] || path.join(__dirname, '..', '..', 'Statistics.html');
@@ -31,7 +31,7 @@ const NO_SAMPLE = new Set(['random', 'expectedvalue', 'variancedist', 'mgf', 'en
             tools++;
             const sample = await page.$('#interfaceRoot .sample-btn');
             const go = await page.$('#interfaceRoot .primary-btn');
-            if (!sample) { if (!NO_SAMPLE.has(stat)) problems.push(`${stat}: no "Try sample data" button`); continue; }
+            if (!sample) { if (!(await page.$('#interfaceRoot .stat-interface[data-parameter-only]'))) problems.push(`${stat}: no "Try sample data" button (and not declared parameterOnly)`); continue; }
             await sample.click();
             const typed = await page.$$eval('#interfaceRoot textarea', a => a.map(t => t.value));
             if (typed.some(v => /&#?\w+;/.test(v))) problems.push(`${stat}: sample text still contains an HTML entity: ${JSON.stringify(typed)}`);
