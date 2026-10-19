@@ -160,7 +160,7 @@ function convertSource(src, rules) {
 
 // ---- CSS file --------------------------------------------------------------------------------------------------------------
 function parseCss(text) {
-    const lines = text.split('\n');
+    const lines = text.split(/\r?\n/);
     const owned = new Map(), other = [];
     for (const line of lines) {
         const m = /^#interfaceRoot(?: \.calculation-steps\.rich)? \.(s-[0-9a-f]{6})\b/.exec(line);

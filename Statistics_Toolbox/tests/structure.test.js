@@ -259,7 +259,7 @@ test('tool files carry no convertible inline style, every s-xxxxxx class has a r
 });
 
 test('every generated rule in css/tool-panels.css is one well-formed declaration block (no leaked JavaScript)', () => {
-    const rules = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8').split('\n').filter(l => l.startsWith('#interfaceRoot'));
+    const rules = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8').split(/\r?\n/).filter(l => l.startsWith('#interfaceRoot'));
     assert.ok(rules.length > 500);
     const bad = rules.filter(l => !/^[^{}]*\{[^{}]*\}$/.test(l) || /\+|\$|"|\\|`/.test(l.replace(/font-family:[^;]*/g, '')) || /[^\w\s]'|'[^\w\s]/.test(l.replace(/font-family:[^;]*/g, '')));
     assert.deepEqual(bad.slice(0, 5), []);
