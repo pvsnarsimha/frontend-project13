@@ -526,6 +526,7 @@ function computeQQPlotWithSteps(numbers) {
 }
 
 function renderQQPlotChart(stats) {
+    if (!chartJsReady(renderQQPlotChart, arguments)) return;
     const canvas = document.getElementById('qqplotChartCanvas');
     if (!canvas) return;
     labelChart(canvas, `Normal Q-Q plot of ${describeSample(stats.sorted)}. Sample quantiles are plotted against theoretical normal quantiles; points near the reference line mean the data are close to normal.`);

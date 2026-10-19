@@ -340,6 +340,7 @@ ${plotLines.join('\n')}
 }
 
 function renderStemLeafScatterChart(scatterData, numbers) {
+    if (!chartJsReady(renderStemLeafScatterChart, arguments)) return;
     const canvas = document.getElementById('stemLeafScatterChart');
     if (!canvas) return;
     labelChart(canvas, `Scatter plot of the stem-and-leaf display for ${describeSample(numbers)}: each point is one value, plotted with its leaf digit.`);

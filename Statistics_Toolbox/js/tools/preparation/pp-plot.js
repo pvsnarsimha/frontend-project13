@@ -286,6 +286,7 @@ function computePPPlotWithSteps(numbers, distType = 'normal') {
 }
 
 function renderPPPlotChart(stats) {
+    if (!chartJsReady(renderPPPlotChart, arguments)) return;
     const canvas = document.getElementById('ppplotChartCanvas');
     if (!canvas) return;
     labelChart(canvas, `P-P plot of ${stats.ppPoints.length} values against the ${stats.distName} distribution. Correlation between empirical and theoretical probabilities: ${(+stats.correlation).toFixed(4)}; points close to the diagonal mean a good fit.`);

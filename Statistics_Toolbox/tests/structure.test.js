@@ -200,3 +200,21 @@ test('the boxplot plugin is registered per chart, never globally', () => {
     assert.ok(!/Chart\.register\(/.test(src), 'no global Chart.register');
     assert.match(src, /plugins:\s*\[boxplotPlugin\]/);
 });
+
+test('no top-level const/let/class name is declared twice, or reuses the name of a function or var (classic scripts share one scope, so it is a SyntaxError that stops every later script)', () => {
+    const owners = new Map();     // name -> [{ kind, rel }]
+    for (const rel of scriptList()) {
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        for (const m of src.matchAll(/^(?:(const|let|var|class)|(?:async\s+)?(function))\s*\*?\s+([A-Za-z_$][\w$]*)/gm)) {
+            const list = owners.get(m[3]) || [];
+            list.push({ kind: m[1] || m[2], rel });
+            owners.set(m[3], list);
+        }
+    }
+    const clashes = [];
+    for (const [name, list] of owners) {
+        const lexical = list.filter(d => d.kind === 'const' || d.kind === 'let' || d.kind === 'class');
+        if (lexical.length && list.length > 1) clashes.push(`${name}: ${list.map(d => `${d.kind} in ${d.rel}`).join(', ')}`);
+    }
+    assert.deepEqual(clashes, []);
+});

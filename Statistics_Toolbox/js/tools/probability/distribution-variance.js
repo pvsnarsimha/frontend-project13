@@ -32,46 +32,7 @@ function renderDistributionVarianceInterface() {
 }
 
 function updateDistributionVarianceParams() {
-    const dist = document.getElementById('varianceDistDistribution').value;
-    const paramsDiv = document.getElementById('varianceDistParams');
-    
-    if (dist === 'normal') {
-        setHtml(paramsDiv, `
-            <label>📊 Standard Deviation (σ):</label>
-            <input type="number" id="varianceDistStd" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'exponential') {
-        setHtml(paramsDiv, `
-            <label>📊 Rate (λ):</label>
-            <input type="number" id="varianceDistRate" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'uniform') {
-        setHtml(paramsDiv, `
-            <label>📊 Minimum (a):</label>
-            <input type="number" id="varianceDistMin" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Maximum (b):</label>
-            <input type="number" id="varianceDistMax" value="1" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'beta') {
-        setHtml(paramsDiv, `
-            <label>📊 Alpha (α):</label>
-            <input type="number" id="varianceDistAlpha" value="2" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Beta (β):</label>
-            <input type="number" id="varianceDistBeta" value="5" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'poisson') {
-        setHtml(paramsDiv, `
-            <label>📊 Lambda (λ):</label>
-            <input type="number" id="varianceDistLambda" value="3" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'binomial') {
-        setHtml(paramsDiv, `
-            <label>📊 Number of trials (n):</label>
-            <input type="number" id="varianceDistN" value="10" step="1" min="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Probability of success (p):</label>
-            <input type="number" id="varianceDistP" value="0.5" step="0.1" min="0" max="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    }
+    showDistributionParams('varianceDist', { skip: ['Mean'] });
 }
 
 function setupDistributionVarianceLogic() {

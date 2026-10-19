@@ -5,7 +5,7 @@
   "description": "StatLab: interactive statistics toolbox with step-by-step solutions (static site, no build step)",
   "scripts": {
     "test": "node --test",
-    "test:e2e": "node tests/e2e/smoke.js && node tests/e2e/sample.js && node tests/e2e/edge-cases.js && node tests/e2e/responsive.js",
+    "test:e2e": "node tests/e2e/smoke.js && node tests/e2e/sample.js && node tests/e2e/edge-cases.js && node tests/e2e/responsive.js && node tests/e2e/lazy-chartjs.js",
     "test:all": "npm test && npm run test:e2e",
     "sync:scripts": "node scripts/sync-script-tags.js"
   },

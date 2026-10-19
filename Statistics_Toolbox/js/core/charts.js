@@ -3,6 +3,35 @@
 // Chart instance reference
 let currentChart = null;
 
+// ---- Lazy loading of Chart.js ----
+// The library (~200 KB) is only needed once a chart is drawn, so it is not a <script> tag of the page: the first
+// chart request fetches it, every later one finds `Chart` already defined. Each chart-drawing function begins with
+//     if (!chartJsReady(thisFunction, arguments)) return;
+// which, while the library is missing, loads it and then calls the function again with the same arguments.
+let plottingLibraryLoad = null;
+
+function loadChartJs() {
+    if (typeof Chart !== 'undefined') return Promise.resolve();
+    if (!plottingLibraryLoad) {
+        plottingLibraryLoad = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'vendor/chart.umd.js';
+            script.onload = () => resolve();
+            script.onerror = () => { script.remove(); reject(new Error('Chart.js could not be loaded')); };
+            document.head.appendChild(script);
+        }).catch(err => { plottingLibraryLoad = null; throw err; });   // a failed load can be retried on the next request
+    }
+    return plottingLibraryLoad;
+}
+
+function chartJsReady(retry, args) {
+    if (typeof Chart !== 'undefined') return true;
+    loadChartJs().then(() => retry(...args)).catch(() => {
+        alert('Charts need the Chart.js library, which could not be loaded. Check your connection and try again.');
+    });
+    return false;
+}
+
 // ========== STEM-AND-LEAF PLOT FUNCTIONS ==========
 // ========== PROFESSIONAL STEM-AND-LEAF PLOT WITH SCATTER VISUALIZATION ==========
 let stemLeafChart = null;

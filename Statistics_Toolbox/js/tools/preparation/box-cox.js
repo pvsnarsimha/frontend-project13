@@ -35,6 +35,13 @@ function renderBoxCoxInterface() {
 
 // ========== BOX-COX TRANSFORMATION COMPUTATION ==========
 // ========== BOX-COX TRANSFORMATION COMPUTATION (FIXED) ==========
+// (x^λ - 1) / λ, with its limit ln(x) as λ → 0. Near zero the textbook form subtracts two almost equal numbers and
+// loses digits, so it is written with expm1 (x^λ - 1 = expm1(λ ln x)), which stays accurate down to the switch-over.
+const BOXCOX_LAMBDA_ZERO = 1e-10;
+function boxCoxValue(x, lambda) {
+    return Math.abs(lambda) < BOXCOX_LAMBDA_ZERO ? Math.log(x) : Math.expm1(lambda * Math.log(x)) / lambda;
+}
+
 function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
     if (!numbers || numbers.length === 0) return { error: true, message: "No numbers provided." };
     
@@ -58,9 +65,7 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
         // coarse grid scan on [-5, 5] to bracket the peak, then golden-section search inside the bracket.
         const sumLogX = validNumbers.reduce((a, b) => a + Math.log(b), 0);
         const logLikelihood = lam => {
-            const transformed = Math.abs(lam) < 1e-9
-                ? validNumbers.map(x => Math.log(x))
-                : validNumbers.map(x => (Math.pow(x, lam) - 1) / lam);
+            const transformed = validNumbers.map(x => boxCoxValue(x, lam));
             const mean = transformed.reduce((a, b) => a + b, 0) / n;
             const variance = transformed.reduce((a, b) => a + (b - mean) * (b - mean), 0) / n;
             return variance > 0 ? -n / 2 * Math.log(variance) + (lam - 1) * sumLogX : -Infinity;
@@ -91,11 +96,10 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
     // Apply transformation
     let transformed;
     let formula;
-    if (Math.abs(lambda) < 1e-6) {
-        transformed = validNumbers.map(x => Math.log(x));
+    transformed = validNumbers.map(x => boxCoxValue(x, lambda));
+    if (Math.abs(lambda) < BOXCOX_LAMBDA_ZERO) {
         formula = `y = ln(x)`;
     } else {
-        transformed = validNumbers.map(x => (Math.pow(x, lambda) - 1) / lambda);
         formula = `y = (x^${lambda.toFixed(4)} - 1) / ${lambda.toFixed(4)}`;
     }
     

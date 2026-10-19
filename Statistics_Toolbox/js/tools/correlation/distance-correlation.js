@@ -5,7 +5,7 @@ function renderDistanceCorrelationInterface() {
     return buildInterface({
         id: "statDistanceCorrelationInterface",
         title: "📏 Distance Correlation (dCor)",
-        formula: "📌 dCor(X,Y) = dCov(X,Y) / √(dVar(X)·dVar(Y))",
+        formula: "📌 dCor(X,Y) = √[ dCov²(X,Y) / √(dVar²(X)·dVar²(Y)) ]",
         desc: "Distance correlation measures both linear and non-linear association between variables. dCor = 0 implies independence, dCor = 1 implies perfect dependence.",
         inputs: [
             {
@@ -232,7 +232,10 @@ function computeDistanceCorrelationWithSteps(x, y) {
     if (!(dVarX > 0) || !(dVarY > 0)) {
         return { error: true, message: `Distance correlation is undefined: all ${!(dVarX > 0) ? 'X' : 'Y'} values are identical (zero distance variance).` };
     }
-    let dCor = dCov / Math.sqrt(dVarX * dVarY);
+    // dCov, dVarX and dVarY above are the squared quantities dCov², dVar²(X), dVar²(Y) (means of products of the centred
+    // matrices), so their ratio is dCor²; the distance correlation itself is its square root (Székely et al. 2007).
+    const dCor2 = dCov / Math.sqrt(dVarX * dVarY);
+    const dCor = Math.sqrt(Math.max(0, Math.min(1, dCor2)));
     
     // Calculate Pearson correlation for comparison
     let pearsonResult = computePearsonWithSteps(x, y);
@@ -336,29 +339,29 @@ function computeDistanceCorrelationWithSteps(x, y) {
             <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 4: Calculate Distance Covariance and Variances</h3>
             
             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <strong>Distance Covariance (dCov):</strong>
+                <strong>Squared Distance Covariance (dCov²):</strong>
                 <div style="font-family: monospace; font-size: 14px;">
-                    dCov = (1/n²) × Σ Σ A'<sub>ij</sub> × B'<sub>ij</sub><br>
-                    dCov = (1/${n}²) × ${(dCov * n * n).toFixed(6)}<br>
-                    dCov = ${(dCov * n * n).toFixed(6)} / ${n*n} = <strong style="color: #1a5490;">${dCov.toFixed(8)}</strong>
+                    dCov² = (1/n²) × Σ Σ A'<sub>ij</sub> × B'<sub>ij</sub><br>
+                    dCov² = (1/${n}²) × ${(dCov * n * n).toFixed(6)}<br>
+                    dCov² = ${(dCov * n * n).toFixed(6)} / ${n*n} = <strong style="color: #1a5490;">${dCov.toFixed(8)}</strong>
                 </div>
             </div>
             
             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <strong>Distance Variance of X (dVarX):</strong>
+                <strong>Squared Distance Variance of X (dVar²X):</strong>
                 <div style="font-family: monospace; font-size: 14px;">
-                    dVarX = (1/n²) × Σ Σ (A'<sub>ij</sub>)²<br>
-                    dVarX = (1/${n}²) × ${(dVarX * n * n).toFixed(6)}<br>
-                    dVarX = ${(dVarX * n * n).toFixed(6)} / ${n*n} = <strong style="color: #1a5490;">${dVarX.toFixed(8)}</strong>
+                    dVar²X = (1/n²) × Σ Σ (A'<sub>ij</sub>)²<br>
+                    dVar²X = (1/${n}²) × ${(dVarX * n * n).toFixed(6)}<br>
+                    dVar²X = ${(dVarX * n * n).toFixed(6)} / ${n*n} = <strong style="color: #1a5490;">${dVarX.toFixed(8)}</strong>
                 </div>
             </div>
             
             <div style="background: white; border-radius: 12px; padding: 16px;">
-                <strong>Distance Variance of Y (dVarY):</strong>
+                <strong>Squared Distance Variance of Y (dVar²Y):</strong>
                 <div style="font-family: monospace; font-size: 14px;">
-                    dVarY = (1/n²) × Σ Σ (B'<sub>ij</sub>)²<br>
-                    dVarY = (1/${n}²) × ${(dVarY * n * n).toFixed(6)}<br>
-                    dVarY = ${(dVarY * n * n).toFixed(6)} / ${n*n} = <strong style="color: #1a5490;">${dVarY.toFixed(8)}</strong>
+                    dVar²Y = (1/n²) × Σ Σ (B'<sub>ij</sub>)²<br>
+                    dVar²Y = (1/${n}²) × ${(dVarY * n * n).toFixed(6)}<br>
+                    dVar²Y = ${(dVarY * n * n).toFixed(6)} / ${n*n} = <strong style="color: #1a5490;">${dVarY.toFixed(8)}</strong>
                 </div>
             </div>
         </div>
@@ -367,10 +370,11 @@ function computeDistanceCorrelationWithSteps(x, y) {
             <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 5: Calculate Distance Correlation</h3>
             <div style="background: white; border-radius: 12px; padding: 20px; text-align: center;">
                 <div style="font-family: monospace; font-size: 16px;">
-                    dCor = dCov / √(dVarX × dVarY)<br>
-                    dCor = ${dCov.toFixed(6)} / √(${dVarX.toFixed(6)} × ${dVarY.toFixed(6)})<br>
-                    dCor = ${dCov.toFixed(6)} / √${(dVarX * dVarY).toFixed(6)}<br>
-                    dCor = ${dCov.toFixed(6)} / ${Math.sqrt(dVarX * dVarY).toFixed(6)}
+                    dCor² = dCov² / √(dVar²X × dVar²Y)<br>
+                    dCor² = ${dCov.toFixed(6)} / √(${dVarX.toFixed(6)} × ${dVarY.toFixed(6)})<br>
+                    dCor² = ${dCov.toFixed(6)} / √${(dVarX * dVarY).toFixed(6)}<br>
+                    dCor² = ${dCov.toFixed(6)} / ${Math.sqrt(dVarX * dVarY).toFixed(6)} = ${dCor2.toFixed(6)}<br>
+                    dCor = √dCor² = √${dCor2.toFixed(6)}
                 </div>
                 <div style="font-size: 36px; font-weight: 700; color: #1a5490; margin-top: 16px;">
                     dCor = ${dCor.toFixed(8)}
@@ -417,7 +421,7 @@ function computeDistanceCorrelationWithSteps(x, y) {
         </div>
     </div>`;
     
-    return { dCor, dCov, dVarX, dVarY, pearsonR, steps };
+    return { dCor, dCor2, dCov, dVarX, dVarY, pearsonR, steps };   // dCov, dVarX, dVarY are the squared quantities
 }
 
 function setupDistanceCorrelationLogic() {

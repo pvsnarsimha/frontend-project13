@@ -49,36 +49,7 @@ function renderRandomInterface() {
 
 // ========== RANDOM NUMBER GENERATION FUNCTIONS ==========
 function updateRandomParams() {
-    const dist = document.getElementById('randomDistribution').value;
-    const paramsDiv = document.getElementById('randomParams');
-    
-    if (dist === 'normal') {
-        setHtml(paramsDiv, `
-            <label>📊 Mean (μ):</label>
-            <input type="number" id="randomMean" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Standard Deviation (σ):</label>
-            <input type="number" id="randomStd" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'uniform') {
-        setHtml(paramsDiv, `
-            <label>📊 Minimum (a):</label>
-            <input type="number" id="randomMin" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Maximum (b):</label>
-            <input type="number" id="randomMax" value="1" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'exponential') {
-        setHtml(paramsDiv, `
-            <label>📊 Rate (λ):</label>
-            <input type="number" id="randomRate" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'beta') {
-        setHtml(paramsDiv, `
-            <label>📊 Alpha (α):</label>
-            <input type="number" id="randomAlpha" value="2" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Beta (β):</label>
-            <input type="number" id="randomBeta" value="5" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    }
+    showDistributionParams('random');
 }
 
 // ---- Samplers ----

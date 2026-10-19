@@ -40,36 +40,7 @@ function exponentialCDF(x, rate = 1) {
 // Add setup functions for each probability feature
 // ========== CDF COMPUTATION FUNCTIONS ==========
 function updateCDFParams() {
-    const dist = document.getElementById('cdfDistribution').value;
-    const paramsDiv = document.getElementById('cdfParams');
-    
-    if (dist === 'normal') {
-        setHtml(paramsDiv, `
-            <label>📊 Mean (μ):</label>
-            <input type="number" id="cdfMean" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Standard Deviation (σ):</label>
-            <input type="number" id="cdfStd" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'uniform') {
-        setHtml(paramsDiv, `
-            <label>📊 Minimum (a):</label>
-            <input type="number" id="cdfMin" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Maximum (b):</label>
-            <input type="number" id="cdfMax" value="1" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'exponential') {
-        setHtml(paramsDiv, `
-            <label>📊 Rate (λ):</label>
-            <input type="number" id="cdfRate" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'beta') {
-        setHtml(paramsDiv, `
-            <label>📊 Alpha (α):</label>
-            <input type="number" id="cdfAlpha" value="2" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Beta (β):</label>
-            <input type="number" id="cdfBeta" value="5" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    }
+    showDistributionParams('cdf');
 }
 
 function computeCDFWithSteps() {

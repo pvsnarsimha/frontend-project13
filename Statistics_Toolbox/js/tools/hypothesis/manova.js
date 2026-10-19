@@ -260,8 +260,11 @@ function computeMANOVA(inputText, alpha) {
     const raoT = (p * p + q * q - 5) > 0 ? Math.sqrt((p * p * q * q - 4) / (p * p + q * q - 5)) : 1;
     let df1 = p * q;
     let df2 = rao * raoT - 2 * raoU;
+    if (!(df2 > 0)) {
+        return { error: true, message: `There are too few observations for Rao's F approximation here (denominator degrees of freedom = ${+df2.toFixed(4)}, which must be positive). Add more observations per group or drop a dependent variable.` };
+    }
     let fStatistic = 0;
-    if (wilksLambda > 0 && wilksLambda < 1 && df2 > 0) {
+    if (wilksLambda > 0 && wilksLambda < 1) {
         const root = Math.pow(wilksLambda, 1 / raoT);
         fStatistic = (1 - root) / root * df2 / df1;
     }

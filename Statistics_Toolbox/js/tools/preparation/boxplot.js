@@ -4,6 +4,7 @@
 // Function to create box plot (using bar chart with error bars)
 // Function to create box plot (using bar chart with error bars)
 function createBoxPlot(numbers, chartTitle) {
+    if (!chartJsReady(createBoxPlot, arguments)) return;
     if (!numbers || numbers.length === 0) return;
     
     // Calculate statistics
@@ -797,6 +798,7 @@ function computeBoxplotWithSteps(numbers) {
 
 // Render Boxplot Chart using Chart.js with Custom Plugin and Tooltips
 function renderBoxplotChart(numbers, stats) {
+    if (!chartJsReady(renderBoxplotChart, arguments)) return;
     const canvas = document.getElementById('boxplotChartCanvas');
     if (!canvas) return;
     labelChart(canvas, `Box plot of ${describeSample(numbers)}. Quartiles: Q1 ${+stats.q1.toFixed(3)}, median ${+stats.median.toFixed(3)}, Q3 ${+stats.q3.toFixed(3)}; whiskers ${+stats.whiskerMin.toFixed(3)} to ${+stats.whiskerMax.toFixed(3)}; ${stats.outliers.length} outlier${stats.outliers.length === 1 ? '' : 's'}.`);

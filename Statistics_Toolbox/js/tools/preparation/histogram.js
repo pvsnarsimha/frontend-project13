@@ -3,6 +3,7 @@
 // Function to create histogram
 // Function to create histogram
 function createHistogram(numbers, chartTitle) {
+    if (!chartJsReady(createHistogram, arguments)) return;
     if (!numbers || numbers.length === 0) return;
     
     // Create bins for histogram (using Sturges' rule)
@@ -282,6 +283,7 @@ function getMode(numbers) {
 }
 
 function renderHistogramChart(bins, binLabels, numbers) {
+    if (!chartJsReady(renderHistogramChart, arguments)) return;
     const canvas = document.getElementById('histogramChartCanvas');
     if (!canvas) return;
     {
