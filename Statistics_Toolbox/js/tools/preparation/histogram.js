@@ -266,9 +266,9 @@ function computeHistogramWithSteps(numbers, numBins) {
     
     steps += `\n📌 STATISTICAL SUMMARY:\n`;
     steps += `   • Mean of data = ${(numbers.reduce((a,b)=>a+b,0)/n).toFixed(6)}\n`;
-    steps += `   • Median = ${sorted[Math.floor(n/2)].toFixed(6)}\n`;
+    steps += `   • Median = ${quantileType7(sorted, 0.5).toFixed(6)}\n`;
     steps += `   • Mode = ${getMode(numbers)}\n`;
-    steps += `   • Variance = ${(numbers.reduce((a,b)=>a+Math.pow(b - (numbers.reduce((a,b)=>a+b,0)/n),2),0)/n).toFixed(6)}\n`;
+    steps += `   • Population variance (÷ n) = ${(numbers.reduce((a,b)=>a+Math.pow(b - (numbers.reduce((a,b)=>a+b,0)/n),2),0)/n).toFixed(6)}\n`;
     
     return { steps, bins, binLabels, binWidth, binRanges, frequencies: bins };
 }

@@ -59,12 +59,12 @@ function computeCramersVWithSteps(inputText) {
     const n = pairs.length;
     
     // Create contingency table
-    const observed = {};
-    const rowTotals = {};
-    const colTotals = {};
+    const observed = Object.create(null);
+    const rowTotals = Object.create(null);
+    const colTotals = Object.create(null);
     
     for (let row of rowCategories) {
-        observed[row] = {};
+        observed[row] = Object.create(null);
         rowTotals[row] = 0;
         for (let col of colCategories) {
             observed[row][col] = 0;

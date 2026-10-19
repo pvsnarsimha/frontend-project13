@@ -227,7 +227,9 @@ function computeBoxplotWithSteps(numbers) {
     
     // Build complete steps HTML
     const steps = stepsHtmlBoxplot({ fiveNumTable, iqr, lowerBound, maxVal, mean, median, minVal, n, numbers, outlierTable, outliers, q1, q3, quartileTable, sorted, stdDev, upperBound, whiskerTable });
-    return { steps, minVal, q1, median, q3, maxVal, iqr, lowerBound, upperBound, outliers, whiskerMin, whiskerMax, mean, stdDev, skewness };
+    // `normal` mirrors the IQR-outlier tool: every value that is not an outlier
+    const normal = numbers.filter(x => x >= lowerBound && x <= upperBound);
+    return { steps, minVal, q1, median, q3, maxVal, iqr, lowerBound, upperBound, outliers, normal, whiskerMin, whiskerMax, mean, stdDev, skewness };
 }
 
 

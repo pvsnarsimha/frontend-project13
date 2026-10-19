@@ -5,7 +5,7 @@ function renderZOutlierInterface() {
     return buildInterface({
         id: "statZOutlierInterface",
         title: "📏 Detect Outliers (Z-score > 3)",
-        formula: "📌 Z-score = |x - μ| / σ",
+        formula: "📌 Z-score = |x - x̄| / s",
         desc: "The Z-score method identifies outliers as values where |Z-score| > 3, meaning they are more than 3 standard deviations from the mean. This works best for normally distributed data.",
         inputs: [
             {
@@ -38,6 +38,7 @@ function computeZOutlierWithSteps(numbers) {
     const sumSqDiffs = squaredDiffs.reduce((a, b) => a + b, 0);
     const variance = sumSqDiffs / (n - 1);
     const stdDev = Math.sqrt(variance);
+    if (!(stdDev > 0)) return { error: true, message: "All values are identical, so the standard deviation is 0 and Z-scores are undefined (0 / 0): there are no outliers to find." };
     
     const threshold = 3;
     
@@ -66,24 +67,24 @@ function computeZOutlierWithSteps(numbers) {
     steps += `   Data: [${numbers.join(', ')}]\n`;
     steps += `   n = ${n}\n\n`;
     
-    steps += `📐 STEP 1: Calculate the Mean (μ)\n`;
-    steps += `   μ = Σx / n = ${sum} / ${n} = ${mean.toFixed(6)}\n\n`;
+    steps += `📐 STEP 1: Calculate the Mean (x̄)\n`;
+    steps += `   x̄ = Σx / n = ${sum} / ${n} = ${mean.toFixed(6)}\n\n`;
     
-    steps += `📊 STEP 2: Calculate the Standard Deviation (σ)\n`;
-    steps += `   σ = √[Σ(x - μ)² / (n-1)]\n`;
+    steps += `📊 STEP 2: Calculate the Sample standard deviation (s)\n`;
+    steps += `   s = √[Σ(x - x̄)² / (n-1)]\n`;
     for (let i = 0; i < numbers.length; i++) {
         const diff = numbers[i] - mean;
         steps += `   (${numbers[i]} - ${mean.toFixed(6)})² = ${(diff * diff).toFixed(6)}\n`;
     }
-    steps += `   Σ(x - μ)² = ${sumSqDiffs.toFixed(6)}\n`;
-    steps += `   σ = √(${sumSqDiffs.toFixed(6)} / ${n-1}) = √${(sumSqDiffs/(n-1)).toFixed(6)} = ${stdDev.toFixed(6)}\n\n`;
+    steps += `   Σ(x - x̄)² = ${sumSqDiffs.toFixed(6)}\n`;
+    steps += `   s = √(${sumSqDiffs.toFixed(6)} / ${n-1}) = √${(sumSqDiffs/(n-1)).toFixed(6)} = ${stdDev.toFixed(6)}\n\n`;
     
     steps += `🎯 STEP 3: Calculate Z-scores for each value\n`;
-    steps += `   Formula: Z = |x - μ| / σ\n`;
+    steps += `   Formula: Z = |x - x̄| / s\n`;
     steps += `   Threshold: |Z| > ${threshold} indicates outlier\n\n`;
     
     steps += `   ┌──────┬──────────┬────────────────┬────────────┬────────────────────────────────┐\n`;
-    steps += `   │  #   │  Value   │   |x - μ|      │   Z-score  │  Status                         │\n`;
+    steps += `   │  #   │  Value   │   |x - x̄|      │   Z-score  │  Status                         │\n`;
     steps += `   ├──────┼──────────┼────────────────┼────────────┼────────────────────────────────┤\n`;
     for (let i = 0; i < zScoreDetails.length; i++) {
         const d = zScoreDetails[i];
@@ -95,8 +96,8 @@ function computeZOutlierWithSteps(numbers) {
     
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     steps += `✅ OUTLIER DETECTION SUMMARY:\n`;
-    steps += `   • Mean (μ) = ${mean.toFixed(6)}\n`;
-    steps += `   • Standard Deviation (σ) = ${stdDev.toFixed(6)}\n`;
+    steps += `   • Mean (x̄) = ${mean.toFixed(6)}\n`;
+    steps += `   • Sample standard deviation (s) = ${stdDev.toFixed(6)}\n`;
     steps += `   • Z-score threshold = ${threshold}\n`;
     steps += `   • Total observations: ${n}\n`;
     steps += `   • Outliers found: ${outliers.length}\n`;

@@ -34,37 +34,14 @@ function renderQQPlotInterface() {
 function computeQQPlotWithSteps(numbers) {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
     
+    if (numbers.length < 3) return { error: true, message: "A Q-Q plot needs at least 3 values (with 2 points the correlation is always 1)." };
+    if (!(Math.max(...numbers) - Math.min(...numbers) > 0)) return { error: true, message: "All values are identical, so the Q-Q plot is undefined (zero spread)." };
+    
     const n = numbers.length;
     const sorted = [...numbers].sort((a, b) => a - b);
     const mean = numbers.reduce((a,b) => a+b, 0) / n;
     const variance = numbers.reduce((a,b) => a + Math.pow(b - mean, 2), 0) / n;
     const stdDev = Math.sqrt(variance);
-    
-    // FIXED CONSTANTS (from Abramowitz & Stegun 1972)
-    const CENTRAL_A5 = 2.506628277459239e+00;
-    const CENTRAL_A4 = -3.066479806614716e+01;
-    const CENTRAL_A3 = 1.383577518672690e+02;
-    const CENTRAL_A2 = -2.759285104961687e+02;
-    const CENTRAL_A1 = 2.209460984245205e+02;
-    const CENTRAL_A0 = -3.969683028665376e+01;
-    
-    const CENTRAL_B4 = -1.328068155288572e+01;
-    const CENTRAL_B3 = 6.680131188771972e+01;
-    const CENTRAL_B2 = -1.556989798598866e+02;
-    const CENTRAL_B1 = 1.615858368580409e+02;
-    const CENTRAL_B0 = -5.447609879822406e+01;
-    
-    const TAIL_C5 = 2.938163982698783e+00;
-    const TAIL_C4 = 4.374664141464968e+00;
-    const TAIL_C3 = -2.549732539343734e+00;
-    const TAIL_C2 = -2.400758277161838e+00;
-    const TAIL_C1 = -3.223964580411365e-01;
-    const TAIL_C0 = -7.784894002430293e-03;
-    
-    const TAIL_D3 = 3.754408661907416e+00;
-    const TAIL_D2 = 2.445134137142996e+00;
-    const TAIL_D1 = 3.224671290700398e-01;
-    const TAIL_D0 = 7.784695709041462e-03;
     
     const theoreticalQuantiles = [];
     const sampleQuantiles = [];
@@ -73,166 +50,13 @@ function computeQQPlotWithSteps(numbers) {
     for (let i = 0; i < n; i++) {
         const p = (i + 1 - 0.375) / (n + 0.25);
         const q = p - 0.5;
-        let z;
-        let calculationType = "";
-        let detailedSteps = "";
-        
-        if (p <= 0) {
-            z = -Infinity;
-            detailedSteps = "p = 0 → z = -∞";
-        } else if (p >= 1) {
-            z = Infinity;
-            detailedSteps = "p = 1 → z = +∞";
-        } else {
-            if (Math.abs(q) <= 0.425) {
-                calculationType = "central";
-                const r = 0.180625 - q * q;
-                
-                detailedSteps = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-                detailedSteps += `📊 CENTRAL REGION CALCULATION (|q| ≤ 0.425)\n`;
-                detailedSteps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-                detailedSteps += `📌 INPUT VALUES:\n`;
-                detailedSteps += `   i = ${i+1}, p = ${p.toFixed(6)}, q = ${q.toFixed(6)}\n\n`;
-                detailedSteps += `🔢 Step 1: Calculate r = 0.180625 - q²\n`;
-                detailedSteps += `   q² = (${q.toFixed(6)})² = ${(q*q).toFixed(10)}\n`;
-                detailedSteps += `   r = 0.180625 - ${(q*q).toFixed(10)} = ${r.toFixed(10)}\n\n`;
-                
-                const r2 = r * r;
-                const r3 = r2 * r;
-                const r4 = r3 * r;
-                const r5 = r4 * r;
-                
-                const term5 = CENTRAL_A5 * r5;
-                const term4 = CENTRAL_A4 * r4;
-                const term3 = CENTRAL_A3 * r3;
-                const term2 = CENTRAL_A2 * r2;
-                const term1 = CENTRAL_A1 * r;
-                const term0 = CENTRAL_A0;
-                
-                const P = term5 + term4 + term3 + term2 + term1 + term0;
-                
-                detailedSteps += `📐 Step 2: Calculate P(r) = a₅·r⁵ + a₄·r⁴ + a₃·r³ + a₂·r² + a₁·r + a₀\n`;
-                detailedSteps += `   r = ${r.toFixed(8)}\n`;
-                detailedSteps += `   r² = ${r2.toFixed(8)}\n`;
-                detailedSteps += `   r³ = ${r3.toFixed(8)}\n`;
-                detailedSteps += `   r⁴ = ${r4.toFixed(8)}\n`;
-                detailedSteps += `   r⁵ = ${r5.toFixed(8)}\n\n`;
-                detailedSteps += `   a₅·r⁵ = ${CENTRAL_A5.toFixed(4)} × ${r5.toExponential(6)} = ${term5.toExponential(8)}\n`;
-                detailedSteps += `   a₄·r⁴ = ${CENTRAL_A4.toFixed(4)} × ${r4.toExponential(6)} = ${term4.toExponential(8)}\n`;
-                detailedSteps += `   a₃·r³ = ${CENTRAL_A3.toFixed(4)} × ${r3.toExponential(6)} = ${term3.toExponential(8)}\n`;
-                detailedSteps += `   a₂·r² = ${CENTRAL_A2.toFixed(4)} × ${r2.toExponential(6)} = ${term2.toExponential(8)}\n`;
-                detailedSteps += `   a₁·r  = ${CENTRAL_A1.toFixed(4)} × ${r.toExponential(6)} = ${term1.toExponential(8)}\n`;
-                detailedSteps += `   a₀    = ${CENTRAL_A0.toFixed(4)}\n`;
-                detailedSteps += `   P(r) = ${P.toExponential(10)}\n\n`;
-                
-                const qterm4 = CENTRAL_B4 * r4;
-                const qterm3 = CENTRAL_B3 * r3;
-                const qterm2 = CENTRAL_B2 * r2;
-                const qterm1 = CENTRAL_B1 * r;
-                const qterm0 = CENTRAL_B0;
-                
-                const Q = qterm4 + qterm3 + qterm2 + qterm1 + qterm0;
-                
-                detailedSteps += `📐 Step 3: Calculate Q(r) = b₄·r⁴ + b₃·r³ + b₂·r² + b₁·r + b₀\n`;
-                detailedSteps += `   b₄·r⁴ = ${CENTRAL_B4.toFixed(4)} × ${r4.toExponential(6)} = ${qterm4.toExponential(8)}\n`;
-                detailedSteps += `   b₃·r³ = ${CENTRAL_B3.toFixed(4)} × ${r3.toExponential(6)} = ${qterm3.toExponential(8)}\n`;
-                detailedSteps += `   b₂·r² = ${CENTRAL_B2.toFixed(4)} × ${r2.toExponential(6)} = ${qterm2.toExponential(8)}\n`;
-                detailedSteps += `   b₁·r  = ${CENTRAL_B1.toFixed(4)} × ${r.toExponential(6)} = ${qterm1.toExponential(8)}\n`;
-                detailedSteps += `   b₀    = ${CENTRAL_B0.toFixed(4)}\n`;
-                detailedSteps += `   Q(r) = ${Q.toExponential(10)}\n\n`;
-                
-                const P_over_Q = P / Q;
-                z = q * P_over_Q;
-                
-                detailedSteps += `📐 Step 4: Calculate z = q × P(r) / Q(r)\n`;
-                detailedSteps += `   P(r)/Q(r) = ${P.toExponential(8)} / ${Q.toExponential(8)} = ${P_over_Q.toExponential(10)}\n`;
-                detailedSteps += `   z = ${q.toFixed(6)} × ${P_over_Q.toExponential(10)} = ${z.toFixed(10)}\n\n`;
-                detailedSteps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-                detailedSteps += `✅ FINAL z = ${z.toFixed(10)}\n`;
-                
-            } else {
-                calculationType = "tail";
-                
-                detailedSteps = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-                detailedSteps += `📈 TAIL REGION CALCULATION (|q| > 0.425)\n`;
-                detailedSteps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-                detailedSteps += `📌 INPUT VALUES:\n`;
-                detailedSteps += `   i = ${i+1}, p = ${p.toFixed(6)}, q = ${q.toFixed(6)}\n\n`;
-                
-                detailedSteps += `🔢 Step 1: Calculate r\n`;
-                let r;
-                if (q < 0) {
-                    r = Math.sqrt(-Math.log(p));
-                    detailedSteps += `   Since q = ${q.toFixed(6)} < 0 (lower tail):\n`;
-                    detailedSteps += `   r = √[-ln(p)] = √[-ln(${p.toFixed(6)})]\n`;
-                    detailedSteps += `   -ln(${p.toFixed(6)}) = ${(-Math.log(p)).toFixed(10)}\n`;
-                    detailedSteps += `   r = √${(-Math.log(p)).toFixed(10)} = ${r.toFixed(10)}\n\n`;
-                } else {
-                    r = Math.sqrt(-Math.log(1 - p));
-                    detailedSteps += `   Since q = ${q.toFixed(6)} > 0 (upper tail):\n`;
-                    detailedSteps += `   r = √[-ln(1-p)] = √[-ln(${(1-p).toFixed(6)})]\n`;
-                    detailedSteps += `   -ln(${(1-p).toFixed(6)}) = ${(-Math.log(1-p)).toFixed(10)}\n`;
-                    detailedSteps += `   r = √${(-Math.log(1-p)).toFixed(10)} = ${r.toFixed(10)}\n\n`;
-                }
-                
-                const r2 = r * r;
-                const r3 = r2 * r;
-                const r4 = r3 * r;
-                const r5 = r4 * r;
-                
-                detailedSteps += `📐 Step 2: Calculate P(r) = c₅·r⁵ + c₄·r⁴ + c₃·r³ + c₂·r² + c₁·r + c₀\n`;
-                detailedSteps += `   r = ${r.toFixed(8)}\n`;
-                detailedSteps += `   r² = ${r2.toFixed(8)}\n`;
-                detailedSteps += `   r³ = ${r3.toFixed(8)}\n`;
-                detailedSteps += `   r⁴ = ${r4.toFixed(8)}\n`;
-                detailedSteps += `   r⁵ = ${r5.toFixed(8)}\n\n`;
-                
-                const term5 = TAIL_C5 * r5;
-                const term4 = TAIL_C4 * r4;
-                const term3 = TAIL_C3 * r3;
-                const term2 = TAIL_C2 * r2;
-                const term1 = TAIL_C1 * r;
-                const term0 = TAIL_C0;
-                
-                const P = term5 + term4 + term3 + term2 + term1 + term0;
-                
-                detailedSteps += `   c₅·r⁵ = ${TAIL_C5.toFixed(4)} × ${r5.toExponential(6)} = ${term5.toExponential(8)}\n`;
-                detailedSteps += `   c₄·r⁴ = ${TAIL_C4.toFixed(4)} × ${r4.toExponential(6)} = ${term4.toExponential(8)}\n`;
-                detailedSteps += `   c₃·r³ = ${TAIL_C3.toFixed(4)} × ${r3.toExponential(6)} = ${term3.toExponential(8)}\n`;
-                detailedSteps += `   c₂·r² = ${TAIL_C2.toFixed(4)} × ${r2.toExponential(6)} = ${term2.toExponential(8)}\n`;
-                detailedSteps += `   c₁·r  = ${TAIL_C1.toFixed(4)} × ${r.toExponential(6)} = ${term1.toExponential(8)}\n`;
-                detailedSteps += `   c₀    = ${TAIL_C0.toFixed(4)}\n`;
-                detailedSteps += `   P(r) = ${P.toExponential(10)}\n\n`;
-                
-                detailedSteps += `📐 Step 3: Calculate Q(r) = d₃·r³ + d₂·r² + d₁·r + d₀\n`;
-                const qterm3 = TAIL_D3 * r3;
-                const qterm2 = TAIL_D2 * r2;
-                const qterm1 = TAIL_D1 * r;
-                const qterm0 = TAIL_D0;
-                
-                const Q = qterm3 + qterm2 + qterm1 + qterm0;
-                
-                detailedSteps += `   d₃·r³ = ${TAIL_D3.toFixed(4)} × ${r3.toExponential(6)} = ${qterm3.toExponential(8)}\n`;
-                detailedSteps += `   d₂·r² = ${TAIL_D2.toFixed(4)} × ${r2.toExponential(6)} = ${qterm2.toExponential(8)}\n`;
-                detailedSteps += `   d₁·r  = ${TAIL_D1.toFixed(4)} × ${r.toExponential(6)} = ${qterm1.toExponential(8)}\n`;
-                detailedSteps += `   d₀    = ${TAIL_D0.toFixed(4)}\n`;
-                detailedSteps += `   Q(r) = ${Q.toExponential(10)}\n\n`;
-                
-                let raw_z = P / Q;
-                z = raw_z;
-                if (q < 0) z = -z;
-                
-                detailedSteps += `📐 Step 4: Calculate z = P(r) / Q(r) (sign adjusted)\n`;
-                detailedSteps += `   P(r)/Q(r) = ${P.toExponential(8)} / ${Q.toExponential(8)} = ${raw_z.toExponential(10)}\n`;
-                if (q < 0) {
-                    detailedSteps += `   Since q < 0 (lower tail), z = -${raw_z.toExponential(10)} = ${z.toFixed(10)}\n`;
-                } else {
-                    detailedSteps += `   Since q > 0 (upper tail), z = ${raw_z.toExponential(10)} = ${z.toFixed(10)}\n`;
-                }
-                detailedSteps += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-                detailedSteps += `✅ FINAL z = ${z.toFixed(10)}\n`;
-            }
-        }
+        // The normal quantile comes from the shared inverse CDF (core/numerics.js), the single source of truth for the app
+        const z = normInv(p);
+        const calculationType = Math.abs(q) <= 0.425 ? "central" : "tail";
+        const detailedSteps = `i = ${i + 1}, n = ${n}\n` +
+            `p = (i - 0.375) / (n + 0.25) = (${i + 1} - 0.375) / (${n} + 0.25) = ${p.toFixed(6)}\n` +
+            `z = Φ⁻¹(p) = Φ⁻¹(${p.toFixed(6)}) = ${z.toFixed(6)}\n` +
+            `(Φ⁻¹ is the inverse of the standard normal CDF: a rational approximation refined by one Halley step, accurate to about 1e-15.)`;
         
         theoreticalQuantiles.push(z);
         sampleQuantiles.push(sorted[i]);

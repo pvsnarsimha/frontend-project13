@@ -23,13 +23,15 @@ test('parseValueGroupInput keeps group names that contain spaces and reports unr
 
 test('group-comparison tools use every observation and refuse input they cannot read', () => {
     const text = '10:Low dose, 12:Low dose, 11:Low dose, 20:High dose, 22:High dose, 21:High dose';
-    for (const [fn, groups] of [['computeLeveneTest', 2], ['computeBartlettTest', 2], ['computeTukeyHSD', 2], ['computeScheffeTest', 2], ['computeBonferroniCorrection', 2]]) {
+    for (const [fn, groups] of [['computeLeveneTest', 2], ['computeBartlettTest', 2], ['computeTukeyHSD', 2], ['computeScheffeTest', 2], ['computeBonferroniCorrection', 2], ['computeANOVA', 2], ['computeKruskalWallisTest', 2], ['computeMoodsMedianTest', 2]]) {
         const r = app[fn](text, 0.05);
         assert.ok(!r.error, `${fn}: ${r.message}`);
         assert.ok(r.steps.includes('Low dose'), `${fn} lost the group name`);
     }
-    const lost = app.computeLeveneTest('10:A, 12:A, 11:A, 20:B, 22:B, junk', 0.05);
-    assert.ok(lost.error && /junk/.test(lost.message), 'unreadable entries must not be dropped silently');
+    for (const fn of ['computeLeveneTest', 'computeBartlettTest', 'computeTukeyHSD', 'computeScheffeTest', 'computeBonferroniCorrection', 'computeANOVA', 'computeKruskalWallisTest', 'computeMoodsMedianTest']) {
+        const lost = app[fn]('10:A, 12:A, 11:A, 20:B, 22:B, junk', 0.05);
+        assert.ok(lost.error && /junk/.test(lost.message), `${fn}: unreadable entries must not be dropped silently`);
+    }
 });
 
 test('validateDistributionParams rejects degenerate parameters', () => {
@@ -178,4 +180,157 @@ test('chartJsReady retries every racing call with that call\'s own arguments', a
         app.Chart = function () {};
         assert.equal(app.chartJsReady(retry, ['third']), true);
     } finally { app.Chart = saved.chart; app.loadChartJs = saved.load; }
+});
+
+// ---- Second review: wrong answers on ordinary input ----
+const num = (text, re) => parseFloat(String(text).match(re)[1]);
+
+test('every tool that reports a median agrees with Type 7 for even n (histogram, ranking, boxplot, violin)', () => {
+    const data = [1, 2, 3, 4];
+    assert.equal(app.quantileType7([1, 2, 3, 4], 0.5), 2.5);
+    close(num(app.computeHistogramWithSteps(data, 2).steps, /Median = ([-\d.]+)/), 2.5, 1e-9, 'histogram');
+    close(num(app.computeRankingWithSteps(data).steps, /Median: ([-\d.]+)/), 2.5, 1e-9, 'ranking');
+    close(app.computeBoxplotWithSteps(data).median, 2.5, 1e-9, 'boxplot');
+});
+
+test('Winsorizing at 5% caps values for n = 10 and uses the same percentiles as the Percentiles tool', () => {
+    const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const r = app.computeWinsorizeWithSteps(data, 5);
+    assert.ok(!r.error, r.message);
+    close(r.lowerBound, app.quantileType7(data, 0.05), 1e-12);
+    close(r.upperBound, app.quantileType7(data, 0.95), 1e-12);
+    assert.ok(r.cappedCount > 0, 'a 5% Winsorization of 10 values must cap something');
+});
+
+test('Z-score and Z-outlier use the same (sample) standard deviation', () => {
+    const data = [2, 4, 4, 4, 5, 5, 7, 9];
+    const z = app.computeZScoreWithSteps(data), o = app.computeZOutlierWithSteps(data);
+    assert.equal(z.stdDev, o.stdDev);
+    close(z.stdDev, Math.sqrt(32 / 7), 1e-12);
+    assert.ok(app.computeZScoreWithSteps([4, 4, 4, 4]).error);
+    assert.ok(app.computeZOutlierWithSteps([4, 4, 4, 4]).error);
+});
+
+test('stem-and-leaf keeps every digit: stem and leaf rebuild the value (large range, negatives, decimals)', () => {
+    const rebuild = (values, unit) => {
+        const r = app.computeStemLeafWithSteps(values);
+        assert.ok(!r.error, r.message);
+        for (const pt of r.scatterData) close(pt.stem * unit + pt.y, unit === 0.1 ? Math.round(pt.x * 10) / 10 * 10 / 10 * 1 : Math.floor(pt.x), unit === 0.1 ? 0.051 : 1e-9, `value ${pt.x}`);
+    };
+    rebuild([100, 1234, 2500, 3999], 100);
+    rebuild([-15, -5, 3, 12, 27], 10);
+    rebuild([1, 2, 3, 150], 10);
+    const tenths = app.computeStemLeafWithSteps([0.12, 0.37, 0.55, 0.96]);
+    assert.ok(tenths.scatterData.every(pt => pt.y >= 0 && pt.y <= 9), 'a leaf can never be 10');
+});
+
+test('adjusted R² in the model summary follows the number of predictors k', () => {
+    const x = [1, 2, 3, 4, 5, 6, 7, 8], y = [2.1, 3.9, 6.2, 7.8, 10.1, 12.3, 13.8, 16.2];
+    const fit = app.computeSimpleLinearRegression(x, y);
+    const pred = x.map(v => fit.intercept + fit.slope * v);
+    const k1 = app.computeModelSummary(y, pred, 1);
+    close(k1.adjRSquared, fit.adjRSquared, 1e-12, 'k = 1 matches simple linear regression');
+    const k2 = app.computeModelSummary(y, pred, 2);
+    close(k2.adjRSquared, 1 - (1 - k2.rSquared) * 7 / 5, 1e-12, 'k = 2 uses n - k - 1 = 5');
+    assert.ok(app.computeModelSummary(y, pred, 7).error, 'k must leave residual degrees of freedom');
+    assert.ok(app.computeModelSummary([5, 5, 5, 5], [5, 5, 5, 5], 1).error, 'R² is undefined for constant actuals');
+});
+
+test('simple-regression tools reject a constant predictor instead of returning NaN, Infinity or a false "no effect"', () => {
+    for (const fn of ['computeSimpleLinearRegression', 'computeStdErrorsWithSteps', 'computeTStatsWithSteps']) {
+        assert.equal(app[fn]([1, 1, 1, 1, 1], [2, 3, 4, 5, 6]).error, true, fn);
+    }
+    assert.equal(app.computeFTestOverallWithSteps([1, 1, 1, 1, 1], [2, 3, 4, 5, 6], 0.05).error, true);
+    // the shared core agrees with the tools
+    const x = [1, 2, 4, 5, 7], y = [2, 3, 7, 8, 12];
+    const core = app.simpleRegressionCore(x, y), se = app.computeStdErrorsWithSteps(x, y), t = app.computeTStatsWithSteps(x, y);
+    close(se.seSlope, core.seSlope, 1e-12); close(t.tSlope, core.slope / core.seSlope, 1e-12);
+    assert.equal(app.simpleRegressionCore([3, 3, 3], [1, 2, 3]), null);
+});
+
+test('multiple regression accepts a well-posed design with predictors far from zero, and rejects ragged rows', () => {
+    const rows = [];
+    for (let i = 0; i < 10; i++) { const x = 1e6 + i, z = (i * 7) % 5; rows.push([3 + 0.5 * (x - 1e6) + z * 1.3 + ((i * 13) % 3) * 0.2, x, z]); }
+    const r = app.computeMultipleLinearRegression(rows);
+    assert.ok(!r.error, r.message);
+    close(r.coefficients[1], 0.50258065, 1e-6); close(r.coefficients[2], 1.30870968, 1e-6);   // numpy.linalg.lstsq
+    close(r.coefficients[0], -502577.4941935, 1e-3);
+    assert.ok(app.computeMultipleLinearRegression([[1, 2], [3, 4, 5], [6, 7], [8, 9]]).error);
+});
+
+test('the Q-Q plot takes its normal quantiles from normInv (matches SciPy)', () => {
+    const r = app.computeQQPlotWithSteps(Array.from({ length: 20 }, (_, i) => i + 1));
+    r.theoreticalQuantiles.forEach((z, i) => close(z, app.normInv((i + 1 - 0.375) / 20.25), 1e-12));
+    close(r.correlation, 0.9885258484288462, 1e-9);      // scipy: corrcoef(norm.ppf((i - 0.375)/(n + 0.25)), 1..20)
+    assert.ok(app.computeQQPlotWithSteps([1, 2]).error, 'two points always correlate perfectly');
+    assert.ok(app.computeQQPlotWithSteps([4, 4, 4, 4]).error);
+    assert.ok(app.computePPPlotWithSteps([1, 2], 'normal').error);
+    assert.ok(app.computePPPlotWithSteps([0, 0, 0], 'exponential').error);
+});
+
+test('normality tests refuse constant data instead of failing to reject', () => {
+    for (const [fn, arg] of [['computeShapiroWilkTest', [4, 4, 4, 4, 4, 4]], ['computeAndersonDarlingTest', [4, 4, 4, 4, 4, 4]], ['computeKolmogorovSmirnovTest', [4, 4, 4, 4, 4, 4]]]) {
+        assert.equal(app[fn](arg, 0.05).error, true, fn);
+    }
+});
+
+test('PMF validates its parameters and shows huge factorials without "Infinity"', () => {
+    const bad = withFields({ pmfDistribution: 'poisson', pmfXValues: '1, 2', pmfLambda: -1 }, () => app.computePMFWithSteps());
+    assert.equal(bad.error, true);
+    const badBinomial = withFields({ pmfDistribution: 'binomial', pmfXValues: '1', pmfN: 10, pmfP: 1.5 }, () => app.computePMFWithSteps());
+    assert.equal(badBinomial.error, true);
+    const big = withFields({ pmfDistribution: 'poisson', pmfXValues: '200', pmfLambda: 200 }, () => app.computePMFWithSteps());
+    assert.ok(!big.error && !/Infinity/.test(big.steps), 'k! for k > 170 is shown as a power of ten');
+});
+
+test('Cochran Q, Mood\'s median, McNemar and goodness-of-fit report what they exclude or scale', () => {
+    const cq = app.computeCochranQTest('1, 0, 1\n1, 2, 0\n0, 1, 1\n1, 1, 1', 0.05);
+    assert.ok(cq.error && /Row 2/.test(cq.message), 'a non-binary row is rejected by name');
+    const mm = app.computeMoodsMedianTest('1:A, 2:A, 3:A, 4:B, 5:B, 6:B, 3:B', 0.05);
+    assert.ok(!mm.error, mm.message);
+    assert.ok(mm.excluded >= 1, 'values equal to the overall median are counted');
+    assert.equal(app.computeMcNemarTest('10 5 5 10', 0.05).chiSquare, 0, 'continuity correction never goes below 0');
+    close(app.computeChiSquareGoodnessTest([50, 30, 20], [0.4, 0.3, 0.3], 0.05).chiSquare, app.computeChiSquareGoodnessTest([50, 30, 20], [40, 30, 30], 0.05).chiSquare, 1e-12, 'proportions are scaled to counts');
+});
+
+test('category names that look like object keys (__proto__) do not corrupt the contingency tools', () => {
+    const t = '__proto__, x\n__proto__, y\nb, x\nb, y\nb, x\n__proto__, x';
+    const renamed = t.replace(/__proto__/g, 'a');
+    close(app.computeChisquareWithSteps(t).chiSquare, app.computeChisquareWithSteps(renamed).chiSquare, 1e-12);
+    close(app.computeCramersVWithSteps(t).cramersV, app.computeCramersVWithSteps(renamed).cramersV, 1e-12);
+    assert.deepEqual([...app.computeContingencyTableWithSteps(t).rowCategories].sort(), ['__proto__', 'b']);
+});
+
+test('shared distribution moments match SciPy and every moment tool reads them', () => {
+    const ref = {
+        normal: [{ mean: 3, stdDev: 2 }, 3, 4, 0, 0], exponential: [{ rate: 0.5 }, 2, 4, 2, 6], uniform: [{ min: 2, max: 8 }, 5, 3, 0, -1.2],
+        beta: [{ alpha: 2, beta: 5 }, 0.2857142857142857, 0.025510204081632654, 0.5962847939999439, -0.12],
+        poisson: [{ lambda: 4.5 }, 4.5, 4.5, 0.4714045207910317, 0.2222222222222222], binomial: [{ n: 20, p: 0.3 }, 6, 4.2, 0.19518001458970663, -0.06190476190476191]
+    };
+    for (const [dist, [params, mean, variance, skewness, kurtosis]] of Object.entries(ref)) {
+        const m = app.distributionMoments(dist, params);
+        close(m.mean, mean, 1e-12, dist + ' mean'); close(m.variance, variance, 1e-12, dist + ' variance');
+        close(m.skewness, skewness, 1e-12, dist + ' skewness'); close(m.kurtosis, kurtosis, 1e-12, dist + ' kurtosis');
+        close(app.computeExpectedValueWithSteps(dist, params).expectedValue, mean, 1e-12);
+        close(app.computeDistributionVarianceWithSteps(dist, params).variance, variance, 1e-12);
+        if (dist !== 'normal' || true) {
+            close(app.computeDistSkewnessWithSteps(dist, params).skewness, skewness, 1e-12);
+            close(app.computeDistKurtosisWithSteps(dist, params).kurtosis, kurtosis, 1e-12);
+        }
+    }
+});
+
+test('distribution fit, entropy, hazard and survival handle degenerate input', () => {
+    assert.equal(app.computeFitDistributionWithSteps([4, 4, 4, 4], 'normal').error, true);
+    assert.equal(app.computeFitDistributionWithSteps([4, 4, 4, 4], 'uniform').error, true);
+    assert.equal(app.computeFitDistributionWithSteps([-1, 2, 3], 'exponential').error, true);
+    const t0 = Date.now();
+    const h = app.computeEntropyWithSteps('poisson', { lambda: 1e10 });
+    assert.ok(Number.isFinite(h.entropy) && Date.now() - t0 < 1000, 'huge λ uses the asymptotic expansion');
+    close(app.computeEntropyWithSteps('poisson', { lambda: 20 }).entropy, 2.912526400182312, 1e-9);        // scipy.stats.poisson(20).entropy()
+    close(app.computeEntropyWithSteps('binomial', { n: 100, p: 0.3 }).entropy, 2.940540474235668, 1e-9);   // scipy.stats.binom(100, .3).entropy()
+    const exp = withFields({ hazardDistribution: 'exponential', hazardXValues: '1000', hazardRate: 1 }, () => app.computeHazardWithSteps());
+    assert.ok(!exp.error && !/NaN/.test(exp.steps), 'h(t) = λ even when f and S underflow');
+    assert.equal(withFields({ hazardDistribution: 'weibull', hazardXValues: '1', hazardShape: 0, hazardScale: 2 }, () => app.computeHazardWithSteps()).error, true);
+    assert.equal(withFields({ survivalDistribution: 'weibull', survivalXValues: '1', survivalShape: 2, survivalScale: -1 }, () => app.computeSurvivalWithSteps()).error, true);
 });

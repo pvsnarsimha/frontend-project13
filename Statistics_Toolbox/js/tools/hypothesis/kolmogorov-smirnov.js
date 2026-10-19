@@ -42,6 +42,9 @@ function computeKolmogorovSmirnovTest(data, alpha) {
     const mean = data.reduce((a,b) => a+b, 0) / n;
     const variance = data.reduce((a,b) => a + Math.pow(b - mean, 2), 0) / (n - 1);   // sample variance (parameters estimated from the data)
     const stdDev = Math.sqrt(variance);
+    if (!(stdDev > 0)) {
+        return { error: true, message: "All values are identical, so the normality test is undefined (zero variance)." };
+    }
     
     let maxDiff = 0;
     let diffs = [];

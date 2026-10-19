@@ -62,7 +62,7 @@ function setHtml(element, html) {
     const template = document.createElement('template');
     template.innerHTML = stripEventHandlerAttributes(html);
     if (!template.content || typeof template.content.querySelectorAll !== 'function') {
-        element.innerHTML = String(html);          // no real DOM (unit tests with a stub document)
+        element.innerHTML = stripEventHandlerAttributes(html);   // no real DOM (unit tests with a stub document): at least handlers never reach the stub
         return;
     }
     sanitizeHtmlTree(template.content);

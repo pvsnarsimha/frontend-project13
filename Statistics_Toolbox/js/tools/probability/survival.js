@@ -32,6 +32,8 @@ function computeSurvivalWithSteps() {
     
     if (dist === 'exponential') {
         const rate = parseFloat(document.getElementById('survivalRate').value);
+        const rateError = validateDistributionParams('exponential', { rate });
+        if (rateError) return { error: true, message: rateError };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                   EXPONENTIAL DISTRIBUTION SURVIVAL               ║\n`;
@@ -87,6 +89,7 @@ function computeSurvivalWithSteps() {
     } else if (dist === 'weibull') {
         const shape = parseFloat(document.getElementById('survivalShape').value);
         const scale = parseFloat(document.getElementById('survivalScale').value);
+        if (!(shape > 0 && scale > 0 && isFinite(shape) && isFinite(scale))) return { error: true, message: "The Weibull distribution needs a shape k > 0 and a scale λ > 0." };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      WEIBULL DISTRIBUTION SURVIVAL               ║\n`;

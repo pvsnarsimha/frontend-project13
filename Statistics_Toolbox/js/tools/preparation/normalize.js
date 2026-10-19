@@ -32,7 +32,7 @@ function computeNormalizeWithSteps(numbers) {
     let range = max - min;
     
     if (range === 0) {
-        return { error: true, message: "All values are identical. Normalized values will all be 0.5." };
+        return { error: true, message: "All values are identical, so the range is 0 and min-max scaling (x - min) / (max - min) is undefined (0 / 0)." };
     }
     
     let steps = `📏 FORMULA: x_norm = (x - x_min) / (x_max - x_min)\n`;

@@ -63,7 +63,7 @@ function computeDistSkewnessWithSteps(distType, params) {
     let skewness = 0;
     
     if (distType === 'normal') {
-        skewness = 0;
+        skewness = distributionMoments(distType, params).skewness;
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      NORMAL DISTRIBUTION SKEWNESS               ║\n`;
         steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
@@ -71,7 +71,7 @@ function computeDistSkewnessWithSteps(distType, params) {
         steps += `   Therefore, γ₁ = 0\n\n`;
         
     } else if (distType === 'exponential') {
-        skewness = 2;
+        skewness = distributionMoments(distType, params).skewness;
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                   EXPONENTIAL DISTRIBUTION SKEWNESS              ║\n`;
         steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
@@ -80,7 +80,7 @@ function computeDistSkewnessWithSteps(distType, params) {
         steps += `   γ₁ = 2 (positive, right-skewed)\n\n`;
         
     } else if (distType === 'uniform') {
-        skewness = 0;
+        skewness = distributionMoments(distType, params).skewness;
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                     UNIFORM DISTRIBUTION SKEWNESS                ║\n`;
         steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
@@ -90,7 +90,7 @@ function computeDistSkewnessWithSteps(distType, params) {
     } else if (distType === 'beta') {
         const alpha = params.alpha;
         const beta = params.beta;
-        skewness = 2 * (beta - alpha) * Math.sqrt(alpha + beta + 1) / ((alpha + beta + 2) * Math.sqrt(alpha * beta));
+        skewness = distributionMoments(distType, params).skewness;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                       BETA DISTRIBUTION SKEWNESS                 ║\n`;
@@ -105,7 +105,7 @@ function computeDistSkewnessWithSteps(distType, params) {
         
     } else if (distType === 'poisson') {
         const lambda = params.lambda;
-        skewness = 1 / Math.sqrt(lambda);
+        skewness = distributionMoments(distType, params).skewness;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      POISSON DISTRIBUTION SKEWNESS               ║\n`;
@@ -117,7 +117,7 @@ function computeDistSkewnessWithSteps(distType, params) {
     } else if (distType === 'binomial') {
         const n = params.n;
         const p = params.p;
-        skewness = (1 - 2 * p) / Math.sqrt(n * p * (1 - p));
+        skewness = distributionMoments(distType, params).skewness;
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                     BINOMIAL DISTRIBUTION SKEWNESS               ║\n`;

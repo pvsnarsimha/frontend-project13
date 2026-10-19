@@ -72,6 +72,9 @@ function computeSimpleLinearRegression(xValues, yValues) {
         xyDetails.push({ x: xValues[i], y: yValues[i], xDev, yDev, product: xDev * yDev, xSq: xDev * xDev });
     }
     
+    if (!(denominator > 0)) {
+        return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
+    }
     const slope = numerator / denominator;
     const intercept = meanY - slope * meanX;
     

@@ -77,8 +77,12 @@ function computeStdErrorsWithSteps(xValues, yValues) {
         </tr>`;
     }
     
-    const slope = numerator / denominator;
-    const intercept = meanY - slope * meanX;
+    if (!(denominator > 0)) {
+        return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
+    }
+    const core = simpleRegressionCore(xValues, yValues);   // the shared formulas (core/helpers.js); the loops below only build the display tables
+    const slope = core.slope;
+    const intercept = core.intercept;
     
     // Build predictions and residuals table
     let predictionsRows = '';
@@ -99,10 +103,10 @@ function computeStdErrorsWithSteps(xValues, yValues) {
         </tr>`;
     }
     
-    const mse = ssRes / (n - 2);
+    const mse = core.mse;
     const tCrit = n > 2 ? tCriticalValue(0.025, n - 2) : NaN;   // 95% CI uses the t quantile with n - 2 df
-    const seSlope = Math.sqrt(mse / denominator);
-    const seIntercept = Math.sqrt(mse * (1/n + Math.pow(meanX, 2) / denominator));
+    const seSlope = core.seSlope;
+    const seIntercept = core.seIntercept;
     
     let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
         

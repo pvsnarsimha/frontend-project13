@@ -21,7 +21,7 @@ function renderViolinInterface() {
                 textarea: { id: "violinInput", rows: "4", placeholder: "Example: 12, 15, 14, 16, 13, 25, 24, 22, 35, 34, 33, 100, 5" }
             },
             {
-                label: "🎨 Bandwidth (smoothing factor):",
+                label: "🎨 Bandwidth h (smoothing, in the same units as your data):",
                 labelAttrs: { style: FIELD_GAP },
                 input: {
                     type: "range",
@@ -288,6 +288,7 @@ function computeViolinWithSteps(numbers, bandwidth) {
     
     return { 
         steps, 
+        normal: numbers.filter(x => x >= lowerBound && x <= upperBound),   // same shape as the IQR-outlier and boxplot results
         densityPoints, 
         maxDensity, 
         q1, median, q3, whiskerMin, whiskerMax, 

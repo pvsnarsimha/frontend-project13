@@ -118,10 +118,17 @@ function computeEntropyWithSteps(distType, params) {
         const lambda = params.lambda;
         // Exact: H = -Σ P(k) ln P(k), summed until the remaining tail is negligible
         entropy = 0;
-        const kMax = Math.ceil(lambda + 40 * Math.sqrt(lambda) + 50);
-        for (let k = 0; k <= kMax; k++) {
-            const logP = -lambda + k * Math.log(lambda) - logGamma(k + 1);
-            entropy -= Math.exp(logP) * logP;
+        if (lambda > 1e7) {
+            // Beyond ~1e7 the sum has millions of terms; the asymptotic expansion is exact to far more digits than shown
+            entropy = 0.5 * Math.log(2 * Math.PI * Math.E * lambda) - 1 / (12 * lambda) - 1 / (24 * lambda * lambda);
+        } else {
+            // only the window around the mean carries probability: 40 standard deviations each side is far past double precision
+            const spreadK = 40 * Math.sqrt(lambda) + 50;
+            const kMin = Math.max(0, Math.floor(lambda - spreadK)), kMax = Math.ceil(lambda + spreadK);
+            for (let k = kMin; k <= kMax; k++) {
+                const logP = -lambda + k * Math.log(lambda) - logGamma(k + 1);
+                entropy -= Math.exp(logP) * logP;
+            }
         }
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
@@ -136,7 +143,10 @@ function computeEntropyWithSteps(distType, params) {
         const p = params.p;
         // Exact: H = -Σ P(k) ln P(k) over k = 0..n
         entropy = 0;
-        for (let k = 0; k <= n; k++) {
+        // only the window around n·p carries probability (40 standard deviations each side), so a huge n costs the same
+        const spreadK = 40 * Math.sqrt(n * p * (1 - p)) + 50;
+        const kLo = Math.max(0, Math.floor(n * p - spreadK)), kHi = Math.min(n, Math.ceil(n * p + spreadK));
+        for (let k = kLo; k <= kHi; k++) {
             const logP = logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1) + (k > 0 ? k * Math.log(p) : 0) + (n - k > 0 ? (n - k) * Math.log(1 - p) : 0);
             if (isFinite(logP)) entropy -= Math.exp(logP) * logP;
         }

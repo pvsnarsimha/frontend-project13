@@ -57,11 +57,9 @@ function computeWinsorizeWithSteps(numbers, winsorPercent) {
     const lowerPercentile = winsorPercent / 100;
     const upperPercentile = 1 - winsorPercent / 100;
     
-    const lowerIndex = Math.floor((n - 1) * lowerPercentile);
-    const upperIndex = Math.ceil((n - 1) * upperPercentile);
-    
-    const lowerBound = sorted[lowerIndex];
-    const upperBound = sorted[upperIndex];
+    // Same Type 7 percentiles as the Percentiles tool, so both tools agree at the same level
+    const lowerBound = quantileType7(sorted, lowerPercentile);
+    const upperBound = quantileType7(sorted, upperPercentile);
     
     // Apply winsorization
     const winsorized = validNumbers.map(val => {
@@ -91,10 +89,9 @@ function computeWinsorizeWithSteps(numbers, winsorPercent) {
     steps += `   Sorted: [${sorted.join(', ')}]\n\n`;
     
     steps += `📐 STEP 2: Calculate ${winsorPercent}th and ${100-winsorPercent}th percentiles\n`;
-    steps += `   Lower bound index = floor((${n}-1) × ${lowerPercentile}) = floor(${(n-1)*lowerPercentile}) = ${lowerIndex}\n`;
-    steps += `   Lower bound value = ${lowerBound}\n`;
-    steps += `   Upper bound index = ceil((${n}-1) × ${upperPercentile}) = ceil(${(n-1)*upperPercentile}) = ${upperIndex}\n`;
-    steps += `   Upper bound value = ${upperBound}\n\n`;
+    steps += `   Type 7 percentile: h = (n-1)p, then interpolate between neighbouring sorted values\n`;
+    steps += `   Lower bound: h = (${n}-1) × ${lowerPercentile} = ${((n-1)*lowerPercentile).toFixed(4)} → ${+lowerBound.toFixed(6)}\n`;
+    steps += `   Upper bound: h = (${n}-1) × ${upperPercentile} = ${((n-1)*upperPercentile).toFixed(4)} → ${+upperBound.toFixed(6)}\n\n`;
     
     steps += `✂️ STEP 3: Apply Winsorization\n`;
     steps += `   Values < ${lowerBound} → replaced with ${lowerBound}\n`;

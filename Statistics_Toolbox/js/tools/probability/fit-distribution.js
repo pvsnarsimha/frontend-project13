@@ -62,7 +62,7 @@ function setupFitDistributionLogic() {
             stepsSpan.innerText = result.message;
         } else {
             if (result.results.type === 'normal') {
-                setHtml(valueSpan, `μ̂ = ${result.results.mean.toFixed(4)} | σ̂ = ${result.results.stdDev.toFixed(4)}`);
+                setHtml(valueSpan, `μ̂ = ${result.results.mean.toFixed(4)} | σ̂ (MLE, ÷ n) = ${result.results.stdDev.toFixed(4)}`);
             } else if (result.results.type === 'exponential') {
                 setHtml(valueSpan, `λ̂ = ${result.results.rate.toFixed(4)} | Mean = ${result.results.mean.toFixed(4)}`);
             } else if (result.results.type === 'uniform') {
@@ -81,6 +81,13 @@ function computeFitDistributionWithSteps(data, distType) {
     if (data.length < 2) return { error: true, message: "Need at least 2 data points for fitting." };
     
     const n = data.length;
+    const spread = Math.max(...data) - Math.min(...data);
+    if ((distType === 'normal' || distType === 'uniform') && !(spread > 0)) {
+        return { error: true, message: `All values are identical, so a ${distType} distribution cannot be fitted (${distType === 'normal' ? 'σ̂ = 0 and the likelihood is undefined' : 'the interval a to b has zero width and the likelihood is infinite'}). Enter values that vary.` };
+    }
+    if (distType === 'exponential' && (data.some(v => v < 0) || !(data.reduce((a, b) => a + b, 0) > 0))) {
+        return { error: true, message: "Exponential data must be non-negative with a positive mean." };
+    }
     let steps = `╔══════════════════════════════════════════════════════════════════╗\n`;
     steps += `║           MAXIMUM LIKELIHOOD ESTIMATION (MLE) - DETAILED        ║\n`;
     steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;

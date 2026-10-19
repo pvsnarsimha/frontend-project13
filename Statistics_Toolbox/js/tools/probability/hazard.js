@@ -35,6 +35,8 @@ function computeHazardWithSteps() {
     
     if (dist === 'exponential') {
         const rate = parseFloat(document.getElementById('hazardRate').value);
+        const rateError = validateDistributionParams('exponential', { rate });
+        if (rateError) return { error: true, message: rateError };
         results = xValues.map(() => rate);
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
@@ -57,14 +59,20 @@ function computeHazardWithSteps() {
             steps += `\nFor t = ${t}:\n`;
             steps += `  Step 1: Calculate PDF: f(${t}) = λ·e^{-λt} = ${rate} × e^{-${rate}×${t}} = ${pdf.toFixed(8)}\n`;
             steps += `  Step 2: Calculate Survival: S(${t}) = e^{-λt} = e^{-${rate}×${t}} = ${surv.toFixed(8)}\n`;
-            steps += `  Step 3: Calculate hazard: h(${t}) = f(${t})/S(${t}) = ${pdf.toFixed(8)}/${surv.toFixed(8)}\n`;
-            steps += `  h(${t}) = ${(pdf / surv).toFixed(8)} = λ\n`;
+            if (surv > 0) {
+                steps += `  Step 3: Calculate hazard: h(${t}) = f(${t})/S(${t}) = ${pdf.toFixed(8)}/${surv.toFixed(8)}\n`;
+                steps += `  h(${t}) = ${(pdf / surv).toFixed(8)} = λ\n`;
+            } else {
+                // both f(t) and S(t) underflow to 0 for large λt, so the ratio is taken symbolically: (λe^{-λt}) / e^{-λt} = λ\n                steps += `  Step 3: f(${t}) and S(${t}) are both smaller than the smallest number a computer stores, so cancel e^{-λt} symbolically:\n`;
+                steps += `  h(${t}) = (λ·e^{-λt}) / e^{-λt} = λ = ${rate}\n`;
+            }
             steps += `  Interpretation: Instantaneous failure rate is ${rate} at time ${t}\n\n`;
         });
         
     } else if (dist === 'weibull') {
         const shape = parseFloat(document.getElementById('hazardShape').value);
         const scale = parseFloat(document.getElementById('hazardScale').value);
+        if (!(shape > 0 && scale > 0 && isFinite(shape) && isFinite(scale))) return { error: true, message: "The Weibull distribution needs a shape k > 0 and a scale λ > 0." };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      WEIBULL DISTRIBUTION HAZARD                 ║\n`;

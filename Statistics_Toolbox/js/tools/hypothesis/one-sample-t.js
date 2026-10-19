@@ -161,7 +161,7 @@ function computeOneSampleTTest(data, mu0, alpha, alternative) {
                 </div>
                 <div style="margin-left: 40px; font-family: monospace;">
                     α = ${alpha} (${(1-alpha)*100}% Confidence Level)<br>
-                    Critical Value = ${criticalValue.toFixed(6)}<br>
+                    Critical Value = ${criticalValueText(criticalValue, alternative)}<br>
                     p-value = ${pValue.toFixed(8)}<br>
                     ${alternative === 'two.sided' ? `|t| = ${Math.abs(tStatistic).toFixed(6)} ${Math.abs(tStatistic) > criticalValue ? '>' : '≤'} ${criticalValue.toFixed(6)}` : (alternative === 'greater' ? `t = ${tStatistic.toFixed(6)} ${tStatistic > criticalValue ? '>' : '≤'} ${criticalValue.toFixed(6)}` : `t = ${tStatistic.toFixed(6)} ${tStatistic < criticalValue ? '<' : '≥'} ${criticalValue.toFixed(6)}`)}
                 </div>
@@ -172,7 +172,7 @@ function computeOneSampleTTest(data, mu0, alpha, alternative) {
             <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
             <div><strong>t-statistic:</strong> ${tStatistic.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> ${df}</div>
-            <div><strong>Critical Value:</strong> ${criticalValue.toFixed(6)}</div>
+            <div><strong>Critical Value:</strong> ${criticalValueText(criticalValue, alternative)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                 <strong>Decision:</strong> ${conclusion}<br>

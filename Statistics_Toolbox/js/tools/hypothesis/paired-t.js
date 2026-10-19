@@ -276,7 +276,7 @@ function computePairedTTest(before, after, alpha, alternative) {
                     t = \u0304d / SE = ${meanDiff.toFixed(6)} / ${standardError.toFixed(6)}<br>
                     <div style="font-size: 20px; font-weight: 700; color: #1a5490; margin-top: 8px;">t = ${tStatistic.toFixed(8)}</div>
                     <div>Degrees of Freedom (df) = n - 1 = ${df}</div>
-                    <div>Critical value (α = ${alpha}) = ${criticalValue.toFixed(6)}</div>
+                    <div>Critical value (α = ${alpha}) = ${criticalValueText(criticalValue, alternative)}</div>
                     <div>p-value = ${pValue.toFixed(8)}</div>
                 </div>
             </div>
@@ -286,7 +286,7 @@ function computePairedTTest(before, after, alpha, alternative) {
             <h3 style="margin: 0 0 12px 0;">Test Conclusion</h3>
             <div><strong>t-statistic:</strong> ${tStatistic.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> ${df}</div>
-            <div><strong>Critical Value (${alternative === 'two.sided' ? 'two-tailed' : 'one-tailed'}):</strong> ${criticalValue.toFixed(6)}</div>
+            <div><strong>Critical Value (${alternative === 'two.sided' ? 'two-tailed' : 'one-tailed'}):</strong> ${criticalValueText(criticalValue, alternative)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
             <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
                 <strong>Decision:</strong> ${conclusion}<br>

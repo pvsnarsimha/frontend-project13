@@ -80,8 +80,12 @@ function computeTStatsWithSteps(xValues, yValues) {
     }
     
     // ========== STEP 2: Calculate β̂ coefficients ==========
-    const slope = numerator / denominator;
-    const intercept = meanY - slope * meanX;
+    if (!(denominator > 0)) {
+        return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
+    }
+    const core = simpleRegressionCore(xValues, yValues);   // the shared formulas (core/helpers.js); the loops below only build the display tables
+    const slope = core.slope;
+    const intercept = core.intercept;
     
     // ========== STEP 3: Build predictions and residuals table ==========
     let predictionsRows = '';
@@ -107,9 +111,9 @@ function computeTStatsWithSteps(xValues, yValues) {
     }
     
     // ========== STEP 4: Calculate Standard Errors ==========
-    const mse = ssRes / (n - 2);
-    const seSlope = Math.sqrt(mse / denominator);
-    const seIntercept = Math.sqrt(mse * (1/n + Math.pow(meanX, 2) / denominator));
+    const mse = core.mse;
+    const seSlope = core.seSlope;
+    const seIntercept = core.seIntercept;
     
     // ========== STEP 5: Calculate t-statistics ==========
     const tSlope = slope / seSlope;

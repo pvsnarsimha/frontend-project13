@@ -61,6 +61,7 @@ function getCanvasTooltipElement() {
         tip = document.createElement('div');
         tip.id = 'canvasChartTooltip';
         tip.setAttribute('role', 'tooltip');
+        tip.setAttribute('aria-hidden', 'true');   // mouse-only hint: the same values are in the worked solution's text and tables
         tip.style.cssText = 'position: fixed; background: #1a5490; color: white; padding: 8px 16px; border-radius: 8px; ' +
             'font-size: 12px; font-family: monospace; pointer-events: none; z-index: 1000; display: none; ' +
             'box-shadow: 0 2px 10px rgba(0,0,0,0.3); border-left: 4px solid;';

@@ -321,6 +321,44 @@ function binomialPMF(n, k, p) {
     return Math.exp(logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1) + k * Math.log(p) + (n - k) * Math.log1p(-p));
 }
 
+// Simple linear regression y = b0 + b1·x: the formulas shared by the simple-linear, standard-error, t-statistic and F-test tools.
+// Returns null when x does not vary (Σ(x - x̄)² = 0), where the slope is undefined.
+function simpleRegressionCore(x, y) {
+    const n = x.length;
+    const meanX = x.reduce((a, b) => a + b, 0) / n, meanY = y.reduce((a, b) => a + b, 0) / n;
+    let sxx = 0, sxy = 0;
+    for (let i = 0; i < n; i++) {
+        sxx += (x[i] - meanX) * (x[i] - meanX);
+        sxy += (x[i] - meanX) * (y[i] - meanY);
+    }
+    if (!(sxx > 0)) return null;
+    const slope = sxy / sxx, intercept = meanY - slope * meanX;
+    let ssRes = 0, ssTot = 0;
+    for (let i = 0; i < n; i++) {
+        const residual = y[i] - (intercept + slope * x[i]);
+        ssRes += residual * residual;
+        ssTot += (y[i] - meanY) * (y[i] - meanY);
+    }
+    const mse = n > 2 ? ssRes / (n - 2) : NaN;
+    return { n, meanX, meanY, sxx, sxy, slope, intercept, ssRes, ssTot, mse,
+             seSlope: Math.sqrt(mse / sxx), seIntercept: Math.sqrt(mse * (1 / n + meanX * meanX / sxx)) };
+}
+
+// Critical value as text for the t and z tests, stating the rejection rule so a negative lower-tail value reads naturally:
+// two-sided "±1.96 (reject if |t| > 1.96)", greater "1.96 (reject if t > 1.96)", less "−1.96 (reject if t < −1.96)"
+function criticalValueText(criticalValue, alternative, statName) {
+    const st = statName || 't', c = Math.abs(criticalValue).toFixed(6);
+    if (alternative === 'two.sided') return `±${c} (reject H₀ if |${st}| > ${c})`;
+    if (alternative === 'less') return `−${c} (reject H₀ if ${st} < −${c})`;
+    return `${c} (reject H₀ if ${st} > ${c})`;
+}
+
+// k! as text for worked solutions: exact while it fits in a double (k <= 170), otherwise a power of ten
+function formatFactorial(k) {
+    if (k <= 170) return String(factorial(k));
+    return `≈ 10^${(logGamma(k + 1) / Math.LN10).toFixed(2)} (too large for a double)`;
+}
+
 // C(n, k) as text for worked solutions: the exact value when it fits in a double, otherwise a power of ten
 function formatCombination(n, k) {
     const c = combination(n, k);

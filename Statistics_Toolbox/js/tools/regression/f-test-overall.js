@@ -78,6 +78,9 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
         </tr>`;
     }
     
+    if (!(denominator > 0)) {
+        return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
+    }
     const slope = numerator / denominator;
     const intercept = meanY - slope * meanX;
     

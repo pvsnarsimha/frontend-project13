@@ -18,7 +18,7 @@ function renderChiSquareGoodnessInterface() {
                 textarea: { id: "goodnessExpected", rows: "3", placeholder: "Example: 20, 20, 20, 20, 20" }
             },
             {
-                hint: "Expected frequencies can be equal proportions or custom values",
+                hint: "Expected values can be counts, or proportions that sum to 1 (they are then scaled by the total observed count)",
                 hintAttrs: { style: HINT_STYLE }
             },
             {
@@ -64,6 +64,12 @@ function computeChiSquareGoodnessTest(observed, expected, alpha) {
     let contributions = [];
     let totalObserved = observed.reduce((a,b) => a+b, 0);
     let totalExpected = expected.reduce((a,b) => a+b, 0);
+    // Expected values given as proportions (summing to 1) are scaled to counts: E_i = p_i × (total observed)
+    const proportionsScaled = Math.abs(totalExpected - 1) < 1e-6 && totalObserved > 1;
+    if (proportionsScaled) {
+        expected = expected.map(e => e * totalObserved);
+        totalExpected = totalObserved;
+    }
     
     for (let i = 0; i < n; i++) {
         const diff = observed[i] - expected[i];
@@ -106,6 +112,7 @@ function computeChiSquareGoodnessTest(observed, expected, alpha) {
                 <h2 style="margin: 0;">Chi-Square Goodness-of-Fit Test</h2>
             </div>
             <p style="margin: 8px 0 0 0; opacity: 0.9;">Tests whether observed frequencies match expected frequencies</p>
+            ${proportionsScaled ? `<p style="margin: 4px 0 0 0; opacity: 0.95;">ℹ️ The expected values sum to 1, so they were read as proportions and scaled by the total observed count (${totalObserved}): E<sub>i</sub> = p<sub>i</sub> × ${totalObserved}.</p>` : ''}
             <p style="margin: 4px 0 0 0; opacity: 0.75;">H₀: The data follows the specified distribution | H₁: The data does NOT follow the specified distribution</p>
         </div>
         

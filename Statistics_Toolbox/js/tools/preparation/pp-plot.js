@@ -48,6 +48,12 @@ function renderPPPlotInterface() {
 function computePPPlotWithSteps(numbers, distType = 'normal') {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
     
+    if (numbers.length < 3) return { error: true, message: "A P-P plot needs at least 3 values (with 2 points the correlation is always 1)." };
+    if (!(Math.max(...numbers) - Math.min(...numbers) > 0)) return { error: true, message: "All values are identical, so the P-P plot is undefined (zero spread)." };
+    if (distType === 'exponential' && (numbers.some(v => v < 0) || !(numbers.reduce((a, b) => a + b, 0) > 0))) {
+        return { error: true, message: "The exponential P-P plot needs non-negative values with a positive mean (the rate is 1 / mean)." };
+    }
+    
     const n = numbers.length;
     const sorted = [...numbers].sort((a, b) => a - b);
     const mean = numbers.reduce((a,b) => a+b, 0) / n;

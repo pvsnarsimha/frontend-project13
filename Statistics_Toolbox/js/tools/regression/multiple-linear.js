@@ -50,6 +50,10 @@ function computeMultipleLinearRegression(dataMatrix) {
     
     const n = dataMatrix.length;
     const p = dataMatrix[0].length - 1; // number of predictors
+    const ragged = dataMatrix.findIndex(row => row.length !== dataMatrix[0].length);
+    if (ragged >= 0) {
+        return { error: true, message: `Row ${ragged + 1} has ${dataMatrix[ragged].length} values but row 1 has ${dataMatrix[0].length}. Every row needs the same number of values (Y followed by each predictor).` };
+    }
     
     if (p < 1) {
         return { error: true, message: "Need at least one predictor variable." };
@@ -65,13 +69,21 @@ function computeMultipleLinearRegression(dataMatrix) {
     for (let j = 0; j < p; j++) {
         xMeans.push(x.reduce((sum, row) => sum + row[j], 0) / n);
     }
+    // A predictor that sits far from 0 relative to its spread (for example years, or values near 1,000,000) makes X'X so badly
+    // scaled that a perfectly valid design looks singular. Such predictors are centred (x - mean) before solving, and the
+    // intercept is converted back to the original scale afterwards; the other coefficients are unchanged by centring.
+    const shift = xMeans.map((m, j) => {
+        const sd = Math.sqrt(x.reduce((sum, row) => sum + (row[j] - m) ** 2, 0) / n);
+        return sd > 0 && Math.abs(m) > 100 * sd ? m : 0;
+    });
+    const centred = shift.some(v => v !== 0);
     
     // Build design matrix X (with column of 1's for intercept)
     const X = [];
     for (let i = 0; i < n; i++) {
         const row = [1]; // intercept term
         for (let j = 0; j < p; j++) {
-            row.push(x[i][j]);
+            row.push(x[i][j] - shift[j]);
         }
         X.push(row);
     }
@@ -266,6 +278,7 @@ function computeMultipleLinearRegression(dataMatrix) {
         
         <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
             <h3 style="margin: 0 0 16px 0; color: #1a5490;">🧮 Step 2: Matrix Formulation</h3>
+            ${centred ? `<div style="background: #fff3cd; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; color: #856404;">ℹ️ Numerical stability: the predictors ${shift.map((v, j) => v !== 0 ? 'X' + (j + 1) + ' (mean ' + +v.toFixed(6) + ')' : null).filter(Boolean).join(', ')} are far from 0 relative to their spread, so the matrices below use the centred values (x − mean). The intercept is converted back to the original scale in the result; the slopes are the same either way.</div>` : ''}
             <div style="background: white; border-radius: 12px; padding: 16px;">
                 <p>For all n observations, we write the system in matrix form:</p>
                 <div style="background: #f0f4f8; padding: 12px; border-radius: 8px; font-family: monospace; text-align: center; margin: 12px 0;">
@@ -338,6 +351,12 @@ function computeMultipleLinearRegression(dataMatrix) {
             coeffDetails += `<div style="margin: 8px 0;">
                 <strong>β<sub>${i}</sub></strong> = ${terms.join(' + ')} = ${sum.toFixed(6)}
             </div>`;
+        }
+        if (centred) {
+            // β₀ for the original x: ȳ-form intercept minus the slopes times the amounts the predictors were shifted by
+            const centredIntercept = coefficients[0];
+            coefficients[0] = centredIntercept - shift.reduce((sum, v, jx) => sum + coefficients[jx + 1] * v, 0);
+            coeffDetails += `<div style="margin: 8px 0; color: #856404;">Intercept converted back to the original scale: β₀ = ${centredIntercept.toFixed(6)} − Σ βⱼ × (shift of Xⱼ) = ${coefficients[0].toFixed(6)}</div>`;
         }
         
         steps += `
