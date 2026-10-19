@@ -74,6 +74,26 @@ const { chromium } = require('playwright');
   exp(san[0] === false, 'setHtml kept a javascript: ping attribute');
   exp(san[1] === true, 'setHtml removed a harmless https ping attribute');
 
+  // h(): builds elements without HTML parsing; text stays literal, handlers and script URLs are refused
+  const built = await p.evaluate(() => {
+    window.__xss = 0;
+    const el = h('div', { class: 'a b', 'data-x': 1, onclick: 'window.__xss=1', style: 'color:red', id: false },
+      'x < y & <img src=x onerror="window.__xss=2">', 7, null, false, [h('a', { href: 'javascript:window.__xss=3' }, 'bad'), h('a', { href: 'https://example.com' }, 'ok')]);
+    document.body.appendChild(el);
+    const out = {
+      html: el.innerHTML, cls: el.className, dx: el.getAttribute('data-x'), onclick: el.hasAttribute('onclick'), style: el.hasAttribute('style'),
+      id: el.hasAttribute('id'), imgs: el.querySelectorAll('img').length, hrefs: [...el.querySelectorAll('a')].map(a => a.getAttribute('href')), text: el.textContent
+    };
+    el.querySelectorAll('a')[0].click(); el.click(); out.xss = window.__xss; el.remove();
+    return out;
+  });
+  exp(built.cls === 'a b' && built.dx === '1', 'h(): class/data attributes not set: ' + JSON.stringify(built));
+  exp(!built.onclick && !built.style && !built.id, 'h(): on*/style/false attributes must be skipped');
+  exp(built.imgs === 0 && /<img/.test(built.text.replace(/\s/g, ' ')) , 'h(): markup in a string child must stay literal text');
+  exp(built.text.includes('x < y &') && built.text.includes('7'), 'h(): text/number children missing');
+  exp(built.hrefs[0] === null && built.hrefs[1] === 'https://example.com', 'h(): javascript: href must be dropped, https kept: ' + JSON.stringify(built.hrefs));
+  exp(built.xss === 0, 'h(): a payload executed: ' + built.xss);
+
   // Violin: moving the slider after a plot exists redraws it with the new bandwidth
   await p.click('.tab[data-tab="manipulation"]').catch(() => {});
   const btn = await p.$('.stat-btn[data-stat="violin"]');

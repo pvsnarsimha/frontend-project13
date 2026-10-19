@@ -267,3 +267,10 @@ test('split tools keep the calculation and the worked-solution HTML in separate 
         assert.match(steps, /^function stepsHtml[A-Z]\w*\(scope\)/m);
     }
 });
+
+test('h() is defined once in toolkit.js and never assigned to innerHTML', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js', 'core', 'toolkit.js'), 'utf8');
+    assert.match(src, /^function h\(tag, attrs, \.\.\.children\)/m);
+    const body = src.slice(src.indexOf('function h(tag'), src.indexOf('// ---- Shared form constants'));
+    assert.ok(!/innerHTML|insertAdjacentHTML|outerHTML/.test(body), 'h() must not parse HTML strings');
+});
