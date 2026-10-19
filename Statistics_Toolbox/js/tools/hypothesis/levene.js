@@ -6,8 +6,7 @@ function renderLeveneInterface() {
         id: "statLeveneInterface",
         title: "📊 Levene's Test (Homogeneity of Variance)",
         formula: "📌 Tests whether multiple groups have equal variances",
-        desc: "<strong>What is Levene's Test?</strong><br>\n                    Levene's test checks the assumption of homogeneity of variances across groups.\n                    H₀: All group variances are equal | H₁: At least one group variance differs.<br>
-                    <strong>Version:</strong> Levene's original mean-centred form (ANOVA F on |x − group mean|). scipy.stats.levene defaults to the median-centred Brown–Forsythe variant; use center='mean' there to match this tool.",
+        desc: "<strong>What is Levene's Test?</strong><br>\n                    Levene's test checks the assumption of homogeneity of variances across groups.\n                    H₀: All group variances are equal | H₁: At least one group variance differs.<br>\n                    <strong>Version:</strong> Levene's original mean-centred form (ANOVA F on |x − group mean|). scipy.stats.levene defaults to the median-centred Brown–Forsythe variant; use center='mean' there to match this tool.",
         inputs: [
             {
                 label: "📋 Enter data with group labels (format: value:group):",
