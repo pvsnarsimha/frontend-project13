@@ -141,3 +141,41 @@ test('Clear buttons empty the parameter fields of the distribution tools', () =>
     } finally { doc.getElementById = original; }
     assert.ok(cleared.length >= 4, 'expected most setup functions to be found: ' + cleared);
 });
+
+test('binomialPMF is exact for small n and stays finite for large n (C(n, k) overflows a double near n = 1030)', () => {
+    close(app.binomialPMF(10, 3, 0.4), 120 * 0.4 ** 3 * 0.6 ** 7, 1e-15);
+    assert.equal(app.binomialPMF(5, 0, 0), 1);
+    assert.equal(app.binomialPMF(5, 5, 1), 1);
+    assert.equal(app.binomialPMF(5, 6, 0.5), 0);
+    close(app.binomialPMF(2000, 1000, 0.5), 0.01783901114585432, 1e-12);   // exact: C(2000,1000) / 2^2000
+    let sum = 0;
+    for (let k = 0; k <= 2000; k++) sum += app.binomialPMF(2000, k, 0.3);
+    close(sum, 1, 1e-9, 'pmf over all k');
+    assert.ok(!isFinite(app.combination(2000, 1000)), 'the raw coefficient really is out of range');
+    assert.match(app.formatCombination(2000, 1000), /^≈ 10\^600\./);
+    assert.equal(app.formatCombination(10, 3), '120');
+    // tools built on it no longer return NaN for large n
+    const exact = app.computeBinomialExactTest(1030, 2000, 0.5, 0.05, 'two.sided');
+    assert.ok(!exact.error && Number.isFinite(exact.pValue) && exact.pValue > 0 && exact.pValue <= 1, `p = ${exact.pValue}`);
+});
+
+test('runs test refuses a sequence made of a single symbol', () => {
+    const r = app.computeRunsTest('5 5 5 5 5 5', 0.05);
+    assert.equal(r.error, true);
+});
+
+test('chartJsReady retries every racing call with that call\'s own arguments', async () => {
+    const saved = { chart: app.Chart, load: app.loadChartJs };
+    app.Chart = undefined;
+    app.loadChartJs = () => Promise.resolve();
+    const seen = [];
+    const retry = (...args) => seen.push(args);
+    try {
+        assert.equal(app.chartJsReady(retry, ['first', 1]), false);
+        assert.equal(app.chartJsReady(retry, ['second', 2]), false);
+        await new Promise(r => setTimeout(r, 10));
+        assert.deepEqual(seen.map(a => a[0]), ['first', 'second']);
+        app.Chart = function () {};
+        assert.equal(app.chartJsReady(retry, ['third']), true);
+    } finally { app.Chart = saved.chart; app.loadChartJs = saved.load; }
+});

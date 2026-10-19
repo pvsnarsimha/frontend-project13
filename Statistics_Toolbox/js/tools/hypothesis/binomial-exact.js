@@ -77,7 +77,7 @@ function computeBinomialExactTest(successes, n, p0, alpha, alternative) {
         pValue = 0;
         calculationDetails = `<div style="margin-top: 12px;"><strong>P(X ≥ ${successes}) =</strong><br>`;
         for (let k = successes; k <= n; k++) {
-            const prob = combination(n, k) * Math.pow(p0, k) * Math.pow(1 - p0, n - k);
+            const prob = binomialPMF(n, k, p0);
             pValue += prob;
             calculationDetails += `P(X = ${k}) = C(${n},${k}) × ${p0}^${k} × ${(1-p0).toFixed(4)}^${n-k} = ${prob.toFixed(8)}<br>`;
         }
@@ -86,7 +86,7 @@ function computeBinomialExactTest(successes, n, p0, alpha, alternative) {
         pValue = 0;
         calculationDetails = `<div style="margin-top: 12px;"><strong>P(X ≤ ${successes}) =</strong><br>`;
         for (let k = 0; k <= successes; k++) {
-            const prob = combination(n, k) * Math.pow(p0, k) * Math.pow(1 - p0, n - k);
+            const prob = binomialPMF(n, k, p0);
             pValue += prob;
             calculationDetails += `P(X = ${k}) = C(${n},${k}) × ${p0}^${k} × ${(1-p0).toFixed(4)}^${n-k} = ${prob.toFixed(8)}<br>`;
         }
@@ -94,13 +94,13 @@ function computeBinomialExactTest(successes, n, p0, alpha, alternative) {
     } else {
         // Two-tailed
         pValue = 0;
-        const observedProb = combination(n, successes) * Math.pow(p0, successes) * Math.pow(1 - p0, n - successes);
+        const observedProb = binomialPMF(n, successes, p0);
         calculationDetails = `<div style="margin-top: 12px;"><strong>Two-tailed p-value calculation:</strong><br>
         Observed probability = ${observedProb.toFixed(8)}<br>
         Including all outcomes with probability ≤ observed probability:<br>`;
         
         for (let k = 0; k <= n; k++) {
-            const prob = combination(n, k) * Math.pow(p0, k) * Math.pow(1 - p0, n - k);
+            const prob = binomialPMF(n, k, p0);
             if (prob <= observedProb + 1e-10) {
                 pValue += prob;
                 calculationDetails += `P(X = ${k}) = ${prob.toFixed(8)} ✓<br>`;

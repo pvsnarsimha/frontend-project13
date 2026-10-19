@@ -311,6 +311,24 @@ function combination(n, k) {
     return result;
 }
 
+// P(X = k) for X ~ Binomial(n, p). C(n, k) overflows a double from about n = 1030, so large n is evaluated in log space
+// (a product of Infinity and a tiny power would be NaN); for n up to 1000 the direct product keeps full precision.
+function binomialPMF(n, k, p) {
+    if (k < 0 || k > n || !Number.isInteger(k)) return 0;
+    if (p <= 0) return k === 0 ? 1 : 0;
+    if (p >= 1) return k === n ? 1 : 0;
+    if (n <= 1000) return combination(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+    return Math.exp(logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1) + k * Math.log(p) + (n - k) * Math.log1p(-p));
+}
+
+// C(n, k) as text for worked solutions: the exact value when it fits in a double, otherwise a power of ten
+function formatCombination(n, k) {
+    const c = combination(n, k);
+    if (isFinite(c)) return String(c);
+    const log10 = (logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1)) / Math.LN10;
+    return `≈ 10^${log10.toFixed(2)} (too large for a double; probabilities are computed in log space)`;
+}
+
 // Expand/collapse a metric explanation in the model summary (called from the onclick of each metric header)
 function toggleMetric(element) {
     const formulaDiv = element.nextElementSibling;

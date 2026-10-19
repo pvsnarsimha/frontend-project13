@@ -436,7 +436,7 @@ function computeQQPlotWithSteps(numbers) {
                             <td style="padding: 8px; text-align: center;">${sumXY.toFixed(4)}</td>
                             <td style="padding: 8px; text-align: center;">${sumX2.toFixed(4)}</td>
                             <td style="padding: 8px; text-align: center;">${sumY2.toFixed(4)}</td>
-                        </table>
+                        </tr>
                     </tbody>
                 </table>
             </div>

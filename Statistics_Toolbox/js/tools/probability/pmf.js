@@ -84,14 +84,14 @@ function computePMFWithSteps() {
                 steps += `  P(X=${k}) = 0\n\n`;
             } else {
                 const comb = combination(n, k);
-                const pmf = comb * Math.pow(p, k) * Math.pow(1-p, n-k);
+                const pmf = binomialPMF(n, k, p);
                 results.push(pmf);
                 
                 steps += `\nFor x = ${k}:\n`;
-                steps += `  Step 1: Calculate C(${n},${k}) = ${n}!/(${k}!·${n-k}!) = ${comb}\n`;
+                steps += `  Step 1: Calculate C(${n},${k}) = ${n}!/(${k}!·${n-k}!) = ${formatCombination(n, k)}\n`;
                 steps += `  Step 2: Calculate p^{k} = ${p}^${k} = ${Math.pow(p, k).toFixed(8)}\n`;
                 steps += `  Step 3: Calculate (1-p)^{n-k} = ${(1-p).toFixed(6)}^${n-k} = ${Math.pow(1-p, n-k).toFixed(8)}\n`;
-                steps += `  Step 4: Multiply: ${comb} × ${Math.pow(p, k).toFixed(8)} × ${Math.pow(1-p, n-k).toFixed(8)}\n`;
+                steps += `  Step 4: Multiply: ${combination(n, k) === comb && isFinite(comb) ? comb : 'C(n,k)'} × ${Math.pow(p, k).toFixed(8)} × ${Math.pow(1-p, n-k).toFixed(8)}\n`;
                 steps += `  P(X=${k}) = ${pmf.toFixed(8)}\n`;
                 steps += `  Interpretation: ${(pmf * 100).toFixed(4)}% chance of exactly ${k} successes in ${n} trials\n\n`;
             }

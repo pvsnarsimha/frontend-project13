@@ -9,14 +9,20 @@ const { chromium } = require('playwright');
   const p = await b.newPage();
   const errs = [];
   p.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
-  p.on('console', m => { if (m.type() === 'error') errs.push('CONSOLE ' + m.text()); });
+  // The sanitiser test below inserts <img src=x>; that one deliberate failed request (and its console line) is expected
+  let expectedMissing = 0;
+  p.on('requestfailed', r => { if (/\/x$/.test(r.url())) expectedMissing++; else errs.push('REQUEST FAILED ' + r.url()); });
+  p.on('console', m => { if (m.type() === 'error') { if (/Failed to load resource/.test(m.text()) && expectedMissing > 0) { expectedMissing--; return; } errs.push('CONSOLE ' + m.text()); } });
   await p.goto('file://' + file);
+  // Record every HTML string the tools hand to setHtml(), so block-level tags can be checked for balance below
+  await p.evaluate(() => { const orig = window.setHtml; window.__html = []; window.__tool = ''; window.setHtml = (el, h) => { window.__html.push([window.__tool, String(h)]); return orig(el, h); }; });
   const tabs = await p.$$eval('.tab', t => t.map(x => x.dataset.tab));
   let n = 0;
   for (const t of tabs) {
     await p.click(`.tab[data-tab="${t}"]`);
     const stats = await p.$$eval(`#sidebar-${t} .stat-btn[data-stat]`, bs => bs.map(x => x.dataset.stat));
     for (const s of stats) {
+      await p.evaluate(name => { window.__tool = name; }, s);
       await p.click(`#sidebar-${t} .stat-btn[data-stat="${s}"]`);
       const iface = await p.$('#interfaceRoot .stat-interface');
       if (!iface) errs.push('NO INTERFACE for ' + s);
@@ -51,6 +57,18 @@ const { chromium } = require('playwright');
   if (sanitised.flag) errs.push('XSS payload executed: ' + sanitised.flag);
   if (/onerror|<script|<iframe|javascript:|onclick/i.test(sanitised.html)) errs.push('setHtml left dangerous markup: ' + sanitised.html);
   if (!/<b>bold<\/b>/.test(sanitised.html) || !/color:\s*red/.test(sanitised.html)) errs.push('setHtml removed harmless markup: ' + sanitised.html);
+  // Markup: a missing </tr> or </div> is silently repaired by the parser, so it is only visible in the raw string
+  const strings = await p.evaluate(() => window.__html);
+  const TAGS = ['div', 'table', 'thead', 'tbody', 'tr', 'select', 'button', 'textarea', 'ul', 'ol', 'details'];
+  const unbalanced = new Set();
+  for (const [tool, str] of strings) {
+    if (str.length < 300) continue;      // short strings are fragments of a larger piece of markup
+    for (const tag of TAGS) {
+      const open = (str.match(new RegExp(`<${tag}(?=[\\s>])`, 'g')) || []).length, close = (str.match(new RegExp(`</${tag}>`, 'g')) || []).length;
+      if (open !== close) unbalanced.add(`${tool}: <${tag}> opened ${open}, closed ${close}`);
+    }
+  }
+  for (const u of unbalanced) errs.push('UNBALANCED MARKUP ' + u);
   console.log('tools exercised:', n);
   console.log(errs.length ? errs.slice(0, 40).join('\n') : 'NO ERRORS');
   if (errs.length) process.exitCode = 1;

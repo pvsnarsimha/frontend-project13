@@ -110,7 +110,7 @@ function computeAndersonDarlingTest(data, alpha) {
             <td style="padding: 10px; text-align: center;">F(x) = Φ(${d.zScore.toFixed(4)}) = ${d.Fx.toFixed(6)}</td>
             <td style="padding: 10px; text-align: center;">(2×${d.i}−1)ln F(x<sub>${d.i}</sub>) = ${d.term1.toFixed(6)}</td>
             <td style="padding: 10px; text-align: center;">(2×${d.i}−1)ln(1−F(x<sub>${n+1-d.i}</sub>)) = ${d.term2.toFixed(6)}</td>
-        </td>`;
+        </tr>`;
     }
     
     let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">

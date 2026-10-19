@@ -372,7 +372,9 @@ function computeMultipleLinearRegression(dataMatrix) {
         steps += `
                 <div style="background: #f8d7da; border-radius: 8px; padding: 12px; color: #721c24;">
                     ⚠️ Cannot compute coefficients: ${error.message}. At least one predictor is an exact copy or linear combination of the others (perfect multicollinearity), or there are fewer observations than parameters. Remove or combine the redundant predictor, or add more observations.
-                </div>`;
+                </div>
+            </div>
+        </div>`;
         coefficients = null;
         failure = error.message;
     }

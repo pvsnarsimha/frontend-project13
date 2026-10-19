@@ -247,7 +247,7 @@ function computeSignTest(data, hypothesizedMedian, alpha, alternative) {
 function binomialCumulative(k, n, p) {
     let sum = 0;
     for (let i = 0; i <= k; i++) {
-        sum += combination(n, i) * Math.pow(p, i) * Math.pow(1 - p, n - i);
+        sum += binomialPMF(n, i, p);
     }
     return sum;
 }
@@ -255,7 +255,7 @@ function binomialCumulative(k, n, p) {
 function binomialCumulativeComplement(k, n, p) {
     let sum = 0;
     for (let i = k; i <= n; i++) {
-        sum += combination(n, i) * Math.pow(p, i) * Math.pow(1 - p, n - i);
+        sum += binomialPMF(n, i, p);
     }
     return sum;
 }

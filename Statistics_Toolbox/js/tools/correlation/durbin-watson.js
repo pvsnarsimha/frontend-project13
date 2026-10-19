@@ -256,7 +256,7 @@ function computeDurbinWatson(residuals) {
                             <th style="padding: 10px;">k=3</th>
                             <th style="padding: 10px;">k=4</th>
                             <th style="padding: 10px;">k=5</th>
-                        </td>
+                        </tr>
                     </thead>
                     <tbody>
                         <tr style="background: white;"><td style="padding: 8px;">15</td><td>1.08, 1.36</td><td>0.95, 1.54</td><td>0.82, 1.75</td><td>0.69, 1.97</td><td>0.56, 2.21</td></tr>
