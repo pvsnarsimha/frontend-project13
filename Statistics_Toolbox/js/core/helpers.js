@@ -89,7 +89,6 @@ function parseValueGroupInput(inputText) {
 }
 
 // Function to generate detailed distribution analysis
-// Function to generate detailed distribution analysis
 function generateDistributionAnalysis(numbers) {
     if (!numbers || numbers.length === 0) return "No data available for analysis.";
     
@@ -104,12 +103,7 @@ function generateDistributionAnalysis(numbers) {
     const mean = sum / n;
     
     // Calculate median
-    let median;
-    if (n % 2 === 0) {
-        median = (sorted[n/2 - 1] + sorted[n/2]) / 2;
-    } else {
-        median = sorted[Math.floor(n/2)];
-    }
+    const median = quantileType7(sorted, 0.5);       // the app's one quantile definition (core/numerics.js)
     
     // Calculate mode
     const freqMap = new Map();
@@ -134,15 +128,8 @@ function generateDistributionAnalysis(numbers) {
     const cv = stdDev / mean;
     
     // Calculate quartiles
-    const getQ = (arr, percentile) => {
-        const pos = (arr.length - 1) * percentile;
-        const base = Math.floor(pos);
-        const rest = pos - base;
-        if (rest === 0) return arr[base];
-        return arr[base] + rest * (arr[base + 1] - arr[base]);
-    };
-    const q1 = getQ(sorted, 0.25);
-    const q3 = getQ(sorted, 0.75);
+    const q1 = quantileType7(sorted, 0.25);
+    const q3 = quantileType7(sorted, 0.75);
     const iqr = q3 - q1;
     
     // Determine skewness
@@ -182,21 +169,21 @@ function generateDistributionAnalysis(numbers) {
     analysis += `• Mean vs Median difference: ${Math.abs(mean - median).toFixed(4)}\n\n`;
     
     analysis += `📌 DISPERSION (SPREAD):\n`;
-    analysis += `• Variance: ${variance.toFixed(4)}\n`;
-    analysis += `• Standard Deviation: ${stdDev.toFixed(4)}\n`;
-    analysis += `• Coefficient of Variation (CV): ${(cv * 100).toFixed(2)}%\n`;
+    analysis += `• Population variance (÷ n): ${variance.toFixed(4)}\n`;
+    analysis += `• Population standard deviation: ${stdDev.toFixed(4)}\n`;
+    analysis += `• Coefficient of Variation (population σ / mean): ${(cv * 100).toFixed(2)}%\n`;
     analysis += `• Q1 (25th percentile): ${q1.toFixed(4)}\n`;
     analysis += `• Q3 (75th percentile): ${q3.toFixed(4)}\n`;
     analysis += `• Interquartile Range (IQR): ${iqr.toFixed(4)}\n\n`;
     
     analysis += `📌 DISTRIBUTION SHAPE:\n`;
-    analysis += `• Skewness: ${skewness.toFixed(4)} → ${skewType}\n`;
+    analysis += `• Pearson's median skewness (mean − median) / σ: ${skewness.toFixed(4)} → ${skewType}\n`;
     analysis += `  `;
     if (skewness > 0.1) analysis += `Mean > Median, tail extends to the right.\n`;
     else if (skewness < -0.1) analysis += `Mean < Median, tail extends to the left.\n`;
     else analysis += `Mean ≈ Median, roughly bell-shaped.\n`;
     
-    analysis += `• Kurtosis: ${kurtosis.toFixed(4)} → ${kurtosisType}\n`;
+    analysis += `• Excess kurtosis (population): ${kurtosis.toFixed(4)} → ${kurtosisType}\n`;
     analysis += `  `;
     if (kurtosis > 0.5) analysis += `Distribution has heavier tails and sharper peak than normal.\n`;
     else if (kurtosis < -0.5) analysis += `Distribution has lighter tails and flatter peak than normal.\n`;
