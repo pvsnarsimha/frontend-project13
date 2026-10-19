@@ -59,17 +59,12 @@ function computeViolinWithSteps(numbers, bandwidth) {
     const mean = sum / n;
     
     // Calculate quartiles
-    const getMedian = (arr) => {
-        const m = arr.length;
-        if (m % 2 === 0) return (arr[m/2 - 1] + arr[m/2]) / 2;
-        else return arr[Math.floor(m/2)];
-    };
     
     // Type 7 quantiles (linear interpolation at (n - 1)p), the same method as every other quantile in the app
     const q1 = quantileType7(sorted, 0.25);
     const q3 = quantileType7(sorted, 0.75);
     
-    const median = getMedian(sorted);
+    const median = quantileType7(sorted, 0.5);
     const iqr = q3 - q1;
     const lowerBound = q1 - 1.5 * iqr;
     const upperBound = q3 + 1.5 * iqr;

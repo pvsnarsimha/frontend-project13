@@ -107,7 +107,7 @@ function setupRankingLogic() {
         if (rankRes.error) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = rankRes.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(rankRes.message));
             return;
         }
         

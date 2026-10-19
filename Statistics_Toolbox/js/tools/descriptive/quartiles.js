@@ -30,21 +30,10 @@ function computeQuartilesWithSteps(numbers) {
     let sorted = [...numbers].sort((a,b) => a-b);
     let n = sorted.length;
     
-    let getMedian = (arr, arrName) => {
-        let m = arr.length;
-        if (m % 2 === 0) {
-            let left = arr[m/2 - 1];
-            let right = arr[m/2];
-            let median = (left + right) / 2;
-            return { value: median, left, right };
-        } else {
-            return { value: arr[Math.floor(m/2)], left: null, right: null };
-        }
-    };
-    
     // Calculate Q2 (Median) first
-    let q2Result = getMedian(sorted, "full");
-    let q2 = q2Result.value;
+    let q2 = quantileType7(sorted, 0.5);
+    // for an even n the median is the mean of the two middle values (shown in the worked step); both equal the Type 7 value
+    let q2Result = n % 2 === 0 ? { value: q2, left: sorted[n/2 - 1], right: sorted[n/2] } : { value: q2, left: null, right: null };
     
     // Type 7 quantiles (linear interpolation at (n - 1)p)
     const q1 = quantileType7(sorted, 0.25);

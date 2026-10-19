@@ -61,12 +61,7 @@ function computeMoodsMedianTest(inputText, alpha) {
     
     allValues.sort((a, b) => a - b);
     const n = allValues.length;
-    let overallMedian;
-    if (n % 2 === 0) {
-        overallMedian = (allValues[n/2 - 1] + allValues[n/2]) / 2;
-    } else {
-        overallMedian = allValues[Math.floor(n/2)];
-    }
+    const overallMedian = quantileType7(allValues, 0.5);
     
     // Create 2×k contingency table (Above/Below Median × Groups)
     let aboveCount = new Map();

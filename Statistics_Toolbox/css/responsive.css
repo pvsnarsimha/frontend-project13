@@ -26,7 +26,8 @@ textarea, input, select { max-width: 100%; }
 @media (max-width: 900px) {
     .main-panel { flex-direction: column; }
     .action-sidebar { position: static; width: 100%; flex: 0 0 auto; max-height: min(55vh, 420px); -webkit-overflow-scrolling: touch; border-right: none; border-bottom: 1px solid var(--line); overscroll-behavior: contain; }
-    .stats-dashboard { width: calc(100% - 20px); margin-top: -36px; border-radius: 18px; }
+    :root { --dashboard-overlap: 36px; }
+    .stats-dashboard { width: calc(100% - 20px); border-radius: 18px; }
     .hero-curve { opacity: .35; }
     .result-value { font-size: 1.4rem; }
     .formula-card .formula { font-size: .85rem; white-space: normal; }

@@ -34,22 +34,17 @@ function computeBoxplotWithSteps(numbers) {
     const mean = sum / n;
     
     // Type 7 quantiles (linear interpolation at (n - 1)p)
-    const getMedian = (arr) => {
-        const m = arr.length;
-        if (m % 2 === 0) {
-            const left = arr[m/2 - 1];
-            const right = arr[m/2];
-            return { value: (left + right) / 2, left, right, formula: `(${left} + ${right}) / 2 = ${(left + right) / 2}` };
-        } else {
-            const median = arr[Math.floor(m/2)];
-            return { value: median, left: median, right: median, formula: `${median}` };
-        }
+    // the median is the Type 7 value; for an even n that is the mean of the two middle values, which the worked step shows
+    const medianOf = arr => {
+        const m = arr.length, value = quantileType7(arr, 0.5);
+        if (m % 2 === 0) return { value, left: arr[m/2 - 1], right: arr[m/2], formula: `(${arr[m/2 - 1]} + ${arr[m/2]}) / 2 = ${value}` };
+        return { value, left: value, right: value, formula: `${value}` };
     };
     
     const q1 = quantileType7(sorted, 0.25);
     const q3 = quantileType7(sorted, 0.75);
     
-    const medianResult = getMedian(sorted);
+    const medianResult = medianOf(sorted);
     const median = medianResult.value;
     const iqr = q3 - q1;
     const lowerBound = q1 - 1.5 * iqr;

@@ -146,7 +146,7 @@ function setupContingencyLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = result.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
             setHtml(valueSpan, `${result.rowCategories.length} rows × ${result.colCategories.length} columns | Total: ${result.grandTotal} observations`);
             setHtml(stepsSpan, result.steps);

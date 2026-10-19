@@ -305,7 +305,7 @@ function setupChisquareLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = result.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
             setHtml(valueSpan, `χ² = ${result.chiSquare.toFixed(6)} | df = ${result.df} | p = ${result.pValue.toFixed(6)} | α = ${result.alpha}`);
             setHtml(stepsSpan, result.steps);

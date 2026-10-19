@@ -106,7 +106,7 @@ function setupZScoreLogic() {
         if (zscoreRes.error) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = zscoreRes.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(zscoreRes.message));
             return;
         }
         

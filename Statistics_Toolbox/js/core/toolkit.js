@@ -252,7 +252,7 @@ function defineListTool(cfg) {
             const result = cfg.compute(numbers);
             if (result.error) {
                 valueSpan.innerText = cfg.errorValue || 'Error';
-                stepsSpan.innerText = result.message;
+                setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
                 return;
             }
             valueSpan.innerText = cfg.display(result);

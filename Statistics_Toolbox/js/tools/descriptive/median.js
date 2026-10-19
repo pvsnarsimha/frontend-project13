@@ -16,13 +16,13 @@ function computeMedianWithSteps(numbers) {
             let rightIdx = n / 2;
             let leftVal = sorted[leftIdx];
             let rightVal = sorted[rightIdx];
-            median = (leftVal + rightVal) / 2;
+            median = quantileType7(sorted, 0.5);   // the app's one median: for an even n the mean of the two middle values
             steps += `Step 3: n is even → median = average of the two middle values.\n`;
             steps += `   Middle positions: index ${leftIdx+1} = ${leftVal}, index ${rightIdx+1} = ${rightVal}\n`;
             steps += `   Median = (${leftVal} + ${rightVal}) / 2 = ${median.toFixed(10)}\n`;
         } else {
             let midIdx = Math.floor(n / 2);
-            median = sorted[midIdx];
+            median = quantileType7(sorted, 0.5);
             steps += `Step 3: n is odd → median = value at position (n+1)/2 = position ${midIdx+1}\n`;
             steps += `   Value at position ${midIdx+1} = ${median}\n`;
         }

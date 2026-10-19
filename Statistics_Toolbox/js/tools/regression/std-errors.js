@@ -55,7 +55,7 @@ function computeStdErrorsWithSteps(xValues, yValues) {
     const meanY = yValues.reduce((a,b) => a+b, 0) / n;
     
     // Build deviation table
-    let deviationRows = '';
+    const deviationRows = buildDeviationRows(xValues, yValues, meanX, meanY);
     let numerator = 0, denominator = 0;
     
     for (let i = 0; i < n; i++) {
@@ -66,15 +66,6 @@ function computeStdErrorsWithSteps(xValues, yValues) {
         numerator += product;
         denominator += xSq;
         
-        deviationRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]} - ${meanX.toFixed(4)} = ${xDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]} - ${meanY.toFixed(4)} = ${yDev.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; font-weight: 600; color: #1a5490;">${product.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${xSq.toFixed(4)}</td>
-        </tr>`;
     }
     
     if (!(denominator > 0)) {
@@ -91,7 +82,7 @@ function computeStdErrorsWithSteps(xValues, yValues) {
     const intercept = core.intercept;
     
     // Build predictions and residuals table
-    let predictionsRows = '';
+    const predictionsRows = buildPredictionRows(xValues, yValues, slope, intercept);
     let ssRes = 0;
     
     for (let i = 0; i < n; i++) {
@@ -99,14 +90,6 @@ function computeStdErrorsWithSteps(xValues, yValues) {
         const residual = yValues[i] - yPred;
         ssRes += residual * residual;
         
-        predictionsRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center;">${i+1}</td>
-            <td style="padding: 10px; text-align: center;">${xValues[i]}</td>
-            <td style="padding: 10px; text-align: center;">${yValues[i]}</td>
-            <td style="padding: 10px; text-align: center; font-family: monospace;">${intercept.toFixed(4)} + ${slope.toFixed(4)}×${xValues[i]} = ${yPred.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; ${residual >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">${residual.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${(residual * residual).toFixed(4)}</td>
-        </tr>`;
     }
     
     const mse = core.mse;

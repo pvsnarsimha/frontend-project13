@@ -24,10 +24,16 @@ function loadChartJs() {
     return plottingLibraryLoad;
 }
 
+// A short non-blocking message (the toast of the UI layer); alert() only if the UI layer is not loaded (unit tests, broken page)
+function notifyUser(message, ms) {
+    if (typeof window !== 'undefined' && window.StatLabUI && typeof window.StatLabUI.showToast === 'function') window.StatLabUI.showToast(message, ms || 5000);
+    else alert(message);
+}
+
 function chartJsReady(retry, args) {
     if (typeof Chart !== 'undefined') return true;
     loadChartJs().then(() => retry(...args)).catch(() => {
-        alert('Charts need the Chart.js library, which could not be loaded. Check your connection and try again.');
+        notifyUser('Charts need the Chart.js library, which could not be loaded. Check your connection and try again.', 7000);
     });
     return false;
 }

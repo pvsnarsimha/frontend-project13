@@ -186,7 +186,7 @@ function setupWinsorizeLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = result.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
             setHtml(valueSpan, `✂️ ${level}% Winsorization | Capped ${result.winsorized.filter((v,i) => v !== result.original[i]).length} values`);
             stepsSpan.innerText = result.steps;

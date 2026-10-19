@@ -141,7 +141,7 @@ function setupZOutlierLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = result.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
             setHtml(valueSpan, `🔍 ${result.outliers.length} outlier(s) found | Mean = ${result.mean.toFixed(4)} | Std Dev = ${result.stdDev.toFixed(4)} | Threshold = |Z| > ${result.threshold}`);
             stepsSpan.innerText = result.steps;

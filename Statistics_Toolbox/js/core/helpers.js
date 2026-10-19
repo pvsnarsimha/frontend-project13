@@ -105,20 +105,8 @@ function generateDistributionAnalysis(numbers) {
     // Calculate median
     const median = quantileType7(sorted, 0.5);       // the app's one quantile definition (core/numerics.js)
     
-    // Calculate mode
-    const freqMap = new Map();
-    numbers.forEach(num => freqMap.set(num, (freqMap.get(num) || 0) + 1));
-    let maxFreq = 0;
-    let modes = [];
-    for (let [num, freq] of freqMap) {
-        if (freq > maxFreq) {
-            maxFreq = freq;
-            modes = [num];
-        } else if (freq === maxFreq) {
-            modes.push(num);
-        }
-    }
-    const modeText = maxFreq === 1 ? "No mode (all values unique)" : modes.join(", ") + ` (appears ${maxFreq} time${maxFreq > 1 ? 's' : ''})`;
+    // Mode: the Mode tool's own rule and wording (one definition)
+    const modeText = computeModeWithSteps(numbers).display;
     
     // Calculate variance and standard deviation
     const variance = numbers.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
@@ -239,7 +227,7 @@ function generateDistributionAnalysis(numbers) {
 // Enhanced visualization function
 function visualizeData(numbers, statType) {
     if (!numbers || numbers.length === 0) {
-        alert('Please enter numeric data first!');
+        notifyUser('Please enter numeric data first.');
         return false;
     }
     

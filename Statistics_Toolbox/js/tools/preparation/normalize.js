@@ -87,7 +87,7 @@ function setupNormalizeLogic() {
         if (normRes.error) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = normRes.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(normRes.message));
             return;
         }
         

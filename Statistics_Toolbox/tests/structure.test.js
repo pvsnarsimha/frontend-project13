@@ -293,3 +293,22 @@ test('every element id a tool looks up with getElementById is defined by that to
     }
     assert.deepEqual(offenders, [], 'getElementById for an id that nothing creates');
 });
+
+test('error messages are never assigned with innerText: they go through setHtml(escapeHtml(...)) or textContent', () => {
+    const offenders = [];
+    for (const rel of scriptList()) {
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        if (/\.innerText\s*=\s*\w+\.message\b/.test(src)) offenders.push(rel);
+    }
+    assert.deepEqual(offenders, []);
+});
+
+test('no blocking alert() outside notifyUser (messages go through the toast)', () => {
+    const offenders = [];
+    for (const rel of scriptList()) {
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/\/\/[^\n]*/g, '');
+        const hits = (src.match(/\balert\(/g) || []).length;
+        if (hits > (rel === 'js/core/charts.js' ? 1 : 0)) offenders.push(rel);
+    }
+    assert.deepEqual(offenders, []);
+});

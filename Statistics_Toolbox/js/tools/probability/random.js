@@ -98,19 +98,19 @@ function sampleBeta(alpha, beta, source) {
     return 1 / (1 + Math.exp(logY - logX));
 }
 
+// One generator per distribution: adding a distribution to the form means adding its entry here (and nothing else can be selected)
+const RANDOM_GENERATORS = {
+    normal: (params, source) => params.mean + params.std * source.normal(),
+    uniform: (params, source) => params.min + source.uniform() * (params.max - params.min),
+    exponential: (params, source) => -Math.log(1 - source.uniform()) / params.rate,
+    beta: (params, source) => sampleBeta(params.alpha, params.beta, source)
+};
+
 function generateRandomNumbers(count, dist, params, source) {
+    if (!Object.prototype.hasOwnProperty.call(RANDOM_GENERATORS, dist)) throw new Error(`No random generator for the distribution "${dist}"`);
+    const generate = RANDOM_GENERATORS[dist];
     const numbers = [];
-    for (let i = 0; i < count; i++) {
-        if (dist === 'normal') {
-            numbers.push(params.mean + params.std * source.normal());
-        } else if (dist === 'uniform') {
-            numbers.push(params.min + source.uniform() * (params.max - params.min));
-        } else if (dist === 'exponential') {
-            numbers.push(-Math.log(1 - source.uniform()) / params.rate);
-        } else if (dist === 'beta') {
-            numbers.push(sampleBeta(params.alpha, params.beta, source));
-        }
-    }
+    for (let i = 0; i < count; i++) numbers.push(generate(params, source));
     return numbers;
 }
 
@@ -118,6 +118,9 @@ function computeRandomWithSteps() {
     const dist = document.getElementById('randomDistribution').value;
     const count = parseInt(document.getElementById('randomCount').value);
     
+    if (!Object.prototype.hasOwnProperty.call(RANDOM_GENERATORS, dist)) {
+        return { error: true, message: "Choose one of the available distributions." };
+    }
     if (isNaN(count) || count < 1) {
         return { error: true, message: "Please enter a valid number of values to generate (minimum 1)." };
     }
@@ -138,6 +141,7 @@ function computeRandomWithSteps() {
     
     // DECLARE randomNumbers HERE (in outer scope)
     let randomNumbers = [];
+    let rejectionCapped = false;   // set when Beta rejection sampling gave up on some values (reported in the result tile)
     
     if (dist === 'normal') {
         params.mean = parseFloat(document.getElementById('randomMean').value);
@@ -217,7 +221,6 @@ function computeRandomWithSteps() {
             steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
             
             const MAX_REJECTION_ATTEMPTS = 100000;   // a very peaked Beta accepts rarely; never loop forever
-            let rejectionCapped = false;
             let samplesShown = 0;
             const maxShowDetails = Math.min(5, count);
             
@@ -351,7 +354,8 @@ function computeRandomWithSteps() {
     steps += `  Maximum: ${max.toFixed(6)}\n`;
     steps += `  Range: ${(max - min).toFixed(6)}\n`;
     
-    return { randomNumbers, steps, resultStr: randomNumbers.map(n => n.toFixed(4)).join(', ') };
+    const warning = rejectionCapped ? ' | Warning: some values were set to the mode because this Beta is too peaked for rejection sampling; generate fewer values or use less extreme parameters' : '';
+    return { randomNumbers, steps, rejectionCapped, resultStr: randomNumbers.map(n => n.toFixed(4)).join(', ') + warning };
 }
 
 function setupRandomLogic() {
@@ -372,7 +376,7 @@ function setupRandomLogic() {
             if (result.error) {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = 'Error';
-                stepsSpan.innerText = result.message;
+                setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
             } else {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = result.resultStr;

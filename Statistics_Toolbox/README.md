@@ -22,7 +22,8 @@ js/core/charts.js          One variable per plotting tool for its Chart.js insta
 js/core/helpers.js         Input parsing (parseNumbersFromInput, parseValueGroupInput), parameter validation (validateDistributionParams),
                            binomialPMF, simpleRegressionCore and other helpers shared by several tools
 js/core/distributions.js   Mean, variance, skewness and kurtosis of the six distributions, defined once (distributionMoments)
-js/tools/<module>/*.js     One file per tool (about 100): renderXInterface(), computeX(), setupXLogic()
+js/tools/<module>/*.js     One file per tool (about 100): renderXInterface(), computeX(), setupXLogic(); big tools add <tool>-steps.js (worked-solution HTML);
+                           js/tools/regression/regression-html.js holds table rows shared by the simple-regression tools
                            modules: descriptive, preparation, probability, correlation, hypothesis, regression
 js/app.js                  Route table (STAT_ROUTES), tab/sidebar navigation, chart controls
 js/ui/*.js                 Presentation layer: navigation + search, answer tiles and worked-solution layout, form a11y

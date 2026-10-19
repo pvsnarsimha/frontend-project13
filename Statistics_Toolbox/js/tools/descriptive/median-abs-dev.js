@@ -32,24 +32,14 @@ function computeMedianAbsDevWithSteps(numbers) {
     let n = sorted.length;
     
     // Calculate median
-    let median;
-    if (n % 2 === 0) {
-        median = (sorted[n/2 - 1] + sorted[n/2]) / 2;
-    } else {
-        median = sorted[Math.floor(n/2)];
-    }
+    const median = quantileType7(sorted, 0.5);
     
     // Calculate absolute deviations from median
     let absoluteDeviations = numbers.map(v => Math.abs(v - median));
     let sortedAbsDev = [...absoluteDeviations].sort((a, b) => a - b);
     
     // Calculate median of absolute deviations
-    let mad;
-    if (sortedAbsDev.length % 2 === 0) {
-        mad = (sortedAbsDev[sortedAbsDev.length/2 - 1] + sortedAbsDev[sortedAbsDev.length/2]) / 2;
-    } else {
-        mad = sortedAbsDev[Math.floor(sortedAbsDev.length/2)];
-    }
+    const mad = quantileType7(sortedAbsDev, 0.5);
     
     let steps = `📏 FORMULA: MAD = median(|xᵢ - median(x)|)\n`;
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;

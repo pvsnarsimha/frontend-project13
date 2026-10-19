@@ -224,7 +224,7 @@ function setupBoxCoxLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = result.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
             setHtml(valueSpan, `λ = ${result.lambda.toFixed(4)} | Skewness: ${result.origSkew.toFixed(4)} → ${result.transSkew.toFixed(4)}`);
             stepsSpan.innerText = result.steps;

@@ -251,21 +251,11 @@ function computeHistogramWithSteps(numbers, numBins) {
     steps += `\n📌 STATISTICAL SUMMARY:\n`;
     steps += `   • Mean of data = ${(numbers.reduce((a,b)=>a+b,0)/n).toFixed(6)}\n`;
     steps += `   • Median = ${quantileType7(sorted, 0.5).toFixed(6)}\n`;
-    steps += `   • Mode = ${getMode(numbers)}\n`;
+    steps += `   • Mode = ${computeModeWithSteps(numbers).display}\n`;   // the Mode tool's wording and rule
+
     steps += `   • Population variance (÷ n) = ${(numbers.reduce((a,b)=>a+Math.pow(b - (numbers.reduce((a,b)=>a+b,0)/n),2),0)/n).toFixed(6)}\n`;
     
     return { steps, bins, binLabels, binWidth, binRanges, frequencies: bins };
-}
-
-function getMode(numbers) {
-    const freq = new Map();
-    numbers.forEach(n => freq.set(n, (freq.get(n) || 0) + 1));
-    let maxFreq = 0, modes = [];
-    for (let [val, f] of freq) {
-        if (f > maxFreq) { maxFreq = f; modes = [val]; }
-        else if (f === maxFreq && f > 1) modes.push(val);
-    }
-    return maxFreq === 1 ? "No unique mode" : modes.join(', ');
 }
 
 function renderHistogramChart(bins, binLabels, numbers) {

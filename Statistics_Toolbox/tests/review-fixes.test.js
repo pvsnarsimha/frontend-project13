@@ -434,3 +434,43 @@ test('third review: legacy "Visualize Data" charts use the Boxplot and Histogram
     assert.ok(!/← CHANGE/.test(boxplot), 'no leftover debug comments');
     assert.ok(!/ - 15,|\+ 15\s*$/m.test(boxplot.slice(boxplot.indexOf('min: Math.min(minVal'), boxplot.indexOf('min: Math.min(minVal') + 200)), 'y-axis padding is a share of the range, not 15 data units');
 });
+
+test('the median is identical in every tool that reports one (even n, unequal middle values)', () => {
+    for (const data of [[1, 2, 4, 9, 10, 40], [3, 1, 2, 8], [5, 3, 9]]) {
+        const sorted = [...data].sort((a, b) => a - b);
+        const expected = app.quantileType7(sorted, 0.5);
+        const seen = {
+            median: app.computeMedianWithSteps(data).value, fivenum: app.computeFiveNumWithSteps(data).median,
+            quartiles: app.computeQuartilesWithSteps(data).q2, boxplot: app.computeBoxplotWithSteps(data).median,
+            violin: app.computeViolinWithSteps(data, 0.5).median,
+            iqr: num(app.computeIQRWithSteps(data).steps, /median \(Q₂\) = ([-\d.]+)/),
+            histogram: num(app.computeHistogramWithSteps(data, 2).steps, /Median = ([-\d.]+)/),
+            ranking: num(app.computeRankingWithSteps(data).steps, /Median: ([-\d.]+)/)
+        };
+        for (const [tool, value] of Object.entries(seen)) close(value, expected, 1e-9, `${tool} median of [${data}]`);
+        // MAD is the median of |x - median|, taken with the same median
+        close(app.computeMedianAbsDevWithSteps(data).value, app.quantileType7(sorted.map(v => Math.abs(v - expected)).sort((a, b) => a - b), 0.5), 1e-9, 'MAD');
+    }
+    // and no tool carries its own copy of the median arithmetic any more
+    const fs = require('fs'), path = require('path');
+    const dir = path.join(__dirname, '..', 'js', 'tools');
+    const offenders = fs.readdirSync(dir).flatMap(m => fs.readdirSync(path.join(dir, m)).map(f => `${m}/${f}`)).filter(f => /(getMedian|\(sorted\[n\/2 - 1\] \+ sorted\[n\/2\]\) \/ 2|allValues\[n\/2 - 1\])/.test(fs.readFileSync(path.join(dir, f), 'utf8')));
+    assert.deepEqual(offenders, []);
+});
+
+test('inference tools accept data on a tiny scale (the perfect-fit check is relative to the data, not an absolute floor)', () => {
+    const x = [1, 2, 3, 4, 5];
+    for (const y of [[1e-6, 2.1e-6, 2.9e-6, 4.2e-6, 4.8e-6], [1, 1.0001, 1.0003, 1.0002, 1.0005]]) {
+        for (const fn of ['computeStdErrorsWithSteps', 'computeTStatsWithSteps']) assert.ok(!app[fn](x, y).error, `${fn} rejected valid data ${y}`);
+        assert.ok(!app.computeFTestOverallWithSteps(x, y, 0.05).error);
+    }
+});
+
+test('a seeded random source is reproducible and independent of other sources', () => {
+    const a1 = app.createRandomSource(7), a2 = app.createRandomSource(7), b = app.createRandomSource(8);
+    const draw = s => Array.from({ length: 5 }, () => s.uniform());
+    const first = draw(a1);
+    draw(b);                                  // drawing from another source does not disturb this one
+    assert.deepEqual(draw(a2), first);
+    assert.notDeepEqual(draw(app.createRandomSource(8)), first);
+});

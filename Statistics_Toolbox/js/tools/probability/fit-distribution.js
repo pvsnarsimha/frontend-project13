@@ -59,7 +59,7 @@ function setupFitDistributionLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = result.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
             if (result.results.type === 'normal') {
                 setHtml(valueSpan, `μ̂ = ${result.results.mean.toFixed(4)} | σ̂ (MLE, ÷ n) = ${result.results.stdDev.toFixed(4)}`);

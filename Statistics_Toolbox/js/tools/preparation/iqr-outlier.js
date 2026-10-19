@@ -36,11 +36,6 @@ function computeIQROutlierWithSteps(numbers) {
     const n = sorted.length;
     
     // Calculate Quartiles
-    const getMedian = (arr) => {
-        const m = arr.length;
-        if (m % 2 === 0) return (arr[m/2 - 1] + arr[m/2]) / 2;
-        else return arr[Math.floor(m/2)];
-    };
     
     // Type 7 quantiles (linear interpolation at (n - 1)p), the same method as every other quantile in the app
     const q1 = quantileType7(sorted, 0.25);
@@ -137,7 +132,7 @@ function setupIQROutlierLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            stepsSpan.innerText = result.message;
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
             setHtml(valueSpan, `🔍 ${result.outliers.length} outlier(s) found | IQR = ${result.iqr.toFixed(4)} | Boundaries: [${result.lowerBound.toFixed(4)}, ${result.upperBound.toFixed(4)}]`);
             stepsSpan.innerText = result.steps;

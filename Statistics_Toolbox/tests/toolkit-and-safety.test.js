@@ -37,7 +37,7 @@ test('defineListTool renders the expected form and wires one handler per button'
     assert.equal(els.demoValueDisplay.innerText, 'Need 2');
     els.demoInput.value = '99 1'; calls[0][1]();
     assert.equal(els.demoValueDisplay.innerText, 'Error');
-    assert.equal(els.demoStepsDisplay.innerText, 'bad');
+    assert.equal(els.demoStepsDisplay.innerHTML, '⚠️ bad', 'errors are escaped and shown through setHtml');
 });
 
 test('list tools converted to the toolkit still compute the same answers', () => {

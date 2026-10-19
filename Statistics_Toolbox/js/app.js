@@ -201,12 +201,12 @@ tabList.addEventListener('keydown', e => {
 function visualizeCurrentData() {
     const textarea = document.querySelector('.data-input-section textarea');
     if (!textarea) {
-        alert('Please select a statistical measure and enter data first!');
+        notifyUser('Please select a statistical measure and enter data first.');
         return;
     }
     const numbers = parseNumbersFromInput(textarea.value);
     if (numbers.length > 0) visualizeData(numbers, currentStat || 'mean');
-    else alert('Please enter numeric data in the active calculator first!');
+    else notifyUser('Please enter numeric data in the active calculator first.');
 }
 
 document.getElementById('closeChartBtn').addEventListener('click', () => {
