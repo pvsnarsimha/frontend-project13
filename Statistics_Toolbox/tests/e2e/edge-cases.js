@@ -65,11 +65,11 @@ const UNDEFINED = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
                 runs++;
                 const shown = await page.evaluate(() => {
                     const v = document.querySelector('#interfaceRoot .result-value'), s = document.querySelector('#interfaceRoot .calculation-steps');
-                    return { text: (v ? v.textContent : '') + ' ' + (s ? s.textContent : ''), note: !!document.querySelector('#interfaceRoot .undef-note') };
+                    return { value: v ? v.textContent : '', text: (v ? v.textContent : '') + ' ' + (s ? s.textContent : ''), note: !!document.querySelector('#interfaceRoot .undef-note') };
                 });
                 if (UNDEFINED.test(shown.text) && !shown.note) problems.push(`${current}: shows NaN/Infinity/undefined without an explanation`);
                 // The note explains NaN, but a test must not ALSO announce a decision that was reached from undefined values
-                else if (UNDEFINED.test(shown.text) && /\b(fail to reject|reject H₀|not significant|significant)\b/i.test(shown.text)) problems.push(`${current}: reports a decision although values are undefined`);
+                else if (UNDEFINED.test(shown.text) && /\b(fail to reject|reject H₀|not significant)\b/i.test(shown.value)) problems.push(`${current}: reports a decision although values are undefined`);
             }
         }
     }

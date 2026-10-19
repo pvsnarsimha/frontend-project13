@@ -479,6 +479,11 @@ function setupQQPlotLogic() {
         
         const result = computeQQPlotWithSteps(numbers);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.innerText = "Error";
+            setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
+            return;
+        }
         setHtml(valueSpan, `📈 Q-Q Plot | n = ${result.n} | Correlation = ${result.correlation.toFixed(4)} | ${Math.abs(result.correlation) > 0.98 ? 'Normal' : (Math.abs(result.correlation) > 0.95 ? 'Mild deviation' : 'Non-normal')}`);
         setHtml(stepsSpan, result.steps);
         

@@ -427,6 +427,11 @@ function setupPPPlotLogic() {
         
         const result = computePPPlotWithSteps(numbers, distType);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.innerText = "Error";
+            setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
+            return;
+        }
         setHtml(valueSpan, `📊 P-P Plot | n = ${result.n} | Correlation = ${result.correlation.toFixed(4)} | ${Math.abs(result.correlation) > 0.98 ? 'Good fit' : (Math.abs(result.correlation) > 0.95 ? 'Mild deviation' : 'Poor fit')}`);
         setHtml(stepsSpan, result.steps);
         
