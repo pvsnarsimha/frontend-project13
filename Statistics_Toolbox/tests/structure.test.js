@@ -196,7 +196,7 @@ test('no duplicate canvas ids: a tool puts its chart canvas in exactly one place
 });
 
 test('the boxplot plugin is registered per chart, never globally', () => {
-    const src = fs.readFileSync(path.join(ROOT, 'js/tools/preparation/boxplot.js'), 'utf8');
+    const src = fs.readFileSync(path.join(ROOT, 'js/tools/preparation/boxplot-chart.js'), 'utf8');
     assert.ok(!/Chart\.register\(/.test(src), 'no global Chart.register');
     assert.match(src, /plugins:\s*\[boxplotPlugin\]/);
 });
@@ -250,10 +250,20 @@ test('migrated tools carry no inline styles and every class they use is defined 
     const defined = new Set([...css.matchAll(/#interfaceRoot \.([\w-]+)/g)].map(m => m[1]));
     assert.ok(html.includes('css/tool-panels.css'), 'Statistics.html must load css/tool-panels.css');
     for (const tool of MIGRATED_TOOLS) {
-        const src = fs.readFileSync(path.join(ROOT, 'js', 'tools', tool + '.js'), 'utf8');
-        assert.ok(!/\sstyle\s*=/.test(src), `${tool}.js still has an inline style attribute`);
+        // a tool may be split into <tool>.js (interface, calculation, setup) and <tool>-steps.js (worked-solution HTML)
+        const src = ['.js', '-steps.js'].map(ext => path.join(ROOT, 'js', 'tools', tool + ext)).filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8')).join('\n');
+        assert.ok(!/\sstyle\s*=/.test(src), `${tool} still has an inline style attribute`);
         const used = [...src.matchAll(/\b(s-[0-9a-f]{6})\b/g)].map(m => m[1]).concat([...src.matchAll(/'(tp-[\w-]+)'/g)].map(m => m[1]));
         const missing = used.filter(c => !defined.has(c));
         assert.deepEqual(missing, [], `${tool}.js uses classes with no CSS rule`);
+    }
+});
+
+test('split tools keep the calculation and the worked-solution HTML in separate files', () => {
+    for (const tool of ['hypothesis/levene', 'hypothesis/bartlett', 'hypothesis/bonferroni', 'hypothesis/scheffe', 'correlation/cooks-distance', 'preparation/boxplot']) {
+        const main = fs.readFileSync(path.join(ROOT, 'js', 'tools', tool + '.js'), 'utf8');
+        const steps = fs.readFileSync(path.join(ROOT, 'js', 'tools', tool + '-steps.js'), 'utf8');
+        assert.match(main, /stepsHtml[A-Z]\w*\(\{/, `${tool}.js should call its stepsHtml function`);
+        assert.match(steps, /^function stepsHtml[A-Z]\w*\(scope\)/m);
     }
 });
