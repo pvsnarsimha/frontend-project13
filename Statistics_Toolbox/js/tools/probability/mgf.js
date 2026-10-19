@@ -89,41 +89,7 @@ function setupMGFLogic() {
 }
 
 function updateMGFParams() {
-    const dist = document.getElementById('mgfDistribution').value;
-    const paramsDiv = document.getElementById('mgfParams');
-    
-    if (dist === 'normal') {
-        setHtml(paramsDiv, `
-            <label>📊 Mean (μ):</label>
-            <input type="number" id="mgfMean" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Standard Deviation (σ):</label>
-            <input type="number" id="mgfStd" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'exponential') {
-        setHtml(paramsDiv, `
-            <label>📊 Rate (λ):</label>
-            <input type="number" id="mgfRate" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'uniform') {
-        setHtml(paramsDiv, `
-            <label>📊 Minimum (a):</label>
-            <input type="number" id="mgfMin" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Maximum (b):</label>
-            <input type="number" id="mgfMax" value="1" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'poisson') {
-        setHtml(paramsDiv, `
-            <label>📊 Lambda (λ):</label>
-            <input type="number" id="mgfLambda" value="3" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'binomial') {
-        setHtml(paramsDiv, `
-            <label>📊 Number of trials (n):</label>
-            <input type="number" id="mgfN" value="10" step="1" min="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Probability of success (p):</label>
-            <input type="number" id="mgfP" value="0.5" step="0.1" min="0" max="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    }
+    showDistributionParams('mgf');
 }
 
 // ========== MGF COMPUTATION - DETAILED ==========

@@ -204,10 +204,6 @@ function visualizeCurrentData() {
         alert('Please select a statistical measure and enter data first!');
         return;
     }
-    if (typeof Chart === 'undefined') {
-        alert('Charts need the Chart.js library, which could not be loaded. Check your internet connection and reload the page.');
-        return;
-    }
     const numbers = parseNumbersFromInput(textarea.value);
     if (numbers.length > 0) visualizeData(numbers, currentStat || 'mean');
     else alert('Please enter numeric data in the active calculator first!');

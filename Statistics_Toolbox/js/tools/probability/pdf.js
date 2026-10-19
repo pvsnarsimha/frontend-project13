@@ -41,36 +41,7 @@ function exponentialPDF(x, rate = 1) {
 
 // Dynamic parameter UI generators
 function updatePDFParams() {
-    const dist = document.getElementById('pdfDistribution').value;
-    const paramsDiv = document.getElementById('pdfParams');
-    
-    if (dist === 'normal') {
-        setHtml(paramsDiv, `
-            <label>📊 Mean (μ):</label>
-            <input type="number" id="pdfMean" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Standard Deviation (σ):</label>
-            <input type="number" id="pdfStd" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'uniform') {
-        setHtml(paramsDiv, `
-            <label>📊 Minimum (a):</label>
-            <input type="number" id="pdfMin" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Maximum (b):</label>
-            <input type="number" id="pdfMax" value="1" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'exponential') {
-        setHtml(paramsDiv, `
-            <label>📊 Rate (λ):</label>
-            <input type="number" id="pdfRate" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'beta') {
-        setHtml(paramsDiv, `
-            <label>📊 Alpha (α):</label>
-            <input type="number" id="pdfAlpha" value="2" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Beta (β):</label>
-            <input type="number" id="pdfBeta" value="5" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    }
+    showDistributionParams('pdf');
 }
 
 // Main PDF computation

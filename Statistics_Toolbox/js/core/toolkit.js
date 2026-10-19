@@ -76,6 +76,32 @@ const HINT_STYLE = "font-size: 0.75rem; margin-top: 5px;";
 const CARD_GAP = "margin-top: 8px;";
 const DISTRIBUTION_OPTIONS = [ ["normal", "Normal Distribution"], ["uniform", "Uniform Distribution"], ["exponential", "Exponential Distribution"], ["beta", "Beta Distribution"] ];
 const DISTRIBUTION_OPTIONS_2 = [ ["normal", "Normal Distribution"], ["exponential", "Exponential Distribution"], ["uniform", "Uniform Distribution"], ["beta", "Beta Distribution"], ["poisson", "Poisson Distribution (Discrete)"], ["binomial", "Binomial Distribution (Discrete)"] ];
+// Parameter fields of the probability distributions, shared by every tool that asks for them (pdf, cdf, quantile, random,
+// expected value, mgf, entropy, variance, skewness, kurtosis). Each entry is [id suffix, label, default, extra attributes];
+// a tool's input ids are its prefix + suffix (prefix "pdf" -> pdfMean, pdfStd, ...).
+const DISTRIBUTION_PARAMS = {
+    normal: [['Mean', 'Mean (μ)', 0, 'step="any"'], ['Std', 'Standard Deviation (σ)', 1, 'step="any" min="0.01"']],
+    uniform: [['Min', 'Minimum (a)', 0, 'step="any"'], ['Max', 'Maximum (b)', 1, 'step="any"']],
+    exponential: [['Rate', 'Rate (λ)', 1, 'step="any" min="0.01"']],
+    beta: [['Alpha', 'Alpha (α)', 2, 'step="any" min="0.01"'], ['Beta', 'Beta (β)', 5, 'step="any" min="0.01"']],
+    poisson: [['Lambda', 'Lambda (λ)', 3, 'step="any" min="0.01"']],
+    binomial: [['N', 'Number of trials (n)', 10, 'step="1" min="1"'], ['P', 'Probability of success (p)', 0.5, 'step="0.1" min="0" max="1"']]
+};
+const DISTRIBUTION_PARAM_STYLE = "width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;";
+
+// Fills <prefix>Params with the fields of the distribution chosen in <prefix>Distribution.
+//   skip   id suffixes to leave out (a tool that does not need the mean, say)
+//   notes  { distribution: text } shown under the fields in a "desc" box
+function showDistributionParams(prefix, { skip = [], notes = {} } = {}) {
+    const dist = document.getElementById(prefix + 'Distribution').value;
+    const fields = DISTRIBUTION_PARAMS[dist];
+    if (!fields) return;
+    const inputs = fields.filter(([suffix]) => !skip.includes(suffix)).map(([suffix, label, value, attrs]) =>
+        `<label>📊 ${label}:</label>\n<input type="number" id="${prefix}${suffix}" value="${value}" ${attrs} style="${DISTRIBUTION_PARAM_STYLE}">`).join('\n');
+    const note = notes[dist] ? `<div class="desc">${notes[dist]}</div>` : '';
+    setHtml(document.getElementById(prefix + 'Params'), inputs + note);
+}
+
 const ALPHA_OPTIONS = [ ["0.10", "α = 0.10 (90% Confidence)"], ["0.05", "α = 0.05 (95% Confidence) - Standard", true], ["0.01", "α = 0.01 (99% Confidence)"] ];
 const ALPHA_OPTIONS_2 = [ ["0.10", "α = 0.10 (90% Confidence Level)"], ["0.05", "α = 0.05 (95% Confidence Level) - Standard", true], ["0.01", "α = 0.01 (99% Confidence Level)"] ];
 const ALPHA_OPTIONS_3 = [ ["0.10", "α = 0.10 (90% Confidence)"], ["0.05", "α = 0.05 (95% Confidence)", true], ["0.01", "α = 0.01 (99% Confidence)"] ];

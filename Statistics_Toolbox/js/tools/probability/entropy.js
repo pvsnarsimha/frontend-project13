@@ -34,49 +34,14 @@ function renderEntropyInterface() {
 
 // ========== ENTROPY COMPUTATION FUNCTIONS ==========
 function updateEntropyParams() {
-    const dist = document.getElementById('entropyDistribution').value;
-    const paramsDiv = document.getElementById('entropyParams');
-    
-    if (dist === 'normal') {
-        setHtml(paramsDiv, `
-            <label>📊 Standard Deviation (σ):</label>
-            <input type="number" id="entropyStd" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <div class="desc">Entropy for Normal: H = ln(σ√(2πe))</div>
-        `);
-    } else if (dist === 'exponential') {
-        setHtml(paramsDiv, `
-            <label>📊 Rate (λ):</label>
-            <input type="number" id="entropyRate" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <div class="desc">Entropy for Exponential: H = 1 - ln(λ)</div>
-        `);
-    } else if (dist === 'uniform') {
-        setHtml(paramsDiv, `
-            <label>📊 Minimum (a):</label>
-            <input type="number" id="entropyMin" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Maximum (b):</label>
-            <input type="number" id="entropyMax" value="1" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <div class="desc">Entropy for Uniform: H = ln(b-a)</div>
-        `);
-    } else if (dist === 'beta') {
-        setHtml(paramsDiv, `
-            <label>📊 Alpha (α):</label>
-            <input type="number" id="entropyAlpha" value="2" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Beta (β):</label>
-            <input type="number" id="entropyBeta" value="5" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'poisson') {
-        setHtml(paramsDiv, `
-            <label>📊 Lambda (λ):</label>
-            <input type="number" id="entropyLambda" value="3" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    } else if (dist === 'binomial') {
-        setHtml(paramsDiv, `
-            <label>📊 Number of trials (n):</label>
-            <input type="number" id="entropyN" value="10" step="1" min="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Probability of success (p):</label>
-            <input type="number" id="entropyP" value="0.5" step="0.1" min="0" max="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-        `);
-    }
+    showDistributionParams('entropy', {
+        skip: ['Mean'],
+        notes: {
+            normal: 'Entropy for Normal: H = ln(σ√(2πe))',
+            exponential: 'Entropy for Exponential: H = 1 - ln(λ)',
+            uniform: 'Entropy for Uniform: H = ln(b-a)'
+        }
+    });
 }
 
 function computeEntropyWithSteps(distType, params) {

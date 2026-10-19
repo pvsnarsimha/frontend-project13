@@ -33,30 +33,13 @@ function renderDistKurtosisInterface() {
 
 // ========== DISTRIBUTION KURTOSIS COMPUTATION ==========
 function updateDistKurtosisParams() {
-    const dist = document.getElementById('distKurtosisDistribution').value;
-    const paramsDiv = document.getElementById('distKurtosisParams');
-    
-    if (dist === 'normal') {
-        setHtml(paramsDiv, `<div class="desc">Normal distribution excess kurtosis = 0 (mesokurtic)</div>`);
-    } else if (dist === 'exponential') {
-        setHtml(paramsDiv, `<label>📊 Rate (λ):</label>
-            <input type="number" id="distKurtosisRate" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">`);
-    } else if (dist === 'uniform') {
-        setHtml(paramsDiv, `<div class="desc">Uniform distribution excess kurtosis = -1.2 (platykurtic)</div>`);
-    } else if (dist === 'beta') {
-        setHtml(paramsDiv, `<label>📊 Alpha (α):</label>
-            <input type="number" id="distKurtosisAlpha" value="2" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Beta (β):</label>
-            <input type="number" id="distKurtosisBeta" value="5" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">`);
-    } else if (dist === 'poisson') {
-        setHtml(paramsDiv, `<label>📊 Lambda (λ):</label>
-            <input type="number" id="distKurtosisLambda" value="3" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">`);
-    } else if (dist === 'binomial') {
-        setHtml(paramsDiv, `<label>📊 Number of trials (n):</label>
-            <input type="number" id="distKurtosisN" value="10" step="1" min="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <label>📊 Probability of success (p):</label>
-            <input type="number" id="distKurtosisP" value="0.5" step="0.1" min="0" max="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">`);
-    }
+    showDistributionParams('distKurtosis', {
+        skip: ['Mean', 'Std', 'Min', 'Max'],
+        notes: {
+            normal: 'Normal distribution excess kurtosis = 0 (mesokurtic)',
+            uniform: 'Uniform distribution excess kurtosis = -1.2 (platykurtic)'
+        }
+    });
 }
 
 function computeDistKurtosisWithSteps(distType, params) {

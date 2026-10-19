@@ -255,3 +255,83 @@ test('generated markup is balanced: tables built by correlation tools are closed
     assert.equal(count(cv.steps, /<table/g), count(cv.steps, /<\/table>/g));
     assert.ok(!/[^<]\/table>/.test(cv.steps));
 });
+
+// Reference values for the next four tests come from independent implementations of the textbook formulas (pure
+// Python), not from this code: Pearson r with a 0/1 variable, double-centred distance matrices, equal-width binning
+// with log2, and the DW sum-of-squares definition.
+test('point-biserial correlation equals Pearson r with the 0/1 variable', () => {
+    const b = [0, 1, 0, 1, 1, 0, 0, 1];
+    const r = app.computePointBiserialWithSteps(X, b);
+    close(r.r_pb, 0.7844050370414015, 1e-12);
+    close(r.r_pb, app.computePearsonWithSteps(X, b).r, 1e-12);
+    close(app.computePointBiserialWithSteps(X, b.map(v => 1 - v)).r_pb, -0.7844050370414015, 1e-12);   // swapping the labels flips the sign
+    assert.equal(app.computePointBiserialWithSteps(X, [1, 1, 1, 1, 1, 1, 1, 1]).error, true);          // no 0s
+    assert.equal(app.computePointBiserialWithSteps(X, [0, 1, 2, 1, 0, 1, 0, 1]).error, true);          // not binary
+});
+
+test('distance correlation: reference value, detects a non-linear relation, bounded by [0, 1]', () => {
+    const r = app.computeDistanceCorrelationWithSteps(X, Y);
+    close(r.dCor, 0.9537055874760738, 1e-12);
+    const sq = app.computeDistanceCorrelationWithSteps([-3, -2, -1, 0, 1, 2, 3], [9, 4, 1, 0, 1, 4, 9]);
+    close(sq.dCor, 0.5053197494397452, 1e-12);
+    close(sq.pearsonR, 0, 1e-12);                       // Pearson sees nothing in y = x², distance correlation does
+    const perfect = app.computeDistanceCorrelationWithSteps([1, 2, 3, 4, 5], [10, 20, 30, 40, 50]);
+    close(perfect.dCor, 1, 1e-12);
+    assert.equal(app.computeDistanceCorrelationWithSteps([1, 1, 1, 1], [1, 2, 3, 4]).error, true);    // zero distance variance
+});
+
+test('mutual information: reference value, perfect dependence = 1 bit, independence = 0', () => {
+    const r = app.computeMutualInfoWithSteps(X, Y, 3);
+    close(r.mi, 1.2169171866886992, 1e-12);
+    close(r.entropyX, 1.561278124459133, 1e-12);
+    close(r.entropyY, 1.561278124459133, 1e-12);
+    close(r.jointEntropy, 1.9056390622295665, 1e-12);
+    close(r.nmi, 0.7794365191085161, 1e-12);
+    close(r.mi, r.entropyX + r.entropyY - r.jointEntropy, 1e-12);     // I(X;Y) = H(X) + H(Y) - H(X,Y)
+    const line = [1, 2, 3, 4, 5, 6, 7, 8];
+    const dep = app.computeMutualInfoWithSteps(line, line, 2);
+    close(dep.mi, 1, 1e-12);
+    close(dep.nmi, 1, 1e-12);
+    const indep = app.computeMutualInfoWithSteps([1, 1, 2, 2, 1, 1, 2, 2], [1, 2, 1, 2, 1, 2, 1, 2], 2);
+    close(indep.mi, 0, 1e-12);
+});
+
+test('Durbin-Watson statistic: reference value and the 0 / 2 / 4 landmarks', () => {
+    const r = app.computeDurbinWatson([0.5, -0.3, 0.8, -1.1, 0.2, 0.9, -0.4, 0.1]);
+    close(r.durbinWatson, 2.9844236760124607, 1e-12);
+    close(r.numerator, 9.58, 1e-12);
+    close(r.denominator, 3.21, 1e-12);
+    close(app.computeDurbinWatson([1, -1, 1, -1]).durbinWatson, 3, 1e-12);       // 12 / 4: alternating signs push towards 4
+    close(app.computeDurbinWatson([1, 1, 1, 1]).durbinWatson, 0, 1e-12);         // no change between neighbours: 0
+    assert.equal(app.computeDurbinWatson([1]).error, true);
+});
+
+test('MANOVA never returns a statistic built on non-positive denominator degrees of freedom', () => {
+    // Every small design either fails with a message or yields a finite F and p; never NaN or a p-value from df2 <= 0
+    for (let p = 2; p <= 4; p++) for (let k = 2; k <= 3; k++) for (let per = 2; per <= 4; per++) {
+        const rows = [];
+        for (let g = 0; g < k; g++) for (let i = 0; i < per; i++)
+            rows.push([`G${g}`, ...Array.from({ length: p }, (_, j) => (g * 2 + ((i * (j + 3) * 7 + j * j) % 5) + i * 0.37 * (j + 1)).toFixed(2))].join(', '));
+        const r = app.computeMANOVA(rows.join('\n'), 0.05);
+        const label = `p=${p} k=${k} n/group=${per}`;
+        if (r.error) assert.equal(typeof r.message, 'string', label);
+        else {
+            assert.ok(r.df2 > 0, `${label}: df2=${r.df2}`);
+            assert.ok(Number.isFinite(r.fStatistic) && r.pValue >= 0 && r.pValue <= 1, label);
+        }
+    }
+});
+
+test('Box-Cox is continuous at λ = 0: tiny λ agrees with ln(x), and the optimiser works for data whose best λ is ≈ 0', () => {
+    const x = [1.2, 2.3, 2.9, 4.1, 5.5, 7.8, 12.1, 20.4, 33.0, 60.2];
+    const logs = x.map(Math.log);
+    for (const lam of [0, 1e-12, 1e-9, 1e-7, 1e-5, -1e-7]) {
+        const t = app.computeBoxCoxWithSteps(x, 'custom', lam).transformed;
+        t.forEach((v, i) => close(v, logs[i] + lam * logs[i] * logs[i] / 2, 1e-6, `λ=${lam}, x=${x[i]}`));   // (x^λ-1)/λ ≈ ln x + λ (ln x)²/2
+    }
+    // lognormal-like data: the profile likelihood peaks very close to 0, and must be found without noise from cancellation
+    const lognormal = [0.5, 0.8, 1, 1.3, 2, 2.7, 3.3, 4.9, 7.4, 11, 20];
+    const r = app.computeBoxCoxWithSteps(lognormal, 'optimal');
+    assert.ok(Math.abs(r.lambda) < 0.5, `λ=${r.lambda}`);
+    assert.ok(r.transformed.every(Number.isFinite));
+});

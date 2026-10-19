@@ -297,6 +297,7 @@ function computeViolinWithSteps(numbers, bandwidth) {
 }
 
 function renderViolinChart(stats, numbers, bandwidth) {
+    if (!chartJsReady(renderViolinChart, arguments)) return;
     const canvas = document.getElementById('violinChartCanvas');
     if (!canvas) return;
     labelChart(canvas, `Violin plot of ${describeSample(numbers)}. Quartiles: Q1 ${+stats.q1.toFixed(3)}, median ${+stats.median.toFixed(3)}, Q3 ${+stats.q3.toFixed(3)}; kernel density with bandwidth ${bandwidth}.`);

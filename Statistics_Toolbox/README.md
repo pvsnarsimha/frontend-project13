@@ -2,7 +2,7 @@
 
 An interactive statistics workbench: paste data, pick one of 99 techniques, and get the result, the formula,
 a full worked solution and a chart. It is a static site with **no build step**: open `Statistics.html` in a
-browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offline).
+browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offline; Chart.js is only loaded when the first chart is drawn).
 
 ## Layout
 
@@ -16,7 +16,7 @@ js/core/numerics.js        Special functions, CDFs and exact critical values (no
                            matrix helpers (multiplyMatrices, inverseMatrix, transposeMatrix, olsRSquared, computeEigenvalues).
                            Single source of truth: tools never carry their own copy.
 js/core/toolkit.js         buildInterface(), defineListTool(), setHtml() (sanitised HTML insertion), escapeHtml()
-js/core/charts.js          One variable per plotting tool for its Chart.js instance, labelChart() (accessible chart names)
+js/core/charts.js          One variable per plotting tool for its Chart.js instance, lazy loading of Chart.js, labelChart() (accessible chart names)
                            and the shared canvas hover tooltip
 js/core/helpers.js         Input parsing and helpers shared by several tools
 js/tools/<module>/*.js     One file per tool (about 100): renderXInterface(), computeX(), setupXLogic()
@@ -86,6 +86,10 @@ Rules for all tools:
   lives in the worked solution only: one canvas id per page.
 * Each plotting tool keeps its Chart.js instance in a module-level `let ...Chart = null;`. Add the variable to
   `destroyAllCharts()` in `js/app.js` (a test fails if you forget).
+* Chart.js is not a `<script>` tag: `vendor/chart.umd.js` is fetched on the first chart. Start every chart-drawing function with
+  `if (!chartJsReady(thisFunction, arguments)) return;`, which loads the library and then calls the function again.
+* Probability tools that ask for distribution parameters call `showDistributionParams('prefix')` from their `updateXParams()`
+  (fields live in `DISTRIBUTION_PARAMS` in `core/toolkit.js`; inputs get the ids `prefixMean`, `prefixStd`, `prefixRate`, ...).
 
 ## Design notes
 
@@ -169,13 +173,14 @@ npm run test:all    # both
 * `.github/workflows/ci.yml` runs the unit tests on Node 18/20/22 and the browser test on every pull request
 * `tests/e2e/edge-cases.js`: every tool with one value, identical values, zeros, negatives and huge numbers: no freeze, no script error, and any NaN/Infinity comes with an explanation
 * `tests/e2e/responsive.js`: no tool makes the page scroll sideways at 360 px and 768 px
+* `tests/e2e/lazy-chartjs.js`: Chart.js is not fetched at page load, is fetched once on the first chart, and a failed fetch shows a message and can be retried
 * `tests/e2e/smoke.js`: every tool opens, sample data produces a result with no NaN/undefined, no script or console errors
 * `tests/e2e/sample.js`: sample data + Calculate for every tool: no NaN/Infinity, no entity debris in the sample, an "Answer:" label, an `aria-live` solution, no duplicate ids, labelled charts, a labelled tab panel
 * `tests/numerics.test.js`: special functions and critical values against SciPy reference values
 * `tests/calculations.test.js`: whole tests (t, ANOVA, ANCOVA, MANOVA, Tukey, Shapiro-Wilk, ...) against SciPy/NumPy
 * `tests/toolkit-and-safety.test.js`: toolkit behaviour, HTML escaping, CSP / no inline handlers, chart cleanup
 * `tests/parsing-and-ui.test.js`: input parsing edge cases, `parseSolution`, larger-sample normality tests
-* `tests/structure.test.js`: no duplicate function definitions, every function lives in the file that names it, every script parses,
+* `tests/structure.test.js`: no duplicate function definitions or top-level `const`/`let`/`class` names, every function lives in the file that names it, every script parses,
   no mangled closing tags or unterminated attributes, rendered interfaces are balanced, every button has a route and vice versa,
   rendered interfaces have unique ids, accessibility basics of the page shell
 

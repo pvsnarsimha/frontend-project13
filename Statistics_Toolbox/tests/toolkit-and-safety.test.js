@@ -166,3 +166,37 @@ test('stripEventHandlerAttributes removes on* attributes from tags but leaves te
     assert.equal(strip('<td data-one="1" style="color:red">a</td>'), '<td data-one="1" style="color:red">a</td>');
     assert.equal(strip('<b>bold</b> & more'), '<b>bold</b> & more');
 });
+
+test('showDistributionParams: every field it generates is read back by the tool that asked for it', () => {
+    const tools = {   // prefix -> [file, distributions its drop-down offers]
+        pdf: ['pdf', ['normal', 'uniform', 'exponential', 'beta']], cdf: ['cdf', ['normal', 'uniform', 'exponential', 'beta']],
+        quantile: ['quantile', ['normal', 'uniform', 'exponential', 'beta']], random: ['random', ['normal', 'uniform', 'exponential', 'beta']],
+        expected: ['expected-value', ['normal', 'exponential', 'uniform', 'beta', 'poisson', 'binomial']],
+        mgf: ['mgf', ['normal', 'exponential', 'uniform', 'poisson', 'binomial']],
+        entropy: ['entropy', ['normal', 'exponential', 'uniform', 'beta', 'poisson', 'binomial']],
+        varianceDist: ['distribution-variance', ['normal', 'exponential', 'uniform', 'beta', 'poisson', 'binomial']],
+        distSkewness: ['dist-skewness', ['exponential', 'beta', 'poisson', 'binomial']],
+        distKurtosis: ['dist-kurtosis', ['exponential', 'beta', 'poisson', 'binomial']]
+    };
+    const skipped = { entropy: ['Mean'], varianceDist: ['Mean'], distSkewness: ['Mean', 'Std', 'Min', 'Max'], distKurtosis: ['Mean', 'Std', 'Min', 'Max'] };   // fields these tools do not need
+    const els = {};
+    const el = id => (els[id] = els[id] || { value: '', html: '' });
+    const probe = loadApp();
+    require('vm').runInContext('setHtml = function (e, h) { e.html = h; }', probe);
+    probe.document.getElementById = el;
+    for (const [prefix, [file, dists]] of Object.entries(tools)) {
+        const src = fs.readFileSync(path.join(ROOT, 'js/tools/probability', file + '.js'), 'utf8');
+        for (const dist of dists) {
+            el(prefix + 'Distribution').value = dist;
+            probe.showDistributionParams(prefix, { skip: skipped[prefix] || [] });
+            const ids = [...el(prefix + 'Params').html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
+            assert.ok(ids.length > 0, `${prefix}/${dist}: no fields`);
+            for (const id of ids) assert.ok(src.includes(id), `${prefix}/${dist}: nothing in ${file}.js reads ${id}`);
+        }
+    }
+    // an unknown distribution leaves the form alone rather than blanking it
+    el('pdfDistribution').value = 'weibull';
+    el('pdfParams').html = 'kept';
+    probe.showDistributionParams('pdf');
+    assert.equal(el('pdfParams').html, 'kept');
+});
