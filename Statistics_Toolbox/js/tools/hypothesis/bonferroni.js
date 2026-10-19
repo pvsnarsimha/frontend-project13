@@ -137,170 +137,170 @@ function computeBonferroniCorrection(inputText, alpha) {
     }
     
     // Build comprehensive HTML output
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6;">
+    let steps = `<div class="s-8f7049">
         
         <!-- HEADER SECTION -->
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 30px;">
-            <h1 style="margin: 0 0 10px 0;">✏️ Bonferroni Correction</h1>
-            <p style="margin: 0; opacity: 0.95; font-size: 16px;">Adjusting Significance Levels for Multiple Comparisons</p>
-            <div style="margin-top: 15px; background: rgba(255,255,255,0.15); padding: 12px; border-radius: 12px; font-family: monospace; font-size: 14px;">
+        <div class="s-93ccd1 gen-pad">
+            <h1 class="s-6b0f3f">✏️ Bonferroni Correction</h1>
+            <p class="s-6b9200">Adjusting Significance Levels for Multiple Comparisons</p>
+            <div class="s-7b320b">
                 <strong>📐 Formula:</strong> α<sub>adjusted</sub> = α / m &nbsp;&nbsp;|&nbsp;&nbsp; m = number of comparisons
             </div>
         </div>
         
         <!-- 📚 CONCEPT EXPLANATION -->
-        <div style="background: linear-gradient(135deg, #f0f4fa 0%, #e8eef5 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📚 What is the Bonferroni Correction?</h2>
+        <div class="s-23f289 gen-pad">
+            <h2 class="s-404196">📚 What is the Bonferroni Correction?</h2>
             
-            <div style="background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">🎯 The Multiple Comparisons Problem</h3>
+            <div class="s-b11199 gen-pad">
+                <h3 class="s-ece993">🎯 The Multiple Comparisons Problem</h3>
                 <p>When you perform multiple statistical tests, the chance of making a <strong>Type I error (false positive)</strong> increases dramatically.</p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                <div class="s-279259">
                     <strong>Example:</strong> If you perform 10 independent tests each at α = 0.05:<br>
-                    Probability of at least one false positive = 1 - (0.95)¹⁰ ≈ <strong style="color: #dc3545;">40%!</strong>
+                    Probability of at least one false positive = 1 - (0.95)¹⁰ ≈ <strong class="s-e03571">40%!</strong>
                 </div>
-                <div style="background: #e8f4f8; padding: 12px; border-radius: 10px;">
+                <div class="s-91ec11">
                     💡 <strong>Analogy:</strong> It's like buying 10 lottery tickets instead of 1 — your chance of winning (or making a false discovery) increases with each test!
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 15px; padding: 20px;">
-                <h3 style="color: #1a5490;">🔬 How the Bonferroni Correction Works</h3>
+            <div class="s-c25532 gen-pad">
+                <h3 class="s-ece993">🔬 How the Bonferroni Correction Works</h3>
                 <p>The Bonferroni correction divides the original significance level (α) by the number of comparisons (m):</p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; margin: 15px 0;">
+                <div class="s-d68a27">
                     <strong>α<sub>adjusted</sub> = α / m</strong>
                 </div>
                 <p>This ensures that the <strong>family-wise error rate</strong> (probability of making at least one Type I error across all tests) ≤ α.</p>
-                <div style="margin-top: 12px; background: #fff3cd; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-35834d">
                     ⚠️ <strong>Trade-off:</strong> The correction is conservative — it reduces false positives but increases the risk of false negatives (Type II errors).
                 </div>
             </div>
         </div>
         
         <!-- 📊 STEP 1: INPUT DATA -->
-        <div style="background: #f8f9fa; border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📋 Step 1: Input Data Summary</h2>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden;">
-                    <thead><tr style="background: #1a5490; color: white;">
-                        <th style="padding: 12px;">Group</th>
-                        <th style="padding: 12px;">n</th>
-                        <th style="padding: 12px;">Σx</th>
-                        <th style="padding: 12px;">Mean (x̄)</th>
-                        <th style="padding: 12px;">Variance (s²)</th>
-                        <th style="padding: 12px;">Values</th>
+        <div class="s-6b30cb gen-pad">
+            <h2 class="s-404196">📋 Step 1: Input Data Summary</h2>
+            <div class="s-74082b">
+                <table class="s-2b65ac gen-sized">
+                    <thead><tr class="s-0fb8dc">
+                        <th class="s-92407c">Group</th>
+                        <th class="s-92407c">n</th>
+                        <th class="s-92407c">Σx</th>
+                        <th class="s-92407c">Mean (x̄)</th>
+                        <th class="s-92407c">Variance (s²)</th>
+                        <th class="s-92407c">Values</th>
                     </tr></thead>
                     <tbody>
                         ${groupData.map(g => `
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 10px; text-align: center; font-weight: bold;">${g.group}</td>
-                            <td style="padding: 10px; text-align: center;">${g.n}</td>
-                            <td style="padding: 10px; text-align: center;">${g.sum}</td>
-                            <td style="padding: 10px; text-align: center; background: #e8f4f8; font-weight: bold;">${g.mean.toFixed(4)}</td>
-                            <td style="padding: 10px; text-align: center;">${g.variance.toFixed(4)}</td>
-                            <td style="padding: 10px;">${g.values.join(', ')}</td>
+                        <tr class="s-0d2692">
+                            <td class="s-4370aa">${g.group}</td>
+                            <td class="s-9da549">${g.n}</td>
+                            <td class="s-9da549">${g.sum}</td>
+                            <td class="s-99614e">${g.mean.toFixed(4)}</td>
+                            <td class="s-9da549">${g.variance.toFixed(4)}</td>
+                            <td class="s-828f53">${g.values.join(', ')}</td>
                         </tr>
                         `).join('')}
                     </tbody>
                 </table>
             </div>
-            <div style="margin-top: 15px; background: #e8f4f8; padding: 12px; border-radius: 10px;">
+            <div class="s-ffb54b">
                 <strong>📌 Summary:</strong> Total observations (N) = ${totalN} | Number of groups (k) = ${k} | Number of pairwise comparisons (m) = ${m}
             </div>
         </div>
         
         <!-- 🔢 STEP 2: CALCULATE POOLED VARIANCE -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">🔢 Step 2: Calculate Pooled Variance (s²<sub>pooled</sub>)</h2>
+        <div class="s-e28085 gen-pad">
+            <h2 class="s-404196">🔢 Step 2: Calculate Pooled Variance (s²<sub>pooled</sub>)</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <div class="s-faa287 gen-pad">
+                <div class="s-8dc3df">
                     <strong>Formula:</strong> s²<sub>pooled</sub> = Σ(xᵢⱼ - x̄ⱼ)² / (N - k)
                 </div>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <div class="s-c53f8e">
                     <strong>Step 2a: Calculate Sum of Squared Deviations Within Groups</strong>
                     ${ssWithinDetails.join('<br>')}
-                    <div style="margin-top: 10px;"><strong>Σ(xᵢⱼ - x̄ⱼ)² = ${ssWithin.toFixed(4)}</strong></div>
+                    <div class="s-bf36e2"><strong>Σ(xᵢⱼ - x̄ⱼ)² = ${ssWithin.toFixed(4)}</strong></div>
                 </div>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <div class="s-9c0ea3">
                     <strong>Step 2b: Calculate Pooled Variance</strong><br>
                     s²<sub>pooled</sub> = ${ssWithin.toFixed(4)} / (${totalN} - ${k}) = ${ssWithin.toFixed(4)} / ${dfWithin}<br>
-                    <strong style="color: #1a5490; font-size: 18px;">s²<sub>pooled</sub> = ${pooledVar.toFixed(6)}</strong><br>
+                    <strong class="s-c86f47">s²<sub>pooled</sub> = ${pooledVar.toFixed(6)}</strong><br>
                     s<sub>pooled</sub> = √${pooledVar.toFixed(6)} = ${pooledStd.toFixed(6)}
                 </div>
                 
-                <div style="margin-top: 12px; background: #d4edda; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-4e6da5">
                     💡 <strong>What is pooled variance?</strong> It's a weighted average of the group variances, assuming the true population variances are equal.
                 </div>
             </div>
         </div>
         
         <!-- 🔢 STEP 3: APPLY BONFERRONI CORRECTION -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">🔢 Step 3: Apply the Bonferroni Correction</h2>
+        <div class="s-e28085 gen-pad">
+            <h2 class="s-404196">🔢 Step 3: Apply the Bonferroni Correction</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <div class="s-faa287 gen-pad">
+                <div class="s-8dc3df">
                     <strong>Formula:</strong> α<sub>adjusted</sub> = α / m
                 </div>
                 
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
-                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 11px; color: #666;">Original α</div>
-                        <div style="font-size: 28px; font-weight: 700;">${alpha}</div>
+                <div class="s-742bba gen-grid gen-grid-many">
+                    <div class="s-9bccbf">
+                        <div class="s-0ff496">Original α</div>
+                        <div class="s-291d2a">${alpha}</div>
                     </div>
-                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 11px; color: #666;">Number of Comparisons (m)</div>
-                        <div style="font-size: 28px; font-weight: 700;">${m}</div>
-                        <div style="font-size: 11px;">= ${k} × (${k}-1) / 2</div>
+                    <div class="s-9bccbf">
+                        <div class="s-0ff496">Number of Comparisons (m)</div>
+                        <div class="s-291d2a">${m}</div>
+                        <div class="s-f6fd06">= ${k} × (${k}-1) / 2</div>
                     </div>
-                    <div style="background: #d4edda; padding: 12px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 11px; color: #155724;">Adjusted α</div>
-                        <div style="font-size: 28px; font-weight: 700; color: #28a745;">${adjustedAlpha.toFixed(6)}</div>
+                    <div class="s-5258ea">
+                        <div class="s-331772">Adjusted α</div>
+                        <div class="s-20161f">${adjustedAlpha.toFixed(6)}</div>
                     </div>
                 </div>
                 
-                <div style="background: #fff3cd; padding: 12px; border-radius: 8px;">
+                <div class="s-c6ba0c">
                     <strong>📖 Interpretation:</strong> Each individual comparison must have p-value &lt; ${adjustedAlpha.toFixed(6)} to be considered statistically significant at family-wise α = ${alpha}.
                 </div>
             </div>
         </div>
         
         <!-- 🔢 STEP 4: PAIRWISE T-TESTS -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">🔢 Step 4: Perform Pairwise t-tests with Bonferroni Correction</h2>
+        <div class="s-e28085 gen-pad">
+            <h2 class="s-404196">🔢 Step 4: Perform Pairwise t-tests with Bonferroni Correction</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px;">
+            <div class="s-e97429 gen-pad">
+                <div class="s-9454cf">
                     <strong>Formula:</strong> t = (x̄₁ - x̄₂) / √[s²<sub>pooled</sub> × (1/n₁ + 1/n₂)]
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
+            <div class="s-96fc5e gen-pad">
+                <table class="s-1b1faa gen-sized">
                     <thead>
-                        <tr style="background: #1a5490; color: white;">
-                            <th style="padding: 10px;">Comparison</th>
-                            <th style="padding: 10px;">Mean Diff</th>
-                            <th style="padding: 10px;">Standard Error</th>
-                            <th style="padding: 10px;">t-statistic</th>
-                            <th style="padding: 10px;">Critical t</th>
-                            <th style="padding: 10px;">p-value</th>
-                            <th style="padding: 10px;">Significant?</th>
+                        <tr class="s-0fb8dc">
+                            <th class="s-828f53">Comparison</th>
+                            <th class="s-828f53">Mean Diff</th>
+                            <th class="s-828f53">Standard Error</th>
+                            <th class="s-828f53">t-statistic</th>
+                            <th class="s-828f53">Critical t</th>
+                            <th class="s-828f53">p-value</th>
+                            <th class="s-828f53">Significant?</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${comparisons.map(c => `
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 10px; font-weight: bold;">${c.group1} vs ${c.group2}</td>
-                            <td style="padding: 10px; text-align: center;">${c.diff.toFixed(4)}</td>
-                            <td style="padding: 10px; text-align: center;">${c.se.toFixed(4)}</td>
-                            <td style="padding: 10px; text-align: center;">${c.tStat.toFixed(4)}</td>
-                            <td style="padding: 10px; text-align: center;">${c.criticalT.toFixed(4)}</td>
-                            <td style="padding: 10px; text-align: center;">${c.pValue.toFixed(6)}</td>
-                            <td style="padding: 10px; text-align: center; color: ${c.significant ? '#28a745' : '#dc3545'}; font-weight: bold;">
+                        <tr class="s-0d2692">
+                            <td class="s-588c6b">${c.group1} vs ${c.group2}</td>
+                            <td class="s-9da549">${c.diff.toFixed(4)}</td>
+                            <td class="s-9da549">${c.se.toFixed(4)}</td>
+                            <td class="s-9da549">${c.tStat.toFixed(4)}</td>
+                            <td class="s-9da549">${c.criticalT.toFixed(4)}</td>
+                            <td class="s-9da549">${c.pValue.toFixed(6)}</td>
+                            <td class="s-4370aa ${c.significant ? 'tp-text-ok' : 'tp-text-bad'}">
                                 ${c.significant ? '✓ Yes' : '✗ No'}
                              </td>
                         </tr>
@@ -309,7 +309,7 @@ function computeBonferroniCorrection(inputText, alpha) {
                 </table>
             </div>
             
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <div class="s-2a0932">
                 <strong>Detailed Calculation for ${comparisons[0]?.group1} vs ${comparisons[0]?.group2}:</strong><br>
                 t = (${comparisons[0]?.mean1.toFixed(4)} - ${comparisons[0]?.mean2.toFixed(4)}) / √[${pooledVar.toFixed(4)} × (1/${comparisons[0]?.n1} + 1/${comparisons[0]?.n2})]<br>
                 t = ${comparisons[0]?.diff.toFixed(4)} / √[${pooledVar.toFixed(4)} × ${(1/comparisons[0]?.n1 + 1/comparisons[0]?.n2).toFixed(4)}]<br>
@@ -318,50 +318,50 @@ function computeBonferroniCorrection(inputText, alpha) {
         </div>
         
         <!-- 📊 STEP 5: RESULTS SUMMARY -->
-        <div style="background: white; border-radius: 20px; margin-bottom: 30px; border: 2px solid #1a5490; overflow-x: auto;">
-            <h2 style="margin: 0; padding: 20px; background: #1a5490; color: white; text-align: center;">📊 Bonferroni Correction Summary</h2>
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-699d6d">
+            <h2 class="s-6d943d gen-pad">📊 Bonferroni Correction Summary</h2>
+            <table class="s-1b1faa gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef;">
-                        <th style="padding: 12px;">Parameter</th>
-                        <th style="padding: 12px;">Value</th>
-                        <th style="padding: 12px;">Explanation</th>
+                    <tr class="s-a9ce51">
+                        <th class="s-92407c">Parameter</th>
+                        <th class="s-92407c">Value</th>
+                        <th class="s-92407c">Explanation</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">Number of groups (k)</td>
-                        <td style="text-align: center;">${k}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">Number of groups (k)</td>
+                        <td class="s-1a6540">${k}</td>
                         <td>Number of categories being compared</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">Number of comparisons (m)</td>
-                        <td style="text-align: center;">${m}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">Number of comparisons (m)</td>
+                        <td class="s-1a6540">${m}</td>
                         <td>Total pairwise comparisons = k(k-1)/2</td>
                      </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">Original α</td>
-                        <td style="text-align: center;">${alpha}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">Original α</td>
+                        <td class="s-1a6540">${alpha}</td>
                         <td>Desired family-wise error rate</td>
                      </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px; font-weight: bold;">Adjusted α</td>
-                        <td style="text-align: center; font-weight: bold; color: #1a5490;">${adjustedAlpha.toFixed(6)}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-eddf4d">Adjusted α</td>
+                        <td class="s-ea245f">${adjustedAlpha.toFixed(6)}</td>
                         <td>α / m = ${alpha} / ${m}</td>
                      </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">Pooled Variance (s²<sub>pooled</sub>)</td>
-                        <td style="text-align: center;">${pooledVar.toFixed(6)}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">Pooled Variance (s²<sub>pooled</sub>)</td>
+                        <td class="s-1a6540">${pooledVar.toFixed(6)}</td>
                         <td>Weighted average of group variances</td>
                      </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">Degrees of Freedom (df)</td>
-                        <td style="text-align: center;">${dfWithin}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">Degrees of Freedom (df)</td>
+                        <td class="s-1a6540">${dfWithin}</td>
                         <td>N - k = ${totalN} - ${k}</td>
                      </tr>
                     <tr>
-                        <td style="padding: 12px;">Significant Comparisons</td>
-                        <td style="text-align: center; font-weight: bold; color: ${comparisons.filter(c => c.significant).length > 0 ? '#28a745' : '#dc3545'};">${comparisons.filter(c => c.significant).length} / ${comparisons.length}</td>
+                        <td class="s-92407c">Significant Comparisons</td>
+                        <td class="s-118507 ${comparisons.filter(c => c.significant).length > 0 ? 'tp-text-ok' : 'tp-text-bad'}">${comparisons.filter(c => c.significant).length} / ${comparisons.length}</td>
                         <td>Comparisons with p-value &lt; ${adjustedAlpha.toFixed(6)}</td>
                      </tr>
                 </tbody>
@@ -369,14 +369,14 @@ function computeBonferroniCorrection(inputText, alpha) {
         </div>
         
         <!-- 📌 CONCLUSION -->
-        <div style="border-radius: 20px; padding: 25px; ${comparisons.some(c => c.significant) ? 'background: #d4edda; border-left: 8px solid #28a745;' : 'background: #f8d7da; border-left: 8px solid #dc3545;'}">
-            <h2 style="margin-top: 0;">📌 Step 5: Conclusion</h2>
+        <div class="s-411b0f gen-pad ${comparisons.some(c => c.significant) ? 'tp-ok-8' : 'tp-bad-8'}">
+            <h2 class="s-ec2386">📌 Step 5: Conclusion</h2>
             
-            <div style="background: rgba(0,0,0,0.05); border-radius: 10px; padding: 20px;">
+            <div class="s-19d20b gen-pad">
                 <h3>Decision Rule:</h3>
                 <p>For each comparison, reject H₀ if p-value &lt; α<sub>adjusted</sub> = ${adjustedAlpha.toFixed(6)}</p>
                 
-                <div style="margin: 15px 0; padding: 12px; background: white; border-radius: 8px;">
+                <div class="s-0021f5">
                     <strong>Final Result:</strong><br>
                     ${comparisons.some(c => c.significant) ? 
                         `✅ <strong>Significant differences detected</strong> after Bonferroni correction.<br>
@@ -385,7 +385,7 @@ function computeBonferroniCorrection(inputText, alpha) {
                         All p-values > ${adjustedAlpha.toFixed(6)}`}
                 </div>
                 
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+                <div class="s-aa70dd">
                     💡 <strong>Practical Interpretation:</strong><br>
                     The Bonferroni correction controls the family-wise error rate at α = ${alpha}. 
                     ${comparisons.some(c => c.significant) ? 
@@ -396,21 +396,21 @@ function computeBonferroniCorrection(inputText, alpha) {
         </div>
         
         <!-- 💡 ADVANTAGES & DISADVANTAGES -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-top: 20px;">
-            <h3 style="color: #1a5490; margin-top: 0;">💡 Pros & Cons of Bonferroni Correction</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div style="background: white; border-radius: 10px; padding: 12px;">
-                    <strong style="color: #28a745;">✅ Advantages:</strong>
-                    <ul style="margin-top: 8px; margin-bottom: 0;">
+        <div class="s-70e41e gen-pad">
+            <h3 class="s-404196">💡 Pros & Cons of Bonferroni Correction</h3>
+            <div class="s-67b192 gen-grid">
+                <div class="s-30cdaa">
+                    <strong class="s-689fb3">✅ Advantages:</strong>
+                    <ul class="s-ed7837">
                         <li>Simple and easy to understand</li>
                         <li>Very conservative — controls Type I error well</li>
                         <li>Works for any number of comparisons</li>
                         <li>Doesn't require equal sample sizes</li>
                     </ul>
                 </div>
-                <div style="background: white; border-radius: 10px; padding: 12px;">
-                    <strong style="color: #dc3545;">❌ Disadvantages:</strong>
-                    <ul style="margin-top: 8px; margin-bottom: 0;">
+                <div class="s-30cdaa">
+                    <strong class="s-e03571">❌ Disadvantages:</strong>
+                    <ul class="s-ed7837">
                         <li>Can be too conservative (increases Type II error)</li>
                         <li>Less powerful than other methods (Tukey, Scheffé)</li>
                         <li>Assumes independent tests</li>

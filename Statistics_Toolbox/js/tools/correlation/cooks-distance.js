@@ -96,13 +96,13 @@ function computeCooksDistance(xValues, yValues) {
         const hii = leverageTerm1 + leverageTerm2;
         
         leverageDetails.push(`
-            <div style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 6px;">
+            <div class="s-93cb1d">
                 <strong>Observation ${i+1}:</strong><br>
                 h<sub>ii</sub> = 1/${n} + (${xValues[i]} - ${meanX.toFixed(4)})² / ${sxx.toFixed(4)}<br>
                 = ${leverageTerm1.toFixed(6)} + (${xDev.toFixed(4)})² / ${sxx.toFixed(4)}<br>
                 = ${leverageTerm1.toFixed(6)} + ${xDevSq.toFixed(4)} / ${sxx.toFixed(4)}<br>
                 = ${leverageTerm1.toFixed(6)} + ${leverageTerm2.toFixed(6)}<br>
-                = <strong style="color: #1a5490;">${hii.toFixed(6)}</strong>
+                = <strong class="s-ece993">${hii.toFixed(6)}</strong>
             </div>
         `);
         
@@ -112,16 +112,16 @@ function computeCooksDistance(xValues, yValues) {
             : (residuals[i] * residuals[i]) / (2 * mse) * (hii / Math.pow(1 - hii, 2));
         
         let influence = "";
-        let influenceColor = "";
+        let influenceClass = "";   // colour comes from css/tool-panels.css (tp-infl-*)
         if (D < 0.5) { 
             influence = "Not Influential"; 
-            influenceColor = "#28a745"; 
+            influenceClass = "ok"; 
         } else if (D < 1) { 
             influence = "Moderately Influential"; 
-            influenceColor = "#ffc107"; 
+            influenceClass = "warn"; 
         } else { 
             influence = "Highly Influential"; 
-            influenceColor = "#dc3545"; 
+            influenceClass = "bad"; 
         }
         
         cookDetails.push({
@@ -133,7 +133,7 @@ function computeCooksDistance(xValues, yValues) {
             leverage: hii,
             cooksD: D,
             influence: influence,
-            influenceColor: influenceColor
+            influenceClass: influenceClass
         });
     }
     
@@ -145,61 +145,61 @@ function computeCooksDistance(xValues, yValues) {
     let tableRows = '';
     for (let d of cookDetails) {
         tableRows += `
-        <tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center; font-weight: 600;">${d.obs}</td>
-            <td style="padding: 10px; text-align: center;">${d.x}</td>
-            <td style="padding: 10px; text-align: center;">${d.y}</td>
-            <td style="padding: 10px; text-align: center; font-family: monospace;">${d.yPred.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; font-family: monospace; ${d.residual >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">${d.residual.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; font-family: monospace;">${d.leverage.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; background: ${d.influenceColor}20; font-weight: 700; font-family: monospace;">${d.cooksD.toFixed(6)}</td>
-            <td style="padding: 10px; text-align: center; color: ${d.influenceColor}; font-weight: 600;">${d.influence}</td>
+        <tr class="s-0d2692">
+            <td class="s-e73169">${d.obs}</td>
+            <td class="s-9da549">${d.x}</td>
+            <td class="s-9da549">${d.y}</td>
+            <td class="s-69c02e">${d.yPred.toFixed(4)}</td>
+            <td class="s-69c02e ${d.residual >= 0 ? 'tp-text-ok' : 'tp-text-bad'}">${d.residual.toFixed(4)}</td>
+            <td class="s-69c02e">${d.leverage.toFixed(4)}</td>
+            <td class="s-34f862 tp-infl-${d.influenceClass}-bg">${d.cooksD.toFixed(6)}</td>
+            <td class="s-e73169 tp-infl-${d.influenceClass}">${d.influence}</td>
         </tr>`;
     }
     
     // Build complete HTML
     let steps = `
-    <div style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; max-width: 100%;">
+    <div class="s-c1f650">
         
         <!-- HEADER -->
-        <div style="background: linear-gradient(135deg, #d4380d 0%, #e65100 100%); color: white; padding: 25px 30px; border-radius: 16px; margin-bottom: 25px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+        <div class="s-96937a gen-pad">
+            <div class="s-def9b6 gen-flex">
                 <div>
-                    <h1 style="margin: 0; font-size: 28px;">🔥 Cook's Distance</h1>
-                    <p style="margin: 8px 0 0 0; opacity: 0.9;">Identifying Influential Observations in Regression Analysis</p>
+                    <h1 class="s-b31279">🔥 Cook's Distance</h1>
+                    <p class="s-f50cbf">Identifying Influential Observations in Regression Analysis</p>
                 </div>
-                <div style="background: rgba(255,255,255,0.15); padding: 10px 20px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 11px;">Influential Points</div>
-                    <div style="font-size: 32px; font-weight: 700;">${influentialCount}</div>
+                <div class="s-61f99d">
+                    <div class="s-f6fd06">Influential Points</div>
+                    <div class="s-595626 gen-big">${influentialCount}</div>
                 </div>
             </div>
         </div>
         
         <!-- FORMULA SECTION -->
-        <div style="background: #fff3e0; border-radius: 16px; padding: 20px; margin-bottom: 25px; border-left: 5px solid #e65100;">
-            <h3 style="margin: 0 0 12px 0; color: #e65100;">📐 Mathematical Formula</h3>
-            <div style="background: white; padding: 20px; border-radius: 12px;">
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <div style="font-family: monospace; font-size: 20px; font-weight: 700; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                        D<sub>i</sub> = <span style="color: #dc3545;">e<sub>i</sub>²</span> / (2 × MSE) × <span style="color: #1a5490;">h<sub>ii</sub></span> / (1 - h<sub>ii</sub>)²
+        <div class="s-0dcf5a gen-pad">
+            <h3 class="s-5bd939">📐 Mathematical Formula</h3>
+            <div class="s-1dffd8 gen-pad">
+                <div class="s-d0078e">
+                    <div class="s-565fdb">
+                        D<sub>i</sub> = <span class="s-e03571">e<sub>i</sub>²</span> / (2 × MSE) × <span class="s-ece993">h<sub>ii</sub></span> / (1 - h<sub>ii</sub>)²
                     </div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 15px 0;">
-                    <div style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px;">
-                        <div style="font-weight: 700; color: #dc3545;">e<sub>i</sub></div>
-                        <div style="font-size: 12px;">Residual = y<sub>i</sub> - ŷ<sub>i</sub></div>
+                <div class="s-0237e3 gen-grid gen-grid-many">
+                    <div class="s-27b252">
+                        <div class="s-bd9333">e<sub>i</sub></div>
+                        <div class="s-743ea5">Residual = y<sub>i</sub> - ŷ<sub>i</sub></div>
                     </div>
-                    <div style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px;">
-                        <div style="font-weight: 700;">MSE</div>
-                        <div style="font-size: 12px;">Mean Squared Error = Σe<sub>i</sub>²/(n-2)</div>
+                    <div class="s-27b252">
+                        <div class="s-f97f7f">MSE</div>
+                        <div class="s-743ea5">Mean Squared Error = Σe<sub>i</sub>²/(n-2)</div>
                     </div>
-                    <div style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px;">
-                        <div style="font-weight: 700; color: #1a5490;">h<sub>ii</sub></div>
-                        <div style="font-size: 12px;">Leverage = 1/n + (x<sub>i</sub>-x̄)²/Σ(x-x̄)²</div>
+                    <div class="s-27b252">
+                        <div class="s-0a12f2">h<sub>ii</sub></div>
+                        <div class="s-743ea5">Leverage = 1/n + (x<sub>i</sub>-x̄)²/Σ(x-x̄)²</div>
                     </div>
                 </div>
             </div>
-            <div style="margin-top: 15px; background: #fff8f0; padding: 15px; border-radius: 8px;">
+            <div class="s-77c0fb">
                 <strong>📖 Step-by-Step Calculation Overview:</strong><br>
                 1. Calculate regression coefficients (β₀, β₁)<br>
                 2. Calculate residuals: e<sub>i</sub> = y<sub>i</sub> - ŷ<sub>i</sub><br>
@@ -207,25 +207,25 @@ function computeCooksDistance(xValues, yValues) {
                 4. Calculate leverage: h<sub>ii</sub> = 1/n + (x<sub>i</sub> - x̄)² / Σ(x - x̄)²<br>
                 5. Apply formula: D<sub>i</sub> = [e<sub>i</sub>² / (2×MSE)] × [h<sub>ii</sub> / (1-h<sub>ii</sub>)²]<br><br>
                 <strong>📊 Interpretation Thresholds:</strong><br>
-                • <span style="color: #28a745;">D<sub>i</sub> < 0.5</span> → Not influential<br>
-                • <span style="color: #ffc107;">0.5 ≤ D<sub>i</sub> < 1</span> → Moderately influential (investigate)<br>
-                • <span style="color: #dc3545;">D<sub>i</sub> ≥ 1</span> → Highly influential (must address)
+                • <span class="s-689fb3">D<sub>i</sub> < 0.5</span> → Not influential<br>
+                • <span class="s-54f524">0.5 ≤ D<sub>i</sub> < 1</span> → Moderately influential (investigate)<br>
+                • <span class="s-e03571">D<sub>i</sub> ≥ 1</span> → Highly influential (must address)
             </div>
         </div>
         
         <!-- STEP 1: REGRESSION COEFFICIENTS CALCULATION -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <h3 style="margin: 0 0 15px 0; color: #1a5490;">📈 Step 1: Calculate Regression Coefficients (β₀, β₁)</h3>
+        <div class="s-ebcad9 gen-pad">
+            <h3 class="s-8cbaeb">📈 Step 1: Calculate Regression Coefficients (β₀, β₁)</h3>
             
-            <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+            <div class="s-b1c457">
                 <strong>📐 Formula for Slope (β₁):</strong>
-                <div style="font-family: monospace; font-size: 16px; text-align: center; margin: 10px 0;">
+                <div class="s-2c850a">
                     β₁ = Σ(xᵢ - x̄)(yᵢ - ȳ) / Σ(xᵢ - x̄)²
                 </div>
                 
                 <details>
-                    <summary style="cursor: pointer; color: #1a5490; font-weight: 600;">📊 Click to see detailed Σ(x - x̄)(y - ȳ) calculation</summary>
-                    <div style="margin-top: 10px; padding: 10px; background: white; border-radius: 6px;">
+                    <summary class="s-811976">📊 Click to see detailed Σ(x - x̄)(y - ȳ) calculation</summary>
+                    <div class="s-adcc47">
                         ${xyDetails.join('<br>')}
                         <hr>
                         <strong>Σ(x - x̄)(y - ȳ) = ${xySum.toFixed(4)}</strong>
@@ -233,63 +233,63 @@ function computeCooksDistance(xValues, yValues) {
                 </details>
                 
                 <details>
-                    <summary style="cursor: pointer; color: #1a5490; font-weight: 600; margin-top: 10px;">📊 Click to see detailed Σ(x - x̄)² calculation</summary>
-                    <div style="margin-top: 10px; padding: 10px; background: white; border-radius: 6px;">
+                    <summary class="s-8d84a7">📊 Click to see detailed Σ(x - x̄)² calculation</summary>
+                    <div class="s-adcc47">
                         ${xxDetails.join('<br>')}
                         <hr>
                         <strong>Σ(x - x̄)² = ${xxSum.toFixed(4)}</strong>
                     </div>
                 </details>
                 
-                <div style="margin-top: 15px; padding: 10px; background: #e8f4f8; border-radius: 6px;">
-                    <strong>β₁ = ${xySum.toFixed(4)} / ${xxSum.toFixed(4)} = <span style="color: #dc3545; font-size: 18px;">${slope.toFixed(6)}</span></strong>
+                <div class="s-ae13dd">
+                    <strong>β₁ = ${xySum.toFixed(4)} / ${xxSum.toFixed(4)} = <span class="s-4cb8d3">${slope.toFixed(6)}</span></strong>
                 </div>
             </div>
             
-            <div style="background: #f8f9fa; border-radius: 10px; padding: 15px;">
+            <div class="s-cddfbe">
                 <strong>📐 Formula for Intercept (β₀):</strong>
-                <div style="font-family: monospace; font-size: 16px; text-align: center; margin: 10px 0;">
+                <div class="s-2c850a">
                     β₀ = ȳ - β₁·x̄
                 </div>
-                <div style="padding: 10px; background: #e8f4f8; border-radius: 6px;">
+                <div class="s-8993d0">
                     β₀ = ${meanY.toFixed(4)} - (${slope.toFixed(6)} × ${meanX.toFixed(4)})<br>
-                    β₀ = ${meanY.toFixed(4)} - ${(slope * meanX).toFixed(4)} = <span style="color: #dc3545; font-size: 18px;">${intercept.toFixed(6)}</span>
+                    β₀ = ${meanY.toFixed(4)} - ${(slope * meanX).toFixed(4)} = <span class="s-4cb8d3">${intercept.toFixed(6)}</span>
                 </div>
             </div>
             
-            <div style="margin-top: 15px; background: #d4edda; border-radius: 8px; padding: 12px; text-align: center; font-family: monospace; font-size: 16px;">
+            <div class="s-f07e36">
                 <strong>Regression Equation: ŷ = ${intercept.toFixed(4)} + ${slope.toFixed(4)} · x</strong>
             </div>
         </div>
         
         <!-- STEP 2: PREDICTIONS AND RESIDUALS -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <h3 style="margin: 0 0 15px 0; color: #1a5490;">📊 Step 2: Calculate Predictions (ŷ) and Residuals (e)</h3>
+        <div class="s-ebcad9 gen-pad">
+            <h3 class="s-8cbaeb">📊 Step 2: Calculate Predictions (ŷ) and Residuals (e)</h3>
             
             <details>
-                <summary style="cursor: pointer; color: #1a5490; font-weight: 600; margin-bottom: 10px;">📊 Click to see detailed prediction and residual calculations</summary>
-                <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                <summary class="s-8e4404">📊 Click to see detailed prediction and residual calculations</summary>
+                <div class="s-cb9830">
                     ${predictionDetails.join('<br>')}
                     <hr>
                     <strong>SS<sub>res</sub> = Σe² = ${ssRes.toFixed(4)}</strong>
                 </div>
             </details>
             
-            <div style="margin-top: 15px; padding: 10px; background: #e8f4f8; border-radius: 6px;">
-                <strong>MSE = SS<sub>res</sub> / (n - 2) = ${ssRes.toFixed(4)} / ${n-2} = <span style="color: #dc3545;">${mse.toFixed(6)}</span></strong>
+            <div class="s-ae13dd">
+                <strong>MSE = SS<sub>res</sub> / (n - 2) = ${ssRes.toFixed(4)} / ${n-2} = <span class="s-e03571">${mse.toFixed(6)}</span></strong>
             </div>
         </div>
         
         <!-- STEP 3: LEVERAGE CALCULATION -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <h3 style="margin: 0 0 15px 0; color: #1a5490;">🔧 Step 3: Calculate Leverage Values (h<sub>ii</sub>)</h3>
+        <div class="s-ebcad9 gen-pad">
+            <h3 class="s-8cbaeb">🔧 Step 3: Calculate Leverage Values (h<sub>ii</sub>)</h3>
             
-            <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-                <div style="font-family: monospace; font-size: 16px; text-align: center; margin-bottom: 15px;">
+            <div class="s-b1c457">
+                <div class="s-7860e0">
                     <strong>h<sub>ii</sub> = 1/n + (xᵢ - x̄)² / Σ(x - x̄)²</strong>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                <div class="s-52b92e gen-grid">
                     <div><strong>n =</strong> ${n}</div>
                     <div><strong>x̄ =</strong> ${meanX.toFixed(4)}</div>
                     <div><strong>Σ(x - x̄)² =</strong> ${sxx.toFixed(4)}</div>
@@ -297,14 +297,14 @@ function computeCooksDistance(xValues, yValues) {
                 </div>
                 
                 <details>
-                    <summary style="cursor: pointer; color: #1a5490; font-weight: 600;">📊 Click to see detailed leverage calculation for each observation</summary>
-                    <div style="margin-top: 10px;">
+                    <summary class="s-811976">📊 Click to see detailed leverage calculation for each observation</summary>
+                    <div class="s-bf36e2">
                         ${leverageDetails.join('')}
                     </div>
                 </details>
             </div>
             
-            <div style="background: #e8f4f8; border-radius: 10px; padding: 12px;">
+            <div class="s-9a5120">
                 <strong>📌 Leverage Statistics:</strong><br>
                 • Average leverage = ${(2/n).toFixed(4)}<br>
                 • Threshold (2×average) = ${(4/n).toFixed(4)}<br>
@@ -314,23 +314,23 @@ function computeCooksDistance(xValues, yValues) {
         </div>
         
         <!-- STEP 4: COOK'S DISTANCE TABLE -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow-x: auto;">
-            <div style="background: #e65100; color: white; padding: 14px 20px;">
-                <h3 style="margin: 0; font-size: 16px;">📊 Step 4: Cook's Distance Calculations</h3>
-                <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">D<sub>i</sub> = [e<sub>i</sub>² / (2×MSE)] × [h<sub>ii</sub> / (1-h<sub>ii</sub>)²]</p>
+        <div class="s-0b52ad">
+            <div class="s-b047bc">
+                <h3 class="s-c09e89">📊 Step 4: Cook's Distance Calculations</h3>
+                <p class="s-b506d5">D<sub>i</sub> = [e<sub>i</sub>² / (2×MSE)] × [h<sub>ii</sub> / (1-h<sub>ii</sub>)²]</p>
             </div>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <div class="s-74082b">
+                <table class="s-54bb4c gen-sized">
                     <thead>
-                        <tr style="background: #f8f9fa; border-bottom: 2px solid #e65100;">
-                            <th style="padding: 10px;">Obs #</th>
-                            <th style="padding: 10px;">X</th>
-                            <th style="padding: 10px;">Y</th>
-                            <th style="padding: 10px;">Ŷ (Predicted)</th>
-                            <th style="padding: 10px;">Residual (e)</th>
-                            <th style="padding: 10px;">Leverage (h)</th>
-                            <th style="padding: 10px;">Cook's D</th>
-                            <th style="padding: 10px;">Influence Level</th>
+                        <tr class="s-85ccf4">
+                            <th class="s-828f53">Obs #</th>
+                            <th class="s-828f53">X</th>
+                            <th class="s-828f53">Y</th>
+                            <th class="s-828f53">Ŷ (Predicted)</th>
+                            <th class="s-828f53">Residual (e)</th>
+                            <th class="s-828f53">Leverage (h)</th>
+                            <th class="s-828f53">Cook's D</th>
+                            <th class="s-828f53">Influence Level</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -341,25 +341,25 @@ function computeCooksDistance(xValues, yValues) {
         </div>
         
         <!-- INTERPRETATION SECTION -->
-        <div style="border-radius: 16px; padding: 20px; margin-bottom: 25px; ${influentialCount > 0 ? 'background: #f8d7da; border-left: 6px solid #dc3545;' : (moderateCount > 0 ? 'background: #fff3cd; border-left: 6px solid #ffc107;' : 'background: #d4edda; border-left: 6px solid #28a745;')}">
-            <h3 style="margin: 0 0 15px 0;">📌 Step 5: Influence Assessment</h3>
+        <div class="s-30a1a1 gen-pad ${influentialCount > 0 ? 'tp-bad-6' : (moderateCount > 0 ? 'tp-warn-6' : 'tp-ok-6')}">
+            <h3 class="s-405429">📌 Step 5: Influence Assessment</h3>
             
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
-                <div style="background: white; border-radius: 10px; padding: 12px; text-align: center;">
-                    <div style="font-size: 11px;">Total Observations</div>
-                    <div style="font-size: 28px; font-weight: 700;">${n}</div>
+            <div class="s-742bba gen-grid gen-grid-many">
+                <div class="s-cae865">
+                    <div class="s-f6fd06">Total Observations</div>
+                    <div class="s-291d2a">${n}</div>
                 </div>
-                <div style="background: white; border-radius: 10px; padding: 12px; text-align: center;">
-                    <div style="font-size: 11px;">Highly Influential (D ≥ 1)</div>
-                    <div style="font-size: 28px; font-weight: 700; color: #dc3545;">${influentialCount}</div>
+                <div class="s-cae865">
+                    <div class="s-f6fd06">Highly Influential (D ≥ 1)</div>
+                    <div class="s-8743c8">${influentialCount}</div>
                 </div>
-                <div style="background: white; border-radius: 10px; padding: 12px; text-align: center;">
-                    <div style="font-size: 11px;">Moderately Influential (0.5 ≤ D < 1)</div>
-                    <div style="font-size: 28px; font-weight: 700; color: #ffc107;">${moderateCount}</div>
+                <div class="s-cae865">
+                    <div class="s-f6fd06">Moderately Influential (0.5 ≤ D < 1)</div>
+                    <div class="s-3ee5c8">${moderateCount}</div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 10px; padding: 15px;">
+            <div class="s-524735">
                 <strong>🎯 Decision:</strong><br>
                 ${influentialCount > 0 ? 
                     '❌ <strong>ACTION REQUIRED:</strong> One or more observations have Cook\'s Distance ≥ 1. These points strongly influence the regression model.' : 
@@ -368,9 +368,9 @@ function computeCooksDistance(xValues, yValues) {
                         '✅ <strong>ACCEPTABLE:</strong> No highly influential observations detected. The regression model is stable.')}
                 
                 ${influentialCount > 0 ? `
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                <div class="s-cd967e">
                     <strong>🔧 Recommended Actions:</strong>
-                    <ul style="margin-top: 8px; margin-bottom: 0;">
+                    <ul class="s-ed7837">
                         <li>Investigate influential observations for data entry errors</li>
                         <li>Consider removing influential points and re-running analysis</li>
                         <li>Use robust regression methods (e.g., Huber, quantile regression)</li>
@@ -378,9 +378,9 @@ function computeCooksDistance(xValues, yValues) {
                     </ul>
                 </div>
                 ` : (moderateCount > 0 ? `
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                <div class="s-cd967e">
                     <strong>🔧 Recommended Actions:</strong>
-                    <ul style="margin-top: 8px; margin-bottom: 0;">
+                    <ul class="s-ed7837">
                         <li>Examine moderately influential observations in detail</li>
                         <li>Verify data accuracy for these points</li>
                         <li>Consider sensitivity analysis (excluding these points)</li>
@@ -391,25 +391,25 @@ function computeCooksDistance(xValues, yValues) {
         </div>
         
         <!-- TOP INFLUENTIAL POINTS -->
-        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <h3 style="margin: 0 0 15px 0; color: #1a5490;">⭐ Top 5 Most Influential Observations</h3>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <div class="s-6524af gen-pad">
+            <h3 class="s-8cbaeb">⭐ Top 5 Most Influential Observations</h3>
+            <div class="s-74082b">
+                <table class="s-523176 gen-sized">
                     <thead>
-                        <tr style="background: #1a5490; color: white;">
-                            <th style="padding: 10px;">Rank</th>
-                            <th style="padding: 10px;">Observation #</th>
-                            <th style="padding: 10px;">Cook's D</th>
-                            <th style="padding: 10px;">Influence</th>
+                        <tr class="s-0fb8dc">
+                            <th class="s-828f53">Rank</th>
+                            <th class="s-828f53">Observation #</th>
+                            <th class="s-828f53">Cook's D</th>
+                            <th class="s-828f53">Influence</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${sortedD.slice(0, 5).map((d, idx) => `
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 8px; text-align: center;">${idx + 1}</td>
-                            <td style="padding: 8px; text-align: center;">${d.obs}</td>
-                            <td style="padding: 8px; text-align: center; font-weight: 700; color: ${d.influenceColor};">${d.cooksD.toFixed(6)}</td>
-                            <td style="padding: 8px; text-align: center; color: ${d.influenceColor};">${d.influence}</td>
+                        <tr class="s-0d2692">
+                            <td class="s-182047">${idx + 1}</td>
+                            <td class="s-182047">${d.obs}</td>
+                            <td class="s-291e24 tp-infl-${d.influenceClass}">${d.cooksD.toFixed(6)}</td>
+                            <td class="s-182047 tp-infl-${d.influenceClass}">${d.influence}</td>
                         </tr>
                         `).join('')}
                     </tbody>
@@ -418,9 +418,9 @@ function computeCooksDistance(xValues, yValues) {
         </div>
         
         <!-- SUMMARY STATISTICS -->
-        <div style="margin-top: 20px; background: #e8f4f8; border-radius: 12px; padding: 15px; font-size: 12px;">
+        <div class="s-ba1bb3">
             <strong>📊 Cook's Distance Summary Statistics:</strong>
-            <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 8px;">
+            <div class="s-1d249f gen-flex">
                 <div>Min D = ${Math.min(...cookDetails.map(d => d.cooksD)).toFixed(6)}</div>
                 <div>Max D = ${Math.max(...cookDetails.map(d => d.cooksD)).toFixed(6)}</div>
                 <div>Mean D = ${(cookDetails.reduce((a,b) => a + b.cooksD, 0) / n).toFixed(6)}</div>
@@ -429,9 +429,9 @@ function computeCooksDistance(xValues, yValues) {
         </div>
         
         <!-- QUICK REFERENCE CARD -->
-        <div style="margin-top: 15px; background: #e8f4f8; border-radius: 12px; padding: 15px; font-size: 12px;">
+        <div class="s-a790d4">
             <strong>📖 Quick Reference:</strong>
-            <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 8px;">
+            <div class="s-1d249f gen-flex">
                 <div>🟢 <strong>D < 0.5</strong> → Not influential</div>
                 <div>🟡 <strong>0.5 ≤ D < 1</strong> → Moderately influential (investigate)</div>
                 <div>🔴 <strong>D ≥ 1</strong> → Highly influential (must address)</div>

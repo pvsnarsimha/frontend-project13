@@ -241,3 +241,19 @@ test('every accent colour the tools use inline is mapped onto the result-panel p
         assert.ok(css.includes(`background: ${hex}"]`), `no re-theme rule for background ${hex}`);
     }
 });
+
+// The largest tools were migrated from inline style="…" attributes to classes defined in css/tool-panels.css.
+const MIGRATED_TOOLS = ['hypothesis/manova', 'hypothesis/ancova', 'hypothesis/levene', 'hypothesis/bartlett', 'correlation/cooks-distance', 'hypothesis/bonferroni', 'hypothesis/scheffe'];
+
+test('migrated tools carry no inline styles and every class they use is defined in css/tool-panels.css', () => {
+    const css = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8');
+    const defined = new Set([...css.matchAll(/#interfaceRoot \.([\w-]+)/g)].map(m => m[1]));
+    assert.ok(html.includes('css/tool-panels.css'), 'Statistics.html must load css/tool-panels.css');
+    for (const tool of MIGRATED_TOOLS) {
+        const src = fs.readFileSync(path.join(ROOT, 'js', 'tools', tool + '.js'), 'utf8');
+        assert.ok(!/\sstyle\s*=/.test(src), `${tool}.js still has an inline style attribute`);
+        const used = [...src.matchAll(/\b(s-[0-9a-f]{6})\b/g)].map(m => m[1]).concat([...src.matchAll(/'(tp-[\w-]+)'/g)].map(m => m[1]));
+        const missing = used.filter(c => !defined.has(c));
+        assert.deepEqual(missing, [], `${tool}.js uses classes with no CSS rule`);
+    }
+});

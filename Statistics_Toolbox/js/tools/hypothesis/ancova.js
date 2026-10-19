@@ -135,13 +135,13 @@ function computeANCOVA(inputText, alpha) {
                 sumCov += cov[idx];
             }
         }
-        groupTableRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 10px; text-align: center; font-weight: bold;">${g}</td>
-            <td style="padding: 10px; text-align: center;">${groupSizes.get(g)}</td>
-            <td style="padding: 10px; text-align: center;">${sumY}</td>
-            <td style="padding: 10px; text-align: center; font-weight: bold; color: #1a5490;">${groupMeans.get(g).toFixed(6)}</td>
-            <td style="padding: 10px; text-align: center;">${sumCov}</td>
-            <td style="padding: 10px; text-align: center;">${groupCovMeans.get(g).toFixed(6)}</td>
+        groupTableRows += `<tr class="s-0d2692">
+            <td class="s-4370aa">${g}</td>
+            <td class="s-9da549">${groupSizes.get(g)}</td>
+            <td class="s-9da549">${sumY}</td>
+            <td class="s-a6efc7">${groupMeans.get(g).toFixed(6)}</td>
+            <td class="s-9da549">${sumCov}</td>
+            <td class="s-9da549">${groupCovMeans.get(g).toFixed(6)}</td>
         </tr>`;
     }
     
@@ -247,35 +247,35 @@ function computeANCOVA(inputText, alpha) {
     // Build input data table
     let dataRows = '';
     for (let i = 0; i < n; i++) {
-        dataRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${i+1}</td>
-            <td style="padding: 8px; text-align: center;">${y[i]}</td>
-            <td style="padding: 8px; text-align: center; font-weight: bold; color: #1a5490;">${group[i]}</td>
-            <td style="padding: 8px; text-align: center;">${cov[i]}</td>
+        dataRows += `<tr class="s-0d2692">
+            <td class="s-182047">${i+1}</td>
+            <td class="s-182047">${y[i]}</td>
+            <td class="s-9afb27">${group[i]}</td>
+            <td class="s-182047">${cov[i]}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    let steps = `<div class="s-f3b550">
         <!-- Header -->
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">📊</span>
-                <h2 style="margin: 0;">Analysis of Covariance (ANCOVA)</h2>
+        <div class="s-c0b227 gen-pad">
+            <div class="s-cef60d gen-flex">
+                <span class="s-e21123 gen-big">📊</span>
+                <h2 class="s-0f229a">Analysis of Covariance (ANCOVA)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Testing group differences while controlling for covariates</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">H₀: All group means are equal after adjusting for covariates</p>
+            <p class="s-f50cbf">Testing group differences while controlling for covariates</p>
+            <p class="s-3cce3a">H₀: All group means are equal after adjusting for covariates</p>
         </div>
         
         <!-- Input Data -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Input Data</h3>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden;">
-                    <thead><tr style="background: #1a5490; color: white;">
-                        <th style="padding: 10px;">#</th>
-                        <th style="padding: 10px;">Y (Outcome)</th>
-                        <th style="padding: 10px;">Group</th>
-                        <th style="padding: 10px;">X (Covariate)</th>
+        <div class="s-96a3c9 gen-pad">
+            <h3 class="s-1c9d4d">📊 Input Data</h3>
+            <div class="s-74082b">
+                <table class="s-801d2c gen-sized">
+                    <thead><tr class="s-0fb8dc">
+                        <th class="s-828f53">#</th>
+                        <th class="s-828f53">Y (Outcome)</th>
+                        <th class="s-828f53">Group</th>
+                        <th class="s-828f53">X (Covariate)</th>
                     </tr></thead>
                     <tbody>${dataRows}</tbody>
                 </table>
@@ -283,17 +283,17 @@ function computeANCOVA(inputText, alpha) {
         </div>
         
         <!-- Step 1: Group Means -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 1: Calculate Group Means for Y and Covariate X</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px; overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead><tr style="background: #1a5490; color: white;">
-                        <th style="padding: 10px;">Group</th>
-                        <th style="padding: 10px;">n</th>
-                        <th style="padding: 10px;">ΣY</th>
-                        <th style="padding: 10px;">Mean Y (Ȳⱼ)</th>
-                        <th style="padding: 10px;">ΣX</th>
-                        <th style="padding: 10px;">Mean X (X̄ⱼ)</th>
+        <div class="s-71e180 gen-pad">
+            <h3 class="s-1c9d4d">🔢 Step 1: Calculate Group Means for Y and Covariate X</h3>
+            <div class="s-7a1b94">
+                <table class="s-1b1faa gen-sized">
+                    <thead><tr class="s-0fb8dc">
+                        <th class="s-828f53">Group</th>
+                        <th class="s-828f53">n</th>
+                        <th class="s-828f53">ΣY</th>
+                        <th class="s-828f53">Mean Y (Ȳⱼ)</th>
+                        <th class="s-828f53">ΣX</th>
+                        <th class="s-828f53">Mean X (X̄ⱼ)</th>
                     </tr></thead>
                     <tbody>${groupTableRows}</tbody>
                 </table>
@@ -301,20 +301,20 @@ function computeANCOVA(inputText, alpha) {
         </div>
         
         <!-- Step 2: Grand Mean -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 2: Calculate Grand Means</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+        <div class="s-71e180 gen-pad">
+            <h3 class="s-1c9d4d">🔢 Step 2: Calculate Grand Means</h3>
+            <div class="s-f4c7f0">
                 <div><strong>Grand Mean of Y (Ȳ):</strong> ${grandMean.toFixed(6)}</div>
                 <div><strong>Grand Mean of X (X̄):</strong> ${covMean.toFixed(6)}</div>
             </div>
         </div>
         
         <!-- Step 3: Total Sum of Squares -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 3: Calculate Total Sum of Squares (SS<sub>Total</sub>)</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace;"><strong>Formula:</strong> SS<sub>Total</sub> = Σ(Yᵢ - Ȳ)²</div>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 12px 0;">
+        <div class="s-71e180 gen-pad">
+            <h3 class="s-1c9d4d">🔢 Step 3: Calculate Total Sum of Squares (SS<sub>Total</sub>)</h3>
+            <div class="s-f4c7f0">
+                <div class="s-4f4867"><strong>Formula:</strong> SS<sub>Total</sub> = Σ(Yᵢ - Ȳ)²</div>
+                <div class="s-dc2163">
                     ${ssTotalDetails.join('<br>')}
                 </div>
                 <div><strong>SS<sub>Total</sub> = ${ssTotal.toFixed(6)}</strong></div>
@@ -322,11 +322,11 @@ function computeANCOVA(inputText, alpha) {
         </div>
         
         <!-- Step 4: Within-Group SS (Unadjusted) -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 4: Calculate Within-Group SS (Unadjusted)</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace;"><strong>Formula:</strong> SS<sub>Within</sub> = Σ(Yᵢ - Ȳⱼ)²</div>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 12px 0;">
+        <div class="s-71e180 gen-pad">
+            <h3 class="s-1c9d4d">🔢 Step 4: Calculate Within-Group SS (Unadjusted)</h3>
+            <div class="s-f4c7f0">
+                <div class="s-4f4867"><strong>Formula:</strong> SS<sub>Within</sub> = Σ(Yᵢ - Ȳⱼ)²</div>
+                <div class="s-dc2163">
                     ${ssWithinUnadjDetails.join('<br>')}
                 </div>
                 <div><strong>SS<sub>Within, unadj</sub> = ${ssWithinUnadj.toFixed(6)}</strong></div>
@@ -334,43 +334,43 @@ function computeANCOVA(inputText, alpha) {
         </div>
         
         <!-- Step 5: Regression Coefficient -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 5: Calculate Regression Coefficient (β)</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace;"><strong>Formula:</strong> β = Σ(Yᵢ - Ȳ<sub>group</sub>)(Xᵢ - X̄<sub>group</sub>) / Σ(Xᵢ - X̄<sub>group</sub>)²  (pooled within-group slope)</div>
+        <div class="s-71e180 gen-pad">
+            <h3 class="s-1c9d4d">🔢 Step 5: Calculate Regression Coefficient (β)</h3>
+            <div class="s-f4c7f0">
+                <div class="s-4f4867"><strong>Formula:</strong> β = Σ(Yᵢ - Ȳ<sub>group</sub>)(Xᵢ - X̄<sub>group</sub>) / Σ(Xᵢ - X̄<sub>group</sub>)²  (pooled within-group slope)</div>
                 
                 <div><strong>Numerator Σ(Yᵢ - Ȳ<sub>group</sub>)(Xᵢ - X̄<sub>group</sub>):</strong></div>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 8px 0;">
+                <div class="s-abdf37">
                     ${xyDetails.join('<br>')}
                     <strong>Σ = ${xySum.toFixed(6)}</strong>
                 </div>
                 
                 <div><strong>Denominator Σ(Xᵢ - X̄<sub>group</sub>)²:</strong></div>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 8px 0;">
+                <div class="s-abdf37">
                     ${xxDetails.join('<br>')}
                     <strong>Σ = ${xxSum.toFixed(6)}</strong>
                 </div>
                 
-                <div><strong>β = ${xySum.toFixed(6)} / ${xxSum.toFixed(6)} = <span style="color: #1a5490; font-weight: bold;">${beta.toFixed(6)}</span></strong></div>
+                <div><strong>β = ${xySum.toFixed(6)} / ${xxSum.toFixed(6)} = <span class="s-8eb90d">${beta.toFixed(6)}</span></strong></div>
             </div>
         </div>
         
         <!-- Step 6: Adjusted Means -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 6: Calculate Adjusted Group Means</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace;"><strong>Formula:</strong> Ȳⱼ<sub>adj</sub> = Ȳⱼ - β × (X̄ⱼ - X̄)</div>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 12px 0;">
+        <div class="s-71e180 gen-pad">
+            <h3 class="s-1c9d4d">🔢 Step 6: Calculate Adjusted Group Means</h3>
+            <div class="s-f4c7f0">
+                <div class="s-4f4867"><strong>Formula:</strong> Ȳⱼ<sub>adj</sub> = Ȳⱼ - β × (X̄ⱼ - X̄)</div>
+                <div class="s-dc2163">
                     ${adjMeanDetails.join('<br>')}
                 </div>
             </div>
         </div>
         
         <!-- Step 7: Adjusted Within-Group SS -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 7: Calculate Adjusted Within-Group SS</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+        <div class="s-71e180 gen-pad">
+            <h3 class="s-1c9d4d">🔢 Step 7: Calculate Adjusted Within-Group SS</h3>
+            <div class="s-f4c7f0">
+                <div class="s-1d65fe">
                     ${ssWithinAdjDetails.join('<br>')}
                 </div>
                 <div><strong>SS<sub>Within, adj</sub> = ${ssWithinAdj.toFixed(6)}</strong></div>
@@ -378,73 +378,73 @@ function computeANCOVA(inputText, alpha) {
         </div>
         
         <!-- ANCOVA Summary Table -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; border: 2px solid #1a5490; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white; text-align: center;">📊 ANCOVA Summary Table</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead><tr style="background: #e9ecef;">
-                    <th style="padding: 12px;">Source</th>
-                    <th style="padding: 12px;">SS</th>
-                    <th style="padding: 12px;">df</th>
-                    <th style="padding: 12px;">MS</th>
-                    <th style="padding: 12px;">F</th>
-                    <th style="padding: 12px;">p-value</th>
+        <div class="s-1082f7">
+            <h3 class="s-d0a196">📊 ANCOVA Summary Table</h3>
+            <table class="s-1b1faa gen-sized">
+                <thead><tr class="s-a9ce51">
+                    <th class="s-92407c">Source</th>
+                    <th class="s-92407c">SS</th>
+                    <th class="s-92407c">df</th>
+                    <th class="s-92407c">MS</th>
+                    <th class="s-92407c">F</th>
+                    <th class="s-92407c">p-value</th>
                 </tr></thead>
                 <tbody>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px; font-weight: bold;">Covariate (X)</td>
-                        <td style="text-align: center;">${ssCovariate.toFixed(4)}</td>
-                        <td style="text-align: center;">1</td>
-                        <td style="text-align: center;">${ssCovariate.toFixed(4)}</td>
-                        <td style="text-align: center;">—</td>
-                        <td style="text-align: center;">—</td>
+                    <tr class="s-6085d7">
+                        <td class="s-eddf4d">Covariate (X)</td>
+                        <td class="s-1a6540">${ssCovariate.toFixed(4)}</td>
+                        <td class="s-1a6540">1</td>
+                        <td class="s-1a6540">${ssCovariate.toFixed(4)}</td>
+                        <td class="s-1a6540">—</td>
+                        <td class="s-1a6540">—</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px; font-weight: bold;">Between Groups (Adjusted)</td>
-                        <td style="text-align: center;">${ssBetweenAdj.toFixed(4)}</td>
-                        <td style="text-align: center;">${dfBetween}</td>
-                        <td style="text-align: center;">${msBetween.toFixed(4)}</td>
-                        <td rowspan="2" style="text-align: center; vertical-align: middle; font-weight: bold; font-size: 18px;">${fStatistic.toFixed(4)}</td>
-                        <td rowspan="2" style="text-align: center; vertical-align: middle;">${pValue.toFixed(6)}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-eddf4d">Between Groups (Adjusted)</td>
+                        <td class="s-1a6540">${ssBetweenAdj.toFixed(4)}</td>
+                        <td class="s-1a6540">${dfBetween}</td>
+                        <td class="s-1a6540">${msBetween.toFixed(4)}</td>
+                        <td class="s-718840" rowspan="2">${fStatistic.toFixed(4)}</td>
+                        <td class="s-3354ca" rowspan="2">${pValue.toFixed(6)}</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px; font-weight: bold;">Within Groups (Error)</td>
-                        <td style="text-align: center;">${ssWithinAdj.toFixed(4)}</td>
-                        <td style="text-align: center;">${dfWithin}</td>
-                        <td style="text-align: center;">${msWithin.toFixed(4)}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-eddf4d">Within Groups (Error)</td>
+                        <td class="s-1a6540">${ssWithinAdj.toFixed(4)}</td>
+                        <td class="s-1a6540">${dfWithin}</td>
+                        <td class="s-1a6540">${msWithin.toFixed(4)}</td>
                     </tr>
-                    <tr style="background: #e9ecef;">
-                        <td style="padding: 12px; font-weight: bold;">Total</td>
-                        <td style="text-align: center;">${ssTotal.toFixed(4)}</td>
-                        <td style="text-align: center;">${dfTotal}</td>
-                        <td style="text-align: center;">—</td>
-                        <td style="text-align: center;">—</td>
-                        <td style="text-align: center;">—</td>
+                    <tr class="s-a9ce51">
+                        <td class="s-eddf4d">Total</td>
+                        <td class="s-1a6540">${ssTotal.toFixed(4)}</td>
+                        <td class="s-1a6540">${dfTotal}</td>
+                        <td class="s-1a6540">—</td>
+                        <td class="s-1a6540">—</td>
+                        <td class="s-1a6540">—</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <!-- Conclusion -->
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Conclusion</h3>
+        <div class="s-d9a232 gen-pad ${rejectH0 ? 'tp-ok-6' : 'tp-bad-6'}">
+            <h3 class="s-5e9494">📌 Conclusion</h3>
             <div><strong>F-statistic:</strong> ${fStatistic.toFixed(6)}</div>
             <div><strong>Critical value (α = ${alpha}):</strong> ${criticalValue.toFixed(6)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-0aae12">
                 <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                 <strong>Interpretation:</strong> ${rejectH0 ? 'There IS sufficient evidence that group means differ after controlling for the covariate.' : 'There is NOT sufficient evidence that group means differ after controlling for the covariate.'}
             </div>
         </div>
         
         <!-- Adjusted Means -->
-        <div style="margin-top: 20px; padding: 16px; background: #e8f4f8; border-radius: 12px;">
-            <h4 style="margin: 0 0 8px 0;">📊 Adjusted Group Means</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+        <div class="s-d14fe6">
+            <h4 class="s-be30d6">📊 Adjusted Group Means</h4>
+            <div class="s-457476 gen-grid">
                 ${Array.from(adjustedMeans.entries()).map(([g, mean]) => `
-                    <div style="background: white; padding: 8px; border-radius: 8px; text-align: center;">
+                    <div class="s-6502eb">
                         <strong>Group ${g}</strong><br>
                         Original: ${groupMeans.get(g).toFixed(4)}<br>
-                        Adjusted: <strong style="color: #1a5490;">${mean.toFixed(4)}</strong>
+                        Adjusted: <strong class="s-ece993">${mean.toFixed(4)}</strong>
                     </div>
                 `).join('')}
             </div>

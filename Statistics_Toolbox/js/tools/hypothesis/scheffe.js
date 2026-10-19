@@ -145,25 +145,25 @@ function computeScheffeTest(inputText, alpha) {
     }
     
     // Build comprehensive HTML output
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6;">
+    let steps = `<div class="s-8f7049">
         
         <!-- HEADER SECTION -->
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 30px;">
-            <h1 style="margin: 0 0 10px 0;">📐 Scheffé Test</h1>
-            <p style="margin: 0; opacity: 0.95; font-size: 16px;">The Most Flexible Post-hoc Test for Complex Comparisons</p>
-            <div style="margin-top: 15px; background: rgba(255,255,255,0.15); padding: 12px; border-radius: 12px; font-family: monospace; font-size: 14px;">
+        <div class="s-93ccd1 gen-pad">
+            <h1 class="s-6b0f3f">📐 Scheffé Test</h1>
+            <p class="s-6b9200">The Most Flexible Post-hoc Test for Complex Comparisons</p>
+            <div class="s-7b320b">
                 <strong>📐 Formula:</strong> S = √[(k-1) × F<sub>α,k-1,N-k</sub> × MS<sub>within</sub> × (1/n<sub>i</sub> + 1/n<sub>j</sub>)]
             </div>
         </div>
         
         <!-- 📚 CONCEPT EXPLANATION -->
-        <div style="background: linear-gradient(135deg, #f0f4fa 0%, #e8eef5 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📚 What is the Scheffé Test?</h2>
+        <div class="s-23f289 gen-pad">
+            <h2 class="s-404196">📚 What is the Scheffé Test?</h2>
             
-            <div style="background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">🎯 What Makes Scheffé Special?</h3>
+            <div class="s-b11199 gen-pad">
+                <h3 class="s-ece993">🎯 What Makes Scheffé Special?</h3>
                 <p>The Scheffé test is the <strong>most flexible</strong> post-hoc method because it allows testing <strong>any contrast</strong> (not just pairwise comparisons).</p>
-                <div style="background: #e8f4f8; padding: 12px; border-radius: 10px; margin-top: 10px;">
+                <div class="s-a6a712">
                     💡 <strong>What's a contrast?</strong> A contrast is a linear combination of group means. Examples:<br>
                     • Pairwise: μ<sub>A</sub> - μ<sub>B</sub><br>
                     • Complex: (μ<sub>A</sub> + μ<sub>B</sub>)/2 - μ<sub>C</sub><br>
@@ -171,100 +171,100 @@ function computeScheffeTest(inputText, alpha) {
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 15px; padding: 20px;">
-                <h3 style="color: #1a5490;">🔬 How the Scheffé Test Works</h3>
+            <div class="s-c25532 gen-pad">
+                <h3 class="s-ece993">🔬 How the Scheffé Test Works</h3>
                 <p>The Scheffé test uses the same F-distribution as ANOVA but with an adjusted critical value:</p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; margin: 15px 0;">
+                <div class="s-d68a27">
                     <strong>S = √[(k-1) × F<sub>critical</sub> × MS<sub>within</sub> × (1/n<sub>i</sub> + 1/n<sub>j</sub>)]</strong>
                 </div>
                 <p><strong>Key Property:</strong> If the overall ANOVA is not significant, NO contrast will be significant with Scheffé. This makes it the most conservative test.</p>
-                <div style="margin-top: 12px; background: #fff3cd; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-35834d">
                     ⚠️ <strong>Trade-off:</strong> Most conservative → Hardest to find significance, but protects against Type I error for ALL possible contrasts.
                 </div>
             </div>
         </div>
         
         <!-- 📊 STEP 1: INPUT DATA -->
-        <div style="background: #f8f9fa; border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">📋 Step 1: Input Data Summary</h2>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden;">
-                    <thead><tr style="background: #1a5490; color: white;">
-                        <th style="padding: 12px;">Group</th>
-                        <th style="padding: 12px;">n</th>
-                        <th style="padding: 12px;">Σx</th>
-                        <th style="padding: 12px;">Mean (x̄)</th>
-                        <th style="padding: 12px;">Values</th>
+        <div class="s-6b30cb gen-pad">
+            <h2 class="s-404196">📋 Step 1: Input Data Summary</h2>
+            <div class="s-74082b">
+                <table class="s-2b65ac gen-sized">
+                    <thead><tr class="s-0fb8dc">
+                        <th class="s-92407c">Group</th>
+                        <th class="s-92407c">n</th>
+                        <th class="s-92407c">Σx</th>
+                        <th class="s-92407c">Mean (x̄)</th>
+                        <th class="s-92407c">Values</th>
                     </tr></thead>
                     <tbody>
                         ${groupData.map(g => `
-                        <tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 10px; text-align: center; font-weight: bold;">${g.group}</td>
-                            <td style="padding: 10px; text-align: center;">${g.n}</td>
-                            <td style="padding: 10px; text-align: center;">${g.sum}</td>
-                            <td style="padding: 10px; text-align: center; background: #e8f4f8; font-weight: bold;">${g.mean.toFixed(4)}</td>
-                            <td style="padding: 10px;">${g.values.join(', ')}</td>
+                        <tr class="s-0d2692">
+                            <td class="s-4370aa">${g.group}</td>
+                            <td class="s-9da549">${g.n}</td>
+                            <td class="s-9da549">${g.sum}</td>
+                            <td class="s-99614e">${g.mean.toFixed(4)}</td>
+                            <td class="s-828f53">${g.values.join(', ')}</td>
                         </tr>
                         `).join('')}
                     </tbody>
                 </table>
             </div>
-            <div style="margin-top: 15px; background: #e8f4f8; padding: 12px; border-radius: 10px;">
+            <div class="s-ffb54b">
                 <strong>📌 Summary:</strong> Total observations (N) = ${totalN} | Number of groups (k) = ${k} | Grand Mean = ${grandMean.toFixed(4)}
             </div>
         </div>
         
         <!-- 🔢 STEP 2: ANOVA CALCULATIONS -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">🔢 Step 2: Complete ANOVA Calculations</h2>
+        <div class="s-e28085 gen-pad">
+            <h2 class="s-404196">🔢 Step 2: Complete ANOVA Calculations</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">📊 Step 2a: Sum of Squares Within (SS<sub>within</sub>)</h3>
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+            <div class="s-e97429 gen-pad">
+                <h3 class="s-ece993">📊 Step 2a: Sum of Squares Within (SS<sub>within</sub>)</h3>
+                <div class="s-5a798c">
                     <strong>Formula:</strong> SS<sub>within</sub> = Σ(xᵢⱼ - x̄ⱼ)²
                 </div>
                 ${ssWithinDetails.join('<br>')}
-                <div style="margin-top: 15px; padding: 10px; background: #1a5490; color: white; border-radius: 8px; text-align: center;">
+                <div class="s-629d96">
                     <strong>SS<sub>within</sub> = ${ssWithin.toFixed(4)}</strong>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="color: #1a5490;">📊 Step 2b: Sum of Squares Between (SS<sub>between</sub>)</h3>
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+            <div class="s-e97429 gen-pad">
+                <h3 class="s-ece993">📊 Step 2b: Sum of Squares Between (SS<sub>between</sub>)</h3>
+                <div class="s-5a798c">
                     <strong>Formula:</strong> SS<sub>between</sub> = Σ nⱼ(x̄ⱼ - x̄)²
                 </div>
                 ${ssBetweenDetails.join('<br>')}
-                <div style="margin-top: 15px; padding: 10px; background: #1a5490; color: white; border-radius: 8px; text-align: center;">
+                <div class="s-629d96">
                     <strong>SS<sub>between</sub> = ${ssBetween.toFixed(4)}</strong>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <h3 style="color: #1a5490;">📊 Step 2c: Mean Squares and F-statistic</h3>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+            <div class="s-faa287 gen-pad">
+                <h3 class="s-ece993">📊 Step 2c: Mean Squares and F-statistic</h3>
+                <div class="s-9c0ea3">
                     <strong>df<sub>between</sub></strong> = k - 1 = ${k} - 1 = ${dfBetween}<br>
                     <strong>MS<sub>between</sub></strong> = SS<sub>between</sub> / df<sub>between</sub> = ${ssBetween.toFixed(4)} / ${dfBetween} = ${(ssBetween/dfBetween).toFixed(4)}<br><br>
                     <strong>df<sub>within</sub></strong> = N - k = ${totalN} - ${k} = ${dfWithin}<br>
-                    <strong>MS<sub>within</sub></strong> = SS<sub>within</sub> / df<sub>within</sub> = ${ssWithin.toFixed(4)} / ${dfWithin} = <strong style="color: #1a5490;">${msWithin.toFixed(6)}</strong><br><br>
+                    <strong>MS<sub>within</sub></strong> = SS<sub>within</sub> / df<sub>within</sub> = ${ssWithin.toFixed(4)} / ${dfWithin} = <strong class="s-ece993">${msWithin.toFixed(6)}</strong><br><br>
                     <strong>F-statistic</strong> = MS<sub>between</sub> / MS<sub>within</sub> = ${(ssBetween/dfBetween).toFixed(4)} / ${msWithin.toFixed(4)} = ${fStatistic.toFixed(6)}
                 </div>
-                <div style="margin-top: 12px; background: #d4edda; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-4e6da5">
                     💡 <strong>F-critical value:</strong> F<sub>${alpha}, ${dfBetween}, ${dfWithin}</sub> = ${fCritical.toFixed(4)}
                 </div>
             </div>
         </div>
         
         <!-- 🔢 STEP 3: SCHEFFÉ CRITICAL VALUE -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">🔢 Step 3: Calculate Scheffé Critical Value</h2>
+        <div class="s-e28085 gen-pad">
+            <h2 class="s-404196">🔢 Step 3: Calculate Scheffé Critical Value</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <div class="s-faa287 gen-pad">
+                <div class="s-8dc3df">
                     <strong>Formula:</strong> S = √[(k-1) × F<sub>critical</sub> × MS<sub>within</sub> × (1/n<sub>i</sub> + 1/n<sub>j</sub>)]
                 </div>
                 
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <div class="s-c53f8e">
                     <strong>Components:</strong><br>
                     • (k-1) = ${k} - 1 = ${dfBetween}<br>
                     • F<sub>critical</sub> = ${fCritical.toFixed(4)} (at α = ${alpha})<br>
@@ -272,7 +272,7 @@ function computeScheffeTest(inputText, alpha) {
                     • (1/n<sub>i</sub> + 1/n<sub>j</sub>) = varies by comparison
                 </div>
                 
-                <div style="background: #fff3cd; padding: 12px; border-radius: 8px;">
+                <div class="s-c6ba0c">
                     <strong>📖 Why is Scheffé the most conservative?</strong><br>
                     It uses (k-1) × F<sub>critical</sub> instead of just t or q. For k=3, this multiplies the critical value by √2 ≈ 1.41, making it harder to find significance.
                 </div>
@@ -280,29 +280,29 @@ function computeScheffeTest(inputText, alpha) {
         </div>
         
         <!-- 🔢 STEP 4: PAIRWISE COMPARISONS -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px;">
-            <h2 style="color: #1a5490; margin-top: 0;">🔢 Step 4: Apply Scheffé Test to All Pairwise Comparisons</h2>
+        <div class="s-e28085 gen-pad">
+            <h2 class="s-404196">🔢 Step 4: Apply Scheffé Test to All Pairwise Comparisons</h2>
             
-            <div style="background: white; border-radius: 12px; padding: 20px; overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
+            <div class="s-96fc5e gen-pad">
+                <table class="s-1b1faa gen-sized">
                     <thead>
-                        <tr style="background: #1a5490; color: white;">
-                            <th style="padding: 12px;">Comparison</th>
-                            <th style="padding: 12px;">Mean Difference</th>
-                            <th style="padding: 12px;">Scheffé Calculation</th>
-                            <th style="padding: 12px;">S Critical Value</th>
-                            <th style="padding: 12px;">Result</th>
+                        <tr class="s-0fb8dc">
+                            <th class="s-92407c">Comparison</th>
+                            <th class="s-92407c">Mean Difference</th>
+                            <th class="s-92407c">Scheffé Calculation</th>
+                            <th class="s-92407c">S Critical Value</th>
+                            <th class="s-92407c">Result</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${comparisons.map(c => {
                             const scheffeCalc = `√[${dfBetween} × ${fCritical.toFixed(4)} × ${msWithin.toFixed(4)} × (1/${c.n1} + 1/${c.n2})]`;
-                            return `<tr style="border-bottom: 1px solid #e9ecef;">
-                                <td style="padding: 12px; font-weight: bold;">${c.group1} vs ${c.group2}</td>
-                                <td style="padding: 12px; text-align: center;">|${c.mean1.toFixed(4)} - ${c.mean2.toFixed(4)}| = ${c.diff.toFixed(4)}</td>
-                                <td style="padding: 12px; font-family: monospace; font-size: 11px;">${scheffeCalc}</td>
-                                <td style="padding: 12px; text-align: center; font-weight: bold;">${c.scheffeValue.toFixed(4)}</td>
-                                <td style="padding: 12px; text-align: center; color: ${c.significant ? '#28a745' : '#dc3545'}; font-weight: bold;">
+                            return `<tr class="s-0d2692">
+                                <td class="s-eddf4d">${c.group1} vs ${c.group2}</td>
+                                <td class="s-d32c36">|${c.mean1.toFixed(4)} - ${c.mean2.toFixed(4)}| = ${c.diff.toFixed(4)}</td>
+                                <td class="s-098123">${scheffeCalc}</td>
+                                <td class="s-3b2dbd">${c.scheffeValue.toFixed(4)}</td>
+                                <td class="s-3b2dbd ${c.significant ? 'tp-text-ok' : 'tp-text-bad'}">
                                     ${c.significant ? '✓ Significant' : '✗ Not Significant'}
                                  </td>
                              </tr>`;
@@ -313,45 +313,45 @@ function computeScheffeTest(inputText, alpha) {
         </div>
         
         <!-- 📊 STEP 5: RESULTS SUMMARY -->
-        <div style="background: white; border-radius: 20px; margin-bottom: 30px; border: 2px solid #1a5490; overflow-x: auto;">
-            <h2 style="margin: 0; padding: 20px; background: #1a5490; color: white; text-align: center;">📊 Scheffé Test Summary</h2>
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-699d6d">
+            <h2 class="s-6d943d gen-pad">📊 Scheffé Test Summary</h2>
+            <table class="s-1b1faa gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef;">
-                        <th style="padding: 12px;">Parameter</th>
-                        <th style="padding: 12px;">Value</th>
-                        <th style="padding: 12px;">Explanation</th>
+                    <tr class="s-a9ce51">
+                        <th class="s-92407c">Parameter</th>
+                        <th class="s-92407c">Value</th>
+                        <th class="s-92407c">Explanation</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">Number of groups (k)</td>
-                        <td style="text-align: center;">${k}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">Number of groups (k)</td>
+                        <td class="s-1a6540">${k}</td>
                         <td>Categories compared in ANOVA</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">MS<sub>within</sub> (Error variance)</td>
-                        <td style="text-align: center;">${msWithin.toFixed(6)}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">MS<sub>within</sub> (Error variance)</td>
+                        <td class="s-1a6540">${msWithin.toFixed(6)}</td>
                         <td>Pooled variance within groups</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">F<sub>critical</sub> (ANOVA)</td>
-                        <td style="text-align: center;">${fCritical.toFixed(4)}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">F<sub>critical</sub> (ANOVA)</td>
+                        <td class="s-1a6540">${fCritical.toFixed(4)}</td>
                         <td>Critical value for overall ANOVA</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px; font-weight: bold;">Scheffé Multiplier</td>
-                        <td style="text-align: center; font-weight: bold;">${Math.sqrt(dfBetween * fCritical).toFixed(4)}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-eddf4d">Scheffé Multiplier</td>
+                        <td class="s-118507">${Math.sqrt(dfBetween * fCritical).toFixed(4)}</td>
                         <td>√[(k-1) × F<sub>critical</sub>] = ${Math.sqrt(dfBetween * fCritical).toFixed(4)}</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">Total Comparisons</td>
-                        <td style="text-align: center;">${comparisons.length}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">Total Comparisons</td>
+                        <td class="s-1a6540">${comparisons.length}</td>
                         <td>All possible pairwise comparisons</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #dee2e6;">
-                        <td style="padding: 12px;">Significant Comparisons</td>
-                        <td style="text-align: center; font-weight: bold; color: ${comparisons.filter(c => c.significant).length > 0 ? '#28a745' : '#dc3545'};">${comparisons.filter(c => c.significant).length}</td>
+                    <tr class="s-6085d7">
+                        <td class="s-92407c">Significant Comparisons</td>
+                        <td class="s-118507 ${comparisons.filter(c => c.significant).length > 0 ? 'tp-text-ok' : 'tp-text-bad'}">${comparisons.filter(c => c.significant).length}</td>
                         <td>Pairs where |diff| > S</td>
                     </tr>
                 </tbody>
@@ -359,19 +359,19 @@ function computeScheffeTest(inputText, alpha) {
         </div>
         
         <!-- 📌 CONCLUSION -->
-        <div style="border-radius: 20px; padding: 25px; ${comparisons.some(c => c.significant) ? 'background: #d4edda; border-left: 8px solid #28a745;' : 'background: #f8d7da; border-left: 8px solid #dc3545;'} margin-bottom: 30px;">
-            <h2 style="margin-top: 0;">📌 Step 5: Statistical Conclusion</h2>
+        <div class="s-e0012b gen-pad ${comparisons.some(c => c.significant) ? 'tp-ok-8' : 'tp-bad-8'}">
+            <h2 class="s-ec2386">📌 Step 5: Statistical Conclusion</h2>
             
-            <div style="background: rgba(0,0,0,0.05); border-radius: 10px; padding: 20px;">
+            <div class="s-19d20b gen-pad">
                 <h3>Decision Rule:</h3>
                 <p>For each comparison, reject H₀ if |x̄<sub>i</sub> - x̄<sub>j</sub>| > S (Scheffé critical value)</p>
                 
-                <div style="margin: 15px 0; padding: 12px; background: white; border-radius: 8px;">
+                <div class="s-0021f5">
                     <strong>Overall ANOVA Result:</strong><br>
                     F = ${fStatistic.toFixed(4)} | Critical F = ${fCritical.toFixed(4)} | ${fStatistic > fCritical ? 'ANOVA is SIGNIFICANT' : 'ANOVA is NOT significant'}
                 </div>
                 
-                <div style="margin: 15px 0; padding: 12px; background: white; border-radius: 8px;">
+                <div class="s-0021f5">
                     <strong>Scheffé Test Result:</strong><br>
                     ${comparisons.some(c => c.significant) ? 
                         `✅ <strong>Significant differences detected</strong> with Scheffé test.<br>
@@ -380,7 +380,7 @@ function computeScheffeTest(inputText, alpha) {
                         All mean differences are less than the Scheffé critical values.`}
                 </div>
                 
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+                <div class="s-aa70dd">
                     💡 <strong>Practical Interpretation:</strong><br>
                     The Scheffé test is the <strong>most conservative</strong> post-hoc method. 
                     ${comparisons.some(c => c.significant) ? 
@@ -391,29 +391,29 @@ function computeScheffeTest(inputText, alpha) {
         </div>
         
         <!-- 💡 COMPARISON WITH OTHER TESTS -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px;">
-            <h3 style="color: #1a5490; margin-top: 0;">💡 When to Use Scheffé vs Other Post-hoc Tests</h3>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                <div style="background: white; border-radius: 10px; padding: 12px;">
-                    <strong style="color: #28a745;">✅ Use Scheffé when:</strong>
-                    <ul style="margin-top: 8px; margin-bottom: 0; font-size: 12px;">
+        <div class="s-d15ab1 gen-pad">
+            <h3 class="s-404196">💡 When to Use Scheffé vs Other Post-hoc Tests</h3>
+            <div class="s-000c50 gen-grid gen-grid-many">
+                <div class="s-30cdaa">
+                    <strong class="s-689fb3">✅ Use Scheffé when:</strong>
+                    <ul class="s-b70bca">
                         <li>Testing complex contrasts</li>
                         <li>Sample sizes are unequal</li>
                         <li>You want maximum protection</li>
                         <li>ANOVA is significant</li>
                     </ul>
                 </div>
-                <div style="background: white; border-radius: 10px; padding: 12px;">
-                    <strong style="color: #ffc107;">📊 Use Tukey when:</strong>
-                    <ul style="margin-top: 8px; margin-bottom: 0; font-size: 12px;">
+                <div class="s-30cdaa">
+                    <strong class="s-54f524">📊 Use Tukey when:</strong>
+                    <ul class="s-b70bca">
                         <li>Only pairwise comparisons needed</li>
                         <li>Sample sizes are equal/similar</li>
                         <li>You want more power</li>
                     </ul>
                 </div>
-                <div style="background: white; border-radius: 10px; padding: 12px;">
-                    <strong style="color: #17a2b8;">📈 Use Bonferroni when:</strong>
-                    <ul style="margin-top: 8px; margin-bottom: 0; font-size: 12px;">
+                <div class="s-30cdaa">
+                    <strong class="s-4a607c">📈 Use Bonferroni when:</strong>
+                    <ul class="s-b70bca">
                         <li>Few comparisons (small m)</li>
                         <li>Simplicity is important</li>
                         <li>Tests are independent</li>
