@@ -2,7 +2,8 @@
 (function () {
     const { $, $$ } = window.StatLabUI;
     // ---------- answer tiles + structured worked solution ----------
-    const esc = t => t.replace(/\\bar\{(.)\}/g, '$1\u0304').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const plain = t => t.replace(/\\bar\{(.)\}/g, '$1\u0304');   // text for h() / text nodes; esc() is the same for HTML strings
+    const esc = t => plain(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const RULE = /^[\s━─═\-_=*•·]{6,}$/;
     function buildAnswer(valEl) {
         const old = valEl.parentNode.querySelector(':scope > .kpi-row[data-for="' + valEl.id + '"]');
@@ -27,13 +28,13 @@
         parts.forEach(part => {
             const m = part.match(/^(.{1,40}?)\s*(?:=|:)\s*(.+)$/);
             const d = document.createElement('div'); d.className = 'kpi';
-            if (m) { setHtml(d, '<small>' + esc(m[1]) + '</small><b>' + esc(m[2]) + '</b>'); }
+            if (m) d.append(h('small', null, plain(m[1])), h('b', null, plain(m[2])));
             else {
                 const sig = /^reject/i.test(part), ns = /fail to reject|not significant/i.test(part);
                 d.className = 'kpi verdict ' + (sig ? 'sig' : ns ? 'ns' : 'ok');
                 // Colour is never the only signal: a glyph and a spoken label carry the same meaning
                 const icon = sig ? '▲' : ns ? '●' : '✔', word = sig ? 'Significant result: ' : ns ? 'Not significant: ' : '';
-                setHtml(d, '<small>Decision</small><b><span class="vd-ico" aria-hidden="true">' + icon + '</span><span class="sr-only">' + word + '</span>' + esc(part) + '</b>');
+                d.append(h('small', null, 'Decision'), h('b', null, h('span', { class: 'vd-ico', 'aria-hidden': 'true' }, icon), h('span', { class: 'sr-only' }, word), plain(part)));
             }
             row.appendChild(d);
         });
@@ -356,7 +357,7 @@
         const note = document.createElement('div');
         note.className = 'undef-note';
         note.setAttribute('role', 'note');
-        setHtml(note, '<b>Some values are not defined for this data.</b> They appear as NaN or ∞. This usually means all values are identical (zero variance), there are too few observations for the formula, or a divisor was zero. The working below is still shown; try different data or add more observations.');
+        note.append(h('b', null, 'Some values are not defined for this data.'), ' They appear as NaN or ∞. This usually means all values are identical (zero variance), there are too few observations for the formula, or a divisor was zero. The working below is still shown; try different data or add more observations.');
         (card.querySelector(':scope > .kpi-row') || val).after(note);
     }
 

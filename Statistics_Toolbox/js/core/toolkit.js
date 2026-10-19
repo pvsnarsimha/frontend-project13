@@ -32,7 +32,7 @@ function escapeHtml(value) {
 // (script/iframe/object/embed..., on* handlers, javascript: URLs), and only then attached. The page's
 // Content-Security-Policy is a second line of defence. Never assign to .innerHTML directly (a test enforces this).
 const HTML_BLOCKED_TAGS = new Set(['SCRIPT', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'META', 'BASE', 'FRAME', 'FRAMESET', 'APPLET', 'FORM', 'FOREIGNOBJECT', 'USE']);
-const HTML_URL_ATTRIBUTES = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'background']);
+const HTML_URL_ATTRIBUTES = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'background', 'ping']);
 
 function sanitizeHtmlTree(root) {
     const blocked = [];
@@ -67,6 +67,29 @@ function setHtml(element, html) {
     }
     sanitizeHtmlTree(template.content);
     element.replaceChildren(template.content);
+}
+
+// h(tag, attrs, ...children): builds a DOM element without going through an HTML string, so nothing needs escaping or
+// sanitising: strings become text nodes (markup in them stays literal), attributes are set with setAttribute, on* handlers
+// and script URLs are refused. Children may be strings, numbers, Nodes or arrays of them; null/false/undefined are skipped.
+// Prefer it over setHtml for small pieces of UI; setHtml remains for the large worked-solution templates.
+function h(tag, attrs, ...children) {
+    const el = document.createElement(tag);
+    for (const [name, raw] of Object.entries(attrs || {})) {
+        if (raw === null || raw === undefined || raw === false) continue;
+        const key = name.toLowerCase(), value = raw === true ? '' : String(raw);
+        if (key.startsWith('on') || key === 'srcdoc' || key === 'style') continue;      // style belongs in a class (css/)
+        if (HTML_URL_ATTRIBUTES.has(key) && /^(javascript|vbscript|data):/.test(value.replace(/[\u0000-\u0020]+/g, '').toLowerCase()) && !/^data:image\/(png|jpeg|gif|webp);/i.test(value.replace(/\s+/g, ''))) continue;
+        if (key === 'class' || key === 'classname') el.className = value;
+        else el.setAttribute(name, value);
+    }
+    const add = child => {
+        if (child === null || child === undefined || child === false) return;
+        if (Array.isArray(child)) child.forEach(add);
+        else el.appendChild(typeof child === 'object' && child.nodeType ? child : document.createTextNode(String(child)));
+    };
+    children.forEach(add);
+    return el;
 }
 
 // ---- Shared form constants (used by many buildInterface configs) ----

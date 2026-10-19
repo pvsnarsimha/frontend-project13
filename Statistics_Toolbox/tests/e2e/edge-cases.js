@@ -13,6 +13,13 @@ const CASES = {
     two: '1, 2',
     huge: '1e308, 1e308, 1e308'
 };
+// Tools with two or more inputs (two-sample tests, correlation, regression) also get a different value per box:
+// a single value against five, mismatched lengths, and negatives against zeros.
+const TWO_SAMPLE_CASES = {
+    'one-vs-five': ['5', '1, 2, 3, 4, 5'],
+    mismatched: ['1, 2, 3', '1, 2, 3, 4, 5'],
+    'negatives-vs-zeros': ['-3, -1, -2, -5, -4', '0, 0, 0, 0, 0']
+};
 const UNDEFINED = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
 
 (async () => {
@@ -35,10 +42,15 @@ const UNDEFINED = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
         await page.click(`.tab[data-tab="${tab}"]`);
         const stats = await page.$$eval(`#sidebar-${tab} .stat-btn[data-stat]`, bs => bs.map(x => x.dataset.stat));
         for (const stat of stats) {
-            for (const [name, value] of Object.entries(CASES)) {
+            const boxes = await page.$$eval('#interfaceRoot textarea', a => a.length);
+            const cases = Object.entries(CASES).map(([name, v]) => [name, () => v]);
+            if (boxes >= 2) for (const [name, vals] of Object.entries(TWO_SAMPLE_CASES)) cases.push([name, i => vals[Math.min(i, vals.length - 1)]]);
+            for (const [name, valueFor] of cases) {
                 current = `${stat}/${name}`;
                 await page.click(`#sidebar-${tab} .stat-btn[data-stat="${stat}"]`);
-                await page.$$eval('#interfaceRoot textarea', (areas, v) => areas.forEach(a => { a.value = v; }), value);
+                const values = [];
+                for (let i = 0; i < boxes; i++) values.push(valueFor(i));
+                await page.$$eval('#interfaceRoot textarea', (areas, vs) => areas.forEach((a, i) => { a.value = vs[i]; }), values);
                 const go = await page.$('#interfaceRoot .primary-btn');
                 if (!go) continue;
                 try {

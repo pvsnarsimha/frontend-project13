@@ -98,3 +98,37 @@ test('inverseMatrix reports a singular matrix instead of returning NaN', () => {
     const inv = app.inverseMatrix([[4, 7], [2, 6]]);
     close(inv[0][0], 0.6, 1e-12); close(inv[0][1], -0.7, 1e-12);
 });
+
+test('eigenvalues of a 4x4 companion matrix with known real roots (1, 2, 3, 4)', () => {
+    // x^4 - 10x^3 + 35x^2 - 50x + 24 = (x-1)(x-2)(x-3)(x-4)
+    const companion = [[0, 0, 0, -24], [1, 0, 0, 50], [0, 1, 0, -35], [0, 0, 1, 10]];
+    const e = app.computeEigenvalues(companion);
+    assert.equal(e.length, 4);
+    [4, 3, 2, 1].forEach((v, i) => close(e[i], v, 1e-6));
+    const d = app.computeEigenvalues([[5, 0, 0, 0], [0, -1, 0, 0], [0, 0, 3, 0], [0, 0, 0, 2]]);
+    [5, 3, 2, -1].forEach((v, i) => close(d[i], v, 1e-9));
+});
+
+test('MANOVA with 3 dependent variables gives real, strictly decreasing eigenvalues', () => {
+    const rows = ['Group, Y1, Y2, Y3',
+        'A, 12, 15, 14', 'A, 14, 16, 17', 'A, 13, 14, 13', 'A, 15, 17, 15',
+        'B, 18, 20, 19', 'B, 20, 22, 24', 'B, 19, 21, 20', 'B, 21, 24, 22',
+        'C, 25, 27, 26', 'C, 27, 29, 28', 'C, 26, 28, 30', 'C, 24, 31, 27',
+        'D, 30, 29, 33', 'D, 33, 35, 31', 'D, 31, 32, 36', 'D, 34, 30, 35'];
+    const r = app.computeMANOVA(rows.join('\n'), 0.05);
+    assert.ok(!r.error, r.message);
+    const e = r.eigenvalues;
+    assert.equal(e.length, 3);
+    e.forEach(v => assert.ok(Number.isFinite(v)));
+    assert.ok(e[0] > e[1] && e[1] > e[2] && e[2] > 0, `eigenvalues ${e}`);
+    close(r.hotellingTrace, e[0] + e[1] + e[2], 1e-9);
+    close(r.roysRoot, e[0], 1e-12);
+});
+
+test('studentizedRangeCritical is memoized on (alpha, k, df) without mixing up the keys', () => {
+    const a = app.studentizedRangeCritical(0.05, 3, 10);
+    assert.equal(app.studentizedRangeCritical(0.05, 3, 10), a);
+    assert.notEqual(app.studentizedRangeCritical(0.05, 10, 3), a);
+    assert.notEqual(app.studentizedRangeCritical(0.01, 3, 10), a);
+    assert.ok(Number.isNaN(app.studentizedRangeCritical(0.05, 1, 10)));
+});

@@ -196,7 +196,7 @@ test('no duplicate canvas ids: a tool puts its chart canvas in exactly one place
 });
 
 test('the boxplot plugin is registered per chart, never globally', () => {
-    const src = fs.readFileSync(path.join(ROOT, 'js/tools/preparation/boxplot.js'), 'utf8');
+    const src = fs.readFileSync(path.join(ROOT, 'js/tools/preparation/boxplot-chart.js'), 'utf8');
     assert.ok(!/Chart\.register\(/.test(src), 'no global Chart.register');
     assert.match(src, /plugins:\s*\[boxplotPlugin\]/);
 });
@@ -217,4 +217,60 @@ test('no top-level const/let/class name is declared twice, or reuses the name of
         if (lexical.length && list.length > 1) clashes.push(`${name}: ${list.map(d => `${d.kind} in ${d.rel}`).join(', ')}`);
     }
     assert.deepEqual(clashes, []);
+});
+
+test('vendor/README.md lists the same chart.js version as the vendored chart.umd.js banner', () => {
+    const readme = fs.readFileSync(path.join(ROOT, 'vendor', 'README.md'), 'utf8');
+    const banner = fs.readFileSync(path.join(ROOT, 'vendor', 'chart.umd.js'), 'utf8').slice(0, 400).match(/Chart\.js v(\d+\.\d+\.\d+)/);
+    const row = readme.match(/^\|\s*`chart\.umd\.js`.*?\|\s*(\d+\.\d+\.\d+)\s*\|/m);
+    assert.ok(banner, 'chart.umd.js version comment');
+    assert.ok(row, 'chart.umd.js row in vendor/README.md');
+    assert.equal(row[1], banner[1]);
+});
+
+test('the HTML sanitiser treats ping like the other URL attributes', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js', 'core', 'toolkit.js'), 'utf8');
+    assert.match(src.match(/HTML_URL_ATTRIBUTES = new Set\(\[([^\]]*)\]/)[1], /'ping'/);
+});
+
+test('every accent colour the tools use inline is mapped onto the result-panel palette tokens', () => {
+    const css = fs.readFileSync(path.join(ROOT, 'css', 'statlab.css'), 'utf8');
+    assert.match(css, /--tp-accent:/);
+    for (const hex of ['#1a5490', '#d4380d', '#e65100', '#2e7d32', '#6a1b9a']) {
+        assert.ok(css.includes(`color: ${hex}"]`), `no re-theme rule for text colour ${hex}`);
+        assert.ok(css.includes(`background: ${hex}"]`), `no re-theme rule for background ${hex}`);
+    }
+});
+
+// The largest tools were migrated from inline style="…" attributes to classes defined in css/tool-panels.css.
+const MIGRATED_TOOLS = ['hypothesis/manova', 'hypothesis/ancova', 'hypothesis/levene', 'hypothesis/bartlett', 'correlation/cooks-distance', 'hypothesis/bonferroni', 'hypothesis/scheffe'];
+
+test('migrated tools carry no inline styles and every class they use is defined in css/tool-panels.css', () => {
+    const css = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8');
+    const defined = new Set([...css.matchAll(/#interfaceRoot \.([\w-]+)/g)].map(m => m[1]));
+    assert.ok(html.includes('css/tool-panels.css'), 'Statistics.html must load css/tool-panels.css');
+    for (const tool of MIGRATED_TOOLS) {
+        // a tool may be split into <tool>.js (interface, calculation, setup) and <tool>-steps.js (worked-solution HTML)
+        const src = ['.js', '-steps.js'].map(ext => path.join(ROOT, 'js', 'tools', tool + ext)).filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8')).join('\n');
+        assert.ok(!/\sstyle\s*=/.test(src), `${tool} still has an inline style attribute`);
+        const used = [...src.matchAll(/\b(s-[0-9a-f]{6})\b/g)].map(m => m[1]).concat([...src.matchAll(/'(tp-[\w-]+)'/g)].map(m => m[1]));
+        const missing = used.filter(c => !defined.has(c));
+        assert.deepEqual(missing, [], `${tool}.js uses classes with no CSS rule`);
+    }
+});
+
+test('split tools keep the calculation and the worked-solution HTML in separate files', () => {
+    for (const tool of ['hypothesis/levene', 'hypothesis/bartlett', 'hypothesis/bonferroni', 'hypothesis/scheffe', 'correlation/cooks-distance', 'preparation/boxplot']) {
+        const main = fs.readFileSync(path.join(ROOT, 'js', 'tools', tool + '.js'), 'utf8');
+        const steps = fs.readFileSync(path.join(ROOT, 'js', 'tools', tool + '-steps.js'), 'utf8');
+        assert.match(main, /stepsHtml[A-Z]\w*\(\{/, `${tool}.js should call its stepsHtml function`);
+        assert.match(steps, /^function stepsHtml[A-Z]\w*\(scope\)/m);
+    }
+});
+
+test('h() is defined once in toolkit.js and never assigned to innerHTML', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js', 'core', 'toolkit.js'), 'utf8');
+    assert.match(src, /^function h\(tag, attrs, \.\.\.children\)/m);
+    const body = src.slice(src.indexOf('function h(tag'), src.indexOf('// ---- Shared form constants'));
+    assert.ok(!/innerHTML|insertAdjacentHTML|outerHTML/.test(body), 'h() must not parse HTML strings');
 });

@@ -25,6 +25,14 @@ const WIDTHS = [360, 768];
             });
             return { by: de.scrollWidth - de.clientWidth, worst };
         });
+        // A table wider than the box it sits in must scroll inside .table-scroll / .rd-scroll, even when the page itself
+        // does not overflow (a narrow table in a wide card is fine; a wide table in a narrow card is the bug).
+        const unwrappedTables = () => page.evaluate(() => [...document.querySelectorAll('#interfaceRoot table')].filter(t => {
+            if (t.closest('.table-scroll, .rd-scroll')) return false;
+            const box = t.parentElement, cs = getComputedStyle(box);
+            const inner = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+            return t.getBoundingClientRect().width > inner + 1 || t.scrollWidth > t.clientWidth + 1;
+        }).map(t => (t.closest('.stat-interface')?.id || 'tool') + ' table' + (t.id ? '#' + t.id : '') + ' ' + Math.round(t.getBoundingClientRect().width) + 'px'));
         const shell = await overflow();
         if (shell) problems.push(`${width}px page shell: ${JSON.stringify(shell)}`);
         const tabs = await page.$$eval('.tab', t => t.map(x => x.dataset.tab));
@@ -40,6 +48,7 @@ const WIDTHS = [360, 768];
                 await page.waitForTimeout(30);
                 const o = await overflow();
                 checked++;
+                for (const t of await unwrappedTables()) problems.push(`${width}px ${stat}: wide table outside a scroll wrapper (${t})`);
                 if (o) problems.push(`${width}px ${stat}: page is ${o.by}px wider than the screen (widest: ${JSON.stringify(o.worst)})`);
             }
         }

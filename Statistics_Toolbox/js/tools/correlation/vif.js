@@ -128,8 +128,8 @@ function computeVIF(dataMatrix) {
                 totalDetails.push(`(${dependent[i]} - ${yMean.toFixed(4)})² = ${(devTotal * devTotal).toFixed(4)}`);
             }
             
-            rSquared = 1 - (ssRes / ssTot);
-            if (isNaN(rSquared) || !isFinite(rSquared)) rSquared = 0;
+            // Same routine as the multi-predictor path, so the two cannot drift; the walk-through above only explains it
+            rSquared = olsRSquared(dependent, [independent]);
             
             calculationDetails = `
             <div style="margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
