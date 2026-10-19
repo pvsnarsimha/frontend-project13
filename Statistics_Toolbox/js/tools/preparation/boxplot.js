@@ -63,34 +63,34 @@ function computeBoxplotWithSteps(numbers) {
     
     // Build quartile calculation table
     let quartileTable = `
-    <div style="background: white; border-radius: 16px; margin: 20px 0; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-        <table style="width: 100%; border-collapse: collapse;">
+    <div class="s-538424">
+        <table class="s-897d74 gen-sized">
             <thead>
-                <tr style="background: linear-gradient(135deg, #1a5490, #0d3b66); color: white;">
-                    <th style="padding: 14px; text-align: center;">Quartile</th>
-                    <th style="padding: 14px; text-align: center;">Data Range</th>
-                    <th style="padding: 14px; text-align: center;">Calculation</th>
-                    <th style="padding: 14px; text-align: center;">Result</th>
+                <tr class="s-2d88ce">
+                    <th class="s-16aba4">Quartile</th>
+                    <th class="s-16aba4">Data Range</th>
+                    <th class="s-16aba4">Calculation</th>
+                    <th class="s-16aba4">Result</th>
                 </tr>
             </thead>
             <tbody>
-                <tr style="border-bottom: 1px solid #e9ecef;">
-                    <td style="padding: 12px; font-weight: bold; text-align: center;">Q₁ (25th Percentile)</td>
-                    <td style="padding: 12px;">Full sorted data, p = 0.25</td>
-                    <td style="padding: 12px; font-family: monospace; text-align: center;">${describeQuantileType7(sorted, 0.25, 'Q₁')}</td>
-                    <td style="padding: 12px; background: #e8f4f8; font-weight: bold; text-align: center;">${q1.toFixed(4)}</td>
+                <tr class="s-00049c">
+                    <td class="s-0ed842">Q₁ (25th Percentile)</td>
+                    <td class="s-61a8ef">Full sorted data, p = 0.25</td>
+                    <td class="s-0c5934">${describeQuantileType7(sorted, 0.25, 'Q₁')}</td>
+                    <td class="s-69cbad">${q1.toFixed(4)}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #e9ecef;">
-                    <td style="padding: 12px; font-weight: bold; text-align: center;">Q₂ (Median)</td>
-                    <td style="padding: 12px;">Full data: [${sorted.join(', ')}]</td>
-                    <td style="padding: 12px; font-family: monospace; text-align: center;">${medianResult.formula}</td>
-                    <td style="padding: 12px; background: #e8f4f8; font-weight: bold; text-align: center;">${median.toFixed(4)}</td>
+                <tr class="s-00049c">
+                    <td class="s-0ed842">Q₂ (Median)</td>
+                    <td class="s-61a8ef">Full data: [${sorted.join(', ')}]</td>
+                    <td class="s-0c5934">${medianResult.formula}</td>
+                    <td class="s-69cbad">${median.toFixed(4)}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #e9ecef;">
-                    <td style="padding: 12px; font-weight: bold; text-align: center;">Q₃ (75th Percentile)</td>
-                    <td style="padding: 12px;">Full sorted data, p = 0.75</td>
-                    <td style="padding: 12px; font-family: monospace; text-align: center;">${describeQuantileType7(sorted, 0.75, 'Q₃')}</td>
-                    <td style="padding: 12px; background: #e8f4f8; font-weight: bold; text-align: center;">${q3.toFixed(4)}</td>
+                <tr class="s-00049c">
+                    <td class="s-0ed842">Q₃ (75th Percentile)</td>
+                    <td class="s-61a8ef">Full sorted data, p = 0.75</td>
+                    <td class="s-0c5934">${describeQuantileType7(sorted, 0.75, 'Q₃')}</td>
+                    <td class="s-69cbad">${q3.toFixed(4)}</td>
                 </tr>
             </tbody>
         </table>
@@ -98,14 +98,14 @@ function computeBoxplotWithSteps(numbers) {
     
     // Build outlier detection table
     let outlierTable = `
-    <div style="background: white; border-radius: 16px; margin: 20px 0; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-        <table style="width: 100%; border-collapse: collapse;">
+    <div class="s-538424">
+        <table class="s-897d74 gen-sized">
             <thead>
-                <tr style="background: linear-gradient(135deg, #dc3545, #a71d2a); color: white;">
-                    <th style="padding: 14px; text-align: center;">#</th>
-                    <th style="padding: 14px; text-align: center;">Value</th>
-                    <th style="padding: 14px; text-align: center;">Comparison</th>
-                    <th style="padding: 14px; text-align: center;">Status</th>
+                <tr class="s-fce476">
+                    <th class="s-16aba4">#</th>
+                    <th class="s-16aba4">Value</th>
+                    <th class="s-16aba4">Comparison</th>
+                    <th class="s-16aba4">Status</th>
                 </tr>
             </thead>
             <tbody>`;
@@ -131,10 +131,10 @@ function computeBoxplotWithSteps(numbers) {
         
         outlierTable += `
             <tr style="border-bottom: 1px solid #e9ecef; background: ${bgColor};">
-                <td style="padding: 10px; text-align: center; font-weight: bold;">${idx + 1}</td>
-                <td style="padding: 10px; text-align: center; font-weight: bold;">${val}</td>
-                <td style="padding: 10px; font-family: monospace; text-align: center;">${comparison}</td>
-                <td style="padding: 10px;">${status}</td>
+                <td class="s-09833f">${idx + 1}</td>
+                <td class="s-09833f">${val}</td>
+                <td class="s-762d5d">${comparison}</td>
+                <td class="s-aa3a8a">${status}</td>
             </tr>`;
     }
     
@@ -145,46 +145,46 @@ function computeBoxplotWithSteps(numbers) {
     
     // Build Five-Number Summary Table
     let fiveNumTable = `
-    <div style="background: white; border-radius: 16px; margin-bottom: 25px; border: 2px solid #1a5490; overflow-x: auto;">
-        <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white; text-align: center;">📊 Five-Number Summary</h3>
-        <table style="width: 100%; border-collapse: collapse;">
+    <div class="s-20f162">
+        <h3 class="s-ba9de1">📊 Five-Number Summary</h3>
+        <table class="s-897d74 gen-sized">
             <thead>
-                <tr style="background: #e9ecef;">
-                    <th style="padding: 12px; text-align: center;">Statistic</th>
-                    <th style="padding: 12px; text-align: center;">Value</th>
-                    <th style="padding: 12px; text-align: center;">Interpretation</th>
+                <tr class="s-bfd0ae">
+                    <th class="s-34ffd2">Statistic</th>
+                    <th class="s-34ffd2">Value</th>
+                    <th class="s-34ffd2">Interpretation</th>
                 </tr>
             </thead>
             <tbody>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 12px; font-weight: bold;">Minimum (Min)</td>
-                    <td style="text-align: center; font-weight: bold; color: #28a745;">${minVal}</td>
-                    <td style="text-align: center;">Smallest value in dataset</td>
+                <tr class="s-b490b8">
+                    <td class="s-8136fa">Minimum (Min)</td>
+                    <td class="s-5dac7a">${minVal}</td>
+                    <td class="s-02528c">Smallest value in dataset</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 12px; font-weight: bold;">Q₁ (First Quartile)</td>
-                    <td style="text-align: center; font-weight: bold;">${q1.toFixed(4)}</td>
-                    <td style="text-align: center;">25% of data ≤ this value</td>
+                <tr class="s-b490b8">
+                    <td class="s-8136fa">Q₁ (First Quartile)</td>
+                    <td class="s-f91e25">${q1.toFixed(4)}</td>
+                    <td class="s-02528c">25% of data ≤ this value</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 12px; font-weight: bold;">Median (Q₂)</td>
-                    <td style="text-align: center; font-weight: bold; color: #ffc107;">${median.toFixed(4)}</td>
-                    <td style="text-align: center;">50% of data ≤ this value</td>
+                <tr class="s-b490b8">
+                    <td class="s-8136fa">Median (Q₂)</td>
+                    <td class="s-65630c">${median.toFixed(4)}</td>
+                    <td class="s-02528c">50% of data ≤ this value</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 12px; font-weight: bold;">Q₃ (Third Quartile)</td>
-                    <td style="text-align: center; font-weight: bold;">${q3.toFixed(4)}</td>
-                    <td style="text-align: center;">75% of data ≤ this value</td>
+                <tr class="s-b490b8">
+                    <td class="s-8136fa">Q₃ (Third Quartile)</td>
+                    <td class="s-f91e25">${q3.toFixed(4)}</td>
+                    <td class="s-02528c">75% of data ≤ this value</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 12px; font-weight: bold;">Maximum (Max)</td>
-                    <td style="text-align: center; font-weight: bold; color: #dc3545;">${maxVal}</td>
-                    <td style="text-align: center;">Largest value in dataset</td>
+                <tr class="s-b490b8">
+                    <td class="s-8136fa">Maximum (Max)</td>
+                    <td class="s-ec8a35">${maxVal}</td>
+                    <td class="s-02528c">Largest value in dataset</td>
                 </tr>
-                <tr style="background: #f0f4fa;">
-                    <td style="padding: 12px; font-weight: bold;">IQR (Interquartile Range)</td>
-                    <td style="text-align: center; font-weight: bold; color: #1a5490;">${iqr.toFixed(4)}</td>
-                    <td style="text-align: center;">Q₃ - Q₁ = ${q3.toFixed(4)} - ${q1.toFixed(4)}</td>
+                <tr class="s-2411fb">
+                    <td class="s-8136fa">IQR (Interquartile Range)</td>
+                    <td class="s-a79d4a">${iqr.toFixed(4)}</td>
+                    <td class="s-02528c">Q₃ - Q₁ = ${q3.toFixed(4)} - ${q1.toFixed(4)}</td>
                 </tr>
             </tbody>
         </table>
@@ -192,29 +192,29 @@ function computeBoxplotWithSteps(numbers) {
     
     // Build Whisker Table
     let whiskerTable = `
-    <div style="background: white; border-radius: 16px; margin: 20px 0; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-        <h3 style="margin: 0; padding: 14px; background: #17a2b8; color: white; text-align: center;">📏 Whisker Calculations</h3>
-        <table style="width: 100%; border-collapse: collapse;">
+    <div class="s-538424">
+        <h3 class="s-3fb06f">📏 Whisker Calculations</h3>
+        <table class="s-897d74 gen-sized">
             <thead>
-                <tr style="background: #e9ecef;">
-                    <th style="padding: 12px; text-align: center;">Whisker</th>
-                    <th style="padding: 12px; text-align: center;">Formula</th>
-                    <th style="padding: 12px; text-align: center;">Value</th>
-                    <th style="padding: 12px; text-align: center;">Interpretation</th>
+                <tr class="s-bfd0ae">
+                    <th class="s-34ffd2">Whisker</th>
+                    <th class="s-34ffd2">Formula</th>
+                    <th class="s-34ffd2">Value</th>
+                    <th class="s-34ffd2">Interpretation</th>
                 </tr>
             </thead>
             <tbody>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 12px; font-weight: bold;">Lower Whisker</td>
-                    <td style="text-align: center; font-family: monospace;">Smallest value ≥ Q₁ - 1.5×IQR</td>
-                    <td style="text-align: center; font-weight: bold; color: #28a745;">${whiskerMin.toFixed(4)}</td>
-                    <td style="text-align: center;">Smallest non-outlier</td>
+                <tr class="s-b490b8">
+                    <td class="s-8136fa">Lower Whisker</td>
+                    <td class="s-365ea1">Smallest value ≥ Q₁ - 1.5×IQR</td>
+                    <td class="s-5dac7a">${whiskerMin.toFixed(4)}</td>
+                    <td class="s-02528c">Smallest non-outlier</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 12px; font-weight: bold;">Upper Whisker</td>
-                    <td style="text-align: center; font-family: monospace;">Largest value ≤ Q₃ + 1.5×IQR</td>
-                    <td style="text-align: center; font-weight: bold; color: #dc3545;">${whiskerMax.toFixed(4)}</td>
-                    <td style="text-align: center;">Largest non-outlier</td>
+                <tr class="s-b490b8">
+                    <td class="s-8136fa">Upper Whisker</td>
+                    <td class="s-365ea1">Largest value ≤ Q₃ + 1.5×IQR</td>
+                    <td class="s-ec8a35">${whiskerMax.toFixed(4)}</td>
+                    <td class="s-02528c">Largest non-outlier</td>
                 </tr>
             </tbody>
         </table>

@@ -103,53 +103,53 @@ function computeCochranQTest(inputText, alpha) {
     const df = k - 1;
     const criticalValue = chiSquareCriticalValue(alpha, df);
     const pValue = 1 - chiSquareCDF(Q, df);
-    const rejectH0 = Q > criticalValue;
+    const rejectH0 = pValue < alpha;
     
     // Build data table
     let dataRows = '';
     for (let i = 0; i < n; i++) {
-        dataRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${i+1}</td>
+        dataRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${i+1}</td>
             ${data[i].map(val => `<td style="padding: 8px; text-align: center; font-weight: ${val === 1 ? 'bold' : 'normal'}; color: ${val === 1 ? '#28a745' : '#6c757d'};">${val}</td>`).join('')}
-            <td style="padding: 8px; text-align: center; background: #e8f4f8;">${rowTotals[i]}</td>
+            <td class="s-f8c27c">${rowTotals[i]}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 25px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">🔬</span>
+    let steps = `<div class="s-9217e5">
+        <div class="s-6d8291 gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">🔬</span>
                 <div>
-                    <h1 style="margin: 0; font-size: 28px;">Cochran's Q Test</h1>
-                    <p style="margin: 8px 0 0 0; opacity: 0.9;">Comparing Multiple Related Binary Outcomes</p>
+                    <h1 class="s-b80b8c">Cochran's Q Test</h1>
+                    <p class="s-259079">Comparing Multiple Related Binary Outcomes</p>
                 </div>
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Data Summary</h3>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
-                <div style="background: white; padding: 12px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 12px;">Subjects (n)</div>
-                    <div style="font-size: 32px; font-weight: 700;">${n}</div>
+        <div class="s-2f2db9 gen-pad">
+            <h3 class="s-d163b6">📊 Data Summary</h3>
+            <div class="s-17247c gen-grid gen-grid-many">
+                <div class="s-46421d">
+                    <div class="s-137d30">Subjects (n)</div>
+                    <div class="s-e35605 gen-big">${n}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 12px;">Treatments (k)</div>
-                    <div style="font-size: 32px; font-weight: 700;">${k}</div>
+                <div class="s-46421d">
+                    <div class="s-137d30">Treatments (k)</div>
+                    <div class="s-e35605 gen-big">${k}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 12px;">Total "Successes"</div>
-                    <div style="font-size: 32px; font-weight: 700;">${sumColTotals}</div>
+                <div class="s-46421d">
+                    <div class="s-137d30">Total "Successes"</div>
+                    <div class="s-e35605 gen-big">${sumColTotals}</div>
                 </div>
             </div>
             
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
+            <div class="s-01a9b9">
+                <table class="s-897d74 gen-sized">
                     <thead>
-                        <tr style="background: #1a5490; color: white;">
-                            <th style="padding: 10px;">Subject</th>
-                            ${Array(k).fill().map((_, j) => `<th style="padding: 10px;">Treatment ${j+1}</th>`).join('')}
-                            <th style="padding: 10px;">Row Total (Rᵢ)</th>
+                        <tr class="s-e7b83b">
+                            <th class="s-a756db">Subject</th>
+                            ${Array(k).fill().map((_, j) => `<th class="s-a756db">Treatment ${j+1}</th>`).join('')}
+                            <th class="s-a756db">Row Total (Rᵢ)</th>
                         </tr>
                     </thead>
                     <tbody>${dataRows}</tbody>
@@ -157,41 +157,42 @@ function computeCochranQTest(inputText, alpha) {
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step-by-Step Calculation</h3>
+        <div class="s-4b5ce2 gen-pad">
+            <h3 class="s-d163b6">🔢 Step-by-Step Calculation</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div class="s-ca9e5c">
                 <strong>Step 1: Calculate column totals (Cⱼ)</strong><br>
                 ${colTotals.map((c, j) => `C<sub>${j+1}</sub> = ${c}`).join(', ')}<br>
                 ΣCⱼ = ${sumColTotals}<br>
                 ΣCⱼ² = ${colTotals.map(c => `${c}² = ${c*c}`).join(' + ')} = ${sumColSquares}
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div class="s-ca9e5c">
                 <strong>Step 2: Calculate row totals (Rᵢ)</strong><br>
                 ${rowTotals.map((r, i) => `R<sub>${i+1}</sub> = ${r}`).join(', ')}<br>
                 ΣRᵢ = ${sumRowTotals}<br>
                 ΣRᵢ² = ${rowTotals.map(r => `${r}² = ${r*r}`).join(' + ')} = ${sumRowSquares}
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+            <div class="s-6025fc">
                 <strong>Step 3: Calculate Cochran's Q statistic</strong><br>
                 Q = [k(k-1) × ΣCⱼ² - (k-1) × (ΣCⱼ)²] / [k × ΣRᵢ - ΣRᵢ²]<br>
                 Q = [${k}×${k-1} × ${sumColSquares} - ${k-1} × ${sumColTotals}²] / [${k} × ${sumRowTotals} - ${sumRowSquares}]<br>
                 Q = [${k*(k-1)} × ${sumColSquares} - ${k-1} × ${sumColTotals*sumColTotals}] / [${k*sumRowTotals} - ${sumRowSquares}]<br>
                 Q = [${k*(k-1)*sumColSquares} - ${(k-1)*sumColTotals*sumColTotals}] / [${k*sumRowTotals} - ${sumRowSquares}]<br>
                 Q = ${numerator.toFixed(4)} / ${denominator.toFixed(4)}<br>
-                <strong style="color: #1a5490; font-size: 18px;">Q = ${Q.toFixed(6)}</strong>
+                <strong class="s-bbce95">Q = ${Q.toFixed(6)}</strong>
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
+        <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Test Conclusion</h3>
             <div><strong>Q Statistic:</strong> ${Q.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> ${df}</div>
             <div><strong>Critical Value (α = ${alpha}):</strong> ${criticalValue.toFixed(4)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-34b24f">
+                <strong>Decision rule:</strong> p-value ${rejectH0 ? '<' : '≥'} α (${alpha})<br>
                 <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                 <strong>Conclusion:</strong> ${rejectH0 ? 'There IS sufficient evidence that the treatments have different effects (proportions are not equal).' : 'There is NOT sufficient evidence that the treatments differ in their effects.'}
             </div>

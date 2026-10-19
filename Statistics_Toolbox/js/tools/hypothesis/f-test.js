@@ -124,11 +124,11 @@ function computeFTest(sample1, sample2, alpha, alternative) {
     for (let i = 0; i < n1; i++) {
         let sign1 = deviations1[i] >= 0 ? '+' : '';
         let sign2 = squaredDeviations1[i] >= 0 ? '+' : '';
-        var1Rows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${i+1}</td>
-            <td style="padding: 8px; text-align: center;">${sample1[i]}</td>
-            <td style="padding: 8px; text-align: center;">${sample1[i]} - ${mean1.toFixed(4)} = ${sign1}${deviations1[i].toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center; font-weight: 600; color: #1a5490;">(${sign1}${deviations1[i].toFixed(4)})² = ${squaredDeviations1[i].toFixed(4)}</td>
+        var1Rows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${i+1}</td>
+            <td class="s-a7c3f4">${sample1[i]}</td>
+            <td class="s-a7c3f4">${sample1[i]} - ${mean1.toFixed(4)} = ${sign1}${deviations1[i].toFixed(4)}</td>
+            <td class="s-b33403">(${sign1}${deviations1[i].toFixed(4)})² = ${squaredDeviations1[i].toFixed(4)}</td>
         </tr>`;
     }
     
@@ -136,38 +136,38 @@ function computeFTest(sample1, sample2, alpha, alternative) {
     for (let i = 0; i < n2; i++) {
         let sign1 = deviations2[i] >= 0 ? '+' : '';
         let sign2 = squaredDeviations2[i] >= 0 ? '+' : '';
-        var2Rows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${i+1}</td>
-            <td style="padding: 8px; text-align: center;">${sample2[i]}</td>
-            <td style="padding: 8px; text-align: center;">${sample2[i]} - ${mean2.toFixed(4)} = ${sign1}${deviations2[i].toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center; font-weight: 600; color: #1a5490;">(${sign1}${deviations2[i].toFixed(4)})² = ${squaredDeviations2[i].toFixed(4)}</td>
+        var2Rows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${i+1}</td>
+            <td class="s-a7c3f4">${sample2[i]}</td>
+            <td class="s-a7c3f4">${sample2[i]} - ${mean2.toFixed(4)} = ${sign1}${deviations2[i].toFixed(4)}</td>
+            <td class="s-b33403">(${sign1}${deviations2[i].toFixed(4)})² = ${squaredDeviations2[i].toFixed(4)}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">F</span>
-                <h2 style="margin: 0;">F-test (Comparison of Variances)</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">F</span>
+                <h2 class="s-f8a94d">F-test (Comparison of Variances)</h2>
             </div>
-            <div style="margin-top: 12px; font-family: monospace; font-size: 14px;">
+            <div class="s-55b017">
                 <div>Formula: <strong>F = s₁² / s₂²</strong> &nbsp;&nbsp;(where s₁² ≥ s₂²)</div>
-                <div style="margin-top: 8px;">Where:</div>
+                <div class="s-af5894">Where:</div>
                 <div>• s₁² = Variance of sample 1 = Σ(xᵢ - x̄₁)² / (n₁ - 1)</div>
                 <div>• s₂² = Variance of sample 2 = Σ(yᵢ - ȳ₂)² / (n₂ - 1)</div>
             </div>
-            <p style="margin: 12px 0 0 0; opacity: 0.9;">H₀: σ₁² = σ₂² (Variances are equal) | H₁: σ₁² ${alternative === 'two.sided' ? '≠' : (alternative === 'greater' ? '>' : '<')} σ₂²</p>
+            <p class="s-98fe52">H₀: σ₁² = σ₂² (Variances are equal) | H₁: σ₁² ${alternative === 'two.sided' ? '≠' : (alternative === 'greater' ? '>' : '<')} σ₂²</p>
         </div>
         
         <!-- SECTION 1: SAMPLE 1 VARIANCE CALCULATION -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #28a745;">Sample 1 Variance Calculation (s₁²)</h3>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-a767b0">Sample 1 Variance Calculation (s₁²)</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <div style="font-family: monospace; font-size: 14px; margin-bottom: 12px;">
+            <div class="s-3a063a">
+                <div class="s-5bf32f">
                     <strong>Formula: s₁² = Σ(xᵢ - x̄₁)² / (n₁ - 1)</strong>
                 </div>
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                <div class="s-f6a2e8">
                     <strong>Step-by-step explanation:</strong><br><br>
                     1. Calculate the mean of Sample 1: <strong>x̄₁ = (Σ xᵢ) / n₁</strong><br>
                     2. For each value, find the deviation from the mean: <strong>(xᵢ - x̄₁)</strong><br>
@@ -176,21 +176,21 @@ function computeFTest(sample1, sample2, alpha, alternative) {
                     5. Divide by (n₁ - 1) to get the sample variance (unbiased estimate)
                 </div>
                 
-                <div style="margin-top: 16px;">
+                <div class="s-c803e1">
                     <strong>Step 1: Calculate mean of Sample 1</strong><br>
                     x̄₁ = (${sample1.join(' + ')}) / ${n1} = ${mean1.toFixed(6)}
                 </div>
                 
-                <div style="margin-top: 16px;">
+                <div class="s-c803e1">
                     <strong>Steps 2-4: Calculate squared deviations from the mean</strong>
-                    <div style="overflow-x: auto; margin-top: 8px;">
-                        <table style="width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden;">
+                    <div class="s-cc7da6">
+                        <table class="s-92a0fb gen-sized">
                             <thead>
-                                <tr style="background: #28a745; color: white;">
-                                    <th style="padding: 8px;">i</th>
-                                    <th style="padding: 8px;">xᵢ</th>
-                                    <th style="padding: 8px;">xᵢ - x̄₁ (Deviation)</th>
-                                    <th style="padding: 8px;">(xᵢ - x̄₁)² (Squared Deviation)</th>
+                                <tr class="s-a9f1d9">
+                                    <th class="s-939795">i</th>
+                                    <th class="s-939795">xᵢ</th>
+                                    <th class="s-939795">xᵢ - x̄₁ (Deviation)</th>
+                                    <th class="s-939795">(xᵢ - x̄₁)² (Squared Deviation)</th>
                                  </tr>
                             </thead>
                             <tbody>${var1Rows}</tbody>
@@ -198,26 +198,26 @@ function computeFTest(sample1, sample2, alpha, alternative) {
                     </div>
                 </div>
                 
-                <div style="margin-top: 16px; font-family: monospace;">
+                <div class="s-e825be">
                     <strong>Step 4: Sum of squared deviations</strong><br>
                     Σ(xᵢ - x̄₁)² = ${sumSq1.toFixed(6)}<br><br>
                     <strong>Step 5: Calculate sample variance</strong><br>
                     s₁² = Σ(xᵢ - x̄₁)² / (n₁ - 1)<br>
                     s₁² = ${sumSq1.toFixed(6)} / ${n1 - 1}<br>
-                    <strong style="color: #28a745; font-size: 16px;">s₁² = ${var1.toFixed(8)}</strong>
+                    <strong class="s-111099">s₁² = ${var1.toFixed(8)}</strong>
                 </div>
             </div>
         </div>
         
         <!-- SECTION 2: SAMPLE 2 VARIANCE CALCULATION -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #dc3545;">Sample 2 Variance Calculation (s₂²)</h3>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-8f4470">Sample 2 Variance Calculation (s₂²)</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <div style="font-family: monospace; font-size: 14px; margin-bottom: 12px;">
+            <div class="s-3a063a">
+                <div class="s-5bf32f">
                     <strong>Formula: s₂² = Σ(yᵢ - ȳ₂)² / (n₂ - 1)</strong>
                 </div>
-                <div style="background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                <div class="s-f6a2e8">
                     <strong>Step-by-step explanation:</strong><br><br>
                     1. Calculate the mean of Sample 2: <strong>ȳ₂ = (Σ yᵢ) / n₂</strong><br>
                     2. For each value, find the deviation from the mean: <strong>(yᵢ - ȳ₂)</strong><br>
@@ -226,21 +226,21 @@ function computeFTest(sample1, sample2, alpha, alternative) {
                     5. Divide by (n₂ - 1) to get the sample variance
                 </div>
                 
-                <div style="margin-top: 16px;">
+                <div class="s-c803e1">
                     <strong>Step 1: Calculate mean of Sample 2</strong><br>
                     ȳ₂ = (${sample2.join(' + ')}) / ${n2} = ${mean2.toFixed(6)}
                 </div>
                 
-                <div style="margin-top: 16px;">
+                <div class="s-c803e1">
                     <strong>Steps 2-4: Calculate squared deviations from the mean</strong>
-                    <div style="overflow-x: auto; margin-top: 8px;">
-                        <table style="width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden;">
+                    <div class="s-cc7da6">
+                        <table class="s-92a0fb gen-sized">
                             <thead>
-                                <tr style="background: #dc3545; color: white;">
-                                    <th style="padding: 8px;">i</th>
-                                    <th style="padding: 8px;">yᵢ</th>
-                                    <th style="padding: 8px;">yᵢ - ȳ₂ (Deviation)</th>
-                                    <th style="padding: 8px;">(yᵢ - ȳ₂)² (Squared Deviation)</th>
+                                <tr class="s-d91a85">
+                                    <th class="s-939795">i</th>
+                                    <th class="s-939795">yᵢ</th>
+                                    <th class="s-939795">yᵢ - ȳ₂ (Deviation)</th>
+                                    <th class="s-939795">(yᵢ - ȳ₂)² (Squared Deviation)</th>
                                  </tr>
                             </thead>
                             <tbody>${var2Rows}</tbody>
@@ -248,51 +248,51 @@ function computeFTest(sample1, sample2, alpha, alternative) {
                     </div>
                 </div>
                 
-                <div style="margin-top: 16px; font-family: monospace;">
+                <div class="s-e825be">
                     <strong>Step 4: Sum of squared deviations</strong><br>
                     Σ(yᵢ - ȳ₂)² = ${sumSq2.toFixed(6)}<br><br>
                     <strong>Step 5: Calculate sample variance</strong><br>
                     s₂² = Σ(yᵢ - ȳ₂)² / (n₂ - 1)<br>
                     s₂² = ${sumSq2.toFixed(6)} / ${n2 - 1}<br>
-                    <strong style="color: #dc3545; font-size: 16px;">s₂² = ${var2.toFixed(8)}</strong>
+                    <strong class="s-74bf1f">s₂² = ${var2.toFixed(8)}</strong>
                 </div>
             </div>
         </div>
         
         <!-- SECTION 3: F-TEST CALCULATION -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">F-Test Calculation</h3>
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">F-Test Calculation</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">1</div>
                     <div><strong>Sample variances</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     s₁² = ${var1.toFixed(6)} &nbsp;|&nbsp; s₂² = ${var2.toFixed(6)}<br>
                     Larger variance = ${Math.max(var1, var2).toFixed(6)} (${var1 >= var2 ? 'Sample 1' : 'Sample 2'})<br>
                     Smaller variance = ${Math.min(var1, var2).toFixed(6)} (${var1 >= var2 ? 'Sample 2' : 'Sample 1'})
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">2</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">2</div>
                     <div><strong>Calculate the F-statistic</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     <strong>${twoSided ? 'F = (larger variance) / (smaller variance)' : 'F = s₁² / s₂²'}</strong><br>
                     F = ${(swapped ? var2 : var1).toFixed(6)} / ${(swapped ? var1 : var2).toFixed(6)}<br>
-                    <div style="font-size: 20px; font-weight: 700; color: #1a5490; margin-top: 8px;">F = ${fStatistic.toFixed(8)}</div>
+                    <div class="s-505d41">F = ${fStatistic.toFixed(8)}</div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</div>
+            <div class="s-6025fc">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">3</div>
                     <div><strong>Determine Degrees of Freedom and Critical Value</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     df₁ (numerator, sample ${numeratorSample}) = n${numeratorSample === 1 ? '₁' : '₂'} - 1 = ${numeratorSample === 1 ? n1 : n2} - 1 = ${df1}<br>
                     df₂ (denominator, sample ${denominatorSample}) = n${denominatorSample === 1 ? '₁' : '₂'} - 1 = ${denominatorSample === 1 ? n1 : n2} - 1 = ${df2}<br>
                     Significance level (α) = ${alpha}<br>
@@ -303,13 +303,13 @@ function computeFTest(sample1, sample2, alpha, alternative) {
         </div>
         
         <!-- SECTION 4: CONCLUSION -->
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">Test Conclusion</h3>
+        <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
+            <h3 class="s-c7f0b4">Test Conclusion</h3>
             <div><strong>F-statistic:</strong> ${fStatistic.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> (${df1}, ${df2})</div>
             <div><strong>Critical Value:</strong> ${criticalValue.toFixed(6)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}<br>
                 ${rejectH0 ? 
@@ -318,7 +318,7 @@ function computeFTest(sample1, sample2, alpha, alternative) {
             </div>
         </div>
         
-        <div style="margin-top: 20px; padding: 16px; background: #e8f4f8; border-radius: 12px; font-size: 13px;">
+        <div class="s-afe18c">
             <strong>💡 Interpretation Guide for F-test:</strong><br>
             • If F > F<sub>critical</sub>, reject H₀ → Variances are significantly different<br>
             • If F ≤ F<sub>critical</sub>, fail to reject H₀ → Variances are not significantly different<br>

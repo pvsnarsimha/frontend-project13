@@ -31,6 +31,16 @@ function computeStemLeafWithSteps(numbers) {
     const maxVal = Math.max(...sorted);
     const range = maxVal - minVal;
     const mean = sorted.reduce((a,b) => a+b, 0) / n;
+    // Shape verdict from the adjusted Fisher-Pearson skewness (same formula as the Skewness tool), not from stem sizes
+    let shapeLabel = 'not enough data to judge (needs at least 3 distinct values)';
+    if (n >= 3) {
+        const s2 = sorted.reduce((a, v) => a + (v - mean) * (v - mean), 0) / (n - 1);
+        if (s2 > 0) {
+            const g = (n / ((n - 1) * (n - 2))) * sorted.reduce((a, v) => a + Math.pow((v - mean) / Math.sqrt(s2), 3), 0);
+            shapeLabel = Math.abs(g) < 0.5 ? `approximately symmetric (skewness = ${g.toFixed(2)})`
+                : `${g > 0 ? 'right' : 'left'}-skewed (skewness = ${g.toFixed(2)})`;
+        }
+    }
     
     // Intelligent stem unit detection
     let stemUnit = 1;
@@ -139,59 +149,59 @@ function computeStemLeafWithSteps(numbers) {
     plotLines.push(`Depth: Cumulative frequency from the nearest extreme`);
     
     const plotHtml = `
-    <div style="background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); border-radius: 20px; padding: 25px; margin-top: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #4fc3f7; padding-bottom: 15px;">
-            <span style="font-size: 36px;">🌿</span>
+    <div class="s-0101f8 gen-pad">
+        <div class="s-74360b gen-flex">
+            <span class="s-b8a397 gen-big">🌿</span>
             <div>
-                <h3 style="margin: 0; color: #4fc3f7; font-family: 'Courier New', monospace;">STEM-AND-LEAF DISPLAY</h3>
-                <p style="margin: 5px 0 0 0; font-size: 12px; color: #b39ddb;">n = ${n} | Range: ${minVal} – ${maxVal} | Mean: ${mean.toFixed(4)}</p>
+                <h3 class="s-0a404f">STEM-AND-LEAF DISPLAY</h3>
+                <p class="s-37a758">n = ${n} | Range: ${minVal} – ${maxVal} | Mean: ${mean.toFixed(4)}</p>
             </div>
         </div>
         
-        <div style="font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; overflow-x: auto;">
-            <pre style="background: #0d1117; padding: 20px; border-radius: 12px; color: #e6edf3; margin: 0; white-space: pre-wrap; word-wrap: break-word;">
+        <div class="s-2cf239">
+            <pre class="s-c81510 gen-pad">
 ${plotLines.join('\n')}
             </pre>
         </div>
         
         <!-- Scatter Plot Visualization -->
-        <div style="margin-top: 30px; padding: 20px; background: #0d1117; border-radius: 12px;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                <span style="font-size: 20px;">📈</span>
-                <h4 style="margin: 0; color: #4fc3f7;">Scatter Plot: Original Data vs Leaf Values</h4>
+        <div class="s-413a3e gen-pad">
+            <div class="s-948514 gen-flex">
+                <span class="s-ea3eb7">📈</span>
+                <h4 class="s-fd2e58">Scatter Plot: Original Data vs Leaf Values</h4>
             </div>
-            <div style="font-size: 12px; color: #b39ddb; margin-bottom: 15px;">
+            <div class="s-d1f4df">
                 X-axis: Original data values | Y-axis: Leaf values (each point represents one observation)
             </div>
-            <canvas id="stemLeafScatterChart" style="max-height: 400px; width: 100%;"></canvas>
+            <canvas class="s-0cc923 gen-sized" id="stemLeafScatterChart"></canvas>
         </div>
     </div>`;
     
     // Build calculation table
     let calcTable = `
-    <div style="background: white; border-radius: 16px; margin: 25px 0; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+    <div class="s-24483d">
+        <table class="s-306b2c gen-sized">
             <thead>
-                <tr style="background: linear-gradient(135deg, #1a5490, #0d3b66); color: white;">
-                    <th style="padding: 14px; text-align: center;">Index (i)</th>
-                    <th style="padding: 14px; text-align: center;">Original Value (xᵢ)</th>
-                    <th style="padding: 14px; text-align: center;">Stem Calculation</th>
-                    <th style="padding: 14px; text-align: center;">Stem</th>
-                    <th style="padding: 14px; text-align: center;">Leaf</th>
-                    <th style="padding: 14px; text-align: center;">Final Representation</th>
+                <tr class="s-2d88ce">
+                    <th class="s-16aba4">Index (i)</th>
+                    <th class="s-16aba4">Original Value (xᵢ)</th>
+                    <th class="s-16aba4">Stem Calculation</th>
+                    <th class="s-16aba4">Stem</th>
+                    <th class="s-16aba4">Leaf</th>
+                    <th class="s-16aba4">Final Representation</th>
                 </tr>
             </thead>
             <tbody>`;
     
     for (let detail of calculationDetails) {
         calcTable += `
-            <tr style="border-bottom: 1px solid #e9ecef;">
-                <td style="padding: 12px; text-align: center; font-weight: 500;">${detail.index}</td>
-                <td style="padding: 12px; text-align: center; font-family: monospace; font-weight: 600;">${detail.original}</td>
-                <td style="padding: 12px; font-family: monospace; font-size: 11px; color: #6c757d;">${detail.formula}</td>
-                <td style="padding: 12px; text-align: center; background: #e8f4f8; font-weight: 700;">${detail.stem}</td>
-                <td style="padding: 12px; text-align: center; background: #fff3cd; font-weight: 700;">${detail.leaf}</td>
-                <td style="padding: 12px; text-align: center; font-family: monospace;">${detail.stem} | ${detail.leaf} → ${detail.stem}${detail.leaf}</td>
+            <tr class="s-00049c">
+                <td class="s-6e1b96">${detail.index}</td>
+                <td class="s-4097f1">${detail.original}</td>
+                <td class="s-41aade">${detail.formula}</td>
+                <td class="s-3b92a8">${detail.stem}</td>
+                <td class="s-7e5db6">${detail.leaf}</td>
+                <td class="s-1d6537">${detail.stem} | ${detail.leaf} → ${detail.stem}${detail.leaf}</td>
             </tr>`;
     }
     
@@ -204,82 +214,82 @@ ${plotLines.join('\n')}
     const scatterDataPoints = scatterData;
     
     let steps = `
-<div style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;">
+<div class="s-3097a8">
     <!-- Header Card -->
-    <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 25px 30px; border-radius: 20px; margin-bottom: 25px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+    <div class="s-6d8291 gen-pad">
+        <div class="s-b15718 gen-flex">
             <div>
-                <h1 style="margin: 0; font-size: 28px;">🌿 Stem-and-Leaf Plot</h1>
-                <p style="margin: 8px 0 0 0; opacity: 0.9;">A complete step-by-step analysis of data distribution</p>
+                <h1 class="s-b80b8c">🌿 Stem-and-Leaf Plot</h1>
+                <p class="s-259079">A complete step-by-step analysis of data distribution</p>
             </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 12px 24px; border-radius: 12px; text-align: center;">
-                <div style="font-size: 11px; opacity: 0.8;">SAMPLE SIZE</div>
-                <div style="font-size: 32px; font-weight: 700;">${n}</div>
+            <div class="s-0c68a3">
+                <div class="s-7ce57c">SAMPLE SIZE</div>
+                <div class="s-e35605 gen-big">${n}</div>
             </div>
         </div>
     </div>
     
     <!-- Step 1: Data Summary Card -->
-    <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #1a5490; color: white; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px;">1</span>
+    <div class="s-bfd155 gen-pad">
+        <h2 class="s-13101f gen-flex">
+            <span class="s-ed7f21 gen-sized">1</span>
             📋 Data Summary & Descriptive Statistics
         </h2>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
-            <div style="background: white; border-radius: 12px; padding: 15px; text-align: center;">
-                <div style="font-size: 11px; color: #6c757d;">Sample Size (n)</div>
-                <div style="font-size: 32px; font-weight: 700; color: #1a5490;">${n}</div>
+        <div class="s-f127a4 gen-grid">
+            <div class="s-64b6dd">
+                <div class="s-033765">Sample Size (n)</div>
+                <div class="s-abfdfd gen-big">${n}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px; text-align: center;">
-                <div style="font-size: 11px; color: #6c757d;">Minimum (Min)</div>
-                <div style="font-size: 24px; font-weight: 700;">${minVal}</div>
+            <div class="s-64b6dd">
+                <div class="s-033765">Minimum (Min)</div>
+                <div class="s-c2434f">${minVal}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px; text-align: center;">
-                <div style="font-size: 11px; color: #6c757d;">Maximum (Max)</div>
-                <div style="font-size: 24px; font-weight: 700;">${maxVal}</div>
+            <div class="s-64b6dd">
+                <div class="s-033765">Maximum (Max)</div>
+                <div class="s-c2434f">${maxVal}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px; text-align: center;">
-                <div style="font-size: 11px; color: #6c757d;">Range (R)</div>
-                <div style="font-size: 24px; font-weight: 700;">${range.toFixed(4)}</div>
+            <div class="s-64b6dd">
+                <div class="s-033765">Range (R)</div>
+                <div class="s-c2434f">${range.toFixed(4)}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px; text-align: center;">
-                <div style="font-size: 11px; color: #6c757d;">Mean (x̄)</div>
-                <div style="font-size: 20px; font-weight: 700;">${mean.toFixed(4)}</div>
+            <div class="s-64b6dd">
+                <div class="s-033765">Mean (x̄)</div>
+                <div class="s-9d1896">${mean.toFixed(4)}</div>
             </div>
         </div>
         
-        <div style="background: #e8f4f8; border-radius: 10px; padding: 15px;">
-            <strong>📌 Sorted Data:</strong> <code style="background: white; padding: 4px 8px; border-radius: 6px;">[${sorted.join(', ')}]</code>
+        <div class="s-694182">
+            <strong>📌 Sorted Data:</strong> <code class="s-f47f5a">[${sorted.join(', ')}]</code>
         </div>
     </div>
     
     <!-- Step 2: Stem Unit Determination -->
-    <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #1a5490; color: white; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px;">2</span>
+    <div class="s-95d04a gen-pad">
+        <h2 class="s-13101f gen-flex">
+            <span class="s-ed7f21 gen-sized">2</span>
             🔢 Stem Unit Determination
         </h2>
         
-        <div style="background: white; border-radius: 12px; padding: 20px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="s-6fab3a gen-pad">
+            <div class="s-87555e gen-grid">
                 <div>
                     <strong>📐 Formula:</strong>
-                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-family: monospace;">
+                    <div class="s-ab1ee9">
                         Stem Unit = 10<sup>⌊log₁₀(Range)⌋</sup>
                     </div>
                 </div>
                 <div>
                     <strong>🔢 Calculation:</strong>
-                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-family: monospace;">
+                    <div class="s-ab1ee9">
                         log₁₀(${range.toFixed(2)}) = ${Math.log10(range).toFixed(2)}<br>
                         ⌊${Math.log10(range).toFixed(2)}⌋ = ${Math.floor(Math.log10(range))}<br>
-                        Stem Unit = 10<sup>${Math.floor(Math.log10(range))}</sup> = <strong style="color: #1a5490;">${stemUnit}</strong>
+                        Stem Unit = 10<sup>${Math.floor(Math.log10(range))}</sup> = <strong class="s-f342b5">${stemUnit}</strong>
                     </div>
                 </div>
             </div>
             
-            <div style="margin-top: 20px; background: #d4edda; padding: 15px; border-radius: 10px;">
+            <div class="s-f4f7ef">
                 <strong>✅ Selected Stem Unit:</strong> ${stemUnit} (${unitName})<br>
                 <strong>📖 Interpretation:</strong> Each stem represents ${stemUnit} ${unitName}, and each leaf represents the next digit.
             </div>
@@ -287,14 +297,14 @@ ${plotLines.join('\n')}
     </div>
     
     <!-- Step 3: Stem and Leaf Calculation Table -->
-    <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #1a5490; color: white; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px;">3</span>
+    <div class="s-bfd155 gen-pad">
+        <h2 class="s-13101f gen-flex">
+            <span class="s-ed7f21 gen-sized">3</span>
             📐 Stem & Leaf Calculation (Step-by-Step)
         </h2>
         ${calcTable}
         
-        <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-top: 15px;">
+        <div class="s-e57b74">
             <strong>💡 Understanding the Transformation:</strong><br>
             Each original value is split into two parts:<br>
             • <strong>Stem</strong> = The leading digit(s) representing the larger unit<br>
@@ -307,30 +317,30 @@ ${plotLines.join('\n')}
     ${plotHtml}
     
     <!-- Step 5: Interpretation Guide -->
-    <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-top: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #1a5490; color: white; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px;">4</span>
+    <div class="s-284793 gen-pad">
+        <h2 class="s-13101f gen-flex">
+            <span class="s-ed7f21 gen-sized">4</span>
             📖 How to Read This Plot
         </h2>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-            <div style="background: white; border-radius: 12px; padding: 15px;">
+        <div class="s-91e6a8 gen-grid">
+            <div class="s-6fdce2">
                 <strong>🔍 Step 1 - Locate the Stem</strong><br>
                 Find the stem value in the left column. This represents the tens/hundreds place.
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px;">
+            <div class="s-6fdce2">
                 <strong>📊 Step 2 - Read the Leaves</strong><br>
                 The leaves to the right are the units digits. Read them in order.
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px;">
+            <div class="s-6fdce2">
                 <strong>📈 Step 3 - Scatter Plot</strong><br>
                 The chart below shows each data point: X = original value, Y = leaf value.
             </div>
         </div>
         
-        <div style="margin-top: 20px; background: #1a5490; color: white; border-radius: 12px; padding: 15px; text-align: center;">
+        <div class="s-d17639">
             <strong>🎯 Key Insights from this Plot:</strong><br>
-            • Distribution shape: ${Math.max(...stems.map(s => stemMap.get(s).length)) > n/2 ? 'Skewed' : 'Approximately symmetric'}<br>
+            • Distribution shape: ${shapeLabel}<br>
             • Most frequent stem: ${stems.reduce((a,b) => stemMap.get(a).length > stemMap.get(b).length ? a : b)} (${Math.max(...stems.map(s => stemMap.get(s).length))} observations)<br>
             • Data spread: ${minVal} to ${maxVal} (Range: ${range.toFixed(2)})<br>
             • Center tendency: Mean = ${mean.toFixed(4)} | Median = ${sorted[Math.floor(n/2)].toFixed(4)}

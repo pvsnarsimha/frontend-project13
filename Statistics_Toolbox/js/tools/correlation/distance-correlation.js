@@ -61,64 +61,64 @@ function computeDistanceCorrelationWithSteps(x, y) {
     }
     
     // Build properly labeled distance matrix A (for X)
-    aMatrixHtml = `<div style="overflow-x: auto; margin: 15px 0;">
-        <table style="border-collapse: collapse; border: 2px solid #1a5490; margin: 0 auto;">
-            <caption style="caption-side: top; margin-bottom: 10px; font-weight: bold; color: #1a5490;">Distance Matrix A (for X): a<sub>ij</sub> = |x<sub>i</sub> - x<sub>j</sub>|</caption>
+    aMatrixHtml = `<div class="s-babcad">
+        <table class="s-91a2ac">
+            <caption class="s-6723a1">Distance Matrix A (for X): a<sub>ij</sub> = |x<sub>i</sub> - x<sub>j</sub>|</caption>
             <thead>
-                <tr style="background: #1a5490; color: white;">
-                    <th style="border: 1px solid #ddd; padding: 10px;">i \\ j</th>`;
+                <tr class="s-e7b83b">
+                    <th class="s-20ba02">i \\ j</th>`;
     for (let j = 0; j < n; j++) {
-        aMatrixHtml += `<th style="border: 1px solid #ddd; padding: 10px;">j=${j+1}<br>(x=${x[j]})</th>`;
+        aMatrixHtml += `<th class="s-20ba02">j=${j+1}<br>(x=${x[j]})</th>`;
     }
     aMatrixHtml += `</tr></thead><tbody>`;
     
     for (let i = 0; i < n; i++) {
-        aMatrixHtml += `<tr style="background: ${i % 2 === 0 ? '#f8f9fa' : 'white'};">
-            <th style="border: 1px solid #ddd; padding: 10px; background: #e8f4f8;">i=${i+1}<br>(x=${x[i]})</th>`;
+        aMatrixHtml += `<tr class="${i % 2 === 0 ? 's-6d64ad' : 's-67f264'}">
+            <th class="s-172be4">i=${i+1}<br>(x=${x[i]})</th>`;
         for (let j = 0; j < n; j++) {
             let bgColor = (i === j) ? '#d4edda' : '';
             let value = a[i][j];
             aMatrixHtml += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: ${bgColor};">
                 ${value.toFixed(2)}
-                ${i === j ? '<br><span style="font-size: 10px;">(zero)</span>' : ''}
+                ${i === j ? '<br><span class="s-55fe05">(zero)</span>' : ''}
             </td>`;
         }
         aMatrixHtml += `</tr>`;
     }
     aMatrixHtml += `</tbody></table>
-        <div style="margin-top: 8px; font-size: 12px; color: #6c757d; text-align: center;">
+        <div class="s-0a741a">
             💡 Note: Diagonal values (i=j) are always 0 because distance from a point to itself is zero.<br>
             The matrix is symmetric: a<sub>ij</sub> = a<sub>ji</sub>
         </div>
     </div>`;
     
     // Build properly labeled distance matrix B (for Y)
-    bMatrixHtml = `<div style="overflow-x: auto; margin: 15px 0;">
-        <table style="border-collapse: collapse; border: 2px solid #2e7d32; margin: 0 auto;">
-            <caption style="caption-side: top; margin-bottom: 10px; font-weight: bold; color: #2e7d32;">Distance Matrix B (for Y): b<sub>ij</sub> = |y<sub>i</sub> - y<sub>j</sub>|</caption>
+    bMatrixHtml = `<div class="s-babcad">
+        <table class="s-4ff558">
+            <caption class="s-e1ed0a">Distance Matrix B (for Y): b<sub>ij</sub> = |y<sub>i</sub> - y<sub>j</sub>|</caption>
             <thead>
-                <tr style="background: #2e7d32; color: white;">
-                    <th style="border: 1px solid #ddd; padding: 10px;">i \\ j</th>`;
+                <tr class="s-257ed8">
+                    <th class="s-20ba02">i \\ j</th>`;
     for (let j = 0; j < n; j++) {
-        bMatrixHtml += `<th style="border: 1px solid #ddd; padding: 10px;">j=${j+1}<br>(y=${y[j]})</th>`;
+        bMatrixHtml += `<th class="s-20ba02">j=${j+1}<br>(y=${y[j]})</th>`;
     }
     bMatrixHtml += `</tr></thead><tbody>`;
     
     for (let i = 0; i < n; i++) {
-        bMatrixHtml += `<tr style="background: ${i % 2 === 0 ? '#f8f9fa' : 'white'};">
-            <th style="border: 1px solid #ddd; padding: 10px; background: #e8f4f8;">i=${i+1}<br>(y=${y[i]})</th>`;
+        bMatrixHtml += `<tr class="${i % 2 === 0 ? 's-6d64ad' : 's-67f264'}">
+            <th class="s-172be4">i=${i+1}<br>(y=${y[i]})</th>`;
         for (let j = 0; j < n; j++) {
             let bgColor = (i === j) ? '#d4edda' : '';
             let value = b[i][j];
             bMatrixHtml += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center; background: ${bgColor};">
                 ${value.toFixed(2)}
-                ${i === j ? '<br><span style="font-size: 10px;">(zero)</span>' : ''}
+                ${i === j ? '<br><span class="s-55fe05">(zero)</span>' : ''}
             </td>`;
         }
         bMatrixHtml += `</tr>`;
     }
     bMatrixHtml += `</tbody></table>
-        <div style="margin-top: 8px; font-size: 12px; color: #6c757d; text-align: center;">
+        <div class="s-0a741a">
             💡 The distance matrix shows how far apart each pair of observations is.
         </div>
     </div>`;
@@ -164,20 +164,20 @@ function computeDistanceCorrelationWithSteps(x, y) {
     let centeredAHtml = '';
     let centeredBHtml = '';
     
-    centeredAHtml = `<div style="overflow-x: auto; margin: 15px 0;">
-        <table style="border-collapse: collapse; border: 1px solid #ddd; margin: 0 auto;">
-            <caption style="caption-side: top; margin-bottom: 10px; font-weight: bold;">Centered Matrix A': A'<sub>ij</sub> = a<sub>ij</sub> - Ā<sub>i·</sub> - Ā<sub>·j</sub> + Ā<sub>··</sub></caption>
+    centeredAHtml = `<div class="s-babcad">
+        <table class="s-0fedbe">
+            <caption class="s-ba2d91">Centered Matrix A': A'<sub>ij</sub> = a<sub>ij</sub> - Ā<sub>i·</sub> - Ā<sub>·j</sub> + Ā<sub>··</sub></caption>
             <thead>
-                <tr style="background: #1a5490; color: white;">
-                    <th style="border: 1px solid #ddd; padding: 8px;">i \\ j</th>`;
+                <tr class="s-e7b83b">
+                    <th class="s-e59e20">i \\ j</th>`;
     for (let j = 0; j < n; j++) {
-        centeredAHtml += `<th style="border: 1px solid #ddd; padding: 8px;">${j+1}</th>`;
+        centeredAHtml += `<th class="s-e59e20">${j+1}</th>`;
     }
     centeredAHtml += `</tr></thead><tbody>`;
     
     for (let i = 0; i < n; i++) {
         centeredAHtml += `<tr>
-            <th style="border: 1px solid #ddd; padding: 8px; background: #e8f4f8;">${i+1}</th>`;
+            <th class="s-131038">${i+1}</th>`;
         for (let j = 0; j < n; j++) {
             let val = A_centered[i][j];
             centeredAHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center; ${val >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">
@@ -188,20 +188,20 @@ function computeDistanceCorrelationWithSteps(x, y) {
     }
     centeredAHtml += `</tbody></table></div>`;
     
-    centeredBHtml = `<div style="overflow-x: auto; margin: 15px 0;">
-        <table style="border-collapse: collapse; border: 1px solid #ddd; margin: 0 auto;">
-            <caption style="caption-side: top; margin-bottom: 10px; font-weight: bold;">Centered Matrix B': B'<sub>ij</sub> = b<sub>ij</sub> - B̄<sub>i·</sub> - B̄<sub>·j</sub> + B̄<sub>··</sub></caption>
+    centeredBHtml = `<div class="s-babcad">
+        <table class="s-0fedbe">
+            <caption class="s-ba2d91">Centered Matrix B': B'<sub>ij</sub> = b<sub>ij</sub> - B̄<sub>i·</sub> - B̄<sub>·j</sub> + B̄<sub>··</sub></caption>
             <thead>
-                <tr style="background: #2e7d32; color: white;">
-                    <th style="border: 1px solid #ddd; padding: 8px;">i \\ j</th>`;
+                <tr class="s-257ed8">
+                    <th class="s-e59e20">i \\ j</th>`;
     for (let j = 0; j < n; j++) {
-        centeredBHtml += `<th style="border: 1px solid #ddd; padding: 8px;">${j+1}</th>`;
+        centeredBHtml += `<th class="s-e59e20">${j+1}</th>`;
     }
     centeredBHtml += `</tr></thead><tbody>`;
     
     for (let i = 0; i < n; i++) {
         centeredBHtml += `<tr>
-            <th style="border: 1px solid #ddd; padding: 8px; background: #e8f4f8;">${i+1}</th>`;
+            <th class="s-131038">${i+1}</th>`;
         for (let j = 0; j < n; j++) {
             let val = B_centered[i][j];
             centeredBHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center; ${val >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">
@@ -242,54 +242,54 @@ function computeDistanceCorrelationWithSteps(x, y) {
     let pearsonR = pearsonResult.r || 0;
     
     // Build complete HTML output
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">📏</span>
-                <h2 style="margin: 0;">Distance Correlation (dCor)</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">📏</span>
+                <h2 class="s-f8a94d">Distance Correlation (dCor)</h2>
             </div>
-            <div style="margin-top: 12px; font-family: monospace; font-size: 13px;">
+            <div class="s-e414b5">
                 <div><strong>What is Distance Correlation?</strong></div>
                 <div>Unlike Pearson correlation which only detects LINEAR relationships, distance correlation can detect ANY type of relationship (linear, quadratic, exponential, periodic, etc.)</div>
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Input Data</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">Number of Observations (n)</div>
-                    <div style="font-size: 28px; font-weight: 700;">${n}</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📊 Input Data</h3>
+            <div class="s-720c2d gen-grid">
+                <div class="s-63afdf">
+                    <div class="s-42da0a">Number of Observations (n)</div>
+                    <div class="s-93c0a8">${n}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">Pearson Correlation (for comparison)</div>
-                    <div style="font-size: 20px;">${pearsonR.toFixed(6)}</div>
+                <div class="s-63afdf">
+                    <div class="s-42da0a">Pearson Correlation (for comparison)</div>
+                    <div class="s-23ee8e">${pearsonR.toFixed(6)}</div>
                 </div>
             </div>
             
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden;">
+            <div class="s-01a9b9">
+                <table class="s-92a0fb gen-sized">
                     <thead>
-                        <tr style="background: #1a5490; color: white;">
-                            <th style="padding: 10px;">i</th>
-                            <th style="padding: 10px;">Xᵢ</th>
-                            <th style="padding: 10px;">Yᵢ</th>
+                        <tr class="s-e7b83b">
+                            <th class="s-a756db">i</th>
+                            <th class="s-a756db">Xᵢ</th>
+                            <th class="s-a756db">Yᵢ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${x.map((val, i) => `<tr style="border-bottom: 1px solid #e9ecef;">
-                            <td style="padding: 8px; text-align: center; font-weight: bold;">${i+1}</td>
-                            <td style="padding: 8px; text-align: center;">${val}</td>
-                            <td style="padding: 8px; text-align: center;">${y[i]}</td>
+                        ${x.map((val, i) => `<tr class="s-00049c">
+                            <td class="s-f8719c">${i+1}</td>
+                            <td class="s-a7c3f4">${val}</td>
+                            <td class="s-a7c3f4">${y[i]}</td>
                         </tr>`).join('')}
                     </tbody>
                 </table>
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📐 Step 1: Calculate Distance Matrices</h3>
-            <div style="font-family: monospace; font-size: 13px; margin-bottom: 12px;">
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📐 Step 1: Calculate Distance Matrices</h3>
+            <div class="s-65a263">
                 <strong>Formula: a<sub>ij</sub> = |x<sub>i</sub> - x<sub>j</sub>|</strong> (Euclidean distance for 1D)
             </div>
             
@@ -297,36 +297,36 @@ function computeDistanceCorrelationWithSteps(x, y) {
             ${bMatrixHtml}
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📐 Step 2: Calculate Row Means and Grand Means</h3>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📐 Step 2: Calculate Row Means and Grand Means</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div class="s-ca9e5c">
                 <strong>For Matrix A (X distances):</strong>
-                <div style="font-family: monospace; font-size: 13px; margin-top: 8px;">
+                <div class="s-e2c3c6">
                     <strong>Row means (Ā<sub>i·</sub>):</strong> ${aRowMeans.map((m, i) => `Ā<sub>${i+1}·</sub> = ${m.toFixed(4)}`).join(', ')}<br>
                     <strong>Grand mean (Ā<sub>··</sub>):</strong> ${aGrandMean.toFixed(6)}
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+            <div class="s-6025fc">
                 <strong>For Matrix B (Y distances):</strong>
-                <div style="font-family: monospace; font-size: 13px; margin-top: 8px;">
+                <div class="s-e2c3c6">
                     <strong>Row means (B̄<sub>i·</sub>):</strong> ${bRowMeans.map((m, i) => `B̄<sub>${i+1}·</sub> = ${m.toFixed(4)}`).join(', ')}<br>
                     <strong>Grand mean (B̄<sub>··</sub>):</strong> ${bGrandMean.toFixed(6)}
                 </div>
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📐 Step 3: Double-Center the Distance Matrices</h3>
-            <div style="font-family: monospace; font-size: 13px; margin-bottom: 12px;">
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📐 Step 3: Double-Center the Distance Matrices</h3>
+            <div class="s-65a263">
                 <strong>Formula: A'<sub>ij</sub> = a<sub>ij</sub> - Ā<sub>i·</sub> - Ā<sub>·j</sub> + Ā<sub>··</sub></strong><br>
-                <span style="font-size: 12px;">This centers the matrix so that row and column means are zero.</span>
+                <span class="s-888a4b">This centers the matrix so that row and column means are zero.</span>
             </div>
             
             <details open>
-                <summary style="cursor: pointer; color: #1a5490; font-weight: bold;">Click to see double-centered matrices</summary>
-                <div style="margin-top: 12px;">
+                <summary class="s-918799">Click to see double-centered matrices</summary>
+                <div class="s-9d5978">
                     <h4>Centered Matrix A' (Green = positive, Red = negative):</h4>
                     ${centeredAHtml}
                     <h4>Centered Matrix B' (Green = positive, Red = negative):</h4>
@@ -335,74 +335,74 @@ function computeDistanceCorrelationWithSteps(x, y) {
             </details>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 4: Calculate Distance Covariance and Variances</h3>
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 4: Calculate Distance Covariance and Variances</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div class="s-ca9e5c">
                 <strong>Squared Distance Covariance (dCov²):</strong>
-                <div style="font-family: monospace; font-size: 14px;">
+                <div class="s-4b0e48">
                     dCov² = (1/n²) × Σ Σ A'<sub>ij</sub> × B'<sub>ij</sub><br>
                     dCov² = (1/${n}²) × ${(dCov * n * n).toFixed(6)}<br>
-                    dCov² = ${(dCov * n * n).toFixed(6)} / ${n*n} = <strong style="color: #1a5490;">${dCov.toFixed(8)}</strong>
+                    dCov² = ${(dCov * n * n).toFixed(6)} / ${n*n} = <strong class="s-f342b5">${dCov.toFixed(8)}</strong>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div class="s-ca9e5c">
                 <strong>Squared Distance Variance of X (dVar²X):</strong>
-                <div style="font-family: monospace; font-size: 14px;">
+                <div class="s-4b0e48">
                     dVar²X = (1/n²) × Σ Σ (A'<sub>ij</sub>)²<br>
                     dVar²X = (1/${n}²) × ${(dVarX * n * n).toFixed(6)}<br>
-                    dVar²X = ${(dVarX * n * n).toFixed(6)} / ${n*n} = <strong style="color: #1a5490;">${dVarX.toFixed(8)}</strong>
+                    dVar²X = ${(dVarX * n * n).toFixed(6)} / ${n*n} = <strong class="s-f342b5">${dVarX.toFixed(8)}</strong>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+            <div class="s-6025fc">
                 <strong>Squared Distance Variance of Y (dVar²Y):</strong>
-                <div style="font-family: monospace; font-size: 14px;">
+                <div class="s-4b0e48">
                     dVar²Y = (1/n²) × Σ Σ (B'<sub>ij</sub>)²<br>
                     dVar²Y = (1/${n}²) × ${(dVarY * n * n).toFixed(6)}<br>
-                    dVar²Y = ${(dVarY * n * n).toFixed(6)} / ${n*n} = <strong style="color: #1a5490;">${dVarY.toFixed(8)}</strong>
+                    dVar²Y = ${(dVarY * n * n).toFixed(6)} / ${n*n} = <strong class="s-f342b5">${dVarY.toFixed(8)}</strong>
                 </div>
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 5: Calculate Distance Correlation</h3>
-            <div style="background: white; border-radius: 12px; padding: 20px; text-align: center;">
-                <div style="font-family: monospace; font-size: 16px;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 5: Calculate Distance Correlation</h3>
+            <div class="s-20865b gen-pad">
+                <div class="s-8308fb">
                     dCor² = dCov² / √(dVar²X × dVar²Y)<br>
                     dCor² = ${dCov.toFixed(6)} / √(${dVarX.toFixed(6)} × ${dVarY.toFixed(6)})<br>
                     dCor² = ${dCov.toFixed(6)} / √${(dVarX * dVarY).toFixed(6)}<br>
                     dCor² = ${dCov.toFixed(6)} / ${Math.sqrt(dVarX * dVarY).toFixed(6)} = ${dCor2.toFixed(6)}<br>
                     dCor = √dCor² = √${dCor2.toFixed(6)}
                 </div>
-                <div style="font-size: 36px; font-weight: 700; color: #1a5490; margin-top: 16px;">
+                <div class="s-9c9645 gen-big">
                     dCor = ${dCor.toFixed(8)}
                 </div>
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; background: #f3e5f5; border-left: 6px solid #6a1b9a;">
-            <h3 style="margin: 0 0 12px 0;">📌 Interpretation & Comparison</h3>
-            <div style="display: grid; gap: 10px;">
+        <div class="s-6fb674 gen-pad">
+            <h3 class="s-c7f0b4">📌 Interpretation & Comparison</h3>
+            <div class="s-45b8b7">
                 <div><strong>Distance Correlation (dCor):</strong> ${dCor.toFixed(6)}</div>
                 <div><strong>Pearson Correlation (r):</strong> ${pearsonR.toFixed(6)}</div>
                 <div><strong>Difference:</strong> ${Math.abs(dCor - Math.abs(pearsonR)).toFixed(6)}</div>
                 
-                <div style="margin-top: 8px; padding: 12px; background: white; border-radius: 8px;">
+                <div class="s-d605bd">
                     <strong>🔍 What does this tell us?</strong><br><br>
                     ${Math.abs(pearsonR) < 0.3 && dCor > 0.5 ? 
-                        `✓ <strong style="color: #28a745;">NON-LINEAR RELATIONSHIP DETECTED!</strong><br>
+                        `✓ <strong class="s-15a612">NON-LINEAR RELATIONSHIP DETECTED!</strong><br>
                         Pearson correlation (${pearsonR.toFixed(3)}) suggests weak linear relationship, but distance correlation (${dCor.toFixed(3)}) reveals a strong overall relationship.<br>
                         This indicates a non-linear pattern (e.g., quadratic, exponential, periodic, or other complex relationship).` : 
                         
                         Math.abs(pearsonR) > 0.7 && Math.abs(dCor - Math.abs(pearsonR)) < 0.1 ?
-                        `✓ <strong style="color: #28a745;">STRONG LINEAR RELATIONSHIP</strong><br>
+                        `✓ <strong class="s-15a612">STRONG LINEAR RELATIONSHIP</strong><br>
                         Both Pearson (${pearsonR.toFixed(3)}) and distance (${dCor.toFixed(3)}) correlations are strong and similar.<br>
                         This suggests the relationship is approximately linear.` :
                         
                         Math.abs(pearsonR) > 0.7 && dCor < 0.7 ?
-                        `⚠ <strong style="color: #ffc107;">POSSIBLE OUTLIER EFFECT</strong><br>
+                        `⚠ <strong class="s-8df210">POSSIBLE OUTLIER EFFECT</strong><br>
                         Pearson shows strong correlation (${pearsonR.toFixed(3)}) but distance correlation is weaker (${dCor.toFixed(3)}).<br>
                         This may indicate that outliers are affecting Pearson correlation.` :
                         
@@ -412,7 +412,7 @@ function computeDistanceCorrelationWithSteps(x, y) {
                     }
                 </div>
                 
-                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+                <div class="s-f8d781">
                     <strong>💡 Key Insight:</strong> Distance correlation = 0 if and only if X and Y are statistically independent.<br>
                     Pearson correlation = 0 does NOT imply independence (only no LINEAR relationship).<br>
                     Distance correlation captures ALL types of relationships (linear, quadratic, exponential, periodic, etc.).

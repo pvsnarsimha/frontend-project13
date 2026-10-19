@@ -128,13 +128,14 @@ function renderHistogramInterface() {
             label: "🎯 HISTOGRAM",
             value: "histogramValueDisplay",
             steps: "histogramStepsDisplay",
-            extra: ['<canvas id="histogramChartCanvas" style="max-height: 400px; margin-top: 20px;"></canvas>']
+            extra: ['<canvas class="s-72ec90" id="histogramChartCanvas"></canvas>']
         }
     });
 }
 
 function computeHistogramWithSteps(numbers, numBins) {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
+    numBins = Math.max(1, Math.min(30, Math.floor(numBins) || 5));
     
     const n = numbers.length;
     const minVal = Math.min(...numbers);
@@ -200,22 +201,21 @@ function computeHistogramWithSteps(numbers, numBins) {
     const density = bins.map(f => (f / (n * binWidth)).toFixed(6));
     
     // Build histogram table
-    let tableHtml = '<div style="overflow-x: auto; margin: 20px 0;">';
-    tableHtml += '<table style="width: 100%; border-collapse: collapse; font-size: 13px; background: white; border-radius: 12px; overflow: hidden;">';
-    tableHtml += '<thead><tr style="background: linear-gradient(135deg, #1a5490, #0d3b66); color: white;">';
-    tableHtml += '<th style="padding: 12px;">Bin #</th><th style="padding: 12px;">Bin Range</th><th style="padding: 12px;">Frequency (f)</th>';
-    tableHtml += '<th style="padding: 12px;">Relative Freq (%)</th><th style="padding: 12px;">Cumulative Freq</th><th style="padding: 12px;">Density</th>';
+    let tableHtml = '<div class="s-91cab3">';
+    tableHtml += '<table class="s-eb002f gen-sized">';
+    tableHtml += '<thead><tr class="s-2d88ce">';
+    tableHtml += '<th class="s-d66e1c">Bin #</th><th class="s-d66e1c">Bin Range</th><th class="s-d66e1c">Frequency (f)</th>';
+    tableHtml += '<th class="s-d66e1c">Relative Freq (%)</th><th class="s-d66e1c">Cumulative Freq</th><th class="s-d66e1c">Density</th>';
     tableHtml += '</tr></thead><tbody>';
     
     for (let i = 0; i < numBins; i++) {
-        const rowBg = i % 2 === 0 ? '#f8f9fa' : 'white';
-        tableHtml += `<tr style="border-bottom: 1px solid #e9ecef; background: ${rowBg};">`;
-        tableHtml += `<td style="padding: 10px; text-align: center; font-weight: bold;">${i+1}</td>`;
-        tableHtml += `<td style="padding: 10px;">${binLabels[i]}</td>`;
-        tableHtml += `<td style="padding: 10px; text-align: center; font-weight: bold; color: #1a5490;">${bins[i]}</td>`;
-        tableHtml += `<td style="padding: 10px; text-align: center;">${relativeFreq[i]}%</td>`;
-        tableHtml += `<td style="padding: 10px; text-align: center;">${cumulativeFreq[i]}</td>`;
-        tableHtml += `<td style="padding: 10px; text-align: center;">${density[i]}</td>`;
+        tableHtml += `<tr class="${i % 2 === 0 ? 's-d7104c' : 's-c647c3'}">`;
+        tableHtml += `<td class="s-09833f">${i+1}</td>`;
+        tableHtml += `<td class="s-aa3a8a">${binLabels[i]}</td>`;
+        tableHtml += `<td class="s-edf7fd">${bins[i]}</td>`;
+        tableHtml += `<td class="s-618bb3">${relativeFreq[i]}%</td>`;
+        tableHtml += `<td class="s-618bb3">${cumulativeFreq[i]}</td>`;
+        tableHtml += `<td class="s-618bb3">${density[i]}</td>`;
         tableHtml += `</tr>`;
     }
     tableHtml += '</tbody></table></div>';
@@ -233,7 +233,7 @@ function computeHistogramWithSteps(numbers, numBins) {
     steps += `📐 STEP 2: Bin Width Calculation - Formula\n`;
     steps += `   Bin Width = (Maximum - Minimum) / Number of Bins\n`;
     steps += `   Bin Width = (${maxVal.toFixed(6)} - ${minVal.toFixed(6)}) / ${numBins}\n`;
-    steps += `   Bin Width = ${range.toFixed(6)} / ${numBins} = <strong style="color: #1a5490;">${binWidth.toFixed(6)}</strong>\n\n`;
+    steps += `   Bin Width = ${range.toFixed(6)} / ${numBins} = <strong class="s-f342b5">${binWidth.toFixed(6)}</strong>\n\n`;
     
     steps += `📊 STEP 3: Optimal Bin Width Recommendations\n`;
     steps += `   • Sturges' Rule: k = ⌈log₂(n) + 1⌉ = ⌈log₂(${n}) + 1⌉ = ${sturgesBins} bins → width = ${sturgesWidth.toFixed(6)}\n`;
@@ -332,7 +332,7 @@ function setupHistogramLogic() {
     computeBtn.addEventListener('click', () => {
         const raw = document.getElementById("histogramInput").value;
         const numbers = parseNumbersFromInput(raw);
-        const numBins = parseInt(document.getElementById("histogramBins").value) || 5;
+        const numBins = Math.max(1, Math.min(30, parseInt(document.getElementById("histogramBins").value) || 5));
         const resultDiv = document.getElementById("histogramResultArea");
         const valueSpan = document.getElementById("histogramValueDisplay");
         const stepsSpan = document.getElementById("histogramStepsDisplay");

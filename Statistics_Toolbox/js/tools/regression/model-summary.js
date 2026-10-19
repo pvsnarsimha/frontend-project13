@@ -132,97 +132,97 @@ function computeModelSummary(actual, predicted, k = 1) {
         '<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;">',
         
         // HEADER SECTION
-        '<div style="background: linear-gradient(135deg, #1e3a5f 0%, #0f2b45 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">',
-        '<div style="display: flex; align-items: center; gap: 12px;">',
-        '<span style="font-size: 32px;">📈</span>',
-        '<h2 style="margin: 0;">Regression Model Dashboard</h2>',
+        '<div class="s-090589 gen-pad">',
+        '<div class="s-4c6057 gen-flex">',
+        '<span class="s-1f18a8 gen-big">📈</span>',
+        '<h2 class="s-f8a94d">Regression Model Dashboard</h2>',
         '</div>',
-        '<p style="margin: 8px 0 0 0; opacity: 0.9;">Model Performance Analysis & Diagnostics | ' + n + ' Observations</p>',
+        '<p class="s-259079">Model Performance Analysis & Diagnostics | ' + n + ' Observations</p>',
         '</div>',
         
         // KPI CARDS SECTION
-        '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 28px;">',
+        '<div class="s-58bbf9 gen-grid">',
         
         // R² Card
-        '<div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);">',
-        '<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">',
-        '<span style="font-size: 14px; font-weight: 500; color: #6b7280; text-transform: uppercase;">R-Squared (R²)</span>',
-        '<span style="font-size: 24px;">📊</span>',
+        '<div class="s-713960 gen-pad">',
+        '<div class="s-711e5f gen-flex">',
+        '<span class="s-1d267a">R-Squared (R²)</span>',
+        '<span class="s-530413">📊</span>',
         '</div>',
-        '<div style="font-size: 36px; font-weight: 800; color: #1f2937; margin-bottom: 8px;">' + (rSquared * 100).toFixed(1) + '<span style="font-size: 18px;">%</span></div>',
-        '<div style="font-size: 12px; display: flex; align-items: center; gap: 8px;">',
+        '<div class="s-be29f3 gen-big">' + (rSquared * 100).toFixed(1) + '<span class="s-2faf9e">%</span></div>',
+        '<div class="s-4b1eff gen-flex">',
         '<span style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: ' + r2Perf.bg + '; color: ' + r2Perf.color + ';">' + r2Perf.icon + ' ' + r2Perf.text + '</span>',
         '<span>Variance explained</span>',
         '</div></div>',
         
         // Adjusted R² Card
-        '<div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);">',
-        '<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">',
-        '<span style="font-size: 14px; font-weight: 500; color: #6b7280; text-transform: uppercase;">Adjusted R²</span>',
-        '<span style="font-size: 24px;">⚙️</span>',
+        '<div class="s-713960 gen-pad">',
+        '<div class="s-711e5f gen-flex">',
+        '<span class="s-1d267a">Adjusted R²</span>',
+        '<span class="s-530413">⚙️</span>',
         '</div>',
-        '<div style="font-size: 36px; font-weight: 800; color: #1f2937; margin-bottom: 8px;">' + (adjRSquared * 100).toFixed(1) + '<span style="font-size: 18px;">%</span></div>',
-        '<div style="font-size: 12px;">Penalized for ' + dfRes + ' df</div></div>',
+        '<div class="s-be29f3 gen-big">' + (adjRSquared * 100).toFixed(1) + '<span class="s-2faf9e">%</span></div>',
+        '<div class="s-137d30">Penalized for ' + dfRes + ' df</div></div>',
         
         // RMSE Card
-        '<div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);">',
-        '<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">',
-        '<span style="font-size: 14px; font-weight: 500; color: #6b7280; text-transform: uppercase;">RMSE</span>',
-        '<span style="font-size: 24px;">🎯</span>',
+        '<div class="s-713960 gen-pad">',
+        '<div class="s-711e5f gen-flex">',
+        '<span class="s-1d267a">RMSE</span>',
+        '<span class="s-530413">🎯</span>',
         '</div>',
-        '<div style="font-size: 36px; font-weight: 800; color: #1f2937; margin-bottom: 8px;">' + rmse.toFixed(4) + '</div>',
-        '<div style="font-size: 12px;">Root Mean Square Error</div></div>',
+        '<div class="s-be29f3 gen-big">' + rmse.toFixed(4) + '</div>',
+        '<div class="s-137d30">Root Mean Square Error</div></div>',
         
         // MAE Card (with Mean Y)
-        '<div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);">',
-        '<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">',
-        '<span style="font-size: 14px; font-weight: 500; color: #6b7280; text-transform: uppercase;">MAE</span>',
-        '<span style="font-size: 24px;">📏</span>',
+        '<div class="s-713960 gen-pad">',
+        '<div class="s-711e5f gen-flex">',
+        '<span class="s-1d267a">MAE</span>',
+        '<span class="s-530413">📏</span>',
         '</div>',
-        '<div style="font-size: 36px; font-weight: 800; color: #1f2937; margin-bottom: 8px;">' + mae.toFixed(4) + '</div>',
-        '<div style="font-size: 12px;">Mean Absolute Error</div>',
-        '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb;">',
-        '<span style="font-size: 11px; color: #6b7280;">Mean of Y (ȳ) = ' + meanY.toFixed(4) + '</span>',
+        '<div class="s-be29f3 gen-big">' + mae.toFixed(4) + '</div>',
+        '<div class="s-137d30">Mean Absolute Error</div>',
+        '<div class="s-cc2b6b">',
+        '<span class="s-1f89fd">Mean of Y (ȳ) = ' + meanY.toFixed(4) + '</span>',
         '</div></div>',
         
         // MAPE Card
-        '<div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);">',
-        '<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">',
-        '<span style="font-size: 14px; font-weight: 500; color: #6b7280; text-transform: uppercase;">MAPE</span>',
-        '<span style="font-size: 24px;">%</span>',
+        '<div class="s-713960 gen-pad">',
+        '<div class="s-711e5f gen-flex">',
+        '<span class="s-1d267a">MAPE</span>',
+        '<span class="s-530413">%</span>',
         '</div>',
-        '<div style="font-size: 36px; font-weight: 800; color: #1f2937; margin-bottom: 8px;">' + mape.toFixed(1) + '<span style="font-size: 18px;">%</span></div>',
-        '<div style="font-size: 12px;">',
+        '<div class="s-be29f3 gen-big">' + mape.toFixed(1) + '<span class="s-2faf9e">%</span></div>',
+        '<div class="s-137d30">',
         '<span style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: ' + mapePerf.bg + '; color: ' + mapePerf.color + ';">' + mapePerf.icon + ' ' + (mape < 10 ? 'High Accuracy' : (mape < 20 ? 'Moderate Accuracy' : 'Low Accuracy')) + '</span>',
         '</div></div>',
         
         // Sum of Squares Card
-        '<div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);">',
-        '<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">',
-        '<span style="font-size: 14px; font-weight: 500; color: #6b7280; text-transform: uppercase;">Sum of Squares</span>',
-        '<span style="font-size: 24px;">🔢</span>',
+        '<div class="s-713960 gen-pad">',
+        '<div class="s-711e5f gen-flex">',
+        '<span class="s-1d267a">Sum of Squares</span>',
+        '<span class="s-530413">🔢</span>',
         '</div>',
-        '<div style="font-size: 20px; font-weight: 800; color: #1f2937;">SS<sub>res</sub>: ' + ssRes.toFixed(2) + '</div>',
-        '<div style="font-size: 12px;">SS<sub>tot</sub>: ' + ssTot.toFixed(2) + '</div></div>',
+        '<div class="s-24b94a">SS<sub>res</sub>: ' + ssRes.toFixed(2) + '</div>',
+        '<div class="s-137d30">SS<sub>tot</sub>: ' + ssTot.toFixed(2) + '</div></div>',
         '</div>',
         
         // MAIN CONTENT: 2 COLUMNS (Data Table + Expandable Metrics)
-        '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">',
+        '<div class="s-48ea9a gen-grid">',
         
         // LEFT COLUMN: Data Table
-        '<div style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">',
-        '<div style="font-size: 18px; font-weight: 700; color: #1f2937; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 12px;">',
+        '<div class="s-706cf4 gen-pad">',
+        '<div class="s-818b9e gen-flex">',
         '<span>📋</span> Observed vs Predicted Values',
         '</div>',
-        '<div style="overflow-x: auto;">',
-        '<table style="width: 100%; border-collapse: collapse; font-size: 13px;">',
-        '<thead><tr style="background: #f8fafc;">',
-        '<th style="padding: 12px; text-align: center;">#</th>',
-        '<th style="padding: 12px; text-align: center;">Actual (y)</th>',
-        '<th style="padding: 12px; text-align: center;">Predicted (ŷ)</th>',
-        '<th style="padding: 12px; text-align: center;">Residual (e)</th>',
-        '<th style="padding: 12px; text-align: center;">e²</th>',
-        '<th style="padding: 12px; text-align: center;">(y-ȳ)²</th>',
+        '<div class="s-01a9b9">',
+        '<table class="s-306b2c gen-sized">',
+        '<thead><tr class="s-cacac0">',
+        '<th class="s-34ffd2">#</th>',
+        '<th class="s-34ffd2">Actual (y)</th>',
+        '<th class="s-34ffd2">Predicted (ŷ)</th>',
+        '<th class="s-34ffd2">Residual (e)</th>',
+        '<th class="s-34ffd2">e²</th>',
+        '<th class="s-34ffd2">(y-ȳ)²</th>',
         '</tr></thead>',
         '<tbody>'
     ];
@@ -230,34 +230,34 @@ function computeModelSummary(actual, predicted, k = 1) {
     // Add table rows
     for (var i = 0; i < residualDetails.length; i++) {
         var r = residualDetails[i];
-        steps.push('<tr style="border-bottom: 1px solid #f1f5f9;">');
-        steps.push('<td style="padding: 10px; text-align: center;">' + (i+1) + '</td>');
-        steps.push('<td style="padding: 10px; text-align: center;"><strong>' + r.actual + '</strong></td>');
-        steps.push('<td style="padding: 10px; text-align: center;">' + r.predicted.toFixed(4) + '</td>');
+        steps.push('<tr class="s-ccf761">');
+        steps.push('<td class="s-618bb3">' + (i+1) + '</td>');
+        steps.push('<td class="s-618bb3"><strong>' + r.actual + '</strong></td>');
+        steps.push('<td class="s-618bb3">' + r.predicted.toFixed(4) + '</td>');
         steps.push('<td style="padding: 10px; text-align: center; color: ' + (r.residual >= 0 ? '#10b981' : '#ef4444') + ';">' + (r.residual >= 0 ? '+' : '') + r.residual.toFixed(4) + '</td>');
-        steps.push('<td style="padding: 10px; text-align: center;">' + r.squaredRes.toFixed(4) + '</td>');
-        steps.push('<td style="padding: 10px; text-align: center;">' + r.squaredDev.toFixed(4) + '</td>');
+        steps.push('<td class="s-618bb3">' + r.squaredRes.toFixed(4) + '</td>');
+        steps.push('<td class="s-618bb3">' + r.squaredDev.toFixed(4) + '</td>');
         steps.push('</tr>');
     }
     
-    steps.push('<tr style="background: #f1f5f9; font-weight: 600;">');
-    steps.push('<td colspan="4" style="padding: 10px; text-align: right;">SUMS →</td>');
-    steps.push('<td style="padding: 10px; text-align: center;">' + ssRes.toFixed(4) + '</td>');
-    steps.push('<td style="padding: 10px; text-align: center;">' + ssTot.toFixed(4) + '</td>');
+    steps.push('<tr class="s-635578">');
+    steps.push('<td class="s-c1430c" colspan="4">SUMS →</td>');
+    steps.push('<td class="s-618bb3">' + ssRes.toFixed(4) + '</td>');
+    steps.push('<td class="s-618bb3">' + ssTot.toFixed(4) + '</td>');
     steps.push('</tr></tbody></table></div></div>');
     
     // RIGHT COLUMN: Expandable Metrics
-    steps.push('<div style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">');
-    steps.push('<div style="font-size: 18px; font-weight: 700; color: #1f2937; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 12px;">');
+    steps.push('<div class="s-706cf4 gen-pad">');
+    steps.push('<div class="s-818b9e gen-flex">');
     steps.push('<span>🧮</span> How Metrics Are Calculated');
-    steps.push('<span style="font-size: 12px; margin-left: auto;">▼ Click any metric to expand</span>');
+    steps.push('<span class="s-04e12b">▼ Click any metric to expand</span>');
     steps.push('</div>');
     
     // R² Expandable
-    steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
-    steps.push('<span style="font-weight: 600;">📐 R-Squared (R²)</span>');
-    steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + rSquared.toFixed(6) + '</span>');
+    steps.push('<div class="s-58dab4">');
+    steps.push('<div class="s-d1792e gen-flex" data-toggle-metric="1">');
+    steps.push('<span class="s-48f582">📐 R-Squared (R²)</span>');
+    steps.push('<span class="s-5e6201">' + rSquared.toFixed(6) + '</span>');
     steps.push('</div>');
     steps.push('<div class="metric-formula" style="background: #f1f5f9; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 12px; margin-top: 8px; display: none; border-left: 3px solid #1e3a5f;">');
     steps.push('<strong>Formula:</strong> R² = 1 - SS<sub>res</sub> / SS<sub>tot</sub><br><br>');
@@ -269,14 +269,14 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('R² = 1 - (' + ssRes.toFixed(4) + ' / ' + ssTot.toFixed(4) + ')<br>');
     steps.push('R² = 1 - ' + (ssRes/ssTot).toFixed(6) + '<br>');
     steps.push('<strong>R² = ' + rSquared.toFixed(6) + '</strong><br><br>');
-    steps.push('<span style="background: #e0e7ff; padding: 2px 6px; border-radius: 4px;">✅ ' + (rSquared * 100).toFixed(1) + '% of variance explained</span>');
+    steps.push('<span class="s-701bb6">✅ ' + (rSquared * 100).toFixed(1) + '% of variance explained</span>');
     steps.push('</div></div>');
     
     // Adjusted R² Expandable
-    steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
-    steps.push('<span style="font-weight: 600;">🔧 Adjusted R-Squared</span>');
-    steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + adjRSquared.toFixed(6) + '</span>');
+    steps.push('<div class="s-58dab4">');
+    steps.push('<div class="s-d1792e gen-flex" data-toggle-metric="1">');
+    steps.push('<span class="s-48f582">🔧 Adjusted R-Squared</span>');
+    steps.push('<span class="s-5e6201">' + adjRSquared.toFixed(6) + '</span>');
     steps.push('</div>');
     steps.push('<div class="metric-formula" style="background: #f1f5f9; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 12px; margin-top: 8px; display: none; border-left: 3px solid #1e3a5f;">');
     steps.push('<strong>Formula:</strong> R²<sub>adj</sub> = 1 - (1-R²)(n-1)/(n-k-1)<br><br>');
@@ -287,10 +287,10 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('</div></div>');
     
     // RMSE Expandable
-    steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
-    steps.push('<span style="font-weight: 600;">📏 RMSE (Root Mean Square Error)</span>');
-    steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + rmse.toFixed(6) + '</span>');
+    steps.push('<div class="s-58dab4">');
+    steps.push('<div class="s-d1792e gen-flex" data-toggle-metric="1">');
+    steps.push('<span class="s-48f582">📏 RMSE (Root Mean Square Error)</span>');
+    steps.push('<span class="s-5e6201">' + rmse.toFixed(6) + '</span>');
     steps.push('</div>');
     steps.push('<div class="metric-formula" style="background: #f1f5f9; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 12px; margin-top: 8px; display: none; border-left: 3px solid #1e3a5f;">');
     steps.push('<strong>Formula:</strong> RMSE = √(SS<sub>res</sub>/n)<br><br>');
@@ -300,10 +300,10 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('</div></div>');
     
     // MAE Expandable
-    steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
-    steps.push('<span style="font-weight: 600;">📊 MAE (Mean Absolute Error)</span>');
-    steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + mae.toFixed(6) + '</span>');
+    steps.push('<div class="s-58dab4">');
+    steps.push('<div class="s-d1792e gen-flex" data-toggle-metric="1">');
+    steps.push('<span class="s-48f582">📊 MAE (Mean Absolute Error)</span>');
+    steps.push('<span class="s-5e6201">' + mae.toFixed(6) + '</span>');
     steps.push('</div>');
     steps.push('<div class="metric-formula" style="background: #f1f5f9; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 12px; margin-top: 8px; display: none; border-left: 3px solid #1e3a5f;">');
     steps.push('<strong>Formula:</strong> MAE = (1/n) × Σ|yᵢ - ŷᵢ|<br><br>');
@@ -315,10 +315,10 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('</div></div>');
     
     // MAPE Expandable
-    steps.push('<div style="margin-bottom: 20px;">');
-    steps.push('<div data-toggle-metric="1" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px;">');
-    steps.push('<span style="font-weight: 600;">% MAPE (Mean Absolute Percentage Error)</span>');
-    steps.push('<span style="font-weight: 700; color: #1e3a5f;">' + mape.toFixed(2) + '%</span>');
+    steps.push('<div class="s-58dab4">');
+    steps.push('<div class="s-d1792e gen-flex" data-toggle-metric="1">');
+    steps.push('<span class="s-48f582">% MAPE (Mean Absolute Percentage Error)</span>');
+    steps.push('<span class="s-5e6201">' + mape.toFixed(2) + '%</span>');
     steps.push('</div>');
     steps.push('<div class="metric-formula" style="background: #f1f5f9; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 12px; margin-top: 8px; display: none; border-left: 3px solid #1e3a5f;">');
     steps.push('<strong>Formula:</strong> MAPE = (100/n) × Σ|(yᵢ - ŷᵢ)/yᵢ|<br><br>');
@@ -331,48 +331,48 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('</div></div>');
     
     // BOTTOM SECTION: Complete Calculation Details for All Metrics
-    steps.push('<div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 24px; margin-top: 20px; border: 1px solid #bbf7d0;">');
-    steps.push('<div style="font-size: 18px; font-weight: 700; color: #166534; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">');
+    steps.push('<div class="s-839cf0 gen-pad">');
+    steps.push('<div class="s-9c2cb9 gen-flex">');
     steps.push('<span>📚</span> Complete Formula Reference & Calculation Summary');
     steps.push('</div>');
     
-    steps.push('<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">');
+    steps.push('<div class="s-fbb6b7 gen-grid">');
     
     // SSres Detailed Calculation
-    steps.push('<div style="background: white; border-radius: 12px; padding: 16px;">');
-    steps.push('<h4 style="margin: 0 0 8px 0; color: #1e3a5f;">📐 Sum of Squared Residuals (SS<sub>res</sub>)</h4>');
-    steps.push('<p style="font-family: monospace; font-size: 12px; margin: 0 0 8px 0;">SS<sub>res</sub> = Σ(yᵢ - ŷᵢ)²</p>');
-    steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 11px;">');
+    steps.push('<div class="s-6025fc">');
+    steps.push('<h4 class="s-6fc54b">📐 Sum of Squared Residuals (SS<sub>res</sub>)</h4>');
+    steps.push('<p class="s-9f96c4">SS<sub>res</sub> = Σ(yᵢ - ŷᵢ)²</p>');
+    steps.push('<div class="s-52b70c">');
     steps.push(ssResCalculation.replace(/\n/g, '<br>'));
     steps.push('</div>');
-    steps.push('<p style="margin-top: 8px;"><strong>Total SS<sub>res</sub> = ' + ssRes.toFixed(4) + '</strong></p>');
+    steps.push('<p class="s-2747c5"><strong>Total SS<sub>res</sub> = ' + ssRes.toFixed(4) + '</strong></p>');
     steps.push('</div>');
     
     // SStot Detailed Calculation
-    steps.push('<div style="background: white; border-radius: 12px; padding: 16px;">');
-    steps.push('<h4 style="margin: 0 0 8px 0; color: #1e3a5f;">📊 Total Sum of Squares (SS<sub>tot</sub>)</h4>');
-    steps.push('<p style="font-family: monospace; font-size: 12px; margin: 0 0 8px 0;">SS<sub>tot</sub> = Σ(yᵢ - ȳ)² where ȳ = ' + meanY.toFixed(4) + '</p>');
-    steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 11px;">');
+    steps.push('<div class="s-6025fc">');
+    steps.push('<h4 class="s-6fc54b">📊 Total Sum of Squares (SS<sub>tot</sub>)</h4>');
+    steps.push('<p class="s-9f96c4">SS<sub>tot</sub> = Σ(yᵢ - ȳ)² where ȳ = ' + meanY.toFixed(4) + '</p>');
+    steps.push('<div class="s-52b70c">');
     steps.push(ssTotCalculation.replace(/\n/g, '<br>'));
     steps.push('</div>');
-    steps.push('<p style="margin-top: 8px;"><strong>Total SS<sub>tot</sub> = ' + ssTot.toFixed(4) + '</strong></p>');
+    steps.push('<p class="s-2747c5"><strong>Total SS<sub>tot</sub> = ' + ssTot.toFixed(4) + '</strong></p>');
     steps.push('</div>');
     
     // R² Calculation
-    steps.push('<div style="background: white; border-radius: 12px; padding: 16px;">');
-    steps.push('<h4 style="margin: 0 0 8px 0; color: #1e3a5f;">🎯 R-Squared (R²)</h4>');
-    steps.push('<p style="font-family: monospace; font-size: 12px; margin: 0 0 8px 0;">R² = 1 - SS<sub>res</sub>/SS<sub>tot</sub></p>');
-    steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px;">');
+    steps.push('<div class="s-6025fc">');
+    steps.push('<h4 class="s-6fc54b">🎯 R-Squared (R²)</h4>');
+    steps.push('<p class="s-9f96c4">R² = 1 - SS<sub>res</sub>/SS<sub>tot</sub></p>');
+    steps.push('<div class="s-2eeaac">');
     steps.push('R² = 1 - (' + ssRes.toFixed(4) + ' / ' + ssTot.toFixed(4) + ')<br>');
     steps.push('R² = 1 - ' + (ssRes/ssTot).toFixed(6) + '<br>');
     steps.push('<strong>R² = ' + rSquared.toFixed(6) + '</strong> (' + (rSquared*100).toFixed(1) + '%)');
     steps.push('</div></div>');
     
     // Adjusted R² Calculation
-    steps.push('<div style="background: white; border-radius: 12px; padding: 16px;">');
-    steps.push('<h4 style="margin: 0 0 8px 0; color: #1e3a5f;">⚙️ Adjusted R-Squared</h4>');
-    steps.push('<p style="font-family: monospace; font-size: 12px; margin: 0 0 8px 0;">R²<sub>adj</sub> = 1 - (1-R²)(n-1)/(n-k-1), k = ' + k + '</p>');
-    steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px;">');
+    steps.push('<div class="s-6025fc">');
+    steps.push('<h4 class="s-6fc54b">⚙️ Adjusted R-Squared</h4>');
+    steps.push('<p class="s-9f96c4">R²<sub>adj</sub> = 1 - (1-R²)(n-1)/(n-k-1), k = ' + k + '</p>');
+    steps.push('<div class="s-2eeaac">');
     steps.push('1 - R² = ' + (1-rSquared).toFixed(6) + '<br>');
     steps.push('(n-1)/(n-k-1) = ' + (n-1) + '/' + dfRes + ' = ' + ((n-1)/dfRes).toFixed(4) + '<br>');
     steps.push('Product = ' + (1-rSquared).toFixed(6) + ' × ' + ((n-1)/dfRes).toFixed(4) + ' = ' + ((1-rSquared)*(n-1)/dfRes).toFixed(6) + '<br>');
@@ -381,30 +381,30 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('</div></div>');
     
     // RMSE Calculation
-    steps.push('<div style="background: white; border-radius: 12px; padding: 16px;">');
-    steps.push('<h4 style="margin: 0 0 8px 0; color: #1e3a5f;">📏 RMSE (Root Mean Square Error)</h4>');
-    steps.push('<p style="font-family: monospace; font-size: 12px; margin: 0 0 8px 0;">RMSE = √(SS<sub>res</sub>/n)</p>');
-    steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px;">');
+    steps.push('<div class="s-6025fc">');
+    steps.push('<h4 class="s-6fc54b">📏 RMSE (Root Mean Square Error)</h4>');
+    steps.push('<p class="s-9f96c4">RMSE = √(SS<sub>res</sub>/n)</p>');
+    steps.push('<div class="s-2eeaac">');
     steps.push('SS<sub>res</sub>/n = ' + ssRes.toFixed(4) + ' / ' + n + ' = ' + (ssRes/n).toFixed(4) + '<br>');
     steps.push('RMSE = √(' + (ssRes/n).toFixed(4) + ')<br>');
     steps.push('<strong>RMSE = ' + rmse.toFixed(6) + '</strong>');
     steps.push('</div></div>');
     
     // MAE Calculation
-    steps.push('<div style="background: white; border-radius: 12px; padding: 16px;">');
-    steps.push('<h4 style="margin: 0 0 8px 0; color: #1e3a5f;">📊 MAE (Mean Absolute Error)</h4>');
-    steps.push('<p style="font-family: monospace; font-size: 12px; margin: 0 0 8px 0;">MAE = (1/n) Σ|yᵢ - ŷᵢ|</p>');
-    steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 11px;">');
+    steps.push('<div class="s-6025fc">');
+    steps.push('<h4 class="s-6fc54b">📊 MAE (Mean Absolute Error)</h4>');
+    steps.push('<p class="s-9f96c4">MAE = (1/n) Σ|yᵢ - ŷᵢ|</p>');
+    steps.push('<div class="s-52b70c">');
     steps.push(maeCalculation.replace(/\n/g, '<br>'));
     steps.push('<br><strong>Sum |eᵢ| = ' + sumAbsResiduals.toFixed(4) + '</strong><br>');
     steps.push('MAE = ' + sumAbsResiduals.toFixed(4) + ' / ' + n + ' = <strong>' + mae.toFixed(6) + '</strong>');
     steps.push('</div></div>');
     
     // MAPE Calculation
-    steps.push('<div style="background: white; border-radius: 12px; padding: 16px;">');
-    steps.push('<h4 style="margin: 0 0 8px 0; color: #1e3a5f;">% MAPE (Mean Absolute Percentage Error)</h4>');
-    steps.push('<p style="font-family: monospace; font-size: 12px; margin: 0 0 8px 0;">MAPE = (100/n) Σ|(yᵢ - ŷᵢ)/yᵢ|</p>');
-    steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 11px;">');
+    steps.push('<div class="s-6025fc">');
+    steps.push('<h4 class="s-6fc54b">% MAPE (Mean Absolute Percentage Error)</h4>');
+    steps.push('<p class="s-9f96c4">MAPE = (100/n) Σ|(yᵢ - ŷᵢ)/yᵢ|</p>');
+    steps.push('<div class="s-52b70c">');
     steps.push(mapeCalculation.replace(/\n/g, '<br>'));
     steps.push('<br><strong>Sum of % = ' + sumMape.toFixed(2) + '%</strong><br>');
     steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + mapeCount + ' = <strong>' + mape.toFixed(2) + '%</strong>');
@@ -413,11 +413,11 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('</div></div>');
     
     // Insights Section
-    steps.push('<div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 20px; margin-top: 20px;">');
-    steps.push('<div style="font-weight: 700; font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">');
+    steps.push('<div class="s-cdd1cd gen-pad">');
+    steps.push('<div class="s-5587fc gen-flex">');
     steps.push('<span>💡</span> Model Performance Insights');
     steps.push('</div>');
-    steps.push('<div style="font-size: 14px; line-height: 1.6; color: #78350f;">');
+    steps.push('<div class="s-0e0d76">');
     steps.push('<strong>R² = ' + (rSquared * 100).toFixed(1) + '%</strong> — ' + (rSquared >= 0.7 ? 'The model explains a substantial portion of variance, indicating strong predictive power.' : (rSquared >= 0.4 ? 'The model shows moderate explanatory power, but there may be room for improvement.' : 'The model explains limited variance, suggesting other factors may be important.')) + '<br><br>');
     steps.push('<strong>RMSE = ' + rmse.toFixed(4) + '</strong> vs <strong>MAE = ' + mae.toFixed(4) + '</strong> — ' + ((rmse - mae) > (rmse * 0.2) ? 'The larger RMSE compared to MAE suggests presence of some larger prediction errors/outliers.' : 'RMSE and MAE are close, indicating consistent prediction errors across observations.') + '<br><br>');
     steps.push('<strong>MAPE = ' + mape.toFixed(1) + '%</strong> — ' + (mape < 10 ? 'Excellent forecasting accuracy (highly reliable predictions).' : (mape < 20 ? 'Good forecasting accuracy with acceptable error margins.' : 'Moderate accuracy; consider model refinement or additional predictors.')));
