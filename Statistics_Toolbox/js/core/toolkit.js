@@ -32,7 +32,7 @@ function escapeHtml(value) {
 // (script/iframe/object/embed..., on* handlers, javascript: URLs), and only then attached. The page's
 // Content-Security-Policy is a second line of defence. Never assign to .innerHTML directly (a test enforces this).
 const HTML_BLOCKED_TAGS = new Set(['SCRIPT', 'IFRAME', 'OBJECT', 'EMBED', 'LINK', 'META', 'BASE', 'FRAME', 'FRAMESET', 'APPLET', 'FORM', 'FOREIGNOBJECT', 'USE']);
-const HTML_URL_ATTRIBUTES = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'background']);
+const HTML_URL_ATTRIBUTES = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster', 'background', 'ping']);
 
 function sanitizeHtmlTree(root) {
     const blocked = [];

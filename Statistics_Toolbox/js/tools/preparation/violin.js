@@ -477,7 +477,7 @@ function setupViolinLogic() {
         });
     }
     
-    computeBtn.addEventListener('click', () => {
+    const runViolin = () => {
         const raw = document.getElementById("violinInput").value;
         const numbers = parseNumbersFromInput(raw);
         const bandwidth = parseFloat(document.getElementById("violinBandwidth").value);
@@ -500,7 +500,19 @@ function setupViolinLogic() {
         setTimeout(() => {
             renderViolinChart(result, numbers, bandwidth);
         }, 100);
-    });
+    };
+    computeBtn.addEventListener('click', runViolin);
+
+    // Once a plot has been drawn, moving the slider redraws it (debounced) so the control does what it looks like
+    if (bandwidthSlider) {
+        let timer = null;
+        bandwidthSlider.addEventListener('input', () => {
+            const resultDiv = document.getElementById("violinResultArea");
+            if (!resultDiv || resultDiv.style.display !== "block") return;
+            clearTimeout(timer);
+            timer = setTimeout(runViolin, 200);
+        });
+    }
     
     attachClearHandler("violinClearBtn", "violinInput", "violinResultArea");
 }

@@ -846,7 +846,7 @@ function computeMANOVA(inputText, alpha) {
         </div>
     </div>`;
     
-    return { wilksLambda, pillaiTrace, hotellingTrace, roysRoot, fStatistic, df1, df2, pValue, rejectH0, steps };
+    return { eigenvalues, wilksLambda, pillaiTrace, hotellingTrace, roysRoot, fStatistic, df1, df2, pValue, rejectH0, steps };
 }
 
 function setupMANOVALogic() {

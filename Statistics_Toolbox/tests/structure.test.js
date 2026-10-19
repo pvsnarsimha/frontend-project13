@@ -218,3 +218,17 @@ test('no top-level const/let/class name is declared twice, or reuses the name of
     }
     assert.deepEqual(clashes, []);
 });
+
+test('vendor/README.md lists the same chart.js version as the vendored chart.umd.js banner', () => {
+    const readme = fs.readFileSync(path.join(ROOT, 'vendor', 'README.md'), 'utf8');
+    const banner = fs.readFileSync(path.join(ROOT, 'vendor', 'chart.umd.js'), 'utf8').slice(0, 400).match(/Chart\.js v(\d+\.\d+\.\d+)/);
+    const row = readme.match(/^\|\s*`chart\.umd\.js`.*?\|\s*(\d+\.\d+\.\d+)\s*\|/m);
+    assert.ok(banner, 'chart.umd.js version comment');
+    assert.ok(row, 'chart.umd.js row in vendor/README.md');
+    assert.equal(row[1], banner[1]);
+});
+
+test('the HTML sanitiser treats ping like the other URL attributes', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js', 'core', 'toolkit.js'), 'utf8');
+    assert.match(src.match(/HTML_URL_ATTRIBUTES = new Set\(\[([^\]]*)\]/)[1], /'ping'/);
+});

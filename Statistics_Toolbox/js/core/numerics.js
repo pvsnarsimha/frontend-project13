@@ -313,7 +313,14 @@ function studentizedRangeCDF(q, k, df) {
     return Math.min(1, gaussLegendreIntegral(integrand, 0, sHi, 5, 16));
 }
 
+const studentizedRangeCache = new Map();
 function studentizedRangeCritical(alpha, k, df) {
+    const key = alpha + '|' + k + '|' + df;
+    if (!studentizedRangeCache.has(key)) studentizedRangeCache.set(key, studentizedRangeCriticalUncached(alpha, k, df));
+    return studentizedRangeCache.get(key);
+}
+
+function studentizedRangeCriticalUncached(alpha, k, df) {
     // q such that P(Q > q) = alpha; Illinois (modified regula falsi) on the monotone CDF
     if (!(k >= 2) || !(df >= 1) || !(alpha > 0) || alpha >= 1) return NaN;
     const target = 1 - alpha;

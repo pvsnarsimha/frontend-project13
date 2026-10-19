@@ -13,11 +13,11 @@ function renderANCOVAInterface() {
                 textarea: {
                     id: "ancovaData",
                     rows: "6",
-                    placeholder: "Example:&#10;Dependent Y, Group, Covariate X&#10;12, A, 5&#10;15, A, 6&#10;14, A, 4&#10;18, B, 7&#10;20, B, 8&#10;19, B, 6&#10;25, C, 9&#10;27, C, 10&#10;24, C, 8"
+                    placeholder: "Example:&#10;Y, Group, Covariate&#10;12, A, 5&#10;15, A, 6&#10;14, A, 4&#10;18, B, 7&#10;20, B, 8&#10;19, B, 6&#10;25, C, 9&#10;27, C, 10&#10;24, C, 8"
                 }
             },
             {
-                hint: "<strong>Format:</strong> Each row: Y (outcome), Group (categorical), X1 (covariate), X2 (optional), ...<br>\n                    <strong>Example:</strong> 12, A, 5 means Y=12, Group=A, Covariate=5",
+                hint: "<strong>Format:</strong> Each row: Y (outcome), Group (categorical), Covariate (numeric). Only one covariate is used; any extra columns are ignored.<br>\n                    <strong>Example:</strong> 12, A, 5 means Y=12, Group=A, Covariate=5",
                 hintAttrs: { style: HINT_STYLE }
             },
             {
@@ -85,7 +85,7 @@ function computeANCOVA(inputText, alpha) {
     // Second column is Group (categorical)
     let group = data.map(row => row[1].toString());
     
-    // Third column and beyond are covariates (use first covariate for simplicity)
+    // Third column is the covariate (single-covariate ANCOVA; extra columns are ignored)
     let cov = data.map(row => parseFloat(row[2]));
     
     const groups = [...new Set(group)];

@@ -245,3 +245,34 @@ test('copy falls back to execCommand when the Clipboard API is missing or refuse
     fresh.navigator.clipboard = undefined;
     assert.equal(await fresh.get('window.StatLabUI').copyText('hello'), false);
 });
+
+test('parseSolution: FORMULA mid-step, Note line, boxed row and a final line containing "="', () => {
+    const sol = UI.parseSolution([
+        'DEMO',
+        'Step 1: Set up',
+        '   Formula: z = (x - μ) / σ',
+        '   Note: values are illustrative',
+        '   │ x │ z │',
+        '   │ 3 │ 0.5 │',
+        '✅ Result: z = 0.5'
+    ].join('\n'));
+    const s1 = sol.items[0];
+    assert.equal(sol.formulas.length, 0, 'a FORMULA inside a step stays in the step');
+    assert.ok(s1.lines.some(l => l.cls === 'formula' && l.t.includes('z = (x - μ) / σ')));
+    assert.ok(s1.lines.some(l => l.t.trim().startsWith('Note:')));
+    const rows = s1.lines.filter(l => l.cls === 'row');
+    assert.equal(rows.length, 2);
+    deepEqual(rows[0].cells, ['x', 'z']);
+    assert.ok(sol.finals.some(f => f.includes('Result: z = 0.5')));
+});
+
+test('parseSolution: a boxed ASCII line becomes a chapter and is followed by an anonymous block', () => {
+    const sol = UI.parseSolution(['TITLE HERE', '║ PART ONE ║', 'first line of work', 'Step 1: Next'].join('\n'));
+    const chapter = sol.items.find(i => i.chapter);
+    assert.ok(chapter, 'chapter header');
+    assert.equal(chapter.title, 'PART ONE');
+    const idx = sol.items.indexOf(chapter);
+    assert.ok(sol.items[idx + 1].anon, 'anonymous block follows the chapter');
+    assert.ok(sol.items[idx + 1].lines.some(l => l.t.includes('first line of work')));
+    assert.ok(sol.items[idx + 2].step);
+});
