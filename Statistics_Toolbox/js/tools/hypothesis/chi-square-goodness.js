@@ -52,6 +52,13 @@ function computeChiSquareGoodnessTest(observed, expected, alpha) {
         return { error: true, message: "Need at least 2 categories." };
     }
     
+    if (expected.some(e => !(e > 0) || !isFinite(e))) {
+        return { error: true, message: "Every expected frequency must be a number greater than 0 (a category with expected frequency 0 makes (O − E)² / E undefined). Combine or remove such categories." };
+    }
+    if (observed.some(o => !(o >= 0) || !isFinite(o))) {
+        return { error: true, message: "Observed frequencies must be numbers that are 0 or greater." };
+    }
+    
     const n = observed.length;
     let chiSquare = 0;
     let contributions = [];

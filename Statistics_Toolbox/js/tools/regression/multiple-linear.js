@@ -204,6 +204,7 @@ function computeMultipleLinearRegression(dataMatrix) {
     
     // Calculate coefficients: β = (X'X)⁻¹ X'y
     let coefficients;
+    let failure = null;
     let inverseSteps = '';
     let XtX_inv;
     
@@ -373,6 +374,7 @@ function computeMultipleLinearRegression(dataMatrix) {
                     ⚠️ Cannot compute coefficients: ${error.message}. At least one predictor is an exact copy or linear combination of the others (perfect multicollinearity), or there are fewer observations than parameters. Remove or combine the redundant predictor, or add more observations.
                 </div>`;
         coefficients = null;
+        failure = error.message;
     }
     
     // Generate regression equation
@@ -416,6 +418,8 @@ function computeMultipleLinearRegression(dataMatrix) {
     </div>`;
     
     return { 
+        // set when X'X cannot be inverted: the tile must report the failure, with the explanation kept in `steps`
+        ...(failure ? { error: true, message: `Cannot compute coefficients: ${failure}.` } : {}),
         steps, 
         n, 
         p, 
@@ -468,7 +472,7 @@ function setupMultipleLinearLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
-            setHtml(stepsSpan, result.message);
+            setHtml(stepsSpan, result.steps || result.message);
         } else {
             setHtml(valueSpan, `${result.n} observations, ${result.p} predictors | Mean Y = ${result.yMean.toFixed(4)}`);
             setHtml(stepsSpan, result.steps);

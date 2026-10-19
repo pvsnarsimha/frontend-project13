@@ -207,6 +207,8 @@ function computeRandomWithSteps() {
             steps += `🔢 GENERATION PROCESS (showing first 5 samples in detail):\n`;
             steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
             
+            const MAX_REJECTION_ATTEMPTS = 100000;   // a very peaked Beta accepts rarely; never loop forever
+            let rejectionCapped = false;
             let samplesShown = 0;
             const maxShowDetails = Math.min(5, count);
             
@@ -216,7 +218,8 @@ function computeRandomWithSteps() {
                     x = source.uniform();
                     y = source.uniform() * maxDensity;
                     attempts++;
-                } while (y > betaPDF(x, params.alpha, params.beta));
+                } while (y > betaPDF(x, params.alpha, params.beta) && attempts < MAX_REJECTION_ATTEMPTS);
+                if (attempts >= MAX_REJECTION_ATTEMPTS) { rejectionCapped = true; x = mode; }
                 randomNumbers.push(x);
                 
                 if (samplesShown < maxShowDetails) {
@@ -299,10 +302,14 @@ function computeRandomWithSteps() {
         
         steps += `\n💡 QUALITY CHECK:\n`;
         const meanDiff = Math.abs(sampleMean - theoreticalMean);
-        if (meanDiff < 0.05 * theoreticalStd) {
-            steps += `✓ Sample mean is close to theoretical mean → Good approximation\n`;
+        // compare with the standard error of a sample mean, not with σ itself (which a sample of 10 can never meet)
+        const meanTolerance = 3 * theoreticalStd / Math.sqrt(randomNumbers.length);
+        if (rejectionCapped) {
+            steps += `⚠ Rejection sampling hit its attempt limit for some values (the distribution is very peaked); those values were set to the mode.\n`;
+        } else if (meanDiff < meanTolerance) {
+            steps += `✓ Sample mean is within 3 standard errors (±${meanTolerance.toFixed(6)}) of the theoretical mean → consistent with Beta(${params.alpha},${params.beta})\n`;
         } else {
-            steps += `⚠ Sample mean differs from theoretical mean. Try generating more samples.\n`;
+            steps += `⚠ Sample mean is more than 3 standard errors from the theoretical mean (unusual; try generating again or more values).\n`;
         }
         
         steps += `\n🎯 PRACTICAL APPLICATIONS:\n`;

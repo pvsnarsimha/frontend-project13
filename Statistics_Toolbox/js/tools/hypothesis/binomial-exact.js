@@ -67,6 +67,8 @@ function renderBinomialExactInterface() {
 // ========== BINOMIAL EXACT TEST COMPUTATION (COMPLETE WITH DETAILED STEPS) ==========
 function computeBinomialExactTest(successes, n, p0, alpha, alternative) {
     if (n < 1) return { error: true, message: "Sample size must be at least 1." };
+    if (!(p0 >= 0 && p0 <= 1)) return { error: true, message: "The hypothesized probability p₀ must be a number between 0 and 1." };
+    if (successes < 0 || successes > n) return { error: true, message: "Successes must be between 0 and n." };
     
     let pValue;
     let calculationDetails = "";
@@ -207,6 +209,11 @@ function setupBinomialExactLogic() {
         
         const result = computeBinomialExactTest(successes, n, p0, alpha, alternative);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.textContent = "Error";
+            setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
+            return;
+        }
         setHtml(valueSpan, `p = ${result.pValue?.toFixed(6) || 'Error'} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
         setHtml(stepsSpan, result.steps || "Calculation completed.");
     });

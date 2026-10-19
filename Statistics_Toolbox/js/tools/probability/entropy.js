@@ -201,6 +201,10 @@ function setupEntropyLogic() {
                 params.p = parseFloat(document.getElementById('entropyP').value);
             }
             
+            const paramError = validateDistributionParams(dist, params, { openProbability: true });
+            
+            if (paramError) { showToolError('entropy', paramError); return; }
+            
             const result = computeEntropyWithSteps(dist, params);
             const resultDiv = document.getElementById('entropyResultArea');
             const valueSpan = document.getElementById('entropyValueDisplay');
@@ -212,5 +216,5 @@ function setupEntropyLogic() {
         });
     }
     
-    attachClearHandler('entropyClearBtn', '', 'entropyResultArea');
+    attachClearHandler("entropyClearBtn", ["entropyStd", "entropyRate", "entropyMin", "entropyMax", "entropyAlpha", "entropyBeta", "entropyLambda", "entropyN", "entropyP"], "entropyResultArea");
 }

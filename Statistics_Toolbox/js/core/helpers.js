@@ -32,6 +32,62 @@ function attachClearHandler(clearBtnId, inputIds, resultAreaId) {
     });
 }
 
+// Checks the parameters of a named distribution before a moment/entropy/MGF tool divides by them.
+// Returns a message for the first invalid parameter, or null. opts.openProbability: p must lie strictly inside (0, 1),
+// for statistics that are undefined for a degenerate binomial (skewness, kurtosis, entropy).
+function validateDistributionParams(dist, params, opts) {
+    const o = opts || {};
+    const bad = (name, cond) => cond ? null : `Invalid ${name}.`;
+    const ok = v => typeof v === 'number' && isFinite(v);
+    const checks = {
+        normal: () => (params.mean !== undefined && !ok(params.mean) ? 'The mean must be a number.' : null) || (ok(params.stdDev) && params.stdDev > 0 ? null : 'The standard deviation σ must be a number greater than 0.'),
+        exponential: () => ok(params.rate) && params.rate > 0 ? null : 'The rate λ must be a number greater than 0.',
+        uniform: () => ok(params.min) && ok(params.max) && params.min < params.max ? null : 'Uniform needs numbers with minimum a < maximum b.',
+        beta: () => ok(params.alpha) && ok(params.beta) && params.alpha > 0 && params.beta > 0 ? null : 'Beta needs α > 0 and β > 0.',
+        poisson: () => ok(params.lambda) && params.lambda > 0 ? null : 'The Poisson mean λ must be a number greater than 0.',
+        binomial: () => {
+            if (!ok(params.n) || params.n < 1 || Math.floor(params.n) !== params.n) return 'The number of trials n must be a whole number of at least 1.';
+            if (!ok(params.p) || params.p < 0 || params.p > 1) return 'The probability p must be a number between 0 and 1.';
+            if (o.openProbability && (params.p === 0 || params.p === 1)) return 'p must be strictly between 0 and 1 (for p = 0 or 1 the distribution is a single point and this statistic is undefined).';
+            return null;
+        }
+    };
+    return checks[dist] ? checks[dist]() : null;
+}
+
+// Shows a validation message in the standard result area of a tool whose element ids start with `prefix`
+function showToolError(prefix, message) {
+    const area = document.getElementById(prefix + 'ResultArea');
+    const value = document.getElementById(prefix + 'ValueDisplay');
+    const steps = document.getElementById(prefix + 'StepsDisplay');
+    if (area) area.style.display = 'block';
+    if (value) value.textContent = 'Error';
+    if (steps) setHtml(steps, '⚠️ ' + escapeHtml(message));
+}
+
+// Parses "value:group" input for the group-comparison tests (Levene, Bartlett, Bonferroni, Scheffe, Tukey).
+// Entries are separated by commas, semicolons or line breaks, and by spaces when a space is followed by another "number:";
+// so "2.5:Group A, 3.1:Group B" and "2.5:A 3.1:A 4:B" both work and a group name may contain spaces.
+// Returns { groups: Map(name -> numbers), skipped: [text that could not be read] }; group names are HTML-escaped.
+function parseValueGroupInput(inputText) {
+    const groups = new Map(), skipped = [];
+    const entry = /([-+−]?\d*\.?\d+(?:[eE][-+]?\d+)?)\s*:\s*([^,;\n]*?)(?=\s+[-+−]?\d*\.?\d+(?:[eE][-+]?\d+)?\s*:|[,;\n]|$)/g;
+    const text = String(inputText || '');
+    let last = 0, m;
+    const leftover = piece => piece.split(/[,;\n]+/).map(t => t.trim()).filter(Boolean).forEach(t => skipped.push(t));
+    while ((m = entry.exec(text)) !== null) {
+        leftover(text.slice(last, m.index));
+        last = entry.lastIndex;
+        const value = parseFloat(m[1].replace('−', '-')), name = m[2].trim();
+        if (!isFinite(value) || !name) { skipped.push(m[0].trim()); continue; }
+        const key = escapeHtml(name);
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(value);
+    }
+    leftover(text.slice(last));
+    return { groups, skipped };
+}
+
 // Function to generate detailed distribution analysis
 // Function to generate detailed distribution analysis
 function generateDistributionAnalysis(numbers) {

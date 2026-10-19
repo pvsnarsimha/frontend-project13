@@ -165,6 +165,10 @@ function setupDistKurtosisLogic() {
                 params.p = parseFloat(document.getElementById('distKurtosisP').value);
             }
             
+            const paramError = validateDistributionParams(dist, params, { openProbability: true });
+            
+            if (paramError) { showToolError('distKurtosis', paramError); return; }
+            
             const result = computeDistKurtosisWithSteps(dist, params);
             const resultDiv = document.getElementById('distKurtosisResultArea');
             const valueSpan = document.getElementById('distKurtosisValueDisplay');
@@ -176,5 +180,5 @@ function setupDistKurtosisLogic() {
         });
     }
     
-    attachClearHandler('distKurtosisClearBtn', '', 'distKurtosisResultArea');
+    attachClearHandler("distKurtosisClearBtn", ["distKurtosisRate", "distKurtosisAlpha", "distKurtosisBeta", "distKurtosisLambda", "distKurtosisN", "distKurtosisP"], "distKurtosisResultArea");
 }

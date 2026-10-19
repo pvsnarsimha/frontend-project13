@@ -74,6 +74,11 @@ function setupMGFLogic() {
                 params.p = parseFloat(document.getElementById("mgfP").value);
             }
             
+            const paramError = validateDistributionParams(dist, params);
+            
+            if (paramError) { showToolError('mgf', paramError); return; }
+            if (!isFinite(t)) { showToolError('mgf', 'Enter a numeric value for t.'); return; }
+            
             const result = computeMGFWithSteps(dist, params, t);
             const resultDiv = document.getElementById("mgfResultArea");
             const valueSpan = document.getElementById("mgfValueDisplay");
@@ -85,7 +90,7 @@ function setupMGFLogic() {
         });
     }
     
-    attachClearHandler("mgfClearBtn", ["mgfTValue"], "mgfResultArea");
+    attachClearHandler("mgfClearBtn", ["mgfTValue", "mgfMean", "mgfStd", "mgfRate", "mgfMin", "mgfMax", "mgfLambda", "mgfN", "mgfP"], "mgfResultArea");
 }
 
 function updateMGFParams() {

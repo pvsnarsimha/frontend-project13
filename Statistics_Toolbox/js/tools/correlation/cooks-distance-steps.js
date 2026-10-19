@@ -251,7 +251,7 @@ function stepsHtmlCooksDistance(scope) {
                         <tr class="s-0d2692">
                             <td class="s-182047">${idx + 1}</td>
                             <td class="s-182047">${d.obs}</td>
-                            <td class="s-291e24 tp-infl-${d.influenceClass}">${d.cooksD.toFixed(6)}</td>
+                            <td class="s-291e24 tp-infl-${d.influenceClass}">${isFinite(d.cooksD) ? d.cooksD.toFixed(6) : "∞"}</td>
                             <td class="s-182047 tp-infl-${d.influenceClass}">${d.influence}</td>
                         </tr>
                         `).join('')}

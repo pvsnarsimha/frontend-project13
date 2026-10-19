@@ -152,7 +152,7 @@ function computeCooksDistance(xValues, yValues) {
             <td class="s-69c02e">${d.yPred.toFixed(4)}</td>
             <td class="s-69c02e ${d.residual >= 0 ? 'tp-text-ok' : 'tp-text-bad'}">${d.residual.toFixed(4)}</td>
             <td class="s-69c02e">${d.leverage.toFixed(4)}</td>
-            <td class="s-34f862 tp-infl-${d.influenceClass}-bg">${d.cooksD.toFixed(6)}</td>
+            <td class="s-34f862 tp-infl-${d.influenceClass}-bg">${isFinite(d.cooksD) ? d.cooksD.toFixed(6) : "∞"}</td>
             <td class="s-e73169 tp-infl-${d.influenceClass}">${d.influence}</td>
         </tr>`;
     }
@@ -184,7 +184,9 @@ function setupCooksDistanceLogic() {
             setHtml(stepsSpan, result.message);  // ← innerHTML
         } else {
             const influential = result.cooksDistances.filter(d => d >= 1).length;
-            setHtml(valueSpan, `${influential} influential obs | Max D = ${Math.max(...result.cooksDistances).toFixed(4)}`);
+            const maxD = Math.max(...result.cooksDistances);
+            // Cook's D is Infinity when a point has leverage 1 (it alone determines the line); say so instead of printing "Infinity"
+            setHtml(valueSpan, `${influential} influential obs | Max D = ${isFinite(maxD) ? maxD.toFixed(4) : '∞ (leverage = 1)'}`);
             setHtml(stepsSpan, result.steps);  // ← CRITICAL: use innerHTML not innerText
         }
     });

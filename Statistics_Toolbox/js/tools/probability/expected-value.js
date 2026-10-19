@@ -62,6 +62,10 @@ function setupExpectedValueLogic() {
                 params.p = parseFloat(document.getElementById("expectedP").value);
             }
             
+            const paramError = validateDistributionParams(dist, params);
+            
+            if (paramError) { showToolError('expected', paramError); return; }
+            
             const result = computeExpectedValueWithSteps(dist, params);
             const resultDiv = document.getElementById("expectedResultArea");
             const valueSpan = document.getElementById("expectedValueDisplay");
@@ -73,7 +77,7 @@ function setupExpectedValueLogic() {
         });
     }
     
-    attachClearHandler("expectedClearBtn", "", "expectedResultArea");
+    attachClearHandler("expectedClearBtn", ["expectedMean", "expectedStd", "expectedRate", "expectedMin", "expectedMax", "expectedAlpha", "expectedBeta", "expectedLambda", "expectedN", "expectedP"], "expectedResultArea");
 }
 
 // ========== PARAMETER UPDATE FUNCTIONS ==========

@@ -65,6 +65,8 @@ function computeOneSampleZTest(data, mu0, sigma, alpha, alternative) {
         return { error: true, message: "Need at least 2 observations." };
     }
     
+    if (!(sigma > 0) || !isFinite(sigma)) return { error: true, message: "The known population standard deviation σ must be a number greater than 0." };
+    
     const n = data.length;
     const sum = data.reduce((a,b) => a+b, 0);
     const mean = sum / n;
@@ -194,6 +196,11 @@ function setupOneSampleZLogic() {
         
         const result = computeOneSampleZTest(data, mu0, sigma, alpha, alternative);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.textContent = "Error";
+            setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
+            return;
+        }
         setHtml(valueSpan, `z = ${result.zStatistic?.toFixed(6) || 'Error'} | p = ${result.pValue?.toFixed(6) || 'Error'}`);
         setHtml(stepsSpan, result.steps || "Calculation completed.");
     });

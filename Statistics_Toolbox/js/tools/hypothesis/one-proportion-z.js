@@ -68,6 +68,7 @@ function renderOneProportionZInterface() {
 function computeOneProportionZTest(successes, n, p0, alpha, alternative) {
     if (n < 1) return { error: true, message: "Sample size must be at least 1." };
     if (successes < 0 || successes > n) return { error: true, message: "Successes must be between 0 and n." };
+    if (!(p0 > 0 && p0 < 1)) return { error: true, message: "The hypothesized proportion p₀ must be strictly between 0 and 1 (for p₀ = 0 or 1 the standard error is 0 and z is undefined; use the exact binomial test instead)." };
     
     const pHat = successes / n;
     const standardError = Math.sqrt(p0 * (1 - p0) / n);
@@ -192,6 +193,11 @@ function setupOneProportionZLogic() {
         
         const result = computeOneProportionZTest(successes, n, p0, alpha, alternative);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.textContent = "Error";
+            setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
+            return;
+        }
         setHtml(valueSpan, `z = ${result.zStatistic?.toFixed(6) || 'Error'} | p = ${result.pValue?.toFixed(6) || 'Error'}`);
         setHtml(stepsSpan, result.steps || "Calculation completed.");
     });

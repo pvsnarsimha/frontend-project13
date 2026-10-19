@@ -180,7 +180,7 @@ textarea:focus, input:focus, select:focus { outline: none; border-color: var(--b
     color: #064e3b; background: radial-gradient(420px 160px at 100% 0, rgba(16,185,129,.18), transparent 70%), linear-gradient(135deg, #ecfdf5, #f0fdfa);
     border: 1px solid #a7f3d0;
 }
-.result-value::before { content: "ANSWER"; position: absolute; top: 9px; left: 28px; font-family: 'Inter', sans-serif; font-size: .62rem; font-weight: 800; letter-spacing: .18em; color: #059669; }
+.result-value::before { content: "ANSWER"; content: "ANSWER" / ""; /* decorative: the spoken label is the .sr-only "Answer:" prefix */ position: absolute; top: 9px; left: 28px; font-family: 'Inter', sans-serif; font-size: .62rem; font-weight: 800; letter-spacing: .18em; color: #059669; }
 .result-card.is-notice::before { background: linear-gradient(90deg, #f59e0b, #f97316); }
 .result-card.is-notice > .result-label::before { background: #f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,.2); }
 .result-card.is-notice .result-value { color: #92400e; background: linear-gradient(135deg, #fffbeb, #fff7ed); border-color: #fde68a; }

@@ -31,7 +31,7 @@ function renderPPPlotInterface() {
                 ]
             },
             {
-                html: "<div id=\"ppplotParams\" style=\"display: none;\">\n                    <!-- Dynamic params for distributions -->\n                </div>"
+                html: `<p style="${HINT_STYLE}">Distribution parameters are estimated from your data: mean and standard deviation (normal), minimum and maximum (uniform), 1/mean (exponential).</p>`
             }
         ],
         run: { id: "ppplotComputeBtn", text: "📊 Generate P-P Plot + Full Steps" },

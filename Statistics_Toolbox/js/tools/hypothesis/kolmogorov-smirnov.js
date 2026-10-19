@@ -196,7 +196,7 @@ function computeKolmogorovSmirnovTest(data, alpha) {
             <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 2: Calculate Critical Value</h3>
             <div style="background: white; border-radius: 12px; padding: 16px;">
                 <div style="font-family: monospace; font-size: 16px; text-align: center;">
-                    D<sub>critical</sub> = 1.36 / √n = 1.36 / √${n} = <strong style="color: #1a5490;">${criticalValue.toFixed(4)}</strong>
+                    D<sub>critical</sub> (Lilliefors critical value for α = ${alpha}, n = ${n}) = <strong style="color: #1a5490;">${criticalValue.toFixed(4)}</strong>
                 </div>
                 <div style="margin-top: 12px; font-size: 13px; color: #6c757d; text-align: center;">
                     Using α = ${alpha} significance level (${(1-alpha)*100}% confidence)

@@ -72,7 +72,12 @@ function getCanvasTooltipElement() {
 function setupCanvasTooltip(canvas, chart) {
     const tooltipDiv = getCanvasTooltipElement();
     tooltipDiv.style.display = 'none';
-    canvas.addEventListener('mousemove', (e) => {
+    // The same canvas can be redrawn many times: drop the previous listeners so they do not pile up or read a destroyed chart
+    if (canvas._tooltipHandlers) {
+        canvas.removeEventListener('mousemove', canvas._tooltipHandlers.move);
+        canvas.removeEventListener('mouseleave', canvas._tooltipHandlers.leave);
+    }
+    const onMove = (e) => {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
@@ -135,11 +140,13 @@ function setupCanvasTooltip(canvas, chart) {
         } else {
             tooltipDiv.style.display = 'none';
         }
-    });
-    
-    canvas.addEventListener('mouseleave', () => {
+    };
+    const onLeave = () => {
         tooltipDiv.style.display = 'none';
-    });
+    };
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('mouseleave', onLeave);
+    canvas._tooltipHandlers = { move: onMove, leave: onLeave };
 }
 
 // ---- Accessible names for charts ----

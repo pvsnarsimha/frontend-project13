@@ -166,6 +166,10 @@ function setupDistSkewnessLogic() {
                 params.p = parseFloat(document.getElementById('distSkewnessP').value);
             }
             
+            const paramError = validateDistributionParams(dist, params, { openProbability: true });
+            
+            if (paramError) { showToolError('distSkewness', paramError); return; }
+            
             const result = computeDistSkewnessWithSteps(dist, params);
             const resultDiv = document.getElementById('distSkewnessResultArea');
             const valueSpan = document.getElementById('distSkewnessValueDisplay');
@@ -177,5 +181,5 @@ function setupDistSkewnessLogic() {
         });
     }
     
-    attachClearHandler('distSkewnessClearBtn', '', 'distSkewnessResultArea');
+    attachClearHandler("distSkewnessClearBtn", ["distSkewnessRate", "distSkewnessAlpha", "distSkewnessBeta", "distSkewnessLambda", "distSkewnessN", "distSkewnessP"], "distSkewnessResultArea");
 }

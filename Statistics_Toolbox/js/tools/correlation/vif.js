@@ -51,6 +51,7 @@ function computeVIF(dataMatrix) {
         }
     }
     const vifs = [];
+    const fmtVif = (x, d) => isFinite(x) ? x.toFixed(d) : '∞';   // perfect collinearity gives VIF = Infinity
     const detailedCalculations = []; // Store detailed R² calculations
     
     // Helper function for correlation
@@ -240,11 +241,15 @@ function computeVIF(dataMatrix) {
                     </details>
                 </div>
             </td>
-            <td style="padding: 12px; text-align: center; background: ${v.severityColor}20; font-weight: 700; font-size: 16px;">${v.vif.toFixed(4)}</td>
+            <td style="padding: 12px; text-align: center; background: ${v.severityColor}20; font-weight: 700; font-size: 16px;">${fmtVif(v.vif, 4)}</td>
             <td style="padding: 12px; text-align: center; color: ${v.severityColor}; font-weight: 600;">${v.severity}</td>
             <td style="padding: 12px; text-align: center;">${v.recommendation}</td>
         </tr>`;
     }
+    
+    // Perfect collinearity gives VIF = Infinity; show ∞ and leave it out of the mean instead of printing "Infinity"
+    const infiniteVifs = vifs.filter(v => !isFinite(v.vif)).length;
+    const meanVifText = infiniteVifs ? `N/A (${infiniteVifs} predictor${infiniteVifs > 1 ? 's' : ''} with infinite VIF)` : (vifs.reduce((a, b) => a + b.vif, 0) / p).toFixed(2);
     
     // Build complete HTML
     let steps = `
@@ -259,7 +264,7 @@ function computeVIF(dataMatrix) {
                 </div>
                 <div style="background: rgba(255,255,255,0.15); padding: 10px 20px; border-radius: 12px; text-align: center;">
                     <div style="font-size: 11px;">Max VIF</div>
-                    <div style="font-size: 32px; font-weight: 700;">${Math.max(...vifs.map(v => v.vif)).toFixed(2)}</div>
+                    <div style="font-size: 32px; font-weight: 700;">${fmtVif(Math.max(...vifs.map(v => v.vif)), 2)}</div>
                 </div>
             </div>
         </div>
@@ -300,11 +305,11 @@ function computeVIF(dataMatrix) {
             </div>
             <div style="background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                 <div style="font-size: 11px; color: #666;">Mean VIF</div>
-                <div style="font-size: 24px; font-weight: 700;">${(vifs.reduce((a, b) => a + b.vif, 0) / p).toFixed(2)}</div>
+                <div style="font-size: 24px; font-weight: 700;">${meanVifText}</div>
             </div>
             <div style="background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                 <div style="font-size: 11px; color: #666;">Min VIF</div>
-                <div style="font-size: 24px; font-weight: 700;">${Math.min(...vifs.map(v => v.vif)).toFixed(2)}</div>
+                <div style="font-size: 24px; font-weight: 700;">${fmtVif(Math.min(...vifs.map(v => v.vif)), 2)}</div>
             </div>
         </div>
         
@@ -384,7 +389,7 @@ function computeVIF(dataMatrix) {
         <!-- DECISION SUMMARY -->
         <div style="border-radius: 16px; padding: 20px; ${Math.max(...vifs.map(v => v.vif)) >= 10 ? 'background: #f8d7da; border-left: 6px solid #dc3545;' : (Math.max(...vifs.map(v => v.vif)) >= 5 ? 'background: #fff3cd; border-left: 6px solid #ffc107;' : 'background: #d4edda; border-left: 6px solid #28a745;')}">
             <h3 style="margin: 0 0 12px 0;">📊 Overall Assessment</h3>
-            <p><strong>Maximum VIF:</strong> ${Math.max(...vifs.map(v => v.vif)).toFixed(4)}</p>
+            <p><strong>Maximum VIF:</strong> ${fmtVif(Math.max(...vifs.map(v => v.vif)), 4)}</p>
             <p><strong>Conclusion:</strong> ${Math.max(...vifs.map(v => v.vif)) >= 10 ? '❌ Severe multicollinearity detected. Model needs revision.' : (Math.max(...vifs.map(v => v.vif)) >= 5 ? '⚠️ Moderate multicollinearity detected. Consider addressing.' : '✅ No severe multicollinearity. Model is acceptable.')}</p>
         </div>
     </div>`;

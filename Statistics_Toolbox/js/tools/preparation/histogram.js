@@ -117,34 +117,36 @@ function createHistogram(numbers, chartTitle) {
 }
 
 function renderHistogramInterface() {
-    return `
-        <div class="stat-interface">
-            <div class="interface-title">📊 Histogram with Professional Chart</div>
-            <div class="formula-card">
-                <div class="formula">📌 Bin Width = (Max - Min) / Number of Bins</div>
-                <div class="desc">Shows the frequency distribution of data using bars. Choose number of bins or use optimal rules (Sturges, Freedman-Diaconis).</div>
-            </div>
-            <div class="data-input-section">
-                <label>📋 Enter numeric values:</label>
-                <textarea id="histogramInput" rows="4" placeholder="Example: 12, 15, 14, 16, 13, 25, 24, 22, 35, 34, 33"></textarea>
-                <label style="margin-top: 15px;">📊 Number of bins:</label>
-                <input type="number" id="histogramBins" value="5" min="1" max="30" step="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 15px;">
-                <div class="desc" style="font-size: 0.75rem;">💡 Tip: Sturges' rule suggests ${Math.ceil(Math.log2(10) + 1)} bins for 10 values | Freedman-Diaconis uses IQR</div>
-                <div class="action-row">
-                    <button class="primary-btn" id="histogramComputeBtn">📊 Generate Histogram + Chart</button>
-                    <button class="secondary-btn" id="histogramClearBtn">Clear</button>
-                </div>
-            </div>
-            <div id="histogramResultArea" style="display: none;">
-                <div class="result-card">
-                    <div class="result-label">🎯 HISTOGRAM</div>
-                    <div class="result-value" id="histogramValueDisplay">—</div>
-                    <div class="calculation-steps" id="histogramStepsDisplay"></div>
-                </div>
-                <canvas id="histogramChartCanvas" style="max-height: 400px; margin-top: 20px;"></canvas>
-            </div>
-        </div>
-    `;
+    return buildInterface({
+        id: "statHistogramInterface",
+        title: "📊 Histogram with Professional Chart",
+        formula: "📌 Bin Width = (Max - Min) / Number of Bins",
+        desc: "Shows the frequency distribution of data using bars. Choose number of bins or use optimal rules (Sturges, Freedman-Diaconis).",
+        inputs: [
+            {
+                label: "📋 Enter numeric values:",
+                textarea: { id: "histogramInput", rows: "4", placeholder: "Example: 12, 15, 14, 16, 13, 25, 24, 22, 35, 34, 33" }
+            },
+            {
+                label: "📊 Number of bins:",
+                labelAttrs: { style: FIELD_GAP },
+                input: { type: "number", id: "histogramBins", value: "5", min: "1", max: "30", step: "1", style: FIELD_STYLE }
+            },
+            {
+                hint: "💡 Tip: Sturges' rule gives ⌈log₂(n) + 1⌉ bins (5 bins for 10 values); Freedman-Diaconis uses the IQR.",
+                hintAttrs: { style: HINT_STYLE }
+            }
+        ],
+        run: { id: "histogramComputeBtn", text: "📊 Generate Histogram + Chart" },
+        clear: { id: "histogramClearBtn", text: "Clear" },
+        result: {
+            area: "histogramResultArea",
+            label: "🎯 HISTOGRAM",
+            value: "histogramValueDisplay",
+            steps: "histogramStepsDisplay",
+            extra: ['<canvas id="histogramChartCanvas" style="max-height: 400px; margin-top: 20px;"></canvas>']
+        }
+    });
 }
 
 function computeHistogramWithSteps(numbers, numBins) {

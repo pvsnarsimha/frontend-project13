@@ -65,6 +65,10 @@ function setupDistributionVarianceLogic() {
                 params.p = parseFloat(document.getElementById("varianceDistP").value);
             }
             
+            const paramError = validateDistributionParams(dist, params);
+            
+            if (paramError) { showToolError('varianceDist', paramError); return; }
+            
             const result = computeDistributionVarianceWithSteps(dist, params);
             const resultDiv = document.getElementById("varianceDistResultArea");
             const valueSpan = document.getElementById("varianceDistValueDisplay");
@@ -76,7 +80,7 @@ function setupDistributionVarianceLogic() {
         });
     }
     
-    attachClearHandler("varianceDistClearBtn", "", "varianceDistResultArea");
+    attachClearHandler("varianceDistClearBtn", ["varianceDistStd", "varianceDistRate", "varianceDistMin", "varianceDistMax", "varianceDistAlpha", "varianceDistBeta", "varianceDistLambda", "varianceDistN", "varianceDistP"], "varianceDistResultArea");
 }
 
 // ========== DISTRIBUTION VARIANCE COMPUTATION - DETAILED ==========

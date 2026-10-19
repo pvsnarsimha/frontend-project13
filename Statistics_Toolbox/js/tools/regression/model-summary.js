@@ -73,7 +73,9 @@ function computeModelSummary(actual, predicted) {
     const adjRSquared = 1 - ((1 - rSquared) * (n - 1) / (n - 2));
     const rmse = Math.sqrt(ssRes / n);
     const mae = residuals.reduce((sum, r) => sum + Math.abs(r), 0) / n;
-    const mape = residuals.reduce((sum, r, i) => sum + Math.abs(r / actual[i]) * 100, 0) / n;
+    // A percentage error is undefined where the actual value is 0, so those points are left out of MAPE (and the count says so)
+    const mapeCount = actual.filter(a => a !== 0).length;
+    const mape = mapeCount ? residuals.reduce((sum, r, i) => sum + (actual[i] === 0 ? 0 : Math.abs(r / actual[i]) * 100), 0) / mapeCount : NaN;
     
     // Determine performance colors and icons
     const getPerformanceColor = (value, type) => {
@@ -108,11 +110,11 @@ function computeModelSummary(actual, predicted) {
     }).join('\n');
     
     const mapeCalculation = residualDetails.map(function(r, idx) {
-        return '  ' + (idx+1) + '. |' + r.residual.toFixed(4) + '/' + r.actual + '| × 100 = ' + (Math.abs(r.residual/r.actual)*100).toFixed(2) + '%';
+        return r.actual === 0 ? '  ' + (idx+1) + '. actual = 0 → percentage error undefined, skipped' : '  ' + (idx+1) + '. |' + r.residual.toFixed(4) + '/' + r.actual + '| × 100 = ' + (Math.abs(r.residual/r.actual)*100).toFixed(2) + '%';
     }).join('\n');
     
     const sumAbsResiduals = residualDetails.reduce(function(s, r) { return s + Math.abs(r.residual); }, 0);
-    const sumMape = residualDetails.reduce(function(s, r) { return s + Math.abs(r.residual/r.actual)*100; }, 0);
+    const sumMape = residualDetails.reduce(function(s, r) { return s + (r.actual === 0 ? 0 : Math.abs(r.residual/r.actual)*100); }, 0);
     
     let steps = [
         '<div style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;">',
@@ -311,7 +313,7 @@ function computeModelSummary(actual, predicted) {
     steps.push('<strong>Step 1 - Calculate percentage errors:</strong><br>' + mapeCalculation.replace(/\n/g, '<br>') + '<br>');
     steps.push('<strong>Sum of percentages = ' + sumMape.toFixed(2) + '%</strong><br><br>');
     steps.push('<strong>Step 2 - Divide by n:</strong><br>');
-    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + n + '<br>');
+    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + mapeCount + (mapeCount < n ? ' (points with actual = 0 are excluded)' : '') + '<br>');
     steps.push('<strong>MAPE = ' + mape.toFixed(2) + '%</strong>');
     steps.push('</div></div>');
     steps.push('</div></div>');
@@ -393,7 +395,7 @@ function computeModelSummary(actual, predicted) {
     steps.push('<div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 11px;">');
     steps.push(mapeCalculation.replace(/\n/g, '<br>'));
     steps.push('<br><strong>Sum of % = ' + sumMape.toFixed(2) + '%</strong><br>');
-    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + n + ' = <strong>' + mape.toFixed(2) + '%</strong>');
+    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + mapeCount + ' = <strong>' + mape.toFixed(2) + '%</strong>');
     steps.push('</div></div>');
     
     steps.push('</div></div>');

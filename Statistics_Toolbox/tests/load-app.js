@@ -49,7 +49,12 @@ function loadApp(opts = {}) {
     const ctx = vm.createContext(sandbox);
     for (const rel of scriptList()) {
         if (skip.some(s => rel.includes(s))) continue;
-        vm.runInContext(fs.readFileSync(path.join(ROOT, rel), 'utf8'), ctx, { filename: rel });
+        try {
+            vm.runInContext(fs.readFileSync(path.join(ROOT, rel), 'utf8'), ctx, { filename: rel });
+        } catch (e) {
+            e.message = `${rel}: ${e.message}`;     // name the broken file instead of failing every test with an anonymous error
+            throw e;
+        }
     }
     // top-level let/const are not properties of the context; expose the few we need
     ctx.get = expr => vm.runInContext(expr, ctx);

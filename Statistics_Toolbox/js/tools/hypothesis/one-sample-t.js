@@ -163,7 +163,7 @@ function computeOneSampleTTest(data, mu0, alpha, alternative) {
                     α = ${alpha} (${(1-alpha)*100}% Confidence Level)<br>
                     Critical Value = ${criticalValue.toFixed(6)}<br>
                     p-value = ${pValue.toFixed(8)}<br>
-                    |t| = ${Math.abs(tStatistic).toFixed(6)} ${Math.abs(tStatistic) > criticalValue ? '>' : '<'} ${criticalValue.toFixed(6)}
+                    ${alternative === 'two.sided' ? `|t| = ${Math.abs(tStatistic).toFixed(6)} ${Math.abs(tStatistic) > criticalValue ? '>' : '≤'} ${criticalValue.toFixed(6)}` : (alternative === 'greater' ? `t = ${tStatistic.toFixed(6)} ${tStatistic > criticalValue ? '>' : '≤'} ${criticalValue.toFixed(6)}` : `t = ${tStatistic.toFixed(6)} ${tStatistic < criticalValue ? '<' : '≥'} ${criticalValue.toFixed(6)}`)}
                 </div>
             </div>
         </div>
