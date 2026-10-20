@@ -43,6 +43,12 @@ test('every sidebar button points at a registered tool, and every tool has a but
     assert.equal(new Set(buttonStats).size, buttonStats.length, 'two buttons open the same tool');
 });
 
+test('every sidebar button has a unique id', () => {
+    const ids = [...html.matchAll(/<button[^>]*\sdata-stat="[^"]+"[^>]*>/g)].map(m => (m[0].match(/\sid="([^"]+)"/) || [])[1]);
+    assert.ok(ids.every(Boolean), 'a data-stat button has no id');
+    assert.equal(new Set(ids).size, ids.length, 'two data-stat buttons share an id');
+});
+
 test('element ids in the page shell are unique', () => {
     const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
     const dups = ids.filter((id, i) => ids.indexOf(id) !== i);
@@ -93,11 +99,18 @@ test('Statistics.html lists exactly the scripts under js/, in dependency order (
     assert.deepEqual([...onDisk].sort(), [...scriptOrder()].sort());
 });
 
-test('each tool lives in its own file: one route per file, no file larger than 1,200 lines', () => {
+// File-size budget. A tool file above the limit must be split (worked-solution HTML goes to <tool>-steps.js, the pattern of
+// scheffe.js / manova.js / violin.js); the shared core files get a larger limit because they hold many small functions.
+// The budget is a ratchet: it fails on any file over the limit, with no exception list to grow.
+const MAX_TOOL_LINES = 600, MAX_CORE_LINES = 800;
+test(`file size is enforced: tool files <= ${MAX_TOOL_LINES} lines, core and UI files <= ${MAX_CORE_LINES}, and one route per file`, () => {
+    const tooBig = [];
     for (const rel of scriptList()) {
         const lines = fs.readFileSync(path.join(ROOT, rel), 'utf8').split('\n').length;
-        assert.ok(lines <= 1200, `${rel} has ${lines} lines`);
+        const limit = rel.startsWith('js/tools/') ? MAX_TOOL_LINES : MAX_CORE_LINES;
+        if (lines > limit) tooBig.push(`${rel} has ${lines} lines (limit ${limit})`);
     }
+    assert.deepEqual(tooBig, []);
 });
 
 test('tool functions live in the file that names them (renderX/computeX/setupX/updateX belong to x.js)', () => {
@@ -233,30 +246,51 @@ test('the HTML sanitiser treats ping like the other URL attributes', () => {
     assert.match(src.match(/HTML_URL_ATTRIBUTES = new Set\(\[([^\]]*)\]/)[1], /'ping'/);
 });
 
-test('every accent colour the tools use inline is mapped onto the result-panel palette tokens', () => {
+test('result-panel palette tokens exist and no inline style in a tool still uses a retired accent colour', () => {
     const css = fs.readFileSync(path.join(ROOT, 'css', 'statlab.css'), 'utf8');
-    assert.match(css, /--tp-accent:/);
-    for (const hex of ['#1a5490', '#d4380d', '#e65100', '#2e7d32', '#6a1b9a']) {
-        assert.ok(css.includes(`color: ${hex}"]`), `no re-theme rule for text colour ${hex}`);
-        assert.ok(css.includes(`background: ${hex}"]`), `no re-theme rule for background ${hex}`);
+    for (const token of ['--tp-accent', '--tp-banner', '--tp-head', '--tp-head-soft', '--tp-tint', '--tp-tint-line', '--tp-card']) assert.ok(css.includes(token + ':'), `${token} is not defined`);
+    assert.ok(!/\[style\*=/.test(css), 'statlab.css must not match substrings of style attributes (use classes from css/tool-panels.css)');
+    const { toolFiles } = require('../scripts/extract-styles');
+    const offenders = toolFiles().filter(f => /\sstyle\s*=\s*\\?["'][^"']*#(1a5490|d4380d|e65100|2e7d32|6a1b9a)/i.test(fs.readFileSync(f, 'utf8'))).map(f => path.relative(ROOT, f));
+    assert.deepEqual(offenders, [], 'these inline styles use an accent colour that only a class can re-theme');
+});
+
+// Tool markup is styled by classes in css/tool-panels.css. scripts/extract-styles.js converts inline styles and keeps the CSS in step.
+test('tool files carry no convertible inline style, every s-xxxxxx class has a rule and every rule is used (npm run sync:styles)', () => {
+    const { check } = require('../scripts/extract-styles');
+    const r = check();
+    assert.deepEqual(r.inline, [], 'run: node scripts/extract-styles.js');
+    assert.deepEqual(r.missingRule, [], 'a class is used but css/tool-panels.css has no rule for it');
+    assert.deepEqual(r.orphanRule, [], 'css/tool-panels.css has rules no tool uses; run: node scripts/extract-styles.js');
+    assert.ok(html.includes('css/tool-panels.css'), 'Statistics.html must load css/tool-panels.css');
+});
+
+test('every generated rule in css/tool-panels.css is one well-formed declaration block (no leaked JavaScript)', () => {
+    const rules = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8').split(/\r?\n/).filter(l => l.startsWith('#interfaceRoot'));
+    assert.ok(rules.length > 500);
+    const bad = rules.filter(l => !/^[^{}]*\{[^{}]*\}$/.test(l) || /\+|\$|"|\\|`/.test(l.replace(/font-family:[^;]*/g, '')) || /[^\w\s]'|'[^\w\s]/.test(l.replace(/font-family:[^;]*/g, '')));
+    assert.deepEqual(bad.slice(0, 5), []);
+});
+
+test('every tp-* class a tool names has a hand-written rule in css/tool-panels.css', () => {
+    const css = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8');
+    const defined = new Set([...css.matchAll(/#interfaceRoot \.([\w-]+)/g)].map(m => m[1]));
+    const { toolFiles } = require('../scripts/extract-styles');
+    for (const f of toolFiles()) {
+        const src = fs.readFileSync(f, 'utf8');
+        const used = [...src.matchAll(/'(tp-[\w-]+)'/g)].map(m => m[1]);
+        assert.deepEqual(used.filter(c => !defined.has(c)), [], `${path.relative(ROOT, f)} uses tp-* classes with no CSS rule`);
     }
 });
 
-// The largest tools were migrated from inline style="…" attributes to classes defined in css/tool-panels.css.
-const MIGRATED_TOOLS = ['hypothesis/manova', 'hypothesis/ancova', 'hypothesis/levene', 'hypothesis/bartlett', 'correlation/cooks-distance', 'hypothesis/bonferroni', 'hypothesis/scheffe'];
-
-test('migrated tools carry no inline styles and every class they use is defined in css/tool-panels.css', () => {
-    const css = fs.readFileSync(path.join(ROOT, 'css', 'tool-panels.css'), 'utf8');
-    const defined = new Set([...css.matchAll(/#interfaceRoot \.([\w-]+)/g)].map(m => m[1]));
-    assert.ok(html.includes('css/tool-panels.css'), 'Statistics.html must load css/tool-panels.css');
-    for (const tool of MIGRATED_TOOLS) {
-        // a tool may be split into <tool>.js (interface, calculation, setup) and <tool>-steps.js (worked-solution HTML)
-        const src = ['.js', '-steps.js'].map(ext => path.join(ROOT, 'js', 'tools', tool + ext)).filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8')).join('\n');
-        assert.ok(!/\sstyle\s*=/.test(src), `${tool} still has an inline style attribute`);
-        const used = [...src.matchAll(/\b(s-[0-9a-f]{6})\b/g)].map(m => m[1]).concat([...src.matchAll(/'(tp-[\w-]+)'/g)].map(m => m[1]));
-        const missing = used.filter(c => !defined.has(c));
-        assert.deepEqual(missing, [], `${tool}.js uses classes with no CSS rule`);
-    }
+test('the extractor reproduces the old statlab.css re-theming when it writes a rule', () => {
+    const { buildRule } = require('../scripts/extract-styles');
+    const banner = buildRule('div', 'background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white;').css.join('\n');
+    assert.match(banner, /var\(--tp-banner\) !important/);
+    const head = buildRule('tr', 'background: #1a5490;').css.join('\n');
+    assert.match(head, /background: var\(--tp-head\) !important/);
+    assert.match(head, / th \{ color: #fff !important; background: transparent !important; \}/);
+    assert.equal(buildRule('p', 'margin: 0;').css.length, 1, 'a style with no palette colour gets a plain rule');
 });
 
 test('split tools keep the calculation and the worked-solution HTML in separate files', () => {
@@ -311,4 +345,52 @@ test('no blocking alert() outside notifyUser (messages go through the toast)', (
         if (hits > (rel === 'js/core/charts.js' ? 1 : 0)) offenders.push(rel);
     }
     assert.deepEqual(offenders, []);
+});
+
+test('distribution-analysis.js documents, and gets, the globals it depends on', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js/tools/preparation/distribution-analysis.js'), 'utf8');
+    for (const dep of ['quantileType7', 'computeModeWithSteps']) {
+        assert.ok(src.includes(dep + '  ') || new RegExp(dep).test(src.split('*/')[0]), `${dep} is named in the header comment`);
+        assert.equal(typeof app.get(dep), 'function', `${dep} is defined by the loaded scripts`);
+    }
+});
+
+test('the "Which tool should I use?" page links only to tools that exist, and every link opens its tool', () => {
+    const guide = fs.readFileSync(path.join(ROOT, 'Which-tool.html'), 'utf8');
+    const links = [...guide.matchAll(/data-tool="([^"]+)" href="Statistics\.html#tool=([^"]+)"/g)];
+    assert.ok(links.length >= 60, 'the guide covers most tools');
+    for (const [, id, target] of links) {
+        assert.equal(id, target, 'data-tool and href agree');
+        assert.ok(routes[id], `the guide points at unknown tool "${id}"`);
+    }
+    assert.ok(/href="Statistics\.html"/.test(guide), 'a way back');
+    assert.ok(html.includes('href="Which-tool.html"'), 'Statistics.html links to the guide');
+    assert.ok(fs.existsSync(path.join(ROOT, 'css/guide.css')));
+});
+
+test('the deep link #tool=<id> is handled by app.js', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js/app.js'), 'utf8');
+    assert.ok(/#tool=/.test(src) && /hashchange/.test(src));
+});
+
+test('every textarea offers an "Example:" placeholder (the sample-data contract); parameter-only tools have no textarea', () => {
+    const bad = [];
+    for (const [stat, [render]] of Object.entries(routes)) {
+        const out = render();
+        for (const m of out.matchAll(/<textarea[^>]*>/g)) {
+            const ph = (m[0].match(/placeholder="([^"]*)"/) || [])[1];
+            if (ph === undefined || !/example|e\.g\./i.test(ph) || ph.length >= 700) bad.push(`${stat}: ${(ph || '(none)').slice(0, 40)}`);
+        }
+        if (/data-parameter-only/.test(out) && /<textarea/.test(out)) bad.push(`${stat}: parameter-only but has a textarea`);
+    }
+    assert.deepEqual(bad, []);
+});
+
+test('README states the real amount of script (within 10%)', () => {
+    const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+    const m = readme.match(/about ([\d.]+) MB of script/);
+    assert.ok(m, 'README states the script size');
+    const bytes = scriptList().reduce((sum, rel) => sum + fs.statSync(path.join(ROOT, rel)).size, 0);
+    const actualMB = bytes / 1e6;
+    assert.ok(Math.abs(actualMB - parseFloat(m[1])) / actualMB <= 0.1, `README says ${m[1]} MB, the scripts are ${actualMB.toFixed(2)} MB`);
 });

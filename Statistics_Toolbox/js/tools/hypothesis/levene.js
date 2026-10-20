@@ -6,7 +6,7 @@ function renderLeveneInterface() {
         id: "statLeveneInterface",
         title: "📊 Levene's Test (Homogeneity of Variance)",
         formula: "📌 Tests whether multiple groups have equal variances",
-        desc: "<strong>What is Levene's Test?</strong><br>\n                    Levene's test checks the assumption of homogeneity of variances across groups.\n                    H₀: All group variances are equal | H₁: At least one group variance differs.",
+        desc: "<strong>What is Levene's Test?</strong><br>\n                    Levene's test checks the assumption of homogeneity of variances across groups.\n                    H₀: All group variances are equal | H₁: At least one group variance differs.<br>\n                    <strong>Version:</strong> Levene's original mean-centred form (ANOVA F on |x − group mean|). scipy.stats.levene defaults to the median-centred Brown–Forsythe variant; use center='mean' there to match this tool.",
         inputs: [
             {
                 label: "📋 Enter data with group labels (format: value:group):",
@@ -117,13 +117,17 @@ function computeLeveneTest(inputText, alpha) {
     
     let dfBetween = k - 1;
     let dfWithin = totalN - k;
+    {
+        const guard = withinGroupError(dfWithin, ssWithin, 'Levene\'s test', 'absolute deviations from the group means');
+        if (guard) return guard;
+    }
     let msBetween = ssBetween / dfBetween;
     let msWithin = ssWithin / dfWithin;
     let fStatistic = msBetween / msWithin;
     
     let criticalValue = fCriticalValue(alpha, dfBetween, dfWithin);
     let pValue = 1 - fCDF(fStatistic, dfBetween, dfWithin);
-    let rejectH0 = fStatistic > criticalValue;
+    let rejectH0 = pValue < alpha;
     
     // Build comprehensive educational HTML
     const steps = stepsHtmlLevene({ alpha, betweenDetails, criticalValue, dfBetween, dfWithin, fStatistic, grandZMean, groupMeans, groups, k, msBetween, msWithin, pValue, rejectH0, ssBetween, ssWithin, totalN, withinDetails, zCalculationDetails });

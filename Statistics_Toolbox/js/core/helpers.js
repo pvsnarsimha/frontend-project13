@@ -44,6 +44,7 @@ function validateDistributionParams(dist, params, opts) {
         exponential: () => ok(params.rate) && params.rate > 0 ? null : 'The rate λ must be a number greater than 0.',
         uniform: () => ok(params.min) && ok(params.max) && params.min < params.max ? null : 'Uniform needs numbers with minimum a < maximum b.',
         beta: () => ok(params.alpha) && ok(params.beta) && params.alpha > 0 && params.beta > 0 ? null : 'Beta needs α > 0 and β > 0.',
+        weibull: () => ok(params.shape) && ok(params.scale) && params.shape > 0 && params.scale > 0 ? null : 'The Weibull distribution needs a shape k > 0 and a scale λ > 0.',
         poisson: () => ok(params.lambda) && params.lambda > 0 ? null : 'The Poisson mean λ must be a number greater than 0.',
         binomial: () => {
             if (!ok(params.n) || params.n < 1 || Math.floor(params.n) !== params.n) return 'The number of trials n must be a whole number of at least 1.';
@@ -53,6 +54,20 @@ function validateDistributionParams(dist, params, opts) {
         }
     };
     return checks[dist] ? checks[dist]() : null;
+}
+
+// Guard for every procedure that divides by the pooled within-group variance (ANOVA, Tukey, Scheffe, Bonferroni, Levene):
+// returns an error result when the within-group degrees of freedom are below 1 (every group has a single value) or the
+// within-group sum of squares is 0 (no variation inside any group, so F and the t / q statistics are infinite), else null.
+function withinGroupError(dfWithin, ssWithin, testName, quantity) {
+    const q = quantity || 'values';
+    if (!(dfWithin >= 1)) {
+        return { error: true, message: `${testName} needs at least one group with two or more observations: with every group holding a single value there are no within-group degrees of freedom (N - k = ${dfWithin}), so the pooled variance cannot be estimated.` };
+    }
+    if (!(ssWithin > 0) || !isFinite(ssWithin)) {
+        return { error: true, message: `The ${q} do not vary inside any group (within-group sum of squares = 0), so the test statistic would be infinite and ${testName} is undefined. Add variation within the groups.` };
+    }
+    return null;
 }
 
 // Shows a validation message in the standard result area of a tool whose element ids start with `prefix`
@@ -88,140 +103,6 @@ function parseValueGroupInput(inputText) {
     return { groups, skipped };
 }
 
-// Function to generate detailed distribution analysis
-function generateDistributionAnalysis(numbers) {
-    if (!numbers || numbers.length === 0) return "No data available for analysis.";
-    
-    const n = numbers.length;
-    const sorted = [...numbers].sort((a, b) => a - b);
-    const min = sorted[0];
-    const max = sorted[n - 1];
-    const range = max - min;
-    
-    // Calculate mean
-    const sum = numbers.reduce((a, b) => a + b, 0);
-    const mean = sum / n;
-    
-    // Calculate median
-    const median = quantileType7(sorted, 0.5);       // the app's one quantile definition (core/numerics.js)
-    
-    // Mode: the Mode tool's own rule and wording (one definition)
-    const modeText = computeModeWithSteps(numbers).display;
-    
-    // Calculate variance and standard deviation
-    const variance = numbers.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
-    const stdDev = Math.sqrt(variance);
-    
-    // Calculate Coefficient of Variation (CV)
-    const cv = stdDev / mean;
-    
-    // Calculate quartiles
-    const q1 = quantileType7(sorted, 0.25);
-    const q3 = quantileType7(sorted, 0.75);
-    const iqr = q3 - q1;
-    
-    // Determine skewness
-    const skewness = (mean - median) / stdDev;
-    let skewType = "";
-    if (Math.abs(skewness) < 0.1) skewType = "Approximately symmetric";
-    else if (skewness > 0) skewType = "Right-skewed (positive skew)";
-    else skewType = "Left-skewed (negative skew)";
-    
-    // Determine kurtosis approximation
-    const fourthMoment = numbers.reduce((a, b) => a + Math.pow(b - mean, 4), 0) / n;
-    const kurtosis = fourthMoment / Math.pow(variance, 2) - 3;
-    let kurtosisType = "";
-    if (Math.abs(kurtosis) < 0.5) kurtosisType = "Mesokurtic (normal-like peak)";
-    else if (kurtosis > 0) kurtosisType = "Leptokurtic (heavy tails, sharp peak)";
-    else kurtosisType = "Platykurtic (light tails, flat peak)";
-    
-    // Outlier detection (using IQR method)
-    const lowerBound = q1 - 1.5 * iqr;
-    const upperBound = q3 + 1.5 * iqr;
-    const outliers = numbers.filter(x => x < lowerBound || x > upperBound);
-    
-    // Generate analysis text
-    let analysis = `📊 DETAILED DISTRIBUTION ANALYSIS\n`;
-    analysis += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    
-    analysis += `📌 BASIC STATISTICS:\n`;
-    analysis += `• Sample size (n): ${n}\n`;
-    analysis += `• Minimum value: ${min.toFixed(4)}\n`;
-    analysis += `• Maximum value: ${max.toFixed(4)}\n`;
-    analysis += `• Range: ${range.toFixed(4)}\n\n`;
-    
-    analysis += `📌 CENTRAL TENDENCY:\n`;
-    analysis += `• Mean (average): ${mean.toFixed(4)}\n`;
-    analysis += `• Median (middle): ${median.toFixed(4)}\n`;
-    analysis += `• Mode (most frequent): ${modeText}\n`;
-    analysis += `• Mean vs Median difference: ${Math.abs(mean - median).toFixed(4)}\n\n`;
-    
-    analysis += `📌 DISPERSION (SPREAD):\n`;
-    analysis += `• Population variance (÷ n): ${variance.toFixed(4)}\n`;
-    analysis += `• Population standard deviation: ${stdDev.toFixed(4)}\n`;
-    analysis += `• Coefficient of Variation (population σ / mean): ${(cv * 100).toFixed(2)}%\n`;
-    analysis += `• Q1 (25th percentile): ${q1.toFixed(4)}\n`;
-    analysis += `• Q3 (75th percentile): ${q3.toFixed(4)}\n`;
-    analysis += `• Interquartile Range (IQR): ${iqr.toFixed(4)}\n\n`;
-    
-    analysis += `📌 DISTRIBUTION SHAPE:\n`;
-    analysis += `• Pearson's median skewness (mean − median) / σ: ${skewness.toFixed(4)} → ${skewType}\n`;
-    analysis += `  `;
-    if (skewness > 0.1) analysis += `Mean > Median, tail extends to the right.\n`;
-    else if (skewness < -0.1) analysis += `Mean < Median, tail extends to the left.\n`;
-    else analysis += `Mean ≈ Median, roughly bell-shaped.\n`;
-    
-    analysis += `• Excess kurtosis (population): ${kurtosis.toFixed(4)} → ${kurtosisType}\n`;
-    analysis += `  `;
-    if (kurtosis > 0.5) analysis += `Distribution has heavier tails and sharper peak than normal.\n`;
-    else if (kurtosis < -0.5) analysis += `Distribution has lighter tails and flatter peak than normal.\n`;
-    else analysis += `Distribution similar to normal curve.\n\n`;
-    
-    analysis += `📌 OUTLIER DETECTION (IQR Method):\n`;
-    analysis += `• Lower bound (Q1 - 1.5×IQR): ${lowerBound.toFixed(4)}\n`;
-    analysis += `• Upper bound (Q3 + 1.5×IQR): ${upperBound.toFixed(4)}\n`;
-    if (outliers.length === 0) {
-        analysis += `• ✅ No outliers detected in the dataset.\n`;
-    } else {
-        analysis += `• ⚠️ Outliers found (${outliers.length} value${outliers.length > 1 ? 's' : ''}): ${outliers.map(x => x.toFixed(4)).join(", ")}\n`;
-        analysis += `  These values fall outside the typical range and may affect statistical measures.\n`;
-    }
-    analysis += `\n`;
-    
-    analysis += `📌 INTERPRETATION:\n`;
-    if (Math.abs(mean - median) < 0.1 * stdDev) {
-        analysis += `• The data appears roughly symmetric. The mean and median are close,\n`;
-        analysis += `  suggesting the average is representative of typical values.\n`;
-    } else if (mean > median) {
-        analysis += `• The data is right-skewed (positively skewed). This means there are\n`;
-        analysis += `  some relatively high values pulling the mean above the median.\n`;
-        analysis += `  Consider using median for central tendency.\n`;
-    } else {
-        analysis += `• The data is left-skewed (negatively skewed). This means there are\n`;
-        analysis += `  some relatively low values pulling the mean below the median.\n`;
-        analysis += `  Consider using median for central tendency.\n`;
-    }
-    
-    if (outliers.length > 0) {
-        analysis += `\n• Outliers detected! These extreme values may significantly impact\n`;
-        analysis += `  the mean and standard deviation. Consider investigating these\n`;
-        analysis += `  values or using robust statistics (median, IQR).\n`;
-    }
-    
-    if (cv > 0.3) {
-        analysis += `\n• High relative variability (CV > 30%). The data shows substantial\n`;
-        analysis += `  spread relative to the mean.\n`;
-    } else if (cv < 0.1) {
-        analysis += `\n• Low relative variability (CV < 10%). The data is tightly clustered\n`;
-        analysis += `  around the mean.\n`;
-    } else {
-        analysis += `\n• Moderate relative variability (CV between 10-30%). The data has\n`;
-        analysis += `  reasonable spread around the mean.\n`;
-    }
-    
-    analysis += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    return analysis;
-}
 
 // Enhanced visualization function
 // Enhanced visualization function
@@ -298,6 +179,15 @@ function binomialPMF(n, k, p) {
 
 // Simple linear regression y = b0 + b1·x: the formulas shared by the simple-linear, standard-error, t-statistic and F-test tools.
 // Returns null when x does not vary (Σ(x - x̄)² = 0), where the slope is undefined.
+// One rule for a perfect fit, shared by every regression tool: a residual sum of squares at rounding level relative to the
+// total sum of squares. Descriptive tools (simple regression, model summary) still report R² = 1; the inference tools
+// (standard errors, t statistics, overall F) stop with PERFECT_FIT_MESSAGE because their divisors are zero.
+const PERFECT_FIT_REL_TOL = 1e-12;
+function isPerfectFit(ssRes, ssTot) {
+    return ssRes <= PERFECT_FIT_REL_TOL * ssTot;
+}
+const PERFECT_FIT_MESSAGE = "The line fits the data perfectly (residual sum of squares ≈ 0), so the standard errors are 0 and the t and F statistics are infinite. Inference needs some scatter around the line.";
+
 function simpleRegressionCore(x, y) {
     const n = x.length;
     const meanX = x.reduce((a, b) => a + b, 0) / n, meanY = y.reduce((a, b) => a + b, 0) / n;

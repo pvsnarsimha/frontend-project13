@@ -110,132 +110,132 @@ function computeSignTest(data, hypothesizedMedian, alpha, alternative) {
     for (let i = 0; i < signs.length; i++) {
         const s = signs[i];
         const signColor = s.sign === '+' ? '#28a745' : (s.sign === '-' ? '#dc3545' : '#6c757d');
-        signTableRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${i+1}</td>
-            <td style="padding: 8px; text-align: center;">${s.value}</td>
-            <td style="padding: 8px; text-align: center;">${s.value} - ${hypothesizedMedian} = ${s.diff.toFixed(4)}</td>
+        signTableRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${i+1}</td>
+            <td class="s-a7c3f4">${s.value}</td>
+            <td class="s-a7c3f4">${s.value} - ${hypothesizedMedian} = ${s.diff.toFixed(4)}</td>
             <td style="padding: 8px; text-align: center; font-weight: bold; color: ${signColor};">${s.sign === '0' ? 'Tie (ignored)' : (s.sign === '+' ? 'Positive (+) → Above Median' : 'Negative (-) → Below Median')}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">±</span>
-                <h2 style="margin: 0;">Sign Test (Median)</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">±</span>
+                <h2 class="s-f8a94d">Sign Test (Median)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">A non-parametric test for the population median</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">H₀: Median = ${hypothesizedMedian} | H₁: Median ${alternative === 'two.sided' ? '≠' : (alternative === 'greater' ? '>' : '<')} ${hypothesizedMedian}</p>
+            <p class="s-259079">A non-parametric test for the population median</p>
+            <p class="s-20a400">H₀: Median = ${hypothesizedMedian} | H₁: Median ${alternative === 'two.sided' ? '≠' : (alternative === 'greater' ? '>' : '<')} ${hypothesizedMedian}</p>
         </div>
         
-        <div style="background: #f0f4fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📖 Understanding the Sign Test</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <p style="margin: 0 0 12px 0;"><strong>How it works:</strong></p>
-                <ul style="margin-left: 20px; line-height: 1.6;">
+        <div class="s-42ccf7 gen-pad">
+            <h3 class="s-ed0bb5">📖 Understanding the Sign Test</h3>
+            <div class="s-6025fc">
+                <p class="s-7dacb1"><strong>How it works:</strong></p>
+                <ul class="s-c1e0ca">
                     <li>Count how many observations are ABOVE the hypothesized median (+) </li>
                     <li>Count how many are BELOW the hypothesized median (-) </li>
                     <li>Ignore values exactly equal to the hypothesized median</li>
                     <li>Under H₀, expect ~50% above and ~50% below</li>
                 </ul>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-family: monospace; text-align: center; margin-top: 12px;">
+                <div class="s-0f748e">
                     <strong>Test statistic = min(# of +, # of -)</strong>
                 </div>
-                <div style="margin-top: 12px; background: #fff3cd; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-28c132">
                     💡 <strong>Interpretation:</strong> If the test statistic is small, the median is likely different from hypothesized value.
                 </div>
             </div>
         </div>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px;">
-            <div style="background: white; border-radius: 12px; padding: 16px; border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Sample Size (n)</div>
-                <div style="font-size: 32px; font-weight: 700; color: #1a5490;">${n}</div>
+        <div class="s-5d9fe4 gen-grid">
+            <div class="s-a739ec">
+                <div class="s-42da0a">Sample Size (n)</div>
+                <div class="s-abfdfd gen-big">${n}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px; border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Hypothesized Median</div>
-                <div style="font-size: 24px; font-weight: 700;">${hypothesizedMedian}</div>
+            <div class="s-a739ec">
+                <div class="s-42da0a">Hypothesized Median</div>
+                <div class="s-c2434f">${hypothesizedMedian}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px; border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Non-zero Observations</div>
-                <div style="font-size: 24px; font-weight: 700;">${nonZero}</div>
+            <div class="s-a739ec">
+                <div class="s-42da0a">Non-zero Observations</div>
+                <div class="s-c2434f">${nonZero}</div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto; border: 1px solid #e9ecef;">
-            <h3 style="margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #1a5490; color: #1a5490;">
+        <div class="s-90b704">
+            <h3 class="s-c7276c">
                 📊 Step 1: Determine Signs for Each Observation
             </h3>
-            <table style="width: 100%; border-collapse: collapse;">
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #1a5490; color: white;">
-                        <th style="padding: 10px;">i</th>
-                        <th style="padding: 10px;">Value</th>
-                        <th style="padding: 10px;">Deviation (Value - M₀)</th>
-                        <th style="padding: 10px;">Sign</th>
+                    <tr class="s-e7b83b">
+                        <th class="s-a756db">i</th>
+                        <th class="s-a756db">Value</th>
+                        <th class="s-a756db">Deviation (Value - M₀)</th>
+                        <th class="s-a756db">Sign</th>
                     </tr>
                 </thead>
                 <tbody>${signTableRows}</tbody>
             </table>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 2: Count Signs</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center;">
-                    <div style="background: #d4edda; padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 36px; font-weight: 700; color: #28a745;">${positives}</div>
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 2: Count Signs</h3>
+            <div class="s-6025fc">
+                <div class="s-b37ea4 gen-grid gen-grid-many">
+                    <div class="s-3b0819">
+                        <div class="s-8d6db5 gen-big">${positives}</div>
                         <div>Positive (+) → Above M₀</div>
                     </div>
-                    <div style="background: #f8d7da; padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 36px; font-weight: 700; color: #dc3545;">${negatives}</div>
+                    <div class="s-c20c6d">
+                        <div class="s-bb6dac gen-big">${negatives}</div>
                         <div>Negative (-) → Below M₀</div>
                     </div>
-                    <div style="background: #fff3cd; padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 36px; font-weight: 700; color: #ffc107;">${zeros}</div>
+                    <div class="s-6da5f7">
+                        <div class="s-e5b310 gen-big">${zeros}</div>
                         <div>Ties (ignored)</div>
                     </div>
                 </div>
-                <div style="margin-top: 16px; text-align: center;">
+                <div class="s-64c1da">
                     <strong>Non-zero observations (m) = ${positives} + ${negatives} = ${nonZero}</strong>
                 </div>
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 3: Calculate Test Statistic & p-value</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 3: Calculate Test Statistic & p-value</h3>
+            <div class="s-6025fc">
+                <div class="s-1a4440">
                     <strong>Test statistic = min(${positives}, ${negatives}) = ${testStatistic}</strong>
                 </div>
-                <div style="margin-top: 12px;">
+                <div class="s-9d5978">
                     Under H₀, signs follow Binomial(m, 0.5)<br>
                     p-value = ${pValue.toFixed(8)}
                 </div>
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; margin-bottom: 24px; ${rejectH0 ? 'background: #f8d7da; border-left: 6px solid #dc3545;' : 'background: #d4edda; border-left: 6px solid #28a745;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Step 4: Make Decision</h3>
-            <div style="display: grid; gap: 12px;">
+        <div class="${rejectH0 ? 's-830a4f gen-pad' : 's-28eb84 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Step 4: Make Decision</h3>
+            <div class="s-f27585">
                 <div><strong>Test Statistic:</strong> ${testStatistic}</div>
                 <div><strong>Non-zero observations (m):</strong> ${nonZero}</div>
                 <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
                 <div><strong>Significance Level (α):</strong> ${alpha}</div>
-                <div style="margin-top: 8px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                <div class="s-c6645b">
                     <strong>Decision:</strong> ${conclusion}<br>
                     <strong>Interpretation:</strong> ${interpretation}
                 </div>
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📊 Interpretation Guide</h3>
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                <thead><tr style="background: #1a5490; color: white;"><th style="padding: 8px;">Test Statistic</th><th style="padding: 8px;">Interpretation</th><th style="padding: 8px;">Conclusion</th></tr></thead>
+        <div class="s-44d7a2 gen-pad">
+            <h3 class="s-ed0bb5">📊 Interpretation Guide</h3>
+            <table class="s-306b2c gen-sized">
+                <thead><tr class="s-e7b83b"><th class="s-939795">Test Statistic</th><th class="s-939795">Interpretation</th><th class="s-939795">Conclusion</th></tr></thead>
                 <tbody>
-                    <tr style="background: white;"><td style="padding: 8px;">Large (close to m/2)</td><td style="padding: 8px;">Roughly equal +/- counts</td><td style="padding: 8px;">Cannot reject H₀ (median = M₀)</td></tr>
-                    <tr style="background: #f8f9fa;"><td style="padding: 8px;">Small (near 0)</td><td style="padding: 8px;">Most values on one side</td><td style="padding: 8px;">Reject H₀ (median ≠ M₀)</td></tr>
+                    <tr class="s-67f264"><td class="s-641001">Large (close to m/2)</td><td class="s-641001">Roughly equal +/- counts</td><td class="s-641001">Cannot reject H₀ (median = M₀)</td></tr>
+                    <tr class="s-6d64ad"><td class="s-641001">Small (near 0)</td><td class="s-641001">Most values on one side</td><td class="s-641001">Reject H₀ (median ≠ M₀)</td></tr>
                 </tbody>
             </table>
         </div>

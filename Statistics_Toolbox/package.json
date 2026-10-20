@@ -8,7 +8,8 @@
     "test": "node --test",
     "test:e2e": "node tests/e2e/smoke.js && node tests/e2e/sample.js && node tests/e2e/edge-cases.js && node tests/e2e/responsive.js && node tests/e2e/lazy-chartjs.js && node tests/e2e/ui-dom.js",
     "test:all": "npm test && npm run test:e2e",
-    "sync:scripts": "node scripts/sync-script-tags.js"
+    "sync:scripts": "node scripts/sync-script-tags.js",
+    "sync:styles": "node scripts/extract-styles.js"
   },
   "engines": {
     "node": ">=20"

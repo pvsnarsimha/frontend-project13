@@ -1,7 +1,21 @@
+/* Chart.js instances: one module-level variable per plotting tool, registered with registerChart and released together by destroyAllCharts */
+// next line with registerChart(getter, clearer). destroyAllCharts() releases every registered instance when the tool changes, so a new
+// plotting tool needs no edit anywhere else (a test fails for a `let ...Chart = null;` that is not registered).
+const CHART_REGISTRY = [];
+function registerChart(get, clear) { CHART_REGISTRY.push([get, clear]); }
+function destroyAllCharts() {
+    CHART_REGISTRY.forEach(([get, clear]) => {
+        const chart = get();
+        if (chart && typeof chart.destroy === 'function') chart.destroy();
+        clear();
+    });
+}
+
 /* Chart.js instances: one module-level variable per plotting tool (released together by destroyAllCharts in app.js) */
 
 // Chart instance reference
 let currentChart = null;
+registerChart(() => currentChart, () => { currentChart = null; });
 
 // ---- Lazy loading of Chart.js ----
 // The library (~200 KB) is only needed once a chart is drawn, so it is not a <script> tag of the page: the first
@@ -41,22 +55,28 @@ function chartJsReady(retry, args) {
 // ========== STEM-AND-LEAF PLOT FUNCTIONS ==========
 // ========== PROFESSIONAL STEM-AND-LEAF PLOT WITH SCATTER VISUALIZATION ==========
 let stemLeafChart = null;
+registerChart(() => stemLeafChart, () => { stemLeafChart = null; });
 
 // ========== PROFESSIONAL HISTOGRAM FUNCTIONS ==========
 // Global chart instance
 let histogramChart = null;
+registerChart(() => histogramChart, () => { histogramChart = null; });
 
 // ========== PROFESSIONAL BOXPLOT USING CHART.JS WITH CUSTOM DRAWING ==========
 let boxplotChartInstance = null;
+registerChart(() => boxplotChartInstance, () => { boxplotChartInstance = null; });
 
 // ========== VIOLIN PLOT COMPUTATION ==========
 let violinChart = null;
+registerChart(() => violinChart, () => { violinChart = null; });
 
 // ========== Q-Q PLOT COMPUTATION ==========
 let qqplotChart = null;
+registerChart(() => qqplotChart, () => { qqplotChart = null; });
 
 // ========== P-P PLOT COMPUTATION ==========
 let ppplotChart = null;
+registerChart(() => ppplotChart, () => { ppplotChart = null; });
 
 // ---- Canvas hover tooltip (used by the boxplot) ----
 // One tooltip element for the whole page, created on first use and reused (never one per chart), positioned with

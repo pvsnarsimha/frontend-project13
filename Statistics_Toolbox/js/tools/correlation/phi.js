@@ -65,73 +65,73 @@ function computePhiWithSteps(inputText) {
     else if (Math.abs(phi) < 0.7) interpretation = "Strong association";
     else interpretation = "Very strong association";
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">φ</span>
-                <h2 style="margin: 0;">Phi Coefficient (φ)</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">φ</span>
+                <h2 class="s-f8a94d">Phi Coefficient (φ)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Formula: φ = (ad - bc) / √[(a+b)(c+d)(a+c)(b+d)]</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">Range: -1 to +1 | Measures association between two binary variables</p>
+            <p class="s-259079">Formula: φ = (ad - bc) / √[(a+b)(c+d)(a+c)(b+d)]</p>
+            <p class="s-20a400">Range: -1 to +1 | Measures association between two binary variables</p>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 2×2 Contingency Table</h3>
-            <div style="overflow-x: auto;">
-                <table style="border-collapse: collapse; margin: 0 auto;">
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📊 2×2 Contingency Table</h3>
+            <div class="s-01a9b9">
+                <table class="s-26e7d0">
                     <thead>
                         <tr>
-                            <th style="border: 1px solid #ddd; padding: 12px;"></th>
-                            <th style="border: 1px solid #ddd; padding: 12px;">Y = 0</th>
-                            <th style="border: 1px solid #ddd; padding: 12px;">Y = 1</th>
-                            <th style="border: 1px solid #ddd; padding: 12px;">Row Total</th>
+                            <th class="s-7d7706"></th>
+                            <th class="s-7d7706">Y = 0</th>
+                            <th class="s-7d7706">Y = 1</th>
+                            <th class="s-7d7706">Row Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <th style="border: 1px solid #ddd; padding: 12px; background: #e8f4f8;">X = 0</th>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">a = ${a}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">b = ${b}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: center; background: #e8f4f8;">${row1Total}</td>
+                            <th class="s-32c0c9">X = 0</th>
+                            <td class="s-8a7755">a = ${a}</td>
+                            <td class="s-8a7755">b = ${b}</td>
+                            <td class="s-8f1da4">${row1Total}</td>
                         </tr>
                         <tr>
-                            <th style="border: 1px solid #ddd; padding: 12px; background: #e8f4f8;">X = 1</th>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">c = ${c}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">d = ${d}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: center; background: #e8f4f8;">${row2Total}</td>
+                            <th class="s-32c0c9">X = 1</th>
+                            <td class="s-8a7755">c = ${c}</td>
+                            <td class="s-8a7755">d = ${d}</td>
+                            <td class="s-8f1da4">${row2Total}</td>
                         </tr>
                         <tr>
-                            <th style="border: 1px solid #ddd; padding: 12px; background: #e8f4f8;">Column Total</th>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: center; background: #e8f4f8;">${col1Total}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: center; background: #e8f4f8;">${col2Total}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: center; background: #e8f4f8;">${n}</td>
+                            <th class="s-32c0c9">Column Total</th>
+                            <td class="s-8f1da4">${col1Total}</td>
+                            <td class="s-8f1da4">${col2Total}</td>
+                            <td class="s-8f1da4">${n}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step-by-Step Calculation</h3>
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step-by-Step Calculation</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">1</div>
                     <div><strong>Calculate Numerator (ad - bc)</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     ad = ${a} × ${d} = ${a * d}<br>
                     bc = ${b} × ${c} = ${b * c}<br>
                     ad - bc = ${a * d} - ${b * c} = ${numerator}
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">2</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">2</div>
                     <div><strong>Calculate Denominator √[(a+b)(c+d)(a+c)(b+d)]</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     (a+b) = ${row1Total}<br>
                     (c+d) = ${row2Total}<br>
                     (a+c) = ${col1Total}<br>
@@ -141,25 +141,25 @@ function computePhiWithSteps(inputText) {
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #1a5490; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</div>
+            <div class="s-6025fc">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-541469 gen-flex gen-sized">3</div>
                     <div><strong>Calculate Phi Coefficient</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     φ = (ad - bc) / √[(a+b)(c+d)(a+c)(b+d)]<br>
                     φ = ${numerator} / ${denominator.toFixed(6)}<br>
-                    <div style="font-size: 24px; font-weight: 700; color: #1a5490; margin-top: 12px;">φ = ${phi.toFixed(8)}</div>
+                    <div class="s-56b421">φ = ${phi.toFixed(8)}</div>
                 </div>
             </div>
         </div>
         
         <div style="border-radius: 16px; padding: 20px; ${Math.abs(phi) > 0.3 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Interpretation</h3>
+            <h3 class="s-c7f0b4">📌 Interpretation</h3>
             <div><strong>Phi Coefficient:</strong> ${phi.toFixed(6)}</div>
             <div><strong>Direction:</strong> ${phi > 0 ? 'Positive association' : (phi < 0 ? 'Negative association' : 'No association')}</div>
             <div><strong>Strength:</strong> ${interpretation}</div>
-            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+            <div class="s-8d2e44">
                 💡 <strong>Note:</strong> Phi coefficient is equivalent to Pearson correlation for 2×2 binary variables.<br>
                 It ranges from -1 (perfect negative association) to +1 (perfect positive association).
             </div>

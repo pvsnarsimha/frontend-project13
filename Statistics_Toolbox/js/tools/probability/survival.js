@@ -65,6 +65,8 @@ function computeSurvivalWithSteps() {
     } else if (dist === 'normal') {
         const mean = parseFloat(document.getElementById('survivalMean').value);
         const std = parseFloat(document.getElementById('survivalStd').value);
+        const normalError = validateDistributionParams('normal', { mean, stdDev: std });
+        if (normalError) return { error: true, message: normalError };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      NORMAL DISTRIBUTION SURVIVAL                ║\n`;
@@ -89,7 +91,8 @@ function computeSurvivalWithSteps() {
     } else if (dist === 'weibull') {
         const shape = parseFloat(document.getElementById('survivalShape').value);
         const scale = parseFloat(document.getElementById('survivalScale').value);
-        if (!(shape > 0 && scale > 0 && isFinite(shape) && isFinite(scale))) return { error: true, message: "The Weibull distribution needs a shape k > 0 and a scale λ > 0." };
+        const weibullError = validateDistributionParams('weibull', { shape, scale });
+        if (weibullError) return { error: true, message: weibullError };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      WEIBULL DISTRIBUTION SURVIVAL               ║\n`;
@@ -139,23 +142,23 @@ function updateSurvivalParams() {
     if (dist === 'exponential') {
         setHtml(paramsDiv, `
             <label>📊 Rate (λ):</label>
-            <input type="number" id="survivalRate" value="1" step="0.5" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <div class="desc" style="font-size: 0.75rem;">Higher rate = faster failure</div>
+            <input class="s-c689ef gen-sized" type="number" id="survivalRate" value="1" step="0.5" min="0.01">
+            <div class="desc s-8b77e0">Higher rate = faster failure</div>
         `);
     } else if (dist === 'normal') {
         setHtml(paramsDiv, `
             <label>📊 Mean (μ):</label>
-            <input type="number" id="survivalMean" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
+            <input class="s-c689ef gen-sized" type="number" id="survivalMean" value="0" step="any">
             <label>📊 Standard Deviation (σ):</label>
-            <input type="number" id="survivalStd" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
+            <input class="s-c689ef gen-sized" type="number" id="survivalStd" value="1" step="any" min="0.01">
         `);
     } else if (dist === 'weibull') {
         setHtml(paramsDiv, `
             <label>📊 Shape parameter (k):</label>
-            <input type="number" id="survivalShape" value="1.5" step="0.5" min="0.1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <div class="desc" style="font-size: 0.75rem;">k < 1: decreasing hazard, k = 1: constant, k > 1: increasing</div>
+            <input class="s-c689ef gen-sized" type="number" id="survivalShape" value="1.5" step="0.5" min="0.1">
+            <div class="desc s-8b77e0">k < 1: decreasing hazard, k = 1: constant, k > 1: increasing</div>
             <label>📊 Scale parameter (λ):</label>
-            <input type="number" id="survivalScale" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
+            <input class="s-c689ef gen-sized" type="number" id="survivalScale" value="1" step="any" min="0.01">
         `);
     }
 }

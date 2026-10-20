@@ -225,13 +225,19 @@ function computeRandomWithSteps() {
             const maxShowDetails = Math.min(5, count);
             
             for (let i = 0; i < count; i++) {
-                let x, y, attempts = 0;
-                do {
+                let x, y, attempts = 0, accepted = false;
+                while (!accepted && attempts < MAX_REJECTION_ATTEMPTS) {
                     x = source.uniform();
                     y = source.uniform() * maxDensity;
                     attempts++;
-                } while (y > betaPDF(x, params.alpha, params.beta) && attempts < MAX_REJECTION_ATTEMPTS);
-                if (attempts >= MAX_REJECTION_ATTEMPTS) { rejectionCapped = true; x = mode; }
+                    accepted = y <= betaPDF(x, params.alpha, params.beta);
+                }
+                if (!accepted) {
+                    // never reached on realistic input (the acceptance rate is 1 / f(mode)); the exact Gamma-ratio draw keeps the
+                    // sample correct instead of inserting a constant, and the tile says it happened
+                    rejectionCapped = true;
+                    x = sampleBeta(params.alpha, params.beta, source);
+                }
                 randomNumbers.push(x);
                 
                 if (samplesShown < maxShowDetails) {
@@ -317,7 +323,7 @@ function computeRandomWithSteps() {
         // compare with the standard error of a sample mean, not with σ itself (which a sample of 10 can never meet)
         const meanTolerance = 3 * theoreticalStd / Math.sqrt(randomNumbers.length);
         if (rejectionCapped) {
-            steps += `⚠ Rejection sampling hit its attempt limit for some values (the distribution is very peaked); those values were set to the mode.\n`;
+            steps += `⚠ Rejection sampling hit its attempt limit for some values (the distribution is very peaked); those values were drawn with the exact Gamma-ratio method instead (still a correct Beta sample).\n`;
         } else if (meanDiff < meanTolerance) {
             steps += `✓ Sample mean is within 3 standard errors (±${meanTolerance.toFixed(6)}) of the theoretical mean → consistent with Beta(${params.alpha},${params.beta})\n`;
         } else {
@@ -354,7 +360,7 @@ function computeRandomWithSteps() {
     steps += `  Maximum: ${max.toFixed(6)}\n`;
     steps += `  Range: ${(max - min).toFixed(6)}\n`;
     
-    const warning = rejectionCapped ? ' | Warning: some values were set to the mode because this Beta is too peaked for rejection sampling; generate fewer values or use less extreme parameters' : '';
+    const warning = rejectionCapped ? ' | Note: this Beta is very peaked, so some values used the exact Gamma-ratio method after rejection sampling hit its attempt limit' : '';
     return { randomNumbers, steps, rejectionCapped, resultStr: randomNumbers.map(n => n.toFixed(4)).join(', ') + warning };
 }
 

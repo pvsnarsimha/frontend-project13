@@ -69,6 +69,9 @@ function computePartialCorrelationWithSteps(x, y, z) {
         yz_sumBB += dz * dz;
         yz_details += `      (${y[i]} - ${meanY.toFixed(4)}) × (${z[i]} - ${meanZ.toFixed(4)}) = ${dy.toFixed(4)} × ${dz.toFixed(4)} = ${product.toFixed(4)}\n`;
     }
+    if (yz_sumAA === 0) {
+        return { error: true, message: "Partial correlation is undefined: all Y values are identical (zero variance)." };
+    }
     const r_yz = yz_sumAB / Math.sqrt(yz_sumAA * yz_sumBB);
     
     // ========== PARTIAL CORRELATION ==========
@@ -80,56 +83,56 @@ function computePartialCorrelationWithSteps(x, y, z) {
     const r_xy_z = numerator / denominator;
     
     // Build the complete HTML output
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 100%;">
-        <div style="background: linear-gradient(135deg, #e65100 0%, #bf360c 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">🔗</span>
-                <h2 style="margin: 0;">Partial Correlation (r<sub>xy·z</sub>)</h2>
+    let steps = `<div class="s-3c49f1">
+        <div class="s-68271a gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">🔗</span>
+                <h2 class="s-f8a94d">Partial Correlation (r<sub>xy·z</sub>)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Formula: r<sub>xy·z</sub> = (r<sub>xy</sub> - r<sub>xz</sub>·r<sub>yz</sub>) / √[(1 - r<sub>xz</sub>²)(1 - r<sub>yz</sub>²)]</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">Measures correlation between X and Y after removing the linear effect of Z.</p>
+            <p class="s-259079">Formula: r<sub>xy·z</sub> = (r<sub>xy</sub> - r<sub>xz</sub>·r<sub>yz</sub>) / √[(1 - r<sub>xz</sub>²)(1 - r<sub>yz</sub>²)]</p>
+            <p class="s-20a400">Measures correlation between X and Y after removing the linear effect of Z.</p>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #e65100;">📊 Data Summary</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #e65100;">
-                    <div style="font-size: 12px;">Number of Observations</div>
-                    <div style="font-size: 28px; font-weight: 700;">${n}</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d9708b">📊 Data Summary</h3>
+            <div class="s-a7ffd4 gen-grid">
+                <div class="s-2046d3">
+                    <div class="s-137d30">Number of Observations</div>
+                    <div class="s-93c0a8">${n}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">X̄ (Mean X)</div>
-                    <div style="font-size: 18px; font-weight: 600;">${meanX.toFixed(4)}</div>
+                <div class="s-63afdf">
+                    <div class="s-42da0a">X̄ (Mean X)</div>
+                    <div class="s-e28abf">${meanX.toFixed(4)}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">Ȳ (Mean Y)</div>
-                    <div style="font-size: 18px; font-weight: 600;">${meanY.toFixed(4)}</div>
+                <div class="s-63afdf">
+                    <div class="s-42da0a">Ȳ (Mean Y)</div>
+                    <div class="s-e28abf">${meanY.toFixed(4)}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-size: 12px; color: #6c757d;">Z̄ (Mean Z)</div>
-                    <div style="font-size: 18px; font-weight: 600;">${meanZ.toFixed(4)}</div>
+                <div class="s-63afdf">
+                    <div class="s-42da0a">Z̄ (Mean Z)</div>
+                    <div class="s-e28abf">${meanZ.toFixed(4)}</div>
                 </div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; border: 1px solid #e9ecef; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #e65100;">📋 Input Data</h3>
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-8b4bbf">
+            <h3 class="s-607c17">📋 Input Data</h3>
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #e65100; color: white;">
-                        <th style="padding: 10px;">i</th>
-                        <th style="padding: 10px;">X</th>
-                        <th style="padding: 10px;">Y</th>
-                        <th style="padding: 10px;">Z (Control)</th>
+                    <tr class="s-01ff1c">
+                        <th class="s-a756db">i</th>
+                        <th class="s-a756db">X</th>
+                        <th class="s-a756db">Y</th>
+                        <th class="s-a756db">Z (Control)</th>
                     </tr>
                 </thead>
                 <tbody>`;
     for (let i = 0; i < n; i++) {
-        steps += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${i+1}</td>
-            <td style="padding: 8px; text-align: center;">${x[i]}</td>
-            <td style="padding: 8px; text-align: center;">${y[i]}</td>
-            <td style="padding: 8px; text-align: center;">${z[i]}</td>
+        steps += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${i+1}</td>
+            <td class="s-a7c3f4">${x[i]}</td>
+            <td class="s-a7c3f4">${y[i]}</td>
+            <td class="s-a7c3f4">${z[i]}</td>
          </tr>`;
     }
     steps += `</tbody>
@@ -138,10 +141,10 @@ function computePartialCorrelationWithSteps(x, y, z) {
     
     // ========== SECTION 1: r_xy DETAILS ==========
     steps += `
-        <div style="background: #e3f2fd; border-radius: 16px; padding: 20px; margin-bottom: 24px; border-left: 4px solid #1565c0;">
-            <h3 style="margin: 0 0 16px 0; color: #1565c0;">📐 Step 1: Calculate r<sub>xy</sub> (Correlation between X and Y)</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace; font-size: 13px; line-height: 1.6;">
+        <div class="s-7f33d1 gen-pad">
+            <h3 class="s-b955ab">📐 Step 1: Calculate r<sub>xy</sub> (Correlation between X and Y)</h3>
+            <div class="s-6025fc">
+                <div class="s-2726ad">
                     <strong>Formula:</strong> r<sub>xy</sub> = Σ[(x - x̄)(y - ȳ)] / √[Σ(x - x̄)² × Σ(y - ȳ)²]<br><br>
                     <strong>Means:</strong> x̄ = ${meanX.toFixed(6)}, ȳ = ${meanY.toFixed(6)}<br><br>
                     <strong>Deviations and Products:</strong><br>
@@ -153,7 +156,7 @@ function computePartialCorrelationWithSteps(x, y, z) {
                     <strong>Calculation:</strong><br>
                     &nbsp;&nbsp;r<sub>xy</sub> = ${xy_sumAB.toFixed(6)} / √(${xy_sumAA.toFixed(6)} × ${xy_sumBB.toFixed(6)})<br>
                     &nbsp;&nbsp;r<sub>xy</sub> = ${xy_sumAB.toFixed(6)} / ${Math.sqrt(xy_sumAA * xy_sumBB).toFixed(6)}<br>
-                    <div style="background: #1565c0; color: white; padding: 8px 12px; border-radius: 8px; display: inline-block; margin-top: 8px;">
+                    <div class="s-2d2e8e">
                         ✅ r<sub>xy</sub> = ${r_xy.toFixed(8)}
                     </div>
                 </div>
@@ -162,10 +165,10 @@ function computePartialCorrelationWithSteps(x, y, z) {
     
     // ========== SECTION 2: r_xz DETAILS ==========
     steps += `
-        <div style="background: #e8f5e9; border-radius: 16px; padding: 20px; margin-bottom: 24px; border-left: 4px solid #2e7d32;">
-            <h3 style="margin: 0 0 16px 0; color: #2e7d32;">📐 Step 2: Calculate r<sub>xz</sub> (Correlation between X and Z)</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace; font-size: 13px; line-height: 1.6;">
+        <div class="s-151939 gen-pad">
+            <h3 class="s-0cc8b0">📐 Step 2: Calculate r<sub>xz</sub> (Correlation between X and Z)</h3>
+            <div class="s-6025fc">
+                <div class="s-2726ad">
                     <strong>Formula:</strong> r<sub>xz</sub> = Σ[(x - x̄)(z - z̄)] / √[Σ(x - x̄)² × Σ(z - z̄)²]<br><br>
                     <strong>Means:</strong> x̄ = ${meanX.toFixed(6)}, z̄ = ${meanZ.toFixed(6)}<br><br>
                     <strong>Deviations and Products:</strong><br>
@@ -177,7 +180,7 @@ function computePartialCorrelationWithSteps(x, y, z) {
                     <strong>Calculation:</strong><br>
                     &nbsp;&nbsp;r<sub>xz</sub> = ${xz_sumAB.toFixed(6)} / √(${xz_sumAA.toFixed(6)} × ${xz_sumBB.toFixed(6)})<br>
                     &nbsp;&nbsp;r<sub>xz</sub> = ${xz_sumAB.toFixed(6)} / ${Math.sqrt(xz_sumAA * xz_sumBB).toFixed(6)}<br>
-                    <div style="background: #2e7d32; color: white; padding: 8px 12px; border-radius: 8px; display: inline-block; margin-top: 8px;">
+                    <div class="s-27ff3a">
                         ✅ r<sub>xz</sub> = ${r_xz.toFixed(8)}
                     </div>
                 </div>
@@ -186,10 +189,10 @@ function computePartialCorrelationWithSteps(x, y, z) {
     
     // ========== SECTION 3: r_yz DETAILS ==========
     steps += `
-        <div style="background: #fff3e0; border-radius: 16px; padding: 20px; margin-bottom: 24px; border-left: 4px solid #e65100;">
-            <h3 style="margin: 0 0 16px 0; color: #e65100;">📐 Step 3: Calculate r<sub>yz</sub> (Correlation between Y and Z)</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace; font-size: 13px; line-height: 1.6;">
+        <div class="s-92ff24 gen-pad">
+            <h3 class="s-d9708b">📐 Step 3: Calculate r<sub>yz</sub> (Correlation between Y and Z)</h3>
+            <div class="s-6025fc">
+                <div class="s-2726ad">
                     <strong>Formula:</strong> r<sub>yz</sub> = Σ[(y - ȳ)(z - z̄)] / √[Σ(y - ȳ)² × Σ(z - z̄)²]<br><br>
                     <strong>Means:</strong> ȳ = ${meanY.toFixed(6)}, z̄ = ${meanZ.toFixed(6)}<br><br>
                     <strong>Deviations and Products:</strong><br>
@@ -201,7 +204,7 @@ function computePartialCorrelationWithSteps(x, y, z) {
                     <strong>Calculation:</strong><br>
                     &nbsp;&nbsp;r<sub>yz</sub> = ${yz_sumAB.toFixed(6)} / √(${yz_sumAA.toFixed(6)} × ${yz_sumBB.toFixed(6)})<br>
                     &nbsp;&nbsp;r<sub>yz</sub> = ${yz_sumAB.toFixed(6)} / ${Math.sqrt(yz_sumAA * yz_sumBB).toFixed(6)}<br>
-                    <div style="background: #e65100; color: white; padding: 8px 12px; border-radius: 8px; display: inline-block; margin-top: 8px;">
+                    <div class="s-a759b8">
                         ✅ r<sub>yz</sub> = ${r_yz.toFixed(8)}
                     </div>
                 </div>
@@ -210,40 +213,40 @@ function computePartialCorrelationWithSteps(x, y, z) {
     
     // ========== SECTION 4: PARTIAL CORRELATION ==========
     steps += `
-        <div style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #6a1b9a;">🔢 Step 4: Calculate Partial Correlation r<sub>xy·z</sub></h3>
+        <div class="s-62c9d0 gen-pad">
+            <h3 class="s-e49128">🔢 Step 4: Calculate Partial Correlation r<sub>xy·z</sub></h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #6a1b9a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-5f9750 gen-flex gen-sized">1</div>
                     <div><strong>Collected Correlation Values</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace; font-size: 16px;">
+                <div class="s-edd671">
                     <div>r<sub>xy</sub> = ${r_xy.toFixed(8)}</div>
                     <div>r<sub>xz</sub> = ${r_xz.toFixed(8)}</div>
                     <div>r<sub>yz</sub> = ${r_yz.toFixed(8)}</div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #6a1b9a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">2</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-5f9750 gen-flex gen-sized">2</div>
                     <div><strong>Calculate Numerator</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     <div>Numerator = r<sub>xy</sub> - r<sub>xz</sub> × r<sub>yz</sub></div>
                     <div>= ${r_xy.toFixed(8)} - (${r_xz.toFixed(8)} × ${r_yz.toFixed(8)})</div>
                     <div>= ${r_xy.toFixed(8)} - ${(r_xz * r_yz).toFixed(8)}</div>
-                    <div style="font-size: 18px; font-weight: 700; color: #1565c0;">= ${numerator.toFixed(8)}</div>
+                    <div class="s-198754">= ${numerator.toFixed(8)}</div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #6a1b9a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-5f9750 gen-flex gen-sized">3</div>
                     <div><strong>Calculate Denominator</strong></div>
                 </div>
-                <div style="margin-left: 40px; font-family: monospace;">
+                <div class="s-f55593">
                     <div>Denominator = √[(1 - r<sub>xz</sub>²) × (1 - r<sub>yz</sub>²)]</div>
                     <div>1 - r<sub>xz</sub>² = 1 - ${(r_xz * r_xz).toFixed(8)} = ${(1 - r_xz * r_xz).toFixed(8)}</div>
                     <div>1 - r<sub>yz</sub>² = 1 - ${(r_yz * r_yz).toFixed(8)} = ${(1 - r_yz * r_yz).toFixed(8)}</div>
@@ -252,30 +255,30 @@ function computePartialCorrelationWithSteps(x, y, z) {
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #6a1b9a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">4</div>
+            <div class="s-6025fc">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-5f9750 gen-flex gen-sized">4</div>
                     <div><strong>Calculate Final Partial Correlation</strong></div>
                 </div>
-                <div style="margin-left: 40px;">
+                <div class="s-78a84b">
                     <div>r<sub>xy·z</sub> = Numerator / Denominator</div>
                     <div>= ${numerator.toFixed(8)} / ${Math.sqrt((1 - r_xz*r_xz) * (1 - r_yz*r_yz)).toFixed(8)}</div>
-                    <div style="font-size: 28px; font-weight: 700; color: #6a1b9a; text-align: center; padding: 16px; background: #f3e5f5; border-radius: 12px; margin-top: 12px;">
+                    <div class="s-b85615">
                         r<sub>xy·z</sub> = ${r_xy_z.toFixed(8)}
                     </div>
                 </div>
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; background: #fff3e0; border-left: 6px solid #e65100;">
-            <h3 style="margin: 0 0 12px 0;">📌 Interpretation</h3>
-            <div style="display: grid; gap: 10px;">
+        <div class="s-7be977 gen-pad">
+            <h3 class="s-c7f0b4">📌 Interpretation</h3>
+            <div class="s-45b8b7">
                 <div><strong>Partial Correlation:</strong> r<sub>xy·z</sub> = ${r_xy_z.toFixed(6)}</div>
                 <div><strong>Simple Correlation (r<sub>xy</sub>):</strong> ${r_xy.toFixed(6)}</div>
                 <div><strong>Change after controlling for Z:</strong> ${(r_xy_z - r_xy).toFixed(6)}</div>
                 <div><strong>Direction:</strong> ${r_xy_z > 0 ? 'Positive association between X and Y after removing Z' : (r_xy_z < 0 ? 'Negative association after removing Z' : 'No partial association')}</div>
                 <div><strong>Strength:</strong> ${Math.abs(r_xy_z) >= 0.7 ? 'Strong' : (Math.abs(r_xy_z) >= 0.5 ? 'Moderate' : (Math.abs(r_xy_z) >= 0.3 ? 'Weak' : 'Very Weak or No'))} partial relationship</div>
-                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+                <div class="s-8d2e44">
                     💡 <strong>Practical Meaning:</strong> After removing the linear effect of Z, 
                     ${Math.abs(r_xy_z) > 0.3 ? 'there is a ' + (Math.abs(r_xy_z) >= 0.7 ? 'strong' : (Math.abs(r_xy_z) >= 0.5 ? 'moderate' : 'weak')) + ' ' + (r_xy_z > 0 ? 'positive' : 'negative') + ' relationship between X and Y.' 
                     : 'there is little to no direct linear relationship between X and Y.'}

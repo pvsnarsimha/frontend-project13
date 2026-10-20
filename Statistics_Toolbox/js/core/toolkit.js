@@ -95,6 +95,8 @@ function h(tag, attrs, ...children) {
 // ---- Shared form constants (used by many buildInterface configs) ----
 const FIELD_GAP = "margin-top: 15px;";
 const FIELD_STYLE = "width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 15px;";
+// Same as FIELD_STYLE plus the outlined border some selects use
+const FIELD_STYLE_BORDERED = "width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #cbdde9; margin-bottom: 15px;";
 const HINT_STYLE = "font-size: 0.75rem; margin-top: 5px;";
 const CARD_GAP = "margin-top: 8px;";
 const DISTRIBUTION_OPTIONS = [ ["normal", "Normal Distribution"], ["uniform", "Uniform Distribution"], ["exponential", "Exponential Distribution"], ["beta", "Beta Distribution"] ];
@@ -155,6 +157,8 @@ const ALPHA_OPTIONS_3 = [ ["0.10", "α = 0.10 (90% Confidence)"], ["0.05", "α =
 //     coloured cards or a canvas. Style it with classes from css/, not inline style attributes.
 // Copy a tool of the style you need; do not mix the two in one tool. Set parameterOnly: true for a form with no pasted data
 // (number fields and drop-downs only): it is rendered as data-parameter-only, and the tests then expect no "Try sample data" button.
+// Sample-data contract: every `textarea` input needs a placeholder starting "Example:" (js/ui/forms.js turns it into the "Try sample data" button);
+// a tool with no pasted data sets `parameterOnly: true`. A test fails for a textarea without an Example.
 function buildInterface(cfg) {
     const attrs = a => Object.entries(a || {}).map(([k, v]) => (v === true ? ` ${k}` : ` ${k}="${v}"`)).join('');
     const control = item => {

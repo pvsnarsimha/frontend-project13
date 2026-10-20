@@ -83,7 +83,7 @@ function computeANCOVA(inputText, alpha) {
     let y = data.map(row => parseFloat(row[0]));
     
     // Second column is Group (categorical)
-    let group = data.map(row => row[1].toString());
+    let group = data.map(row => escapeHtml(row[1].toString()));   // labels reach the HTML steps: escaped once, here
     
     // Third column is the covariate (single-covariate ANCOVA; extra columns are ignored)
     let cov = data.map(row => parseFloat(row[2]));
@@ -224,6 +224,10 @@ function computeANCOVA(inputText, alpha) {
     // Covariate-adjusted total SS minus covariate-adjusted error SS
     const ssTotalAdj = ssTotal - (xxTotal !== 0 ? xyTotal * xyTotal / xxTotal : 0);
     let ssBetweenAdj = ssTotalAdj - ssWithinAdj;
+    // Tiny negatives are floating-point cancellation; anything larger means the adjusted SS decomposition failed
+    if (ssBetweenAdj < -1e-9 * Math.max(1, Math.abs(ssTotalAdj))) {
+        return { error: true, message: "The covariate-adjusted between-group sum of squares came out negative, so the ANCOVA decomposition is not reliable for this data. Check for a constant covariate or near-collinear groups." };
+    }
     if (ssBetweenAdj < 0) ssBetweenAdj = 0;
     const ssCovariate = ssTotal - ssBetweenAdj - ssWithinAdj;
     
@@ -242,7 +246,7 @@ function computeANCOVA(inputText, alpha) {
     // ========== STEP 12: Critical Value and p-value ==========
     const criticalValue = fCriticalValue(alpha, dfBetween, dfWithin);
     const pValue = 1 - fCDF(fStatistic, dfBetween, dfWithin);
-    const rejectH0 = fStatistic > criticalValue;
+    const rejectH0 = pValue < alpha;
     
     // Build input data table
     let dataRows = '';

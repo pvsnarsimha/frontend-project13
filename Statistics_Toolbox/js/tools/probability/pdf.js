@@ -185,11 +185,17 @@ function computePDFWithSteps() {
         if (x >= 0 && x <= 1) {
             const numerator1 = Math.pow(x, alpha - 1);
             const numerator2 = Math.pow(1 - x, beta - 1);
-            steps += `  Step 1: Calculate x^(α-1) = ${x}^(${alpha}-1) = ${numerator1.toFixed(8)}\n`;
-            steps += `  Step 2: Calculate (1-x)^(β-1) = (1-${x})^(${beta}-1) = ${numerator2.toFixed(8)}\n`;
-            steps += `  Step 3: Multiply numerators = ${numerator1.toFixed(8)} × ${numerator2.toFixed(8)} = ${(numerator1 * numerator2).toFixed(8)}\n`;
-            steps += `  Step 4: Divide by Beta function = ${(numerator1 * numerator2).toFixed(8)} / ${betaVal.toFixed(8)}\n`;
-            steps += `  f(${x}) = ${pdf.toFixed(8)}\n`;
+            const show = v => isFinite(v) ? v.toFixed(8) : '+∞';
+            steps += `  Step 1: Calculate x^(α-1) = ${x}^(${alpha}-1) = ${show(numerator1)}\n`;
+            steps += `  Step 2: Calculate (1-x)^(β-1) = (1-${x})^(${beta}-1) = ${show(numerator2)}\n`;
+            steps += `  Step 3: Multiply numerators = ${show(numerator1)} × ${show(numerator2)} = ${show(numerator1 * numerator2)}\n`;
+            steps += `  Step 4: Divide by Beta function = ${show(numerator1 * numerator2)} / ${betaVal.toFixed(8)}\n`;
+            if (!isFinite(pdf)) {
+                // x = 0 with α < 1, or x = 1 with β < 1: the density grows without bound at the end point (it is still a valid density)
+                steps += `  f(${x}) = +∞ (for ${x === 0 ? 'α < 1' : 'β < 1'} the Beta density diverges at x = ${x}; it is not a probability, only a limit)\n`;
+            } else {
+                steps += `  f(${x}) = ${pdf.toFixed(8)}\n`;
+            }
             
             if (x === mean) {
                 steps += `  ✨ This is the mean value! The density at the mean is ${pdf.toFixed(6)}\n`;
@@ -209,10 +215,10 @@ function computePDFWithSteps() {
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     steps += `✅ PDF RESULTS:\n`;
     xValues.forEach((x, i) => {
-        steps += `  f(${x}) = ${results[i].toFixed(8)}\n`;
+        steps += `  f(${x}) = ${isFinite(results[i]) ? results[i].toFixed(8) : '+∞ (diverges at the boundary)'}\n`;
     });
     
-    return { results, xValues, steps, resultStr: results.map(r => r.toFixed(6)).join(', ') };
+    return { results, xValues, steps, resultStr: results.map(r => isFinite(r) ? r.toFixed(6) : '∞').join(', ') };
 }
 
 // ========== SETUP FUNCTIONS FOR EACH PROBABILITY FEATURE ==========

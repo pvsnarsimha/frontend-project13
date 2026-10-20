@@ -80,15 +80,22 @@ test("Cook's distance keeps observation order and survives leverage 1 / perfect 
     assert.ok(!/NaN/.test(lev1.steps));
 });
 
-test('every plotting tool is covered by destroyAllCharts', () => {
-    const appSrc = fs.readFileSync(path.join(ROOT, 'js/app.js'), 'utf8');
-    const declared = [];
+test('every Chart.js instance variable is registered with registerChart (so destroyAllCharts releases it)', () => {
+    const declared = [], registered = [];
     for (const rel of scriptList()) {
-        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/\/\/.*$/gm, '');
         for (const m of src.matchAll(/^let (\w*[cC]hart\w*)\s*=\s*null;/gm)) declared.push(m[1]);
+        for (const m of src.matchAll(/registerChart\(\(\)\s*=>\s*(\w+),\s*\(\)\s*=>\s*\{\s*\1\s*=\s*null;/g)) registered.push(m[1]);
     }
     assert.ok(declared.length >= 7, declared.join());
-    for (const name of declared) assert.ok(appSrc.includes(`() => ${name}`), `${name} is not released when switching tools`);
+    assert.deepEqual([...declared].sort(), [...registered].sort(), 'a chart variable is declared but not registered (or the reverse)');
+    // and the registry really releases them
+    const probe = loadApp();
+    let destroyed = 0;
+    probe.histogramChart = null;
+    probe.get('histogramChart = { destroy() { globalThis.__d = 1; } }');
+    probe.destroyAllCharts();
+    assert.equal(probe.get('histogramChart'), null);
 });
 
 test('sample-data contract: tools offering "Try sample data" declare an "Example:" placeholder', () => {
@@ -202,4 +209,12 @@ test('showDistributionParams: every field it generates is read back by the tool 
     el('pdfParams').html = 'kept';
     probe.showDistributionParams('pdf');
     assert.equal(el('pdfParams').html, 'kept');
+});
+
+test('choosing a tool from the sidebar moves focus to the new tool title (focus management)', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js/app.js'), 'utf8');
+    assert.ok(/function focusToolTitle\(/.test(src));
+    assert.ok(/switchToStat\(btn\.dataset\.stat\);\s*focusToolTitle\(\)/.test(src), 'sidebar click focuses the title');
+    const forms = fs.readFileSync(path.join(ROOT, 'js/ui/forms.js'), 'utf8');
+    assert.ok(forms.includes("'.interface-title', iface).forEach(t =>") && forms.includes('t.tabIndex = -1'), 'the title is a focusable heading');
 });

@@ -128,18 +128,21 @@ function renderHistogramInterface() {
             label: "🎯 HISTOGRAM",
             value: "histogramValueDisplay",
             steps: "histogramStepsDisplay",
-            extra: ['<canvas id="histogramChartCanvas" style="max-height: 400px; margin-top: 20px;"></canvas>']
+            extra: ['<canvas class="s-72ec90" id="histogramChartCanvas"></canvas>']
         }
     });
 }
 
 function computeHistogramWithSteps(numbers, numBins) {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
+    numBins = Math.max(1, Math.min(30, Math.floor(numBins) || 5));
     
     const n = numbers.length;
     const minVal = Math.min(...numbers);
     const maxVal = Math.max(...numbers);
     const range = maxVal - minVal;
+    // Identical values have no range to divide: one bin holds them all (its width is 0, so a density is not defined)
+    if (range === 0) numBins = 1;
     
     // Calculate optimal bin width using Sturges' rule
     const sturgesBins = Math.ceil(Math.log2(n) + 1);
@@ -151,7 +154,7 @@ function computeHistogramWithSteps(numbers, numBins) {
     const q3 = quantileType7(sorted, 0.75);
     const iqr = q3 - q1;
     const fdWidth = 2 * iqr / Math.pow(n, 1/3);
-    const fdBins = Math.ceil(range / fdWidth);
+    const fdBins = fdWidth > 0 ? Math.ceil(range / fdWidth) : null;      // null when IQR = 0 (more than half the values equal)
     
     // Calculate bin width
     const binWidth = range / numBins;
@@ -163,10 +166,12 @@ function computeHistogramWithSteps(numbers, numBins) {
     let binCalculations = [];
     
     for (let i = 0; i < numBins; i++) {
+        // each upper edge is the next bin's lower edge, computed the same way, so no value can fall in a gap or in two bins
         let lower = minVal + (i * binWidth);
-        let upper = (i === numBins - 1) ? maxVal : lower + binWidth;
+        let upper = (i === numBins - 1) ? maxVal : minVal + ((i + 1) * binWidth);
         binRanges.push({ lower, upper, width: binWidth });
-        binLabels.push(`${lower.toFixed(4)} – ${upper.toFixed(4)}`);
+        // interval notation: every bin includes its lower edge and excludes its upper edge, except the last, which includes both
+        binLabels.push(i === numBins - 1 ? `[${lower.toFixed(4)}, ${upper.toFixed(4)}]` : `[${lower.toFixed(4)}, ${upper.toFixed(4)})`);
         
         let count = 0;
         let valuesInBin = [];
@@ -185,7 +190,7 @@ function computeHistogramWithSteps(numbers, numBins) {
             }
         }
         bins[i] = count;
-        binCalculations.push(`Bin ${i+1}: [${lower.toFixed(4)}, ${upper.toFixed(4)}) → ${count} values → ${valuesInBin.join(', ')}`);
+        binCalculations.push(`Bin ${i+1}: ${binLabels[i]} → ${count} values → ${valuesInBin.join(', ')}`);
     }
     
     // Calculate statistics
@@ -197,25 +202,24 @@ function computeHistogramWithSteps(numbers, numBins) {
         cumSum += f;
         cumulativeFreq.push(cumSum);
     }
-    const density = bins.map(f => (f / (n * binWidth)).toFixed(6));
+    const density = bins.map(f => binWidth > 0 ? (f / (n * binWidth)).toFixed(6) : 'n/a');
     
     // Build histogram table
-    let tableHtml = '<div style="overflow-x: auto; margin: 20px 0;">';
-    tableHtml += '<table style="width: 100%; border-collapse: collapse; font-size: 13px; background: white; border-radius: 12px; overflow: hidden;">';
-    tableHtml += '<thead><tr style="background: linear-gradient(135deg, #1a5490, #0d3b66); color: white;">';
-    tableHtml += '<th style="padding: 12px;">Bin #</th><th style="padding: 12px;">Bin Range</th><th style="padding: 12px;">Frequency (f)</th>';
-    tableHtml += '<th style="padding: 12px;">Relative Freq (%)</th><th style="padding: 12px;">Cumulative Freq</th><th style="padding: 12px;">Density</th>';
+    let tableHtml = '<div class="s-91cab3">';
+    tableHtml += '<table class="s-eb002f gen-sized">';
+    tableHtml += '<thead><tr class="s-2d88ce">';
+    tableHtml += '<th class="s-d66e1c">Bin #</th><th class="s-d66e1c">Bin Range</th><th class="s-d66e1c">Frequency (f)</th>';
+    tableHtml += '<th class="s-d66e1c">Relative Freq (%)</th><th class="s-d66e1c">Cumulative Freq</th><th class="s-d66e1c">Density</th>';
     tableHtml += '</tr></thead><tbody>';
     
     for (let i = 0; i < numBins; i++) {
-        const rowBg = i % 2 === 0 ? '#f8f9fa' : 'white';
-        tableHtml += `<tr style="border-bottom: 1px solid #e9ecef; background: ${rowBg};">`;
-        tableHtml += `<td style="padding: 10px; text-align: center; font-weight: bold;">${i+1}</td>`;
-        tableHtml += `<td style="padding: 10px;">${binLabels[i]}</td>`;
-        tableHtml += `<td style="padding: 10px; text-align: center; font-weight: bold; color: #1a5490;">${bins[i]}</td>`;
-        tableHtml += `<td style="padding: 10px; text-align: center;">${relativeFreq[i]}%</td>`;
-        tableHtml += `<td style="padding: 10px; text-align: center;">${cumulativeFreq[i]}</td>`;
-        tableHtml += `<td style="padding: 10px; text-align: center;">${density[i]}</td>`;
+        tableHtml += `<tr class="${i % 2 === 0 ? 's-d7104c' : 's-c647c3'}">`;
+        tableHtml += `<td class="s-09833f">${i+1}</td>`;
+        tableHtml += `<td class="s-aa3a8a">${binLabels[i]}</td>`;
+        tableHtml += `<td class="s-edf7fd">${bins[i]}</td>`;
+        tableHtml += `<td class="s-618bb3">${relativeFreq[i]}%</td>`;
+        tableHtml += `<td class="s-618bb3">${cumulativeFreq[i]}</td>`;
+        tableHtml += `<td class="s-618bb3">${density[i]}</td>`;
         tableHtml += `</tr>`;
     }
     tableHtml += '</tbody></table></div>';
@@ -233,11 +237,11 @@ function computeHistogramWithSteps(numbers, numBins) {
     steps += `📐 STEP 2: Bin Width Calculation - Formula\n`;
     steps += `   Bin Width = (Maximum - Minimum) / Number of Bins\n`;
     steps += `   Bin Width = (${maxVal.toFixed(6)} - ${minVal.toFixed(6)}) / ${numBins}\n`;
-    steps += `   Bin Width = ${range.toFixed(6)} / ${numBins} = <strong style="color: #1a5490;">${binWidth.toFixed(6)}</strong>\n\n`;
+    steps += `   Bin Width = ${range.toFixed(6)} / ${numBins} = <strong class="s-f342b5">${binWidth.toFixed(6)}</strong>\n\n`;
     
     steps += `📊 STEP 3: Optimal Bin Width Recommendations\n`;
     steps += `   • Sturges' Rule: k = ⌈log₂(n) + 1⌉ = ⌈log₂(${n}) + 1⌉ = ${sturgesBins} bins → width = ${sturgesWidth.toFixed(6)}\n`;
-    steps += `   • Freedman-Diaconis Rule: bin width = 2 × IQR / n^(1/3) = 2 × ${iqr.toFixed(4)} / ${Math.pow(n, 1/3).toFixed(4)} = ${fdWidth.toFixed(6)} → ${fdBins} bins\n`;
+    steps += `   • Freedman-Diaconis Rule: bin width = 2 × IQR / n^(1/3) = 2 × ${iqr.toFixed(4)} / ${Math.pow(n, 1/3).toFixed(4)} = ${fdWidth.toFixed(6)} → ${fdBins === null ? 'not usable (IQR = 0)' : fdBins + ' bins'}\n`;
     steps += `   • Your selection: ${numBins} bins → width = ${binWidth.toFixed(6)}\n\n`;
     
     steps += `🔢 STEP 4: Bin Construction\n`;
@@ -332,7 +336,7 @@ function setupHistogramLogic() {
     computeBtn.addEventListener('click', () => {
         const raw = document.getElementById("histogramInput").value;
         const numbers = parseNumbersFromInput(raw);
-        const numBins = parseInt(document.getElementById("histogramBins").value) || 5;
+        const numBins = Math.max(1, Math.min(30, parseInt(document.getElementById("histogramBins").value) || 5));
         const resultDiv = document.getElementById("histogramResultArea");
         const valueSpan = document.getElementById("histogramValueDisplay");
         const stepsSpan = document.getElementById("histogramStepsDisplay");
@@ -346,6 +350,11 @@ function setupHistogramLogic() {
         
         const result = computeHistogramWithSteps(numbers, numBins);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.innerText = "Error";
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
+            return;
+        }
         setHtml(valueSpan, `📊 ${numBins} bins | ${numbers.length} values | Range: ${Math.min(...numbers).toFixed(2)} - ${Math.max(...numbers).toFixed(2)} | Width: ${result.binWidth.toFixed(4)}`);
         setHtml(stepsSpan, result.steps);
         

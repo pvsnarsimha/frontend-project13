@@ -17,7 +17,7 @@ function renderLogTransformInterface() {
                 labelAttrs: { style: FIELD_GAP },
                 select: {
                     id: "logBase",
-                    style: "width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #cbdde9; margin-bottom: 15px;"
+                    style: FIELD_STYLE_BORDERED
                 },
                 options: [["natural", "Natural Log (ln) - Base e"], ["base10", "Log Base 10 (log₁₀)"], ["base2", "Log Base 2 (log₂)"]]
             }
@@ -78,7 +78,19 @@ function computeLogTransformWithSteps(numbers, base) {
     steps += `   Transformed Mean: ${transformedMean.toFixed(4)}\n`;
     steps += `   Original Std Dev: ${originalStd.toFixed(4)}\n`;
     steps += `   Transformed Std Dev: ${transformedStd.toFixed(4)}\n`;
-    steps += `   Variance reduction: ${((1 - transformedStd/originalStd) * 100).toFixed(1)}% reduction\n`;
+    // The two standard deviations are in different units (original units vs log units), so their ratio is not a "reduction":
+    // it can exceed 1 (values below 1 have negative logs and log spreads them out) and it is 0/0 for constant data. The
+    // comparison that means something is how skewed the data are before and after.
+    if (originalStd > 0) {
+        const change = (transformedStd / originalStd - 1) * 100;
+        steps += `   Std dev after / before: ${(transformedStd / originalStd).toFixed(4)} (${change < 0 ? Math.abs(change).toFixed(1) + '% smaller' : change.toFixed(1) + '% larger'}; the units differ, so this alone does not show variance stabilisation)\n`;
+    } else {
+        steps += `   Std dev after / before: not defined (all values are identical)\n`;
+    }
+    const skewBefore = sampleSkewness(numbers), skewAfter = sampleSkewness(transformed);
+    if (skewBefore !== null && skewAfter !== null) {
+        steps += `   Skewness: ${skewBefore.toFixed(4)} → ${skewAfter.toFixed(4)} (${Math.abs(skewAfter) < Math.abs(skewBefore) ? 'closer to symmetric' : 'not more symmetric'})\n`;
+    }
     
     steps += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     steps += `✅ LOG TRANSFORMATION RESULTS:\n`;

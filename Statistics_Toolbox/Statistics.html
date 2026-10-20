@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- CSP: scripts are same-origin only. style-src keeps 'unsafe-inline' because tools set run-time values (colours, widths) in style attributes; see README, Design notes. -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <link rel="stylesheet" href="vendor/fonts/fonts.css">
@@ -46,6 +47,7 @@
                 <kbd>/</kbd>
             </div>
             <div class="search-hint" id="searchHint" aria-live="polite">Filters the tools in the current module.</div>
+            <div class="search-hint"><a class="guide-link" href="Which-tool.html">Not sure where to start? Which tool should I use?</a></div>
         </div>
     </div>
 </header>
@@ -231,6 +233,7 @@
 <script src="js/tools/preparation/boxplot-chart.js"></script>
 <script src="js/tools/preparation/boxplot-steps.js"></script>
 <script src="js/tools/preparation/boxplot.js"></script>
+<script src="js/tools/preparation/distribution-analysis.js"></script>
 <script src="js/tools/preparation/histogram.js"></script>
 <script src="js/tools/preparation/iqr-outlier.js"></script>
 <script src="js/tools/preparation/log-transform.js"></script>
@@ -239,6 +242,7 @@
 <script src="js/tools/preparation/qq-plot.js"></script>
 <script src="js/tools/preparation/ranking.js"></script>
 <script src="js/tools/preparation/stem-leaf.js"></script>
+<script src="js/tools/preparation/violin-steps.js"></script>
 <script src="js/tools/preparation/violin.js"></script>
 <script src="js/tools/preparation/winsorize.js"></script>
 <script src="js/tools/preparation/z-outlier.js"></script>
@@ -291,6 +295,7 @@
 <script src="js/tools/hypothesis/levene-steps.js"></script>
 <script src="js/tools/hypothesis/levene.js"></script>
 <script src="js/tools/hypothesis/mann-whitney.js"></script>
+<script src="js/tools/hypothesis/manova-steps.js"></script>
 <script src="js/tools/hypothesis/manova.js"></script>
 <script src="js/tools/hypothesis/mc-nemar.js"></script>
 <script src="js/tools/hypothesis/moods-median.js"></script>
@@ -307,7 +312,9 @@
 <script src="js/tools/hypothesis/two-sample-t.js"></script>
 <script src="js/tools/hypothesis/wilcoxon.js"></script>
 <script src="js/tools/regression/f-test-overall.js"></script>
+<script src="js/tools/regression/model-summary-steps.js"></script>
 <script src="js/tools/regression/model-summary.js"></script>
+<script src="js/tools/regression/multiple-linear-steps.js"></script>
 <script src="js/tools/regression/multiple-linear.js"></script>
 <script src="js/tools/regression/regression-html.js"></script>
 <script src="js/tools/regression/simple-linear.js"></script>

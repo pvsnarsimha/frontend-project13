@@ -158,66 +158,66 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
         let diffColor = d.diff > 0 ? '#28a745' : (d.diff < 0 ? '#dc3545' : '#6c757d');
         let rank = rankDetails.find(r => r.originalIndex === idx)?.rank || '-';
         let sign = d.diff > 0 ? '+' : (d.diff < 0 ? '-' : '0');
-        diffTableRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${idx + 1}</td>
-            <td style="padding: 8px; text-align: center;">${d.before}</td>
-            <td style="padding: 8px; text-align: center;">${d.after}</td>
+        diffTableRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${idx + 1}</td>
+            <td class="s-a7c3f4">${d.before}</td>
+            <td class="s-a7c3f4">${d.after}</td>
             <td style="padding: 8px; text-align: center; font-weight: bold; color: ${diffColor};">${sign}${Math.abs(d.diff).toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center;">${rank}</td>
-            <td style="padding: 8px; text-align: center;">${sign === '+' ? 'Positive' : (sign === '-' ? 'Negative' : 'Zero')}</td>
+            <td class="s-a7c3f4">${rank}</td>
+            <td class="s-a7c3f4">${sign === '+' ? 'Positive' : (sign === '-' ? 'Negative' : 'Zero')}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">W</span>
-                <h2 style="margin: 0;">Wilcoxon Signed-Rank Test</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">W</span>
+                <h2 class="s-f8a94d">Wilcoxon Signed-Rank Test</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Non-parametric alternative to paired t-test</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">Tests whether the median difference between paired observations is zero</p>
+            <p class="s-259079">Non-parametric alternative to paired t-test</p>
+            <p class="s-20a400">Tests whether the median difference between paired observations is zero</p>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Data Summary</h3>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-weight: 700;">Number of Pairs</div>
-                    <div style="font-size: 24px;">${n}</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📊 Data Summary</h3>
+            <div class="s-b00abc gen-grid">
+                <div class="s-63afdf">
+                    <div class="s-cbd2a7">Number of Pairs</div>
+                    <div class="s-af5c21">${n}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px;">
-                    <div style="font-weight: 700;">Non-zero Differences</div>
-                    <div style="font-size: 24px;">${withRanks.length}</div>
+                <div class="s-63afdf">
+                    <div class="s-cbd2a7">Non-zero Differences</div>
+                    <div class="s-af5c21">${withRanks.length}</div>
                 </div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white;">📋 Step 1: Calculate Differences and Ranks</h3>
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-2311e6">
+            <h3 class="s-10bf27">📋 Step 1: Calculate Differences and Ranks</h3>
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef;">
-                        <th style="padding: 10px;">Pair</th>
-                        <th style="padding: 10px;">Before</th>
-                        <th style="padding: 10px;">After</th>
-                        <th style="padding: 10px;">Difference</th>
-                        <th style="padding: 10px;">Rank |d|</th>
-                        <th style="padding: 10px;">Sign</th>
+                    <tr class="s-bfd0ae">
+                        <th class="s-a756db">Pair</th>
+                        <th class="s-a756db">Before</th>
+                        <th class="s-a756db">After</th>
+                        <th class="s-a756db">Difference</th>
+                        <th class="s-a756db">Rank |d|</th>
+                        <th class="s-a756db">Sign</th>
                     </tr>
                 </thead>
                 <tbody>${diffTableRows}</tbody>
             </table>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 2: Calculate Test Statistic</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 2: Calculate Test Statistic</h3>
+            <div class="s-ca9e5c">
                 <strong>Sum of positive ranks (W⁺):</strong> ${Wpos.toFixed(2)}<br>
                 <strong>Sum of negative ranks (W⁻):</strong> ${Wneg.toFixed(2)}<br>
                 <strong>W = min(W⁺, W⁻) = ${W.toFixed(2)}</strong>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+            <div class="s-6025fc">
                 <strong>Step 3: Calculate z-score approximation</strong><br>
                 Non-zero differences used: n = ${nEff} of ${n}<br>
                 Expected W = n(n+1)/4 = ${expectedW.toFixed(2)}<br>
@@ -227,12 +227,12 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
+        <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Test Conclusion</h3>
             <div><strong>W Statistic:</strong> ${W.toFixed(2)}</div>
             <div><strong>z-score:</strong> ${z.toFixed(6)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}
             </div>
@@ -273,7 +273,7 @@ function setupWilcoxonLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);
         } else {
-            setHtml(valueSpan, `W = ${result.W.toFixed(2)} | p${result.smallSample ? ' (normal approx.)' : ''} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
+            setHtml(valueSpan, `W = ${result.W.toFixed(2)} | p${result.smallSample ? ' (normal approx.)' : ''} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}${result.smallSample ? ' | ⚠ small sample: treat p as approximate' : ''}`);
             setHtml(stepsSpan, result.steps);
         }
     });

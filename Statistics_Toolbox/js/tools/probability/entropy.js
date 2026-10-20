@@ -146,12 +146,19 @@ function computeEntropyWithSteps(distType, params) {
         const p = params.p;
         // Exact: H = -Σ P(k) ln P(k) over k = 0..n
         entropy = 0;
-        // only the window around n·p carries probability (40 standard deviations each side), so a huge n costs the same
-        const spreadK = 40 * Math.sqrt(n * p * (1 - p)) + 50;
-        const kLo = Math.max(0, Math.floor(n * p - spreadK)), kHi = Math.min(n, Math.ceil(n * p + spreadK));
-        for (let k = kLo; k <= kHi; k++) {
-            const logP = logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1) + (k > 0 ? k * Math.log(p) : 0) + (n - k > 0 ? (n - k) * Math.log(1 - p) : 0);
-            if (isFinite(logP)) entropy -= Math.exp(logP) * logP;
+        const variance = n * p * (1 - p);
+        if (variance > 1e8) {
+            // The window below would hold millions of terms (it grows with the standard deviation), so the cost is capped here:
+            // H = ½ ln(2πe·npq) + (1/12n)(1 − 1/pq) + O(n⁻²) agrees with the exact sum to far more digits than are shown
+            entropy = 0.5 * Math.log(2 * Math.PI * Math.E * variance) + (1 / (12 * n)) * (1 - 1 / (p * (1 - p)));
+        } else {
+            // only the window around n·p carries probability (40 standard deviations each side)
+            const spreadK = 40 * Math.sqrt(variance) + 50;
+            const kLo = Math.max(0, Math.floor(n * p - spreadK)), kHi = Math.min(n, Math.ceil(n * p + spreadK));
+            for (let k = kLo; k <= kHi; k++) {
+                const logP = logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1) + (k > 0 ? k * Math.log(p) : 0) + (n - k > 0 ? (n - k) * Math.log(1 - p) : 0);
+                if (isFinite(logP)) entropy -= Math.exp(logP) * logP;
+            }
         }
         
         entropy = Math.max(0, entropy);   // a discrete entropy is never negative; floating-point cancellation can leave -0.00000000

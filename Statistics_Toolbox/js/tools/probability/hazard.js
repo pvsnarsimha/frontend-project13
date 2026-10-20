@@ -72,7 +72,8 @@ function computeHazardWithSteps() {
     } else if (dist === 'weibull') {
         const shape = parseFloat(document.getElementById('hazardShape').value);
         const scale = parseFloat(document.getElementById('hazardScale').value);
-        if (!(shape > 0 && scale > 0 && isFinite(shape) && isFinite(scale))) return { error: true, message: "The Weibull distribution needs a shape k > 0 and a scale λ > 0." };
+        const weibullError = validateDistributionParams('weibull', { shape, scale });
+        if (weibullError) return { error: true, message: weibullError };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      WEIBULL DISTRIBUTION HAZARD                 ║\n`;
@@ -117,6 +118,8 @@ function computeHazardWithSteps() {
     } else if (dist === 'normal') {
         const mean = parseFloat(document.getElementById('hazardMean').value);
         const std = parseFloat(document.getElementById('hazardStd').value);
+        const normalError = validateDistributionParams('normal', { mean, stdDev: std });
+        if (normalError) return { error: true, message: normalError };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      NORMAL DISTRIBUTION HAZARD                  ║\n`;
@@ -169,24 +172,24 @@ function updateHazardParams() {
     if (dist === 'exponential') {
         setHtml(paramsDiv, `
             <label>📊 Rate (λ):</label>
-            <input type="number" id="hazardRate" value="1" step="0.5" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <div class="desc" style="font-size: 0.75rem;">Constant hazard rate = λ</div>
+            <input class="s-c689ef gen-sized" type="number" id="hazardRate" value="1" step="0.5" min="0.01">
+            <div class="desc s-8b77e0">Constant hazard rate = λ</div>
         `);
     } else if (dist === 'weibull') {
         setHtml(paramsDiv, `
             <label>📊 Shape parameter (k):</label>
-            <input type="number" id="hazardShape" value="1.5" step="0.5" min="0.1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <div class="desc" style="font-size: 0.75rem;">k < 1: decreasing hazard, k = 1: constant, k > 1: increasing</div>
+            <input class="s-c689ef gen-sized" type="number" id="hazardShape" value="1.5" step="0.5" min="0.1">
+            <div class="desc s-8b77e0">k < 1: decreasing hazard, k = 1: constant, k > 1: increasing</div>
             <label>📊 Scale parameter (λ):</label>
-            <input type="number" id="hazardScale" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
+            <input class="s-c689ef gen-sized" type="number" id="hazardScale" value="1" step="any" min="0.01">
         `);
     } else if (dist === 'normal') {
         setHtml(paramsDiv, `
             <label>📊 Mean (μ):</label>
-            <input type="number" id="hazardMean" value="0" step="any" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
+            <input class="s-c689ef gen-sized" type="number" id="hazardMean" value="0" step="any">
             <label>📊 Standard Deviation (σ):</label>
-            <input type="number" id="hazardStd" value="1" step="any" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <div class="desc" style="font-size: 0.75rem;">Normal hazard is non-monotonic (increases then decreases)</div>
+            <input class="s-c689ef gen-sized" type="number" id="hazardStd" value="1" step="any" min="0.01">
+            <div class="desc s-8b77e0">Normal hazard is non-monotonic (increases then decreases)</div>
         `);
     }
 }

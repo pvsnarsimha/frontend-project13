@@ -474,3 +474,193 @@ test('a seeded random source is reproducible and independent of other sources', 
     assert.deepEqual(draw(a2), first);
     assert.notDeepEqual(draw(app.createRandomSource(8)), first);
 });
+
+test('within-group guards: single-value groups and zero within-group variation give an error, not NaN or Infinity', () => {
+    const singles = '1:A, 2:B, 3:C';
+    const flat = '5:A, 5:A, 7:B, 7:B';
+    for (const [fn, label] of [['computeANOVA', 'ANOVA'], ['computeTukeyHSD', 'Tukey'], ['computeScheffeTest', 'Scheffe'], ['computeBonferroniCorrection', 'Bonferroni'], ['computeLeveneTest', 'Levene']]) {
+        assert.equal(typeof app[fn], 'function', fn);
+        for (const input of [singles, flat]) {
+            const r = app[fn](input, 0.05);
+            assert.ok(r.error, `${label} on "${input}" should be an error`);
+            assert.ok(!/NaN|Infinity/.test(r.message), `${label}: ${r.message}`);
+        }
+    }
+});
+
+test('MGF reports an overflow with ln M instead of printing Infinity', () => {
+    for (const [dist, params, t] of [['normal', { mean: 0, stdDev: 10 }, 100], ['poisson', { lambda: 5 }, 800], ['binomial', { n: 1000, p: 0.5 }, 5], ['uniform', { min: 0, max: 10 }, 100]]) {
+        const r = app.computeMGFWithSteps(dist, params, t);
+        assert.ok(r.error, `${dist}: expected an overflow error`);
+        assert.ok(/ln M_X/.test(r.message) && !/Infinity|NaN/.test(r.message.replace(/ /g, " ")), r.message);
+    }
+    const ok = app.computeMGFWithSteps('normal', { mean: 1, stdDev: 2 }, 0.5);
+    close(ok.mgfValue, Math.exp(0.5 + 0.5), 1e-12);
+    close(app.computeMGFWithSteps('uniform', { min: 0, max: 2 }, 1).mgfValue, (Math.exp(2) - 1) / 2, 1e-12);
+    assert.ok(app.computeMGFWithSteps('exponential', { rate: 1 }, 2).diverges);
+});
+
+test('overall F test decision follows the p-value', () => {
+    const x = [1, 2, 3, 4, 5, 6, 7, 8], y = [1.2, 1.9, 3.3, 3.8, 5.4, 5.9, 7.2, 7.7];
+    const r = app.computeFTestOverallWithSteps(x, y, 0.05);
+    assert.ok(!r.error, r.message);
+    assert.equal(r.rejectH0, r.pValue < 0.05);
+});
+
+test('category and group labels typed by the user are HTML-escaped in chi-square, contingency, ANCOVA and MANOVA output', () => {
+    const evil = '<img src=x onerror=alert(1)>';
+    const pairs = [`${evil}, yes`, `${evil}, no`, 'b, yes', 'b, no', `${evil}, yes`, 'b, no', 'b, yes', `${evil}, no`].join('\n');
+    const out = [
+        app.computeChisquareWithSteps(pairs, 0.05),
+        app.computeContingencyTableWithSteps(pairs)
+    ];
+    const ancova = ['1,' + evil + ',2', '2,' + evil + ',3', '3,' + evil + ',4', '4,b,2', '6,b,3', '7,b,5', '9,b,6'].join('\n');
+    out.push(app.computeANCOVA(ancova, 0.05));
+    const manova = [`${evil}, 1, 2`, `${evil}, 2, 3`, `${evil}, 3, 3`, `${evil}, 2, 5`, 'b, 6, 7', 'b, 7, 9', 'b, 8, 8', 'b, 9, 12'].join('\n');
+    out.push(app.computeMANOVA(manova, 0.05));
+    out.forEach((r, i) => {
+        assert.ok(r.steps, `tool ${i}: ${r.message}`);
+        assert.ok(!r.steps.includes('<img'), `tool ${i} leaks raw markup`);
+        assert.ok(r.steps.includes('&lt;img'), `tool ${i} shows the label as text`);
+    });
+});
+
+test('histogram: bin labels state which edge belongs to which bin, and every value lands in exactly one bin', () => {
+    const data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0.1, 0.2, 0.3, 9.9];
+    for (const bins of [3, 5, 7, 10]) {
+        const r = app.computeHistogramWithSteps(data, bins);
+        assert.ok(!r.error);
+        assert.equal(r.frequencies.reduce((a, b) => a + b, 0), data.length, `${bins} bins lose or double count a value`);
+        assert.ok(r.binLabels.slice(0, -1).every(l => /^\[.*\)$/.test(l)), 'half-open bins use [a, b)');
+        assert.ok(/^\[.*\]$/.test(r.binLabels[r.binLabels.length - 1]), 'the last bin is closed');
+    }
+    const flat = app.computeHistogramWithSteps([4, 4, 4], 3);       // constant data: one bin, no divide by zero
+    assert.ok(!flat.error);
+    assert.deepEqual(flat.frequencies, [3]);
+    assert.ok(!/NaN|Infinity/.test(flat.steps));
+});
+
+test('small-sample flags reach the answer tiles of the rank tests and chi-square goodness of fit', () => {
+    assert.equal(app.computeKruskalWallisTest('1:A\n2:A\n3:A\n4:B\n5:B\n6:B', 0.05).smallSample, true);
+    assert.equal(app.computeChiSquareGoodnessTest([3, 4, 5], [4, 4, 4], 0.05).smallSample, true);
+    assert.equal(app.computeChiSquareGoodnessTest([30, 40, 50], [40, 40, 40], 0.05).smallSample, false);
+});
+
+test('partial correlation reports zero variance in any of X, Y, Z instead of NaN', () => {
+    for (const [x, y, z] of [[[1, 1, 1, 1], [1, 2, 3, 4], [2, 1, 4, 3]], [[1, 2, 3, 4], [5, 5, 5, 5], [2, 1, 4, 3]], [[1, 2, 3, 4], [1, 2, 4, 3], [7, 7, 7, 7]]]) {
+        const r = app.computePartialCorrelationWithSteps(x, y, z);
+        assert.ok(r.error && !/NaN/.test(r.message), r.message);
+    }
+});
+
+test('binomial entropy: huge n is capped (asymptotic form) and agrees with the exact sum where both are available', () => {
+    const t0 = Date.now();
+    const huge = app.computeEntropyWithSteps('binomial', { n: 1e12, p: 0.5 }).entropy;
+    assert.ok(Date.now() - t0 < 500, 'no multi-million-term loop');
+    close(huge, 0.5 * Math.log(2 * Math.PI * Math.E * 2.5e11), 1e-9);
+    // just below the cap the exact sum and the expansion meet
+    const exactSide = app.computeEntropyWithSteps('binomial', { n: 2e8, p: 0.5 }).entropy;     // variance 5e7: exact sum
+    const asym = 0.5 * Math.log(2 * Math.PI * Math.E * 5e7);
+    close(exactSide, asym, 1e-5);       // the exact sum loses a few digits to logGamma rounding at this size
+});
+
+test('Beta PDF at the end points: diverging density is reported as +∞, never "Infinity" or NaN', () => {
+    const els = { pdfDistribution: { value: 'beta' }, pdfXValues: { value: '0, 0.5, 1' }, pdfAlpha: { value: '0.5' }, pdfBeta: { value: '0.5' } };
+    const probe = loadApp();
+    probe.document.getElementById = id => els[id] || { value: '', style: {} };
+    const r = probe.computePDFWithSteps();
+    assert.ok(!r.error, r.message);
+    assert.ok(/\+∞/.test(r.steps) && !/Infinity|NaN/.test(r.steps), r.steps);
+    assert.ok(Number.isFinite(r.results[1]));
+    assert.equal(r.resultStr.split(',')[0].trim(), '∞');
+});
+
+test('hazard and survival validate every distribution through validateDistributionParams', () => {
+    const run = (fn, prefix, dist, vals) => {
+        const els = { [prefix + 'Distribution']: { value: dist }, [prefix + 'XValues']: { value: '1, 2' }, [prefix + 'TValues']: { value: '1, 2' }, ...vals };
+        const probe = loadApp();
+        probe.document.getElementById = id => els[id] || { value: '1', style: {} };
+        return probe[fn]();
+    };
+    for (const [fn, prefix] of [['computeHazardWithSteps', 'hazard'], ['computeSurvivalWithSteps', 'survival']]) {
+        const n = run(fn, prefix, 'normal', { [prefix + 'Mean']: { value: '0' }, [prefix + 'Std']: { value: '-1' } });
+        assert.ok(n.error, `${fn}: normal with σ < 0`);
+        const w = run(fn, prefix, 'weibull', { [prefix + 'Shape']: { value: '0' }, [prefix + 'Scale']: { value: '2' } });
+        assert.ok(w.error && /Weibull/.test(w.message), `${fn}: weibull shape 0`);
+    }
+    assert.ok(app.validateDistributionParams('weibull', { shape: 1.5, scale: 2 }) === null);
+});
+
+test('log transform never prints a negative "reduction" or NaN, and reports skewness before and after', () => {
+    const r = app.computeLogTransformWithSteps([0.1, 0.2, 0.3, 0.5], 'natural');
+    assert.ok(!r.error, r.message);
+    assert.ok(!/reduction|NaN/.test(r.steps), r.steps);
+    assert.ok(/Skewness:/.test(r.steps));
+    const skewed = app.computeLogTransformWithSteps([1, 2, 4, 8, 16, 1000], 'natural');
+    assert.ok(/closer to symmetric/.test(skewed.steps));
+});
+
+test('perfect fit: one rule for every regression tool (descriptive tools report R² = 1, inference tools stop with the same message)', () => {
+    const x = [1, 2, 3, 4, 5, 6], y = [3, 5, 7, 9, 11, 13];            // y = 2x + 1 exactly
+    assert.ok(app.isPerfectFit(0, 10) && app.isPerfectFit(1e-13, 10) && !app.isPerfectFit(0.5, 10));
+    const simple = app.computeSimpleLinearRegression(x, y);
+    assert.ok(!simple.error, 'descriptive tool still fits');
+    close(simple.rSquared, 1, 1e-12);
+    assert.equal(simple.perfectFit, true);
+    assert.ok(/undefined \(perfect fit\)/.test(simple.steps) && !/Infinity|NaN/.test(simple.steps));
+    for (const r of [app.computeStdErrorsWithSteps(x, y), app.computeTStatsWithSteps(x, y), app.computeFTestOverallWithSteps(x, y, 0.05)]) {
+        assert.ok(r.error, 'inference tool refuses');
+        assert.equal(r.message, app.get('PERFECT_FIT_MESSAGE'));
+    }
+    const noisy = app.computeSimpleLinearRegression(x, [3, 5.2, 6.8, 9.1, 11, 12.9]);
+    assert.equal(noisy.perfectFit, false);
+    assert.ok(Number.isFinite(noisy.fStatistic) && Number.isFinite(noisy.pF));
+});
+
+test('Model Summary: RMSE divides by n and is labelled; the residual standard error divides by n - k - 1', () => {
+    const actual = [2, 3, 4, 5, 6.5, 7], predicted = [2.1, 2.9, 4.2, 4.8, 6.0, 7.2];
+    const r = app.computeModelSummary(actual, predicted, 2);
+    const ss = actual.reduce((s, a, i) => s + (a - predicted[i]) ** 2, 0);
+    close(r.rmse, Math.sqrt(ss / 6), 1e-12);
+    close(r.rse, Math.sqrt(ss / 3), 1e-12);
+    assert.ok(/÷ n/.test(r.steps) && /Residual std\. error \(÷ 3 df\)/.test(r.steps));
+});
+
+test('MANOVA: perfect group separation is an error, not an F of 0 or NaN', () => {
+    const rows = ['Group, Y1, Y2', 'A, 1, 1', 'A, 1, 1', 'A, 1, 1', 'B, 5, 9', 'B, 5, 9', 'B, 5, 9'];
+    const r = app.computeMANOVA(rows.join('\n'), 0.05);
+    assert.ok(r.error, 'no within-group variation: nothing to divide by');
+    assert.ok(!/NaN|Infinity/.test(r.message));
+});
+
+test('Cook\'s distance uses one wording for an infinite value (leverage 1)', () => {
+    assert.equal(app.formatCooksD(Infinity), '∞ (leverage = 1)');
+    assert.equal(app.formatCooksD(0.5, 2), '0.50');
+});
+
+test('rank-test answer tiles say "approx" for small samples and not for large ones (Mann-Whitney, Wilcoxon)', () => {
+    const runTile = (setupName, prefix, fields, vals) => {
+        const els = {};
+        const el = id => (els[id] = els[id] || { value: '', style: {}, innerText: '', addEventListener(ev, fn) { this.handler = fn; } });
+        const probe = loadApp();
+        probe.document.getElementById = el;
+        probe.setHtml = (e, h) => { e.html = String(h); };
+        probe.get('setHtml = function (e, h) { e.html = String(h); }');
+        Object.entries(vals).forEach(([id, v]) => { el(id).value = v; });
+        probe[setupName]();
+        el(prefix + 'ComputeBtn').handler();
+        return els[prefix + 'ValueDisplay'].html;
+    };
+    const small = runTile('setupMannWhitneyLogic', 'mannWhitney', null, { mannWhitneyData1: '1,2,3,4', mannWhitneyData2: '5,6,7,9', mannWhitneyAlpha: '0.05', mannWhitneyAlternative: 'two-sided' });
+    assert.ok(/approx/.test(small), small);
+    const large = runTile('setupMannWhitneyLogic', 'mannWhitney', null, { mannWhitneyData1: '1,2,3,4,5,6', mannWhitneyData2: '5.5,6.5,7,9,10,11', mannWhitneyAlpha: '0.05', mannWhitneyAlternative: 'two-sided' });
+    assert.ok(!/approx/.test(large), large);
+    const w = runTile('setupWilcoxonLogic', 'wilcoxon', null, { wilcoxonBeforeData: '1,2,3,4,5', wilcoxonAfterData: '2,4,3.5,6,8', wilcoxonAlpha: '0.05', wilcoxonAlternative: 'two-sided' });
+    assert.ok(/approx/.test(w), w);
+});
+
+test("Cook's D: an infinite value is explained as leverage = 1 or as numerical overflow", () => {
+    assert.equal(app.formatCooksD(Infinity, 6, 1), '∞ (leverage = 1)');
+    assert.ok(/numerical overflow/.test(app.formatCooksD(Infinity, 6, 0.4)));
+    assert.equal(app.formatCooksD(2, 3, 0.4), '2.000');
+});

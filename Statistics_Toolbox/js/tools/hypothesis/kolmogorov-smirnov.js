@@ -87,134 +87,134 @@ function computeKolmogorovSmirnovTest(data, alpha) {
     let tableRows = '';
     for (let d of diffs) {
         const isMax = d.diff === maxDiff;
-        tableRows += `<tr style="border-bottom: 1px solid #e9ecef; ${isMax ? 'background: #fff3cd;' : ''}">
-            <td style="padding: 10px; text-align: center;">${d.i}</td>
-            <td style="padding: 10px; text-align: center;">${d.value.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">${d.i}/${n} = ${d.empirical.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center;">
+        tableRows += `<tr class="${isMax ? 's-a28558' : 's-00049c'}">
+            <td class="s-618bb3">${d.i}</td>
+            <td class="s-618bb3">${d.value.toFixed(4)}</td>
+            <td class="s-618bb3">${d.i}/${n} = ${d.empirical.toFixed(4)}</td>
+            <td class="s-618bb3">
                 <div><strong>z = ${d.zCalc}</strong></div>
-                <div style="font-size: 11px; color: #666;">F(x) = Φ(z) = ${d.theoretical.toFixed(4)}</div>
+                <div class="s-8ddc1c">F(x) = Φ(z) = ${d.theoretical.toFixed(4)}</div>
             </td>
-            <td style="padding: 10px; text-align: center; font-weight: 600; ${isMax ? 'color: #dc3545; background: #fff3cd;' : ''}">${d.diff.toFixed(4)}</td>
+            <td class="${isMax ? 's-1f27db' : 's-3c52bb'}">${d.diff.toFixed(4)}</td>
          </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    let steps = `<div class="s-9217e5">
         <!-- Header -->
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">D</span>
-                <h2 style="margin: 0;">Kolmogorov-Smirnov Test (Normality)</h2>
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">D</span>
+                <h2 class="s-f8a94d">Kolmogorov-Smirnov Test (Normality)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Tests whether a sample comes from a normal distribution</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">H₀: Data is normally distributed | H₁: Data is NOT normally distributed</p>
+            <p class="s-259079">Tests whether a sample comes from a normal distribution</p>
+            <p class="s-20a400">H₀: Data is normally distributed | H₁: Data is NOT normally distributed</p>
         </div>
         
         <!-- Understanding the Test -->
-        <div style="background: #f0f4fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📖 How is F(x) Calculated?</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <p style="margin: 0 0 12px 0;"><strong>Theoretical CDF F(x) for Normal Distribution:</strong></p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; text-align: center;">
+        <div class="s-42ccf7 gen-pad">
+            <h3 class="s-ed0bb5">📖 How is F(x) Calculated?</h3>
+            <div class="s-3a063a">
+                <p class="s-7dacb1"><strong>Theoretical CDF F(x) for Normal Distribution:</strong></p>
+                <div class="s-000adc">
                     <strong>F(x) = Φ(z) = Φ((x - μ) / σ)</strong>
                 </div>
-                <p style="margin-top: 12px;">Where:</p>
-                <ul style="margin-left: 20px;">
+                <p class="s-5e70e1">Where:</p>
+                <ul class="s-d06bdc">
                     <li><strong>Φ(z)</strong> = Standard Normal Cumulative Distribution Function</li>
                     <li><strong>z = (x - μ) / σ</strong> = Standardized value (z-score)</li>
                     <li><strong>μ</strong> = Sample mean = <strong>${mean.toFixed(4)}</strong></li>
                     <li><strong>σ</strong> = Sample standard deviation = <strong>${stdDev.toFixed(4)}</strong></li>
                 </ul>
-                <div style="margin-top: 12px; background: #e8f4f8; padding: 10px; border-radius: 6px; font-size: 13px;">
+                <div class="s-f79949">
                     <strong>📌 Example for first value:</strong> x = ${sorted[0].toFixed(4)}<br>
                     z = (${sorted[0].toFixed(4)} - ${mean.toFixed(4)}) / ${stdDev.toFixed(4)} = ${((sorted[0] - mean)/stdDev).toFixed(4)}<br>
                     F(x) = Φ(${((sorted[0] - mean)/stdDev).toFixed(4)}) = ${normalCDF(sorted[0], mean, stdDev).toFixed(4)}
                 </div>
             </div>
             
-            <h3 style="margin: 16px 0 12px 0; color: #1a5490;">📖 What is the Kolmogorov-Smirnov Test?</h3>
-            <p style="margin: 0; line-height: 1.6;">The KS test compares the empirical cumulative distribution of your data to the theoretical normal cumulative distribution.</p>
-            <ul style="margin-top: 12px; margin-left: 20px; line-height: 1.6;">
+            <h3 class="s-47beab">📖 What is the Kolmogorov-Smirnov Test?</h3>
+            <p class="s-d174a2">The KS test compares the empirical cumulative distribution of your data to the theoretical normal cumulative distribution.</p>
+            <ul class="s-bcb1fd">
                 <li><strong>Fₙ(x)</strong> = Empirical CDF = (rank i) / n (proportion of data ≤ x)</li>
                 <li><strong>F(x)</strong> = Theoretical Normal CDF = Φ((x - μ)/σ)</li>
                 <li><strong>D statistic</strong> = largest vertical distance between the empirical step function and the normal CDF (checked on both sides of each jump)</li>
                 <li><strong>Small D</strong> → Data follows normal distribution closely</li>
                 <li><strong>Large D</strong> → Data deviates from normality</li>
             </ul>
-            <div style="margin-top: 12px; background: #fff3cd; padding: 10px; border-radius: 8px; font-size: 13px;">
+            <div class="s-bd7624">
                 💡 <strong>Formula:</strong> D = max over i of max( i/n − F(xᵢ), F(xᵢ) − (i−1)/n )
             </div>
         </div>
         
         <!-- Data Summary -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
-            <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Sample Size (n)</div>
-                <div style="font-size: 32px; font-weight: 700; color: #1a5490;">${n}</div>
+        <div class="s-11aa18 gen-grid">
+            <div class="s-edbb37">
+                <div class="s-42da0a">Sample Size (n)</div>
+                <div class="s-abfdfd gen-big">${n}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Sample Mean (x̄ = μ)</div>
-                <div style="font-size: 24px; font-weight: 700;">${mean.toFixed(4)}</div>
+            <div class="s-edbb37">
+                <div class="s-42da0a">Sample Mean (x̄ = μ)</div>
+                <div class="s-c2434f">${mean.toFixed(4)}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e9ecef;">
-                <div style="font-size: 12px; color: #6c757d;">Sample Std Dev (s = σ)</div>
-                <div style="font-size: 24px; font-weight: 700;">${stdDev.toFixed(4)}</div>
+            <div class="s-edbb37">
+                <div class="s-42da0a">Sample Std Dev (s = σ)</div>
+                <div class="s-c2434f">${stdDev.toFixed(4)}</div>
             </div>
         </div>
         
         <!-- Step 1: Calculation Table -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto; border: 1px solid #e9ecef;">
-            <h3 style="margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #1a5490; color: #1a5490;">
+        <div class="s-90b704">
+            <h3 class="s-c7276c">
                 📊 Step 1: Calculate Empirical vs Theoretical CDF
             </h3>
-            <div style="padding: 12px 20px; background: #e8f4f8; font-size: 13px;">
+            <div class="s-a35413">
                 <strong>How each column is calculated:</strong><br>
                 • <strong>Fₙ(x)</strong> = i / n (where i is the rank from 1 to n)<br>
                 • <strong>z-score</strong> = (x - μ) / σ<br>
                 • <strong>F(x)</strong> = Φ(z) = Standard Normal CDF (computed exactly, no table lookup)<br>
                 • <strong>Dᵢ</strong> = max( |i/n − F(xᵢ)|, |F(xᵢ) − (i−1)/n| ); the statistic D is the largest Dᵢ
             </div>
-            <table style="width: 100%; border-collapse: collapse;">
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #1a5490; color: white;">
-                        <th style="padding: 12px;">Rank (i)</th>
-                        <th style="padding: 12px;">Value (x)</th>
-                        <th style="padding: 12px;">Fₙ(x) = i/n</th>
-                        <th style="padding: 12px;">F(x) = Φ((x-μ)/σ)</th>
-                        <th style="padding: 12px;">Dᵢ = max(|i/n − F|, |F − (i−1)/n|)</th>
+                    <tr class="s-e7b83b">
+                        <th class="s-d66e1c">Rank (i)</th>
+                        <th class="s-d66e1c">Value (x)</th>
+                        <th class="s-d66e1c">Fₙ(x) = i/n</th>
+                        <th class="s-d66e1c">F(x) = Φ((x-μ)/σ)</th>
+                        <th class="s-d66e1c">Dᵢ = max(|i/n − F|, |F − (i−1)/n|)</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${tableRows}
-                    <tr style="background: #e9ecef; font-weight: 700;">
-                        <td colspan="4" style="padding: 12px; text-align: right;">Maximum D (highlighted in yellow) →</td>
-                        <td style="padding: 12px; text-align: center; background: #dc3545; color: white;">${maxDiff.toFixed(6)}</td>
+                    <tr class="s-767496">
+                        <td class="s-6ecd26" colspan="4">Maximum D (highlighted in yellow) →</td>
+                        <td class="s-df2ba7">${maxDiff.toFixed(6)}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <!-- Step 2: Critical Value -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 2: Calculate Critical Value</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace; font-size: 16px; text-align: center;">
-                    D<sub>critical</sub> (Lilliefors critical value for α = ${alpha}, n = ${n}) = <strong style="color: #1a5490;">${criticalValue.toFixed(4)}</strong>
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 2: Calculate Critical Value</h3>
+            <div class="s-6025fc">
+                <div class="s-252832">
+                    D<sub>critical</sub> (Lilliefors critical value for α = ${alpha}, n = ${n}) = <strong class="s-f342b5">${criticalValue.toFixed(4)}</strong>
                 </div>
-                <div style="margin-top: 12px; font-size: 13px; color: #6c757d; text-align: center;">
+                <div class="s-45c6db">
                     Using α = ${alpha} significance level (${(1-alpha)*100}% confidence)
                 </div>
             </div>
         </div>
         
         <!-- Step 3: Decision -->
-        <div style="border-radius: 16px; padding: 20px; margin-bottom: 24px; ${rejectH0 ? 'background: #f8d7da; border-left: 6px solid #dc3545;' : 'background: #d4edda; border-left: 6px solid #28a745;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Step 3: Make Decision</h3>
-            <div style="display: grid; gap: 12px;">
+        <div class="${rejectH0 ? 's-830a4f gen-pad' : 's-28eb84 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Step 3: Make Decision</h3>
+            <div class="s-f27585">
                 <div><strong>D Statistic (Maximum Difference):</strong> ${maxDiff.toFixed(6)}</div>
                 <div><strong>Critical Value (α = ${alpha}):</strong> ${criticalValue.toFixed(4)}</div>
                 <div><strong>p-value (approximate):</strong> ${pValue.toFixed(6)}</div>
-                <div style="margin-top: 8px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                <div class="s-c6645b">
                     <strong>Comparison:</strong> ${maxDiff.toFixed(4)} ${maxDiff > criticalValue ? '>' : '<'} ${criticalValue.toFixed(4)}<br>
                     <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                     <strong>Conclusion:</strong> ${rejectH0 ? 'There is sufficient evidence that the data is NOT normally distributed.' : 'There is NOT sufficient evidence to reject normality. The data appears normally distributed.'}
@@ -223,19 +223,19 @@ function computeKolmogorovSmirnovTest(data, alpha) {
         </div>
         
         <!-- Visual Interpretation -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📊 Interpretation Guide</h3>
-            <div style="text-align: center;">
-                <div style="background: white; border-radius: 12px; padding: 20px; display: inline-block; min-width: 200px;">
-                    <div style="font-size: 48px; font-weight: 700; color: ${rejectH0 ? '#dc3545' : '#28a745'};">${maxDiff.toFixed(4)}</div>
-                    <div style="font-size: 14px;">D Statistic</div>
-                    <div style="height: 4px; background: linear-gradient(to right, #28a745, #ffc107, #dc3545); margin: 12px 0; border-radius: 2px;"></div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="font-size: 11px;">Normal</span>
-                        <span style="font-size: 11px;">Borderline</span>
-                        <span style="font-size: 11px;">Not Normal</span>
+        <div class="s-44d7a2 gen-pad">
+            <h3 class="s-ed0bb5">📊 Interpretation Guide</h3>
+            <div class="s-546056">
+                <div class="s-92bac6 gen-pad gen-sized">
+                    <div class="${rejectH0 ? 's-1fd66a gen-big' : 's-c5b75d gen-big'}">${maxDiff.toFixed(4)}</div>
+                    <div class="s-67e5d5">D Statistic</div>
+                    <div class="s-2c893c"></div>
+                    <div class="s-e19eba gen-flex">
+                        <span class="s-fb8dcc">Normal</span>
+                        <span class="s-fb8dcc">Borderline</span>
+                        <span class="s-fb8dcc">Not Normal</span>
                     </div>
-                    <div style="margin-top: 12px; font-size: 13px;">
+                    <div class="s-f89ee5">
                         Critical Value: <strong>${criticalValue.toFixed(4)}</strong>
                     </div>
                 </div>

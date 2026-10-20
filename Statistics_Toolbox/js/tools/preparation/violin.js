@@ -34,7 +34,7 @@ function renderViolinInterface() {
                 }
             },
             {
-                html: "<div style=\"display: flex; justify-content: space-between; font-size: 12px;\">\n                    <span>Less smooth (more detail)</span>\n                    <span id=\"bandwidthValue\">0.50</span>\n                    <span>More smooth (general shape)</span>\n                </div>"
+                html: "<div class=\"s-65936d\">\n                    <span>Less smooth (more detail)</span>\n                    <span id=\"bandwidthValue\">0.50</span>\n                    <span>More smooth (general shape)</span>\n                </div>"
             }
         ],
         run: { id: "violinComputeBtn", text: "🎻 Generate Violin Plot + Statistics" },
@@ -50,6 +50,7 @@ function renderViolinInterface() {
 
 function computeViolinWithSteps(numbers, bandwidth) {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
+    if (!(bandwidth > 0) || !isFinite(bandwidth)) return { error: true, message: "Bandwidth must be greater than 0." };
     
     const sorted = [...numbers].sort((a, b) => a - b);
     const n = numbers.length;
@@ -104,61 +105,61 @@ function computeViolinWithSteps(numbers, bandwidth) {
     
     // Calculate statistics for display
     const variancePop = variance;
-    const skewness = numbers.reduce((a, b) => a + Math.pow((b - mean) / stdDev, 3), 0) / n;
-    const kurtosis = numbers.reduce((a, b) => a + Math.pow((b - mean) / stdDev, 4), 0) / n - 3;
+    const skewness = sampleSkewness(numbers);            // the Skewness / Kurtosis tools' estimators (null when undefined)
+    const kurtosis = sampleExcessKurtosis(numbers);
     
     // Build statistics table
     let statsTable = `
-    <div style="background: white; border-radius: 16px; margin: 20px 0; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-        <h3 style="margin: 0; padding: 14px; background: linear-gradient(135deg, #6a1b9a, #4a148c); color: white; text-align: center;">📊 Statistical Summary</h3>
-        <table style="width: 100%; border-collapse: collapse;">
+    <div class="s-538424">
+        <h3 class="s-5041c4">📊 Statistical Summary</h3>
+        <table class="s-897d74 gen-sized">
             <thead>
-                <tr style="background: #e9ecef;">
-                    <th style="padding: 12px; text-align: center;">Statistic</th>
-                    <th style="padding: 12px; text-align: center;">Value</th>
-                    <th style="padding: 12px; text-align: center;">Interpretation</th>
+                <tr class="s-bfd0ae">
+                    <th class="s-34ffd2">Statistic</th>
+                    <th class="s-34ffd2">Value</th>
+                    <th class="s-34ffd2">Interpretation</th>
                 </tr>
             </thead>
             <tbody>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px; font-weight: bold;">Sample Size (n)</td>
-                    <td style="text-align: center;">${n}</td>
-                    <td style="text-align: center;">Number of observations</td>
+                <tr class="s-b490b8">
+                    <td class="s-31373e">Sample Size (n)</td>
+                    <td class="s-02528c">${n}</td>
+                    <td class="s-02528c">Number of observations</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px; font-weight: bold;">Mean (μ)</td>
-                    <td style="text-align: center;">${mean.toFixed(4)}</td>
-                    <td style="text-align: center;">Average value</td>
+                <tr class="s-b490b8">
+                    <td class="s-31373e">Mean (μ)</td>
+                    <td class="s-02528c">${mean.toFixed(4)}</td>
+                    <td class="s-02528c">Average value</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px; font-weight: bold;">Median (Q₂)</td>
-                    <td style="text-align: center;">${median.toFixed(4)}</td>
-                    <td style="text-align: center;">Middle value (50th percentile)</td>
+                <tr class="s-b490b8">
+                    <td class="s-31373e">Median (Q₂)</td>
+                    <td class="s-02528c">${median.toFixed(4)}</td>
+                    <td class="s-02528c">Middle value (50th percentile)</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px; font-weight: bold;">Standard Deviation (σ)</td>
-                    <td style="text-align: center;">${stdDev.toFixed(4)}</td>
-                    <td style="text-align: center;">Measure of spread</td>
+                <tr class="s-b490b8">
+                    <td class="s-31373e">Standard Deviation (σ)</td>
+                    <td class="s-02528c">${stdDev.toFixed(4)}</td>
+                    <td class="s-02528c">Measure of spread</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px; font-weight: bold;">Skewness (γ₁)</td>
-                    <td style="text-align: center;">${skewness.toFixed(4)}</td>
-                    <td style="text-align: center;">${Math.abs(skewness) < 0.1 ? 'Symmetric' : (skewness > 0 ? 'Right-skewed' : 'Left-skewed')}</td>
+                <tr class="s-b490b8">
+                    <td class="s-31373e">Skewness (γ₁)</td>
+                    <td class="s-02528c">${skewness === null ? 'N/A' : skewness.toFixed(4)}</td>
+                    <td class="s-02528c">${skewness === null ? 'Needs at least 3 distinct values' : (Math.abs(skewness) < 0.1 ? 'Symmetric' : (skewness > 0 ? 'Right-skewed' : 'Left-skewed'))}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px; font-weight: bold;">Kurtosis (γ₂)</td>
-                    <td style="text-align: center;">${kurtosis.toFixed(4)}</td>
-                    <td style="text-align: center;">${Math.abs(kurtosis) < 0.5 ? 'Mesokurtic (normal-like)' : (kurtosis > 0 ? 'Leptokurtic (heavy tails)' : 'Platykurtic (light tails)')}</td>
+                <tr class="s-b490b8">
+                    <td class="s-31373e">Kurtosis (γ₂)</td>
+                    <td class="s-02528c">${kurtosis === null ? 'N/A' : kurtosis.toFixed(4)}</td>
+                    <td class="s-02528c">${kurtosis === null ? 'Needs at least 4 distinct values' : (Math.abs(kurtosis) < 0.5 ? 'Mesokurtic (normal-like)' : (kurtosis > 0 ? 'Leptokurtic (heavy tails)' : 'Platykurtic (light tails)'))}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px; font-weight: bold;">IQR (Interquartile Range)</td>
-                    <td style="text-align: center;">${iqr.toFixed(4)}</td>
-                    <td style="text-align: center;">Q₃ - Q₁ = ${q3.toFixed(4)} - ${q1.toFixed(4)}</td>
+                <tr class="s-b490b8">
+                    <td class="s-31373e">IQR (Interquartile Range)</td>
+                    <td class="s-02528c">${iqr.toFixed(4)}</td>
+                    <td class="s-02528c">Q₃ - Q₁ = ${q3.toFixed(4)} - ${q1.toFixed(4)}</td>
                 </tr>
                 <tr>
-                    <td style="padding: 10px; font-weight: bold;">Outliers</td>
-                    <td style="text-align: center;">${outliers.length}</td>
-                    <td style="text-align: center;">${outliers.length > 0 ? `Values: ${outliers.join(', ')}` : 'No outliers detected'}</td>
+                    <td class="s-31373e">Outliers</td>
+                    <td class="s-02528c">${outliers.length}</td>
+                    <td class="s-02528c">${outliers.length > 0 ? `Values: ${outliers.join(', ')}` : 'No outliers detected'}</td>
                 </tr>
             </tbody>
         </table>
@@ -166,120 +167,28 @@ function computeViolinWithSteps(numbers, bandwidth) {
     
     // Build density calculation explanation
     let densitySteps = `
-    <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin: 20px 0;">
-        <h3 style="color: #1a5490; margin-top: 0;">📐 Kernel Density Estimation (KDE)</h3>
-        <div style="background: white; border-radius: 12px; padding: 15px;">
+    <div class="s-498a55 gen-pad">
+        <h3 class="s-862845">📐 Kernel Density Estimation (KDE)</h3>
+        <div class="s-6fdce2">
             <strong>Formula:</strong>
-            <div style="font-family: monospace; background: #f0f4fa; padding: 12px; border-radius: 8px; margin: 10px 0;">
+            <div class="s-fa6a70">
                 f̂(x) = (1/(n·h)) × Σ K((x - xᵢ)/h)
             </div>
-            <div style="margin-top: 10px;">
+            <div class="s-7fd1d1">
                 <strong>Where:</strong><br>
                 • <strong>K(u)</strong> = Gaussian kernel = (1/√(2π)) × e^(-u²/2)<br>
                 • <strong>h</strong> = Bandwidth = ${bandwidth}<br>
                 • <strong>n</strong> = Sample size = ${n}<br>
                 • <strong>xᵢ</strong> = Data points
             </div>
-            <div style="margin-top: 12px; background: #d4edda; padding: 10px; border-radius: 8px;">
+            <div class="s-45aed0">
                 💡 <strong>Interpretation:</strong> The violin shape shows the probability density of data at different values.
                 Wider sections = higher density (more data points clustered there).
             </div>
         </div>
     </div>`;
     
-    let steps = `
-<div style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;">
-    
-    <!-- Header -->
-    <div style="background: linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%); color: white; padding: 30px; border-radius: 20px; margin-bottom: 25px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-            <div>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <span style="font-size: 48px;">🎻</span>
-                    <div>
-                        <h1 style="margin: 0; font-size: 28px;">Violin Plot Analysis</h1>
-                        <p style="margin: 8px 0 0 0; opacity: 0.9;">Kernel Density Estimation + Boxplot for Distribution Visualization</p>
-                    </div>
-                </div>
-            </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 15px 25px; border-radius: 16px; text-align: center;">
-                <div style="font-size: 11px; opacity: 0.8;">BANDWIDTH</div>
-                <div style="font-size: 24px; font-weight: 700;">h = ${bandwidth}</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- KPI Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px;">
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #28a745;">
-            <div style="font-size: 11px; color: #6c757d;">MINIMUM</div>
-            <div style="font-size: 24px; font-weight: 700; color: #28a745;">${minVal}</div>
-        </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #17a2b8;">
-            <div style="font-size: 11px; color: #6c757d;">Q₁</div>
-            <div style="font-size: 24px; font-weight: 700; color: #17a2b8;">${q1.toFixed(4)}</div>
-        </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #ffc107;">
-            <div style="font-size: 11px; color: #6c757d;">MEDIAN</div>
-            <div style="font-size: 24px; font-weight: 700; color: #ffc107;">${median.toFixed(4)}</div>
-        </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #17a2b8;">
-            <div style="font-size: 11px; color: #6c757d;">Q₃</div>
-            <div style="font-size: 24px; font-weight: 700; color: #17a2b8;">${q3.toFixed(4)}</div>
-        </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #dc3545;">
-            <div style="font-size: 11px; color: #6c757d;">MAXIMUM</div>
-            <div style="font-size: 24px; font-weight: 700; color: #dc3545;">${maxVal}</div>
-        </div>
-    </div>
-    
-    <!-- Statistics Table -->
-    ${statsTable}
-    
-    <!-- Density Explanation -->
-    ${densitySteps}
-    
-    <!-- Violin Plot Visualization -->
-    <div style="background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); border-radius: 20px; padding: 25px; margin-top: 20px;">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #9c27b0; padding-bottom: 15px;">
-            <span style="font-size: 28px;">🎻</span>
-            <h3 style="margin: 0; color: #ce93d8;">VIOLIN PLOT VISUALIZATION</h3>
-            <p style="margin: 5px 0 0 0; font-size: 11px; color: #b39ddb;">💡 Hover over the plot to see values | Wider = Higher density</p>
-        </div>
-        
-        <canvas id="violinChartCanvas" style="max-height: 500px; width: 100%; margin-top: 10px;"></canvas>
-        
-        <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
-            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 20px; height: 20px; background: rgba(156, 39, 176, 0.5); border-radius: 50%;"></div><span style="color: #e6edf3; font-size: 11px;">Violin Shape (KDE)</span></div>
-            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 16px; height: 3px; background: #ffb74d;"></div><span style="color: #e6edf3; font-size: 11px;">Median Line</span></div>
-            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 16px; height: 3px; background: #81c784;"></div><span style="color: #e6edf3; font-size: 11px;">IQR Box Boundaries</span></div>
-            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background: #ef5350; border-radius: 50%;"></div><span style="color: #e6edf3; font-size: 11px;">Outliers</span></div>
-        </div>
-    </div>
-    
-    <!-- Interpretation -->
-    <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-top: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0;">📖 Final Interpretation</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
-            <div style="background: white; border-radius: 12px; padding: 15px;">
-                <strong>Distribution Shape:</strong><br>
-                • ${Math.abs(median - mean) < 0.1 * iqr ? 'Symmetric' : (median < mean ? 'Right-skewed' : 'Left-skewed')}<br>
-                • IQR = ${iqr.toFixed(4)}<br>
-                • Range = ${(maxVal - minVal).toFixed(4)}
-            </div>
-            <div style="background: white; border-radius: 12px; padding: 15px;">
-                <strong>Outliers:</strong><br>
-                • ${outliers.length} outlier(s) detected<br>
-                ${outliers.length > 0 ? `• Values: ${outliers.join(', ')}` : '• No outliers'}
-            </div>
-            <div style="background: white; border-radius: 12px; padding: 15px;">
-                <strong>Density Interpretation:</strong><br>
-                • ${maxDensity > 0.5 ? 'High peak concentration' : 'Spread out distribution'}<br>
-                • Bandwidth = ${bandwidth} (${bandwidth < 0.5 ? 'detailed' : (bandwidth > 1 ? 'smooth' : 'balanced')})
-            </div>
-        </div>
-    </div>
-</div>`;
+    const steps = stepsHtmlViolin({ bandwidth, densitySteps, iqr, maxDensity, maxVal, mean, median, minVal, outliers, q1, q3, statsTable });
     
     return { 
         steps, 
@@ -490,6 +399,11 @@ function setupViolinLogic() {
         
         const result = computeViolinWithSteps(numbers, bandwidth);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.innerText = "Error";
+            setHtml(stepsSpan, result.message);
+            return;
+        }
         setHtml(valueSpan, `🎻 n = ${result.n} | Median = ${result.median.toFixed(4)} | IQR = ${result.iqr.toFixed(4)} | Outliers = ${result.outliers.length}`);
         setHtml(stepsSpan, result.steps);
         

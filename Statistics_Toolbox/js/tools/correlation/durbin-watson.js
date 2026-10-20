@@ -84,12 +84,12 @@ function computeDurbinWatson(residuals) {
     let diffRows = '';
     for (let row of diffTable) {
         diffRows += `
-        <tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 12px; text-align: center; font-weight: 500;">${row.t}</td>
-            <td style="padding: 12px; text-align: center; font-family: monospace;">${row.e_t.toFixed(4)}</td>
-            <td style="padding: 12px; text-align: center; font-family: monospace;">${row.e_t_1.toFixed(4)}</td>
-            <td style="padding: 12px; text-align: center; font-family: monospace; color: #dc3545;">${row.diff.toFixed(4)}</td>
-            <td style="padding: 12px; text-align: center; background: #fff3cd; font-weight: 600; font-family: monospace;">${row.sqDiff.toFixed(6)}</td>
+        <tr class="s-00049c">
+            <td class="s-6e1b96">${row.t}</td>
+            <td class="s-1d6537">${row.e_t.toFixed(4)}</td>
+            <td class="s-1d6537">${row.e_t_1.toFixed(4)}</td>
+            <td class="s-ff6d0f">${row.diff.toFixed(4)}</td>
+            <td class="s-ee2ee1">${row.sqDiff.toFixed(6)}</td>
         </tr>`;
     }
     
@@ -97,38 +97,38 @@ function computeDurbinWatson(residuals) {
     let sqResRows = '';
     for (let row of squaredResTable) {
         sqResRows += `
-        <tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 12px; text-align: center; font-weight: 500;">${row.t}</td>
-            <td style="padding: 12px; text-align: center; font-family: monospace;">${row.e_t.toFixed(4)}</td>
-            <td style="padding: 12px; text-align: center; background: #d4edda; font-weight: 600; font-family: monospace;">${row.e_t_sq.toFixed(6)}</td>
+        <tr class="s-00049c">
+            <td class="s-6e1b96">${row.t}</td>
+            <td class="s-1d6537">${row.e_t.toFixed(4)}</td>
+            <td class="s-3f18d1">${row.e_t_sq.toFixed(6)}</td>
         </tr>`;
     }
     
     // Build complete HTML
     let steps = `
-    <div style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; max-width: 100%;">
+    <div class="s-e3295e">
         
         <!-- HEADER SECTION -->
-        <div style="background: linear-gradient(135deg, #0d3b66 0%, #1a5490 100%); color: white; padding: 25px 30px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+        <div class="s-a73c71 gen-pad">
+            <div class="s-b15718 gen-flex">
                 <div>
-                    <h1 style="margin: 0; font-size: 28px;">🔄 Durbin-Watson Statistic</h1>
-                    <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">Testing for First-Order Autocorrelation in Regression Residuals</p>
+                    <h1 class="s-b80b8c">🔄 Durbin-Watson Statistic</h1>
+                    <p class="s-3d1a65">Testing for First-Order Autocorrelation in Regression Residuals</p>
                 </div>
-                <div style="background: rgba(255,255,255,0.15); padding: 12px 24px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 11px; opacity: 0.8; letter-spacing: 1px;">TEST STATISTIC</div>
-                    <div style="font-size: 42px; font-weight: 700;">${durbinWatson.toFixed(4)}</div>
+                <div class="s-0c68a3">
+                    <div class="s-fec7da">TEST STATISTIC</div>
+                    <div class="s-196c52 gen-big">${durbinWatson.toFixed(4)}</div>
                 </div>
             </div>
         </div>
         
         <!-- FORMULA CARD -->
-        <div style="background: #f0f4fa; border-radius: 16px; padding: 20px; margin-bottom: 25px; border-left: 5px solid #1a5490;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📐 Mathematical Formula</h3>
-            <div style="background: white; padding: 20px; border-radius: 12px; text-align: center; font-family: monospace; font-size: 18px;">
+        <div class="s-c21c61 gen-pad">
+            <h3 class="s-ed0bb5">📐 Mathematical Formula</h3>
+            <div class="s-f6c676 gen-pad">
                 <strong>d = \\(\\frac{\\sum_{t=2}^{n} (e_t - e_{t-1})^2}{\\sum_{t=1}^{n} e_t^2}\\)</strong>
             </div>
-            <div style="margin-top: 15px; background: #e8f4f8; padding: 15px; border-radius: 8px;">
+            <div class="s-938536">
                 <strong>📖 Where:</strong><br>
                 • e<sub>t</sub> = Residual at time t<br>
                 • e<sub>t-1</sub> = Residual at previous time period<br>
@@ -138,73 +138,73 @@ function computeDurbinWatson(residuals) {
         </div>
         
         <!-- STEP 1: DIFFERENCES TABLE -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow-x: auto;">
-            <div style="background: #1a5490; color: white; padding: 14px 20px;">
-                <h3 style="margin: 0; font-size: 16px;">📊 Step 1: Calculate Differences (e<sub>t</sub> - e<sub>t-1</sub>) and Squared Differences</h3>
+        <div class="s-83f9af">
+            <div class="s-63fd4e">
+                <h3 class="s-2eb15f">📊 Step 1: Calculate Differences (e<sub>t</sub> - e<sub>t-1</sub>) and Squared Differences</h3>
             </div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <table class="s-306b2c gen-sized">
                 <thead>
-                    <tr style="background: #e8f4f8; border-bottom: 2px solid #1a5490;">
-                        <th style="padding: 12px; text-align: center;">Time (t)</th>
-                        <th style="padding: 12px; text-align: center;">e<sub>t</sub></th>
-                        <th style="padding: 12px; text-align: center;">e<sub>t-1</sub></th>
-                        <th style="padding: 12px; text-align: center;">Difference = e<sub>t</sub> - e<sub>t-1</sub></th>
-                        <th style="padding: 12px; text-align: center;">(Difference)²</th>
+                    <tr class="s-df5107">
+                        <th class="s-34ffd2">Time (t)</th>
+                        <th class="s-34ffd2">e<sub>t</sub></th>
+                        <th class="s-34ffd2">e<sub>t-1</sub></th>
+                        <th class="s-34ffd2">Difference = e<sub>t</sub> - e<sub>t-1</sub></th>
+                        <th class="s-34ffd2">(Difference)²</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${diffRows}
-                    <tr style="background: #e8f4f8; font-weight: 700; border-top: 2px solid #1a5490;">
-                        <td colspan="4" style="padding: 12px; text-align: right;">Σ (e<sub>t</sub> - e<sub>t-1</sub>)² →</td>
-                        <td style="padding: 12px; text-align: center; background: #1a5490; color: white; font-size: 16px;">${numerator.toFixed(6)}</td>
+                    <tr class="s-6c2756">
+                        <td class="s-6ecd26" colspan="4">Σ (e<sub>t</sub> - e<sub>t-1</sub>)² →</td>
+                        <td class="s-2f88df">${numerator.toFixed(6)}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <!-- STEP 2: SQUARED RESIDUALS TABLE -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow-x: auto;">
-            <div style="background: #1a5490; color: white; padding: 14px 20px;">
-                <h3 style="margin: 0; font-size: 16px;">📊 Step 2: Calculate Squared Residuals (e<sub>t</sub>²)</h3>
+        <div class="s-83f9af">
+            <div class="s-63fd4e">
+                <h3 class="s-2eb15f">📊 Step 2: Calculate Squared Residuals (e<sub>t</sub>²)</h3>
             </div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <table class="s-306b2c gen-sized">
                 <thead>
-                    <tr style="background: #e8f4f8; border-bottom: 2px solid #1a5490;">
-                        <th style="padding: 12px; text-align: center;">Time (t)</th>
-                        <th style="padding: 12px; text-align: center;">e<sub>t</sub></th>
-                        <th style="padding: 12px; text-align: center;">e<sub>t</sub>²</th>
+                    <tr class="s-df5107">
+                        <th class="s-34ffd2">Time (t)</th>
+                        <th class="s-34ffd2">e<sub>t</sub></th>
+                        <th class="s-34ffd2">e<sub>t</sub>²</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${sqResRows}
-                    <tr style="background: #e8f4f8; font-weight: 700; border-top: 2px solid #1a5490;">
-                        <td colspan="2" style="padding: 12px; text-align: right;">Σ e<sub>t</sub>² →</td>
-                        <td style="padding: 12px; text-align: center; background: #1a5490; color: white; font-size: 16px;">${denominator.toFixed(6)}</td>
+                    <tr class="s-6c2756">
+                        <td class="s-6ecd26" colspan="2">Σ e<sub>t</sub>² →</td>
+                        <td class="s-2f88df">${denominator.toFixed(6)}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <!-- STEP 3: FINAL CALCULATION -->
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 25px; margin-bottom: 25px;">
-            <h3 style="margin: 0 0 20px 0; color: #1a5490;">🔢 Step 3: Calculate Durbin-Watson Statistic</h3>
-            <div style="background: white; border-radius: 12px; padding: 20px;">
-                <div style="font-family: monospace; font-size: 18px; text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+        <div class="s-5ff38e gen-pad">
+            <h3 class="s-10a1d4">🔢 Step 3: Calculate Durbin-Watson Statistic</h3>
+            <div class="s-6fab3a gen-pad">
+                <div class="s-c835b7">
                     <strong>d = Σ(e<sub>t</sub> - e<sub>t-1</sub>)² / Σe<sub>t</sub>²</strong>
                 </div>
-                <div style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <div class="s-eb3f9c gen-pad">
+                    <table class="s-897d74 gen-sized">
                         <tr>
-                            <td style="padding: 8px;"><strong>Numerator:</strong></td>
-                            <td style="padding: 8px; font-family: monospace;">${numerator.toFixed(6)}</td>
+                            <td class="s-641001"><strong>Numerator:</strong></td>
+                            <td class="s-2e1d0b">${numerator.toFixed(6)}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px;"><strong>Denominator:</strong></td>
-                            <td style="padding: 8px; font-family: monospace;">${denominator.toFixed(6)}</td>
+                            <td class="s-641001"><strong>Denominator:</strong></td>
+                            <td class="s-2e1d0b">${denominator.toFixed(6)}</td>
                         </tr>
-                        <tr style="border-top: 1px solid #dee2e6;">
-                            <td style="padding: 12px;"><strong>d =</strong></td>
-                            <td style="padding: 12px; font-family: monospace; font-size: 20px; font-weight: 700; color: #1a5490;">${numerator.toFixed(6)} / ${denominator.toFixed(6)} = ${durbinWatson.toFixed(6)}</td>
+                        <tr class="s-fba762">
+                            <td class="s-61a8ef"><strong>d =</strong></td>
+                            <td class="s-e80ab1">${numerator.toFixed(6)} / ${denominator.toFixed(6)} = ${durbinWatson.toFixed(6)}</td>
                         </tr>
                     </table>
                 </div>
@@ -213,61 +213,61 @@ function computeDurbinWatson(residuals) {
         
         <!-- INTERPRETATION SECTION -->
         <div style="border-radius: 16px; padding: 20px; margin-bottom: 25px; background: ${severityColor}15; border-left: 6px solid ${severityColor};">
-            <h3 style="margin: 0 0 15px 0;">📌 Interpretation & Decision</h3>
+            <h3 class="s-a63d7a">📌 Interpretation & Decision</h3>
             
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
-                <div style="background: white; border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <div style="font-size: 11px; color: #666; text-transform: uppercase;">Test Statistic (d)</div>
+            <div class="s-6961ce gen-grid gen-grid-many">
+                <div class="s-9f52da">
+                    <div class="s-9a23a8">Test Statistic (d)</div>
                     <div style="font-size: 28px; font-weight: 700; color: ${severityColor};">${durbinWatson.toFixed(4)}</div>
                 </div>
-                <div style="background: white; border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <div style="font-size: 11px; color: #666; text-transform: uppercase;">Observations (n)</div>
-                    <div style="font-size: 28px; font-weight: 700;">${n}</div>
+                <div class="s-9f52da">
+                    <div class="s-9a23a8">Observations (n)</div>
+                    <div class="s-93c0a8">${n}</div>
                 </div>
-                <div style="background: white; border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <div style="font-size: 11px; color: #666; text-transform: uppercase;">Verdict</div>
+                <div class="s-9f52da">
+                    <div class="s-9a23a8">Verdict</div>
                     <div style="font-size: 18px; font-weight: 700; color: ${severityColor};">${severity}</div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 10px; padding: 15px;">
+            <div class="s-2e46b1">
                 <p><strong>🎯 Interpretation:</strong> ${interpretation}</p>
-                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #dee2e6;">
+                <div class="s-df3fc8">
                     <strong>📊 Decision Rules:</strong><br>
-                    <table style="width: 100%; margin-top: 8px; font-size: 13px;">
-                        <tr><td style="padding: 4px;">• d = 2</td><td>→ No autocorrelation</td></tr>
-                        <tr><td style="padding: 4px;">• d < 2</td><td>→ Positive autocorrelation</td></tr>
-                        <tr><td style="padding: 4px;">• d > 2</td><td>→ Negative autocorrelation</td></tr>
+                    <table class="s-770f02 gen-sized">
+                        <tr><td class="s-4e9d15">• d = 2</td><td>→ No autocorrelation</td></tr>
+                        <tr><td class="s-4e9d15">• d < 2</td><td>→ Positive autocorrelation</td></tr>
+                        <tr><td class="s-4e9d15">• d > 2</td><td>→ Negative autocorrelation</td></tr>
                     </table>
                 </div>
             </div>
         </div>
         
         <!-- REFERENCE TABLE -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px;">
-            <h3 style="margin: 0 0 15px 0; color: #1a5490;">📖 Durbin-Watson Critical Values Reference (α = 0.05)</h3>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+        <div class="s-44d7a2 gen-pad">
+            <h3 class="s-6cfbec">📖 Durbin-Watson Critical Values Reference (α = 0.05)</h3>
+            <div class="s-01a9b9">
+                <table class="s-776a1d gen-sized">
                     <thead>
-                        <tr style="background: #1a5490; color: white;">
-                            <th style="padding: 10px;">n</th>
-                            <th style="padding: 10px;">k=1</th>
-                            <th style="padding: 10px;">k=2</th>
-                            <th style="padding: 10px;">k=3</th>
-                            <th style="padding: 10px;">k=4</th>
-                            <th style="padding: 10px;">k=5</th>
+                        <tr class="s-e7b83b">
+                            <th class="s-a756db">n</th>
+                            <th class="s-a756db">k=1</th>
+                            <th class="s-a756db">k=2</th>
+                            <th class="s-a756db">k=3</th>
+                            <th class="s-a756db">k=4</th>
+                            <th class="s-a756db">k=5</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr style="background: white;"><td style="padding: 8px;">15</td><td>1.08, 1.36</td><td>0.95, 1.54</td><td>0.82, 1.75</td><td>0.69, 1.97</td><td>0.56, 2.21</td></tr>
-                        <tr style="background: #f8f9fa;"><td style="padding: 8px;">20</td><td>1.20, 1.41</td><td>1.10, 1.54</td><td>1.00, 1.68</td><td>0.90, 1.83</td><td>0.79, 1.99</td></tr>
-                        <tr style="background: white;"><td style="padding: 8px;">30</td><td>1.35, 1.49</td><td>1.28, 1.57</td><td>1.21, 1.65</td><td>1.14, 1.74</td><td>1.07, 1.83</td></tr>
-                        <tr style="background: #f8f9fa;"><td style="padding: 8px;">40</td><td>1.44, 1.54</td><td>1.39, 1.60</td><td>1.34, 1.66</td><td>1.29, 1.72</td><td>1.23, 1.79</td></tr>
-                        <tr style="background: white;"><td style="padding: 8px;">50</td><td>1.50, 1.59</td><td>1.46, 1.63</td><td>1.42, 1.67</td><td>1.38, 1.72</td><td>1.34, 1.77</td></tr>
+                        <tr class="s-67f264"><td class="s-641001">15</td><td>1.08, 1.36</td><td>0.95, 1.54</td><td>0.82, 1.75</td><td>0.69, 1.97</td><td>0.56, 2.21</td></tr>
+                        <tr class="s-6d64ad"><td class="s-641001">20</td><td>1.20, 1.41</td><td>1.10, 1.54</td><td>1.00, 1.68</td><td>0.90, 1.83</td><td>0.79, 1.99</td></tr>
+                        <tr class="s-67f264"><td class="s-641001">30</td><td>1.35, 1.49</td><td>1.28, 1.57</td><td>1.21, 1.65</td><td>1.14, 1.74</td><td>1.07, 1.83</td></tr>
+                        <tr class="s-6d64ad"><td class="s-641001">40</td><td>1.44, 1.54</td><td>1.39, 1.60</td><td>1.34, 1.66</td><td>1.29, 1.72</td><td>1.23, 1.79</td></tr>
+                        <tr class="s-67f264"><td class="s-641001">50</td><td>1.50, 1.59</td><td>1.46, 1.63</td><td>1.42, 1.67</td><td>1.38, 1.72</td><td>1.34, 1.77</td></tr>
                     </tbody>
                 </table>
             </div>
-            <div style="margin-top: 12px; font-size: 12px; color: #666; text-align: center;">
+            <div class="s-fa6d3d">
                 💡 <strong>Note:</strong> Values shown as (d<sub>L</sub>, d<sub>U</sub>). Reject H₀ if d < d<sub>L</sub> or d > 4 - d<sub>L</sub>.
             </div>
         </div>

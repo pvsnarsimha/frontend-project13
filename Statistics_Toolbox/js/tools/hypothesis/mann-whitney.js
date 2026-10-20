@@ -144,59 +144,58 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
     // Build ranking table
     let rankTableRows = '';
     rankDetails.forEach((item, idx) => {
-        let bgColor = item.group === 1 ? '#e8f4f8' : '#f8f9fa';
-        rankTableRows += `<tr style="border-bottom: 1px solid #e9ecef; background: ${bgColor};">
-            <td style="padding: 8px; text-align: center;">${idx + 1}</td>
-            <td style="padding: 8px; text-align: center;">${item.value}</td>
-            <td style="padding: 8px; text-align: center; font-weight: bold;">${item.rank}</td>
-            <td style="padding: 8px; text-align: center;">${item.group === 1 ? 'Sample 1' : 'Sample 2'}</td>
+        rankTableRows += `<tr class="${item.group === 1 ? 's-42c5fb' : 's-d7104c'}">
+            <td class="s-a7c3f4">${idx + 1}</td>
+            <td class="s-a7c3f4">${item.value}</td>
+            <td class="s-f8719c">${item.rank}</td>
+            <td class="s-a7c3f4">${item.group === 1 ? 'Sample 1' : 'Sample 2'}</td>
         </tr>`;
     });
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">U</span>
-                <h2 style="margin: 0;">Mann-Whitney U Test</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">U</span>
+                <h2 class="s-f8a94d">Mann-Whitney U Test</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Formula: U = n₁n₂ + [n₁(n₁+1)/2] - R₁</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">Non-parametric alternative to independent t-test</p>
+            <p class="s-259079">Formula: U = n₁n₂ + [n₁(n₁+1)/2] - R₁</p>
+            <p class="s-20a400">Non-parametric alternative to independent t-test</p>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Sample Statistics</h3>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #28a745;">
-                    <div style="font-weight: 700;">Sample 1</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📊 Sample Statistics</h3>
+            <div class="s-b00abc gen-grid">
+                <div class="s-a31255">
+                    <div class="s-cbd2a7">Sample 1</div>
                     <div>n₁ = ${n1}</div>
                     <div>Data: ${sample1.join(', ')}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #dc3545;">
-                    <div style="font-weight: 700;">Sample 2</div>
+                <div class="s-30eb0c">
+                    <div class="s-cbd2a7">Sample 2</div>
                     <div>n₂ = ${n2}</div>
                     <div>Data: ${sample2.join(', ')}</div>
                 </div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white;">📋 Step 1: Rank All Values Together</h3>
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-2311e6">
+            <h3 class="s-10bf27">📋 Step 1: Rank All Values Together</h3>
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef;">
-                        <th style="padding: 10px;">Position</th>
-                        <th style="padding: 10px;">Value</th>
-                        <th style="padding: 10px;">Rank</th>
-                        <th style="padding: 10px;">Group</th>
+                    <tr class="s-bfd0ae">
+                        <th class="s-a756db">Position</th>
+                        <th class="s-a756db">Value</th>
+                        <th class="s-a756db">Rank</th>
+                        <th class="s-a756db">Group</th>
                     </tr>
                 </thead>
                 <tbody>${rankTableRows}</tbody>
             </table>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 2: Calculate U Statistic</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 2: Calculate U Statistic</h3>
+            <div class="s-ca9e5c">
                 <strong>Sum of ranks for Sample 1 (R₁):</strong> ${sumRank1.toFixed(2)}<br><br>
                 <strong>U₁ = n₁n₂ + n₁(n₁+1)/2 - R₁</strong><br>
                 U₁ = ${n1}×${n2} + ${n1}×${n1+1}/2 - ${sumRank1.toFixed(2)}<br>
@@ -206,7 +205,7 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
                 <strong>U = min(U₁, U₂) = ${U.toFixed(2)}</strong>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+            <div class="s-6025fc">
                 <strong>Step 3: Calculate z-score approximation</strong><br>
                 Expected U = n₁n₂/2 = ${expectedU.toFixed(2)}<br>
                 Standard Deviation = √(tie-corrected variance) = ${stdU.toFixed(4)}<br>
@@ -216,12 +215,12 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
+        <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Test Conclusion</h3>
             <div><strong>U Statistic:</strong> ${U.toFixed(2)}</div>
             <div><strong>z-score:</strong> ${z.toFixed(6)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}
             </div>
@@ -229,7 +228,7 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
     </div>`;
     
     // the p-value uses the normal approximation, which is rough for small samples
-    return { U, z, pValue, rejectH0, conclusion, interpretation, steps, smallSample: Math.min(n1, n2) < 10 };
+    return { U, z, pValue, rejectH0, conclusion, interpretation, steps, smallSample: n1 * n2 < 20 };
 }
 
 // ========== MANN-WHITNEY SETUP ==========
@@ -262,7 +261,7 @@ function setupMannWhitneyLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);
         } else {
-            setHtml(valueSpan, `U = ${result.U.toFixed(2)} | p${result.smallSample ? ' (normal approx.)' : ''} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
+            setHtml(valueSpan, `U = ${result.U.toFixed(2)} | p${result.smallSample ? ' (normal approx.)' : ''} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}${result.smallSample ? ' | ⚠ small sample: treat p as approximate' : ''}`);
             setHtml(stepsSpan, result.steps);
         }
     });

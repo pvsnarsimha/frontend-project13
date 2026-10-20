@@ -54,105 +54,105 @@ function computePointBiserialWithSteps(xContinuous, yBinary) {
     
     const r_pb = (meanX1 - meanX0) / sdX * Math.sqrt((n1 * n0) / (n * n));
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 100%;">
-        <div style="background: linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">🎯</span>
-                <h2 style="margin: 0;">Point-Biserial Correlation (r<sub>pb</sub>)</h2>
+    let steps = `<div class="s-3c49f1">
+        <div class="s-11d2a4 gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">🎯</span>
+                <h2 class="s-f8a94d">Point-Biserial Correlation (r<sub>pb</sub>)</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Formula: r<sub>pb</sub> = (M₁ - M₀)/s<sub>X</sub> × √[(n₁·n₀)/(n²)]</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">Measures correlation between a continuous variable and a true binary variable (0/1).</p>
+            <p class="s-259079">Formula: r<sub>pb</sub> = (M₁ - M₀)/s<sub>X</sub> × √[(n₁·n₀)/(n²)]</p>
+            <p class="s-20a400">Measures correlation between a continuous variable and a true binary variable (0/1).</p>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #6a1b9a;">📊 Data Summary</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #6a1b9a;">
-                    <div style="font-size: 12px; color: #6c757d;">Total Pairs</div>
-                    <div style="font-size: 28px; font-weight: 700;">${n}</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-e49128">📊 Data Summary</h3>
+            <div class="s-5728d8 gen-grid">
+                <div class="s-b0b20b">
+                    <div class="s-42da0a">Total Pairs</div>
+                    <div class="s-93c0a8">${n}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #28a745;">
-                    <div style="font-size: 12px; color: #6c757d;">Group 1 (Y=1)</div>
-                    <div style="font-size: 20px; font-weight: 600;">n₁ = ${n1}</div>
-                    <div style="font-size: 13px;">Mean₁ = ${meanX1.toFixed(4)}</div>
+                <div class="s-a31255">
+                    <div class="s-42da0a">Group 1 (Y=1)</div>
+                    <div class="s-0f4638">n₁ = ${n1}</div>
+                    <div class="s-9fdf0e">Mean₁ = ${meanX1.toFixed(4)}</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #dc3545;">
-                    <div style="font-size: 12px; color: #6c757d;">Group 0 (Y=0)</div>
-                    <div style="font-size: 20px; font-weight: 600;">n₀ = ${n0}</div>
-                    <div style="font-size: 13px;">Mean₀ = ${meanX0.toFixed(4)}</div>
+                <div class="s-30eb0c">
+                    <div class="s-42da0a">Group 0 (Y=0)</div>
+                    <div class="s-0f4638">n₀ = ${n0}</div>
+                    <div class="s-9fdf0e">Mean₀ = ${meanX0.toFixed(4)}</div>
                 </div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; border: 1px solid #e9ecef; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #6a1b9a;">📋 Input Data</h3>
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="s-8b4bbf">
+            <h3 class="s-4ab1da">📋 Input Data</h3>
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #6a1b9a; color: white;">
-                        <th style="padding: 10px;">i</th>
-                        <th style="padding: 10px;">X (Continuous)</th>
-                        <th style="padding: 10px;">Y (Binary 0/1)</th>
+                    <tr class="s-41b0a5">
+                        <th class="s-a756db">i</th>
+                        <th class="s-a756db">X (Continuous)</th>
+                        <th class="s-a756db">Y (Binary 0/1)</th>
                     </tr>
                 </thead>
                 <tbody>`;
     for (let i = 0; i < n; i++) {
-        steps += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${i+1}</td>
-            <td style="padding: 8px; text-align: center;">${xContinuous[i]}</td>
-            <td style="padding: 8px; text-align: center; font-weight: 600; color: ${yBinary[i] === 1 ? '#28a745' : '#dc3545'};">${yBinary[i]}</td>
+        steps += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${i+1}</td>
+            <td class="s-a7c3f4">${xContinuous[i]}</td>
+            <td class="${yBinary[i] === 1 ? 's-46e98c' : 's-e7e4c5'}">${yBinary[i]}</td>
         </tr>`;
     }
     steps += `</tbody>${"</table>"}</div>
         
-        <div style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #6a1b9a;">🔢 Step-by-Step Calculation</h3>
+        <div class="s-62c9d0 gen-pad">
+            <h3 class="s-e49128">🔢 Step-by-Step Calculation</h3>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #6a1b9a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-5f9750 gen-flex gen-sized">1</div>
                     <div><strong>Calculate Group Means</strong></div>
                 </div>
-                <div style="margin-left: 40px;">
+                <div class="s-78a84b">
                     <div>M₁ = ΣX(Y=1) / n₁ = ${sumX1} / ${n1} = ${meanX1.toFixed(6)}</div>
                     <div>M₀ = ΣX(Y=0) / n₀ = ${sumX0} / ${n0} = ${meanX0.toFixed(6)}</div>
                     <div>M₁ - M₀ = ${(meanX1 - meanX0).toFixed(6)}</div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #6a1b9a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">2</div>
+            <div class="s-ca9e5c">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-5f9750 gen-flex gen-sized">2</div>
                     <div><strong>Calculate Standard Deviation of X</strong></div>
                 </div>
-                <div style="margin-left: 40px;">
+                <div class="s-78a84b">
                     <div>Mean X (overall) = ${meanX.toFixed(6)}</div>
                     <div>Σ(X - X̄)² = ${sumSqDiff.toFixed(6)}</div>
                     <div>s<sub>X</sub> = √(${sumSqDiff.toFixed(6)} / ${n}) = ${sdX.toFixed(6)}</div>
                 </div>
             </div>
             
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="background: #6a1b9a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</div>
+            <div class="s-6025fc">
+                <div class="s-94fb6b gen-flex">
+                    <div class="s-5f9750 gen-flex gen-sized">3</div>
                     <div><strong>Calculate Point-Biserial Correlation</strong></div>
                 </div>
-                <div style="margin-left: 40px;">
+                <div class="s-78a84b">
                     <div>r<sub>pb</sub> = (M₁ - M₀) / s<sub>X</sub> × √[(n₁·n₀) / n²]</div>
                     <div>= ${(meanX1 - meanX0).toFixed(6)} / ${sdX.toFixed(6)} × √[(${n1} × ${n0}) / ${n}²]</div>
                     <div>= ${((meanX1 - meanX0)/sdX).toFixed(6)} × √[${n1*n0} / ${n*n}]</div>
                     <div>= ${((meanX1 - meanX0)/sdX).toFixed(6)} × √${(n1*n0/(n*n)).toFixed(6)}</div>
                     <div>= ${((meanX1 - meanX0)/sdX).toFixed(6)} × ${Math.sqrt(n1*n0/(n*n)).toFixed(6)}</div>
-                    <div style="font-size: 20px; font-weight: 700; color: #6a1b9a; margin-top: 12px;">r<sub>pb</sub> = ${r_pb.toFixed(8)}</div>
+                    <div class="s-e1f7cf">r<sub>pb</sub> = ${r_pb.toFixed(8)}</div>
                 </div>
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; background: #f3e5f5; border-left: 6px solid #6a1b9a;">
-            <h3 style="margin: 0 0 12px 0;">📌 Interpretation</h3>
+        <div class="s-6fb674 gen-pad">
+            <h3 class="s-c7f0b4">📌 Interpretation</h3>
             <div><strong>Point-Biserial Correlation:</strong> r<sub>pb</sub> = ${r_pb.toFixed(6)}</div>
             <div><strong>Direction:</strong> ${r_pb > 0 ? 'Positive (higher X associated with Y=1)' : (r_pb < 0 ? 'Negative (higher X associated with Y=0)' : 'No association')}</div>
             <div><strong>Strength:</strong> ${Math.abs(r_pb) >= 0.7 ? 'Strong' : (Math.abs(r_pb) >= 0.5 ? 'Moderate' : (Math.abs(r_pb) >= 0.3 ? 'Weak' : 'Very Weak or No'))} relationship</div>
-            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px;">
+            <div class="s-8d2e44">
                 💡 <strong>Practical Meaning:</strong> The point-biserial correlation is equivalent to the Pearson correlation when Y is binary (0/1). 
                 It tells you how well the continuous variable can distinguish between the two binary groups.
             </div>

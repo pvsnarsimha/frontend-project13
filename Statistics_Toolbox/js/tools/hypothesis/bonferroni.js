@@ -98,6 +98,10 @@ function computeBonferroniCorrection(inputText, alpha) {
     }
     
     const dfWithin = totalN - k;
+    {
+        const guard = withinGroupError(dfWithin, ssWithin, 'Bonferroni comparisons', 'values');
+        if (guard) return guard;
+    }
     const pooledVar = ssWithin / dfWithin;
     const pooledStd = Math.sqrt(pooledVar);
     

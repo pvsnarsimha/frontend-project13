@@ -19,7 +19,7 @@ function renderBoxCoxInterface() {
                 options: [["optimal", "Find Optimal λ (Recommended)"], ["custom", "Use Custom λ"]]
             },
             {
-                html: "<div id=\"boxcoxCustomLambdaDiv\" style=\"display: none;\">\n                    <label>✏️ Custom Lambda value:</label>\n                    <input type=\"number\" id=\"boxcoxCustomLambda\" value=\"0.5\" step=\"0.1\" style=\"width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 15px;\">\n                    <div class=\"desc\" style=\"font-size: 0.75rem;\">λ = 0 → log transform | λ = 0.5 → square root | λ = 1 → no change | λ = 2 → square</div>\n                </div>"
+                html: "<div id=\"boxcoxCustomLambdaDiv\" style=\"display: none;\">\n                    <label>✏️ Custom Lambda value:</label>\n                    <input class=\"s-ed1da0\" type=\"number\" id=\"boxcoxCustomLambda\" value=\"0.5\" step=\"0.1\">\n                    <div class=\"desc s-8b77e0\">λ = 0 → log transform | λ = 0.5 → square root | λ = 1 → no change | λ = 2 → square</div>\n                </div>"
             }
         ],
         run: { id: "boxcoxComputeBtn", text: "📐 Apply Box-Cox Transformation + Steps" },

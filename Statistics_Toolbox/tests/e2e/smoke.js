@@ -31,6 +31,9 @@ const { chromium } = require('playwright');
       if (sample) await sample.click();
       const go = await p.$('#interfaceRoot .primary-btn');
       if (go) await go.click();
+      // Runtime check for inline event handlers: the source check in structure.test.js cannot see markup a tool builds while it runs
+      const handlers = await p.evaluate(() => [...document.querySelectorAll('body *')].flatMap(el => [...el.attributes].filter(a => /^on/i.test(a.name)).map(a => `<${el.tagName.toLowerCase()} ${a.name}>`)));
+      if (handlers.length) errs.push(`${s}: inline event handler(s) in the page after calculating: ${[...new Set(handlers)].join(', ')}`);
       // A tool that offers sample data must produce a clean, non-empty result for it
       if (sample && go) {
         const shown = await p.evaluate(() => {

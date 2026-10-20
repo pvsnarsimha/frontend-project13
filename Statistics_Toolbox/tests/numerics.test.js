@@ -132,3 +132,29 @@ test('studentizedRangeCritical is memoized on (alpha, k, df) without mixing up t
     assert.notEqual(app.studentizedRangeCritical(0.01, 3, 10), a);
     assert.ok(Number.isNaN(app.studentizedRangeCritical(0.05, 1, 10)));
 });
+
+test('symmetric and generalized eigenvalues: always real, agree with the general routine', () => {
+    const s = app.symmetricEigenvalues([[2, 1, 0], [1, 2, 0], [0, 0, 5]]);
+    [5, 3, 1].forEach((v, i) => close(s[i], v, 1e-10));
+    // eigenvalues of W^-1 B for symmetric B and SPD W: 2x2 closed form check, B = diag(2, 3), W = diag(1, 3) -> 2, 1
+    const g = app.generalizedSymmetricEigenvalues([[2, 0], [0, 3]], [[1, 0], [0, 3]]);
+    close(g[0], 2, 1e-12); close(g[1], 1, 1e-12);
+    assert.equal(app.generalizedSymmetricEigenvalues([[1, 0], [0, 1]], [[1, 2], [2, 1]]), null, 'indefinite W is rejected');
+});
+
+test('computeEigenvalues gives NaN, not wrong real numbers, for a rotation (complex eigenvalues)', () => {
+    assert.ok(app.computeEigenvalues([[0, -1], [1, 0]]).every(Number.isNaN));
+    assert.ok(app.computeEigenvalues([[0, -1, 0], [1, 0, 0], [0, 0, 2]]).every(Number.isNaN));
+});
+
+test('computeEigenvalues: a non-symmetric 5x5 matrix with known real eigenvalues (similarity transform of a diagonal)', () => {
+    const D = [[5, 0, 0, 0, 0], [0, 4, 0, 0, 0], [0, 0, 3, 0, 0], [0, 0, 0, 2, 0], [0, 0, 0, 0, 1]];
+    // an invertible, deterministic, clearly non-symmetric P (unit lower triangle plus a few upper entries)
+    const P = [[1, 0.5, 0, 0.2, 0], [0.3, 1, 0.4, 0, 0.1], [0.2, 0.1, 1, 0.6, 0], [0.5, 0, 0.3, 1, 0.2], [0.1, 0.4, 0, 0.3, 1]];
+    const Pinv = app.inverseMatrix(P);
+    assert.ok(Pinv, 'P is invertible');
+    const A = app.multiplyMatrices(app.multiplyMatrices(P, D), Pinv);
+    assert.ok(A.some((row, i) => row.some((v, j) => Math.abs(v - A[j][i]) > 1e-6)), 'A is not symmetric');
+    const e = app.computeEigenvalues(A);
+    [5, 4, 3, 2, 1].forEach((v, i) => close(e[i], v, 1e-6));
+});

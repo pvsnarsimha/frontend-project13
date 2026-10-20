@@ -34,6 +34,16 @@ function renderCooksDistanceInterface() {
 }
 
 // ========== COOK'S DISTANCE COMPUTATION (PROFESSIONAL VERSION WITH DETAILED CALCULATIONS) ==========
+// Cook's D as text. D is infinite for two different reasons, and the wording says which:
+//  - leverage = 1 (1 - h within 1e-12 of 0): the observation alone determines the fitted line, so deleting it changes the fit without limit;
+//  - numerical overflow: the leverage is below 1 but the residual / leverage terms are too large for a double.
+// `leverage` is the observation's h_ii (omit it when only the value is known: it is then read as the leverage = 1 case).
+function formatCooksD(value, digits, leverage) {
+    if (isFinite(value)) return value.toFixed(digits === undefined ? 6 : digits);
+    if (leverage === undefined || 1 - leverage < 1e-12) return '∞ (leverage = 1)';
+    return `∞ (numerical overflow, h = ${leverage.toFixed(6)} < 1)`;
+}
+
 function computeCooksDistance(xValues, yValues) {
     if (!xValues.length || !yValues.length) {
         return { error: true, message: "Please enter both X and Y values." };
@@ -152,7 +162,7 @@ function computeCooksDistance(xValues, yValues) {
             <td class="s-69c02e">${d.yPred.toFixed(4)}</td>
             <td class="s-69c02e ${d.residual >= 0 ? 'tp-text-ok' : 'tp-text-bad'}">${d.residual.toFixed(4)}</td>
             <td class="s-69c02e">${d.leverage.toFixed(4)}</td>
-            <td class="s-34f862 tp-infl-${d.influenceClass}-bg">${isFinite(d.cooksD) ? d.cooksD.toFixed(6) : "∞"}</td>
+            <td class="s-34f862 tp-infl-${d.influenceClass}-bg">${formatCooksD(d.cooksD, 6, d.leverage)}</td>
             <td class="s-e73169 tp-infl-${d.influenceClass}">${d.influence}</td>
         </tr>`;
     }
@@ -187,9 +197,9 @@ function setupCooksDistanceLogic() {
             setHtml(stepsSpan, result.message);  // ← innerHTML
         } else {
             const influential = result.cooksDistances.filter(d => d >= 1).length;
-            const maxD = Math.max(...result.cooksDistances);
-            // Cook's D is Infinity when a point has leverage 1 (it alone determines the line); say so instead of printing "Infinity"
-            setHtml(valueSpan, `${influential} influential obs | Max D = ${isFinite(maxD) ? maxD.toFixed(4) : '∞ (leverage = 1)'}`);
+            const top = result.cookDetails.reduce((a, b) => (b.cooksD > a.cooksD ? b : a));
+            // an infinite D is explained (leverage 1 or numerical overflow) instead of printing "Infinity"
+            setHtml(valueSpan, `${influential} influential obs | Max D = ${formatCooksD(top.cooksD, 4, top.leverage)}`);
             setHtml(stepsSpan, result.steps);  // ← CRITICAL: use innerHTML not innerText
         }
     });
