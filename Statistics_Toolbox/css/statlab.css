@@ -360,6 +360,12 @@ details.step.part .step-no { background: linear-gradient(135deg, #06b6d4, #6366f
 .error-message { color: #991b1b; background: #fee2e2; border: 1px solid #fecaca; padding: 12px 18px; border-radius: 12px; font-weight: 600; }
 table { border-collapse: collapse; max-width: 100%; }
 
+/* Teaching graphs added under a tool's result (js/core/stat-charts.js): rejection regions, shaded probabilities, scatter and residual plots */
+.stat-chart-card { margin-top: 18px; padding: 18px 20px 20px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.stat-chart-title { font-size: 1rem; font-weight: 800; color: var(--ink); margin: 0 0 6px; }
+.stat-chart-hint { font-size: .86rem; color: var(--ink-2); margin: 0 0 12px; line-height: 1.5; }
+.stat-chart-wrap { position: relative; height: 340px; max-width: 100%; }
+.stat-chart-wrap canvas { max-width: 100%; }
 .chart-container { margin-top: 26px; padding: 22px; background: #fff; border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow); display: none; }
 .chart-container.show { display: block; animation: fadeSlideUp .3s ease-out; }
 .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }

@@ -349,7 +349,7 @@ function computeTStatsWithSteps(xValues, yValues) {
         </div>
     </div>`;
     
-    return { tIntercept, tSlope, pIntercept, pSlope, df, criticalT, steps };
+    return { tIntercept, tSlope, pIntercept, pSlope, df, criticalT, steps, chart: { dist: 't', df: df, stat: tSlope, alternative: 'two.sided', alpha: 0.05, statLabel: 't (slope)', critical: signedCritical('two.sided', criticalT) } };
 }
 
 // ========== T-STATISTICS SETUP ==========
@@ -371,10 +371,13 @@ function setupTStatsLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `t(β₀) = ${result.tIntercept.toFixed(6)} | t(β₁) = ${result.tSlope.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("tstatsResultArea", result.chart);
+            showFitCharts("tstatsResultArea", xValues, yValues, { xName: "x", yName: "y" });
         }
     });
     

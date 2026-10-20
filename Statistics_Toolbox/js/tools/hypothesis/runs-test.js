@@ -252,7 +252,7 @@ function computeRunsTest(inputText, alpha) {
         </div>
     </div>`;
     
-    return { runs, expectedRuns, stdRuns, z, pValue, rejectH0, steps };
+    return { runs, expectedRuns, stdRuns, z, pValue, rejectH0, steps, chart: { dist: 'z', df: undefined, stat: z, alternative: 'two.sided', alpha: alpha, statLabel: 'z', critical: signedCritical('two.sided', criticalZ) } };
 }
 
 // ========== SETUP FUNCTIONS ==========
@@ -279,10 +279,12 @@ function setupRunsTestLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `R = ${result.runs} | z = ${result.z.toFixed(6)} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Non-random' : 'Random'}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("runsTestResultArea", result.chart);
         }
     });
     

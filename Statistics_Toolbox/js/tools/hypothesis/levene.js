@@ -131,7 +131,7 @@ function computeLeveneTest(inputText, alpha) {
     
     // Build comprehensive educational HTML
     const steps = stepsHtmlLevene({ alpha, betweenDetails, criticalValue, dfBetween, dfWithin, fStatistic, grandZMean, groupMeans, groups, k, msBetween, msWithin, pValue, rejectH0, ssBetween, ssWithin, totalN, withinDetails, zCalculationDetails });
-    return { fStatistic, dfBetween, dfWithin, pValue, rejectH0, steps };
+    return { fStatistic, dfBetween, dfWithin, pValue, rejectH0, steps, chart: { dist: 'f', df: dfBetween, df2: dfWithin, stat: fStatistic, alternative: 'greater', alpha: alpha, statLabel: 'F', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== SETUP FUNCTIONS ==========
@@ -158,10 +158,12 @@ function setupLeveneLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `F = ${result.fStatistic.toFixed(4)} | df = (${result.dfBetween}, ${result.dfWithin}) | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("leveneResultArea", result.chart);
         }
     });
     

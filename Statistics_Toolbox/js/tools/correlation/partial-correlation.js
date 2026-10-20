@@ -311,10 +311,12 @@ function setupPartialCorrelationLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `r<sub>xy·z</sub> = ${result.r_xy_z.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showPartialCorrelationChart("partialResultArea", xValues, yValues, zValues, result.r_xy_z);
         }
     });
     

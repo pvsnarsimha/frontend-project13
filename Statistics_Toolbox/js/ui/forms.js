@@ -97,6 +97,8 @@
             const b = document.createElement('button'); b.type = 'button'; b.className = 'secondary-btn sample-btn'; b.textContent = '✨ Try sample data';
             b.addEventListener('click', () => {
                 samples.forEach(([t, v]) => { t.value = v; });
+                // the sample is raw data: show the raw-data inputs if the tool was switched to summary statistics
+                $$('[data-mode-select]', iface).forEach(sel => { if (sel.value !== 'raw') { sel.value = 'raw'; sel.dispatchEvent(new Event('change', { bubbles: true })); } });
                 const go = $('.primary-btn', row); if (go) go.focus();
                 showToast('Sample data loaded. Press Calculate.');
             });

@@ -243,7 +243,7 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
     </div>`;
     
     // the p-value uses the normal approximation, which is rough for small samples
-    return { U, z, pValue, rejectH0, conclusion, interpretation, steps, exact, method: exact ? 'exact' : 'normal approximation', smallSample: !exact && n1 * n2 < 20 };
+    return { U, z, pValue, rejectH0, conclusion, interpretation, steps, exact, method: exact ? 'exact' : 'normal approximation', smallSample: !exact && n1 * n2 < 20, chart: exact ? null : { dist: 'z', df: undefined, stat: z, alternative: alternative, alpha: alpha, statLabel: 'z', critical: signedCritical(alternative, criticalZ) } };
 }
 
 // ========== MANN-WHITNEY SETUP ==========
@@ -274,10 +274,12 @@ function setupMannWhitneyLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `U = ${result.U.toFixed(2)} | p${result.exact ? ' (exact)' : (result.smallSample ? ' (normal approx.)' : '')} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}${result.smallSample ? ' | ⚠ small sample: treat p as approximate' : ''}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("mannWhitneyResultArea", result.chart);
         }
     });
     

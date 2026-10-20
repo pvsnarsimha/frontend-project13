@@ -255,7 +255,7 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
     </div>`;
     
     // exact when there are no ties among the |differences|; otherwise the normal approximation, which is rough for fewer than ~10 non-zero pairs
-    return { W, Wpos, Wneg, z, pValue, rejectH0, conclusion, interpretation, steps, exact, method: exact ? 'exact' : 'normal approximation', smallSample: !exact && nEff < 10 };
+    return { W, Wpos, Wneg, z, pValue, rejectH0, conclusion, interpretation, steps, exact, method: exact ? 'exact' : 'normal approximation', smallSample: !exact && nEff < 10, chart: exact ? null : { dist: 'z', df: undefined, stat: z, alternative: alternative, alpha: alpha, statLabel: 'z', critical: signedCritical(alternative, criticalZ) } };
 }
 
 // ========== WILCOXON SETUP ==========
@@ -286,10 +286,12 @@ function setupWilcoxonLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `W = ${result.W.toFixed(2)} | p${result.exact ? ' (exact)' : (result.smallSample ? ' (normal approx.)' : '')} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}${result.smallSample ? ' | ⚠ small sample: treat p as approximate' : ''}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("wilcoxonResultArea", result.chart);
         }
     });
     

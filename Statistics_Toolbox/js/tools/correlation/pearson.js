@@ -232,10 +232,12 @@ function setupPearsonLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);  // Changed to innerHTML
         } else {
             setHtml(valueSpan, `r = ${result.r.toFixed(6)}`);
-            setHtml(stepsSpan, result.steps);  // Changed to innerHTML
+            setHtml(stepsSpan, result.steps);
+            showFitCharts("pearsonResultArea", xValues, yValues, { xName: "x", yName: "y" });  // Changed to innerHTML
         }
     });
     

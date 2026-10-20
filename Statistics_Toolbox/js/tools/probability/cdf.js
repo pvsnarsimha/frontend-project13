@@ -189,11 +189,13 @@ function setupCDFLogic() {
             if (result.error) {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = 'Error';
+                hideAllStatCharts();
                 setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
             } else {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = result.resultStr;
                 stepsSpan.innerText = result.steps;
+                showDistributionGraph('cdfResultArea', 'cdf', 'cdf', parseNumbersFromInput(document.getElementById('cdfXValues').value));
             }
         });
     }

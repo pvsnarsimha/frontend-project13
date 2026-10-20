@@ -135,7 +135,7 @@ function computeBartlettTest(inputText, alpha) {
     
     // Build comprehensive educational HTML
     const steps = stepsHtmlBartlett({ C, alpha, chiSquare, chiSquareAdj, criticalValue, denominator, df, groupMeans, groupSizes, groups, k, numerator, pValue, pooledDetails, pooledVar, rejectH0, sumInv, term1, term2, term2Details, totalN, varianceDetails });
-    return { chiSquare: chiSquareAdj, df, pValue, rejectH0, steps };
+    return { chiSquare: chiSquareAdj, df, pValue, rejectH0, steps, chart: { dist: 'chisq', df: df, stat: chiSquareAdj, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: chiSquareCriticalValue(alpha, df) } } };
 }
 
 function setupBartlettLogic() {
@@ -161,10 +161,12 @@ function setupBartlettLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `χ² = ${result.chiSquare.toFixed(4)} | df = ${result.df} | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("bartlettResultArea", result.chart);
         }
     });
     

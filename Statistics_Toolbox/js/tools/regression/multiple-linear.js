@@ -336,10 +336,12 @@ function setupMultipleLinearLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.steps || result.message);
         } else {
             setHtml(valueSpan, `${result.n} observations, ${result.p} predictors | Mean Y = ${result.yMean.toFixed(4)}`);
             setHtml(stepsSpan, result.steps);
+            showMultipleRegressionCharts("multipleLinearResultArea", dataMatrix, result.coefficients);
         }
     });
     

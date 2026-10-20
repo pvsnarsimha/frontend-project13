@@ -300,10 +300,12 @@ function setupDurbinWatsonLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);  // ← Use innerHTML
         } else {
             setHtml(valueSpan, `d = ${result.durbinWatson.toFixed(6)}`);
-            setHtml(stepsSpan, result.steps);  // ← Use innerHTML (THIS IS CRITICAL)
+            setHtml(stepsSpan, result.steps);
+            showResidualSequenceChart("dwResultArea", residuals);  // ← Use innerHTML (THIS IS CRITICAL)
         }
     });
     

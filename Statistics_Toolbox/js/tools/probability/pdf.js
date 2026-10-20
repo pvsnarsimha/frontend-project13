@@ -28,17 +28,7 @@ function renderPDFInterface() {
 }
 
 // Uniform Distribution Functions
-function uniformPDF(x, min = 0, max = 1) {
-    if (x < min || x > max) return 0;
-    return 1 / (max - min);
-}
-
 // Exponential Distribution Functions
-function exponentialPDF(x, rate = 1) {
-    if (x < 0) return 0;
-    return rate * Math.exp(-rate * x);
-}
-
 // Dynamic parameter UI generators
 function updatePDFParams() {
     showDistributionParams('pdf');
@@ -240,11 +230,13 @@ function setupPDFLogic() {
             if (result.error) {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = 'Error';
+                hideAllStatCharts();
                 setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
             } else {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = result.resultStr;
                 stepsSpan.innerText = result.steps;
+                showDistributionGraph('pdfResultArea', 'pdf', 'pdf', parseNumbersFromInput(document.getElementById('pdfXValues').value));
             }
         });
     }

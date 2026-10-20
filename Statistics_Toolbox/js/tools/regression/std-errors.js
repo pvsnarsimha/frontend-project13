@@ -252,10 +252,12 @@ function setupStdErrorsLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `SE(β₀) = ${result.seIntercept.toFixed(6)} | SE(β₁) = ${result.seSlope.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showFitCharts("stderrorsResultArea", xValues, yValues, { xName: "x", yName: "y" });
         }
     });
     

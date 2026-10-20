@@ -1,7 +1,7 @@
 # StatLab: Statistics Toolbox
 
-An interactive statistics workbench: paste data, pick one of 99 techniques, and get the result, the formula,
-a full worked solution and a chart. It is a static site with **no build step**: open `Statistics.html` in a
+An interactive statistics workbench: paste data, pick one of 102 techniques, and get the result, the formula,
+a full worked solution and a chart. It is built for working your own textbook questions: type the numbers the question gives (a list of values, or just n / mean / standard deviation, or a table of counts) and see the calculation and the graph. It is a static site with **no build step**: open `Statistics.html` in a
 browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offline; Chart.js is only loaded when the first chart is drawn).
 Not sure which technique fits your question? Open **[Which tool should I use?](Which-tool.html)**: it starts from the question you are asking and
 links straight into the right tool (`Statistics.html#tool=<id>` opens a tool directly).
@@ -126,6 +126,25 @@ Rules for all tools:
 9. Add a test: a known value from SciPy / R / statsmodels for the calculation, and an edge case (one value, identical values, perfect fit).
 10. `npm test` (and `npm run test:e2e` with Playwright installed) must pass before you commit.
 
+## For textbook questions
+
+* **Summary-statistics input.** One-sample t, one-sample z, paired t, two-sample (Welch) t, one- and two-proportion z, and the chi-square test of
+  independence have a "What does your question give you?" drop-down: raw data, or the summary a textbook states (n, x̄, s; the differences' mean and s;
+  counts of successes; a table of observed counts). The code is `computeOneSampleTFromSummary`, `computeOneSampleZFromSummary`,
+  `computePairedTFromSummary`, `computeTwoSampleTFromSummary`, `computeTwoProportionZTest`, `computeChisquareFromTable`; the raw-data path
+  reduces the data to the same summary and calls the same function, so the two cannot disagree. The summary layouts are in `js/core/summary-tests.js`.
+* **Graphs.** Every hypothesis test with a reference distribution draws it with the rejection region shaded, the critical value(s) and the test
+  statistic marked, and the p-value area (`js/core/stat-charts.js`: `showTestChart`, driven by the `chart` spec each compute function returns).
+  The sign, binomial and exact binomial tests draw the binomial bars. Exceptions (no single reference curve): Shapiro-Wilk, Anderson-Darling,
+  Kolmogorov-Smirnov, Tukey HSD and Bonferroni. Correlation and regression tools add a scatter plot with the fitted line and a residual plot.
+  The PDF, CDF, PMF, quantile, survival and hazard tools draw the curve with the asked probability shaded (`js/core/dist-graphs.js`).
+* **Probability Calculator** (`probcalc`): P(X ≤ a), P(X < a), P(X ≥ a), P(X > a), P(a ≤ X ≤ b), outside, and P(X = a) for the normal, t, chi-square,
+  F, exponential, uniform, beta, Weibull, binomial and Poisson distributions, with the working and the shaded graph. The densities and named
+  distributions are in `js/core/density.js`.
+* **Frequency Table / Grouped Data** (`groupeddata`): rows like `10-20, 5` (class, frequency) or `7, 3` (value, frequency) give the mean, median,
+  quartiles, mode and spread by the textbook grouped-data formulas, with the histogram, frequency polygon and ogive.
+* `tests/textbook-features.test.js` checks all of this against SciPy / statsmodels / NumPy values (`tests/fixtures/make-reference.py`).
+
 ## Design notes
 
 * **`setHtml()` fallback.** `setHtml(element, html)` parses into an inert `<template>`, strips anything that can run code and attaches the
@@ -154,7 +173,7 @@ Rules for all tools:
 * **Classic scripts, not ES modules.** The page is meant to open straight from disk (`file://`), where browsers
   refuse to load ES modules. The cost is one shared global scope, which `tests/structure.test.js` polices
   (duplicate definitions, route integrity). Moving to modules would require serving the folder over http and a bundler.
-* **No build step** means no minification or tree-shaking: the page loads about 1.5 MB of script from disk, about 390 KB once a web server gzips it (`npm run size` prints both and CI enforces a budget; `tests/structure.test.js` fails if the 1.5 MB drifts more than 10%) (instant locally,
+* **No build step** means no minification or tree-shaking: the page loads about 1.6 MB of script from disk, about 421 KB once a web server gzips it (`npm run size` prints both and CI enforces a budget; `tests/structure.test.js` fails if the 1.5 MB drifts more than 10%) (instant locally,
   noticeable over a slow network if you host it). Chart.js and the fonts are vendored, so there are no CDN requests and
   the Content-Security-Policy only allows the page's own files.
 

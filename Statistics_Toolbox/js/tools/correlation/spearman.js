@@ -215,10 +215,13 @@ function setupSpearmanLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);  // Changed to innerHTML
         } else {
             setHtml(valueSpan, `ρ = ${result.rho.toFixed(6)}`);
-            setHtml(stepsSpan, result.steps);  // Changed to innerHTML
+            setHtml(stepsSpan, result.steps);
+            showFitCharts("spearmanResultArea", xValues, yValues, { xName: "x", yName: "y" });
+            showScatterCard("spearmanResultArea", "extra", "Ranks: Spearman works on these", "Spearman correlation is the Pearson correlation of the RANKS. A monotone relationship (always rising or always falling, even if curved) puts the rank points on a straight line.", { title: "Rank of y against rank of x", xLabel: "Rank of x", yLabel: "Rank of y", x: result.rankX, y: result.rankY, line: (r => r ? { slope: r.slope, intercept: r.intercept, label: "Least-squares line through the ranks" } : null)(simpleRegressionCore(result.rankX, result.rankY)), description: "Scatter plot of the ranks of the paired values." });  // Changed to innerHTML
         }
     });
     

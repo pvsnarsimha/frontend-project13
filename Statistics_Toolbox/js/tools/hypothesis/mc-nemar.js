@@ -147,7 +147,7 @@ function computeMcNemarTest(inputText, alpha) {
         </div>
     </div>`;
     
-    return { chiSquare, df, pValue, criticalValue, rejectH0, steps };
+    return { chiSquare, df, pValue, criticalValue, rejectH0, steps, chart: { dist: 'chisq', df: df, stat: chiSquare, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== MCNEMAR'S TEST SETUP ==========
@@ -174,10 +174,12 @@ function setupMcNemarLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `χ² = ${result.chiSquare.toFixed(6)} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("mcnemarResultArea", result.chart);
         }
     });
     

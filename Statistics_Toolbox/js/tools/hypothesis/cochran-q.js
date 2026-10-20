@@ -199,7 +199,7 @@ function computeCochranQTest(inputText, alpha) {
         </div>
     </div>`;
     
-    return { Q, df, pValue, criticalValue, rejectH0, steps };
+    return { Q, df, pValue, criticalValue, rejectH0, steps, chart: { dist: 'chisq', df: df, stat: Q, alternative: 'greater', alpha: alpha, statLabel: 'Q (χ²)', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== COCHRAN'S Q TEST SETUP ==========
@@ -226,10 +226,12 @@ function setupCochranQLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `Q = ${result.Q.toFixed(6)} | df = ${result.df} | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("cochranResultArea", result.chart);
         }
     });
     

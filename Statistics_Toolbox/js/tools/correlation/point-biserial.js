@@ -187,6 +187,7 @@ function setupPointBiserialLogic() {
         if (!valid) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, "Binary variable must contain only 0 and 1 values.");
             return;
         }
@@ -200,6 +201,7 @@ function setupPointBiserialLogic() {
         } else {
             setHtml(valueSpan, `r<sub>pb</sub> = ${result.r_pb.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showFitCharts("pointBiserialResultArea", xValues, yValues, { xName: "x", yName: "y" });
         }
     });
     

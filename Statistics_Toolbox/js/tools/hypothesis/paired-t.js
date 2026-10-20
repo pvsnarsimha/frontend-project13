@@ -8,14 +8,10 @@ function renderPairedTInterface() {
         formula: "t = (d_bar) / (s_d / sqrt(n))",
         desc: "Tests whether the mean difference between paired observations (e.g., before-after) is significantly different from zero.",
         inputs: [
+            inputModeItem("pairedMode", "🧮 Summary statistics (n, mean and s of the differences)"),
             {
-                label: "Before values (comma, space, or line separated):",
-                textarea: { id: "pairedBeforeData", rows: "3", placeholder: "Example: 12, 15, 14, 16, 13, 15, 14" }
-            },
-            {
-                label: "After values (same number of observations):",
-                labelAttrs: { style: FIELD_GAP },
-                textarea: { id: "pairedAfterData", rows: "3", placeholder: "Example: 14, 16, 15, 18, 15, 17, 16" }
+                html: modeGroupHtml("raw", '<label>Before values (comma, space, or line separated):</label>\n<textarea id="pairedBeforeData" rows="3" placeholder="Example: 12, 15, 14, 16, 13, 15, 14"></textarea>\n<label style="' + FIELD_GAP + '">After values (same number of observations):</label>\n<textarea id="pairedAfterData" rows="3" placeholder="Example: 14, 16, 15, 18, 15, 17, 16"></textarea>') +
+                    modeGroupHtml("summary", summaryFieldsHtml([["pairedN", "Number of pairs n:", "12", 'min="2"'], ["pairedMeanDiff", "Mean difference d̄ (after − before):", "2.5"], ["pairedSdDiff", "Standard deviation of the differences s_d:", "3.1", 'min="0"']]))
             },
             {
                 label: "Significance Level (alpha):",
@@ -317,15 +313,24 @@ function computePairedTTest(before, after, alpha, alternative) {
         </div>
     </div>`;
     
-    return { tStatistic, df, pValue, criticalValue, meanDiff, stdDevDiff, standardError, rejectH0, conclusion, interpretation, steps };
+    return { tStatistic, df, pValue, criticalValue, meanDiff, stdDevDiff, standardError, rejectH0, conclusion, interpretation, steps, chart: { dist: 't', df: df, stat: tStatistic, alternative: alternative, alpha: alpha, statLabel: 't', critical: signedCritical(alternative, criticalValue) } };
 }
 
 // ========== PAIRED T-TEST SETUP ==========
+// The paired test on a summary of the differences: it is the one-sample t-test of d̄ against 0
+function computePairedTFromSummary(n, meanDiff, sdDiff, alpha, alternative) {
+    const result = computeOneSampleTFromSummary(n, meanDiff, sdDiff, 0, alpha, alternative);
+    if (result.error) return result.message.includes('standard deviation') ? { error: true, message: 'The standard deviation of the differences s_d must be a number greater than 0.' } : result;
+    result.steps = result.steps.replace('One-Sample t-test', 'Paired t-test (from the summary of the differences)').replace('Sample Mean (x̄)', 'Mean difference (d̄)').replace('Sample Std Dev (s)', 'Std Dev of differences (s_d)');
+    return result;
+}
+
 function setupPairedTLogic() {
     const computeBtn = document.getElementById("pairedTComputeBtn");
     if (!computeBtn) return;
     
     computeBtn.addEventListener('click', () => {
+        const summaryMode = document.querySelector('#statPairedTInterface [data-mode-select]').value === 'summary';
         const rawBefore = document.getElementById("pairedBeforeData").value;
         const rawAfter = document.getElementById("pairedAfterData").value;
         const before = parseNumbersFromInput(rawBefore);
@@ -336,22 +341,27 @@ function setupPairedTLogic() {
         const valueSpan = document.getElementById("pairedTValueDisplay");
         const stepsSpan = document.getElementById("pairedTStepsDisplay");
         
-        if (!before.length || !after.length) {
+        if (!summaryMode && (!before.length || !after.length)) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "No data";
             setHtml(stepsSpan, "Please enter both before and after data.");
+            hideStatChartCard('test');
             return;
         }
         
-        const result = computePairedTTest(before, after, alpha, alternative);
+        const result = summaryMode
+            ? computePairedTFromSummary(parseFloat(document.getElementById("pairedN").value), parseFloat(document.getElementById("pairedMeanDiff").value), parseFloat(document.getElementById("pairedSdDiff").value), alpha, alternative)
+            : computePairedTTest(before, after, alpha, alternative);
         resultDiv.style.display = "block";
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `t = ${result.tStatistic.toFixed(6)} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H0' : 'Fail to reject H0'}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("pairedTResultArea", result.chart);
         }
     });
     

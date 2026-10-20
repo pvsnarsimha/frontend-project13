@@ -192,7 +192,7 @@ function computeBinomialExactTest(successes, n, p0, alpha, alternative) {
         </div>
     </div>`;
     
-    return { pValue, rejectH0, successes, n, pHat: successes/n, steps };
+    return { pValue, rejectH0, successes, n, pHat: successes/n, steps, chart: { kind: 'binomial', n: n, p0: p0, k: successes, alternative: alternative, alpha: alpha } };
 }
 
 function setupBinomialExactLogic() {
@@ -212,11 +212,13 @@ function setupBinomialExactLogic() {
         resultDiv.style.display = "block";
         if (result.error) {
             valueSpan.textContent = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
             return;
         }
         setHtml(valueSpan, `p = ${result.pValue?.toFixed(6) || 'Error'} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
         setHtml(stepsSpan, result.steps || "Calculation completed.");
+        showTestChart("binomExactResultArea", result.chart);
     });
     attachClearHandler("binomExactClearBtn", ["binomSuccesses", "binomSampleSize"], "binomExactResultArea");
 }

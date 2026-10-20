@@ -237,7 +237,7 @@ function computeMoodsMedianTest(inputText, alpha) {
         </div>
     </div>`;
     
-    return { chiSquare, df, pValue, criticalValue, rejectH0, overallMedian, excluded, steps };
+    return { chiSquare, df, pValue, criticalValue, rejectH0, overallMedian, excluded, steps, chart: { dist: 'chisq', df: df, stat: chiSquare, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: criticalValue } } };
 }
 
 function setupMoodsMedianLogic() {
@@ -263,10 +263,12 @@ function setupMoodsMedianLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `χ² = ${result.chiSquare.toFixed(6)} | df = ${result.df} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Medians differ' : 'Medians equal'}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("moodsResultArea", result.chart);
         }
     });
     

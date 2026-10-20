@@ -8,9 +8,10 @@ function renderOneSampleZInterface() {
         formula: "📌 z = (x̄ - μ₀) / (σ / √n)",
         desc: "Tests whether the sample mean differs from a hypothesized population mean when the population variance is KNOWN.",
         inputs: [
+            inputModeItem("oneSampleZMode", "🧮 Summary statistics (n, mean; σ is given below)"),
             {
-                label: "📋 Enter sample data (comma, space, or line separated):",
-                textarea: { id: "oneSampleZData", rows: "3", placeholder: "Example: 12, 15, 14, 16, 13, 15, 14, 17, 16, 15" }
+                html: modeGroupHtml("raw", '<label>📋 Enter sample data (comma, space, or line separated):</label>\n<textarea id="oneSampleZData" rows="3" placeholder="Example: 12, 15, 14, 16, 13, 15, 14, 17, 16, 15"></textarea>') +
+                    modeGroupHtml("summary", summaryFieldsHtml([["oneSampleZN", "Sample size n:", "36", 'min="2"'], ["oneSampleZMean", "Sample mean x̄:", "15.8"]]))
             },
             {
                 label: "📊 Hypothesized Population Mean (μ₀):",
@@ -64,12 +65,15 @@ function computeOneSampleZTest(data, mu0, sigma, alpha, alternative) {
     if (!data.length || data.length < 2) {
         return { error: true, message: "Need at least 2 observations." };
     }
-    
-    if (!(sigma > 0) || !isFinite(sigma)) return { error: true, message: "The known population standard deviation σ must be a number greater than 0." };
-    
     const n = data.length;
-    const sum = data.reduce((a,b) => a+b, 0);
-    const mean = sum / n;
+    return computeOneSampleZFromSummary(n, data.reduce((a, b) => a + b, 0) / n, sigma, mu0, alpha, alternative);
+}
+
+// The same test from the summary a textbook question gives: n, x̄ and the known σ
+function computeOneSampleZFromSummary(n, mean, sigma, mu0, alpha, alternative) {
+    if (!(n >= 2) || !Number.isInteger(n)) return { error: true, message: "The sample size n must be a whole number of at least 2." };
+    if (!isFinite(mean) || !isFinite(mu0)) return { error: true, message: "Enter the sample mean and μ₀ as numbers." };
+    if (!(sigma > 0) || !isFinite(sigma)) return { error: true, message: "The known population standard deviation σ must be a number greater than 0." };
     const standardError = sigma / Math.sqrt(n);
     const zStatistic = (mean - mu0) / standardError;
     
@@ -170,13 +174,14 @@ function computeOneSampleZTest(data, mu0, sigma, alpha, alternative) {
         </div>
     </div>`;
     
-    return { zStatistic, pValue, criticalZ, rejectH0, mean, n, steps };
+    return { zStatistic, pValue, criticalZ, rejectH0, mean, n, steps, chart: { dist: 'z', df: undefined, stat: zStatistic, alternative: alternative, alpha: alpha, statLabel: 'z', critical: signedCritical(alternative, criticalZ) } };
 }
 
 function setupOneSampleZLogic() {
     const computeBtn = document.getElementById("oneSampleZComputeBtn");
     if (!computeBtn) return;
     computeBtn.addEventListener('click', () => {
+        const summaryMode = document.querySelector('#statOneSampleZInterface [data-mode-select]').value === 'summary';
         const raw = document.getElementById("oneSampleZData").value;
         const data = parseNumbersFromInput(raw);
         const mu0 = parseFloat(document.getElementById("hypothesizedMeanZ").value);
@@ -187,22 +192,27 @@ function setupOneSampleZLogic() {
         const valueSpan = document.getElementById("oneSampleZValueDisplay");
         const stepsSpan = document.getElementById("oneSampleZStepsDisplay");
         
-        if (!data.length) {
+        if (!summaryMode && !data.length) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "No data";
             setHtml(stepsSpan, "Please enter sample data.");
+            hideStatChartCard('test');
             return;
         }
         
-        const result = computeOneSampleZTest(data, mu0, sigma, alpha, alternative);
+        const result = summaryMode
+            ? computeOneSampleZFromSummary(parseFloat(document.getElementById("oneSampleZN").value), parseFloat(document.getElementById("oneSampleZMean").value), sigma, mu0, alpha, alternative)
+            : computeOneSampleZTest(data, mu0, sigma, alpha, alternative);
         resultDiv.style.display = "block";
         if (result.error) {
             valueSpan.textContent = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
             return;
         }
         setHtml(valueSpan, `z = ${result.zStatistic?.toFixed(6) || 'Error'} | p = ${result.pValue?.toFixed(6) || 'Error'}`);
         setHtml(stepsSpan, result.steps || "Calculation completed.");
+            showTestChart("oneSampleZResultArea", result.chart);
     });
     attachClearHandler("oneSampleZClearBtn", "oneSampleZData", "oneSampleZResultArea");
 }

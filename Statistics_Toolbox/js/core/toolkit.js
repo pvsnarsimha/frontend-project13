@@ -127,6 +127,23 @@ function showDistributionParams(prefix, { skip = [], notes = {} } = {}) {
     setHtml(document.getElementById(prefix + 'Params'), inputs + note);
 }
 
+// ---- Raw data or summary statistics ----------------------------------------------------------------------------------
+// A textbook question often gives n, the mean and the standard deviation instead of the raw values. Tools that accept both put a
+// select with data-mode-select in the form and wrap each way of entering data in a data-mode group; the page-level handler in
+// app.js shows the group that matches the select (the summary group starts hidden).
+const INPUT_MODE_OPTIONS = [["raw", "📋 Raw data (a list of values)", true], ["summary", "🧮 Summary statistics (n, mean, standard deviation)"]];
+function inputModeItem(id, summaryText) {
+    return { label: "📥 What does your question give you?", select: { id, "data-mode-select": true, style: FIELD_STYLE },
+             options: summaryText ? [INPUT_MODE_OPTIONS[0], ["summary", summaryText]] : INPUT_MODE_OPTIONS };
+}
+function modeGroupHtml(mode, innerHtml) {
+    return `<div data-mode="${mode}"${mode === 'raw' ? '' : ' style="display: none;"'}>${innerHtml}</div>`;
+}
+// fields: [[id, label, defaultValue, extraAttributes?], ...] -> number inputs for the summary group
+function summaryFieldsHtml(fields) {
+    return fields.map(([id, label, value, attrs]) => `<label>${label}</label>\n<input type="number" id="${id}" value="${value}" step="any" ${attrs || ''} style="${FIELD_STYLE}">`).join('\n');
+}
+
 const ALPHA_OPTIONS = [ ["0.10", "α = 0.10 (90% Confidence)"], ["0.05", "α = 0.05 (95% Confidence) - Standard", true], ["0.01", "α = 0.01 (99% Confidence)"] ];
 const ALPHA_OPTIONS_2 = [ ["0.10", "α = 0.10 (90% Confidence Level)"], ["0.05", "α = 0.05 (95% Confidence Level) - Standard", true], ["0.01", "α = 0.01 (99% Confidence Level)"] ];
 const ALPHA_OPTIONS_3 = [ ["0.10", "α = 0.10 (90% Confidence)"], ["0.05", "α = 0.05 (95% Confidence)", true], ["0.01", "α = 0.01 (99% Confidence)"] ];

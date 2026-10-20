@@ -418,7 +418,7 @@ function computeANOVA(inputText, alpha) {
         </div>
     </div>`;
     
-    return { fStatistic, dfBetween, dfWithin, pValue, criticalValue, rejectH0, conclusion, interpretation, steps };
+    return { fStatistic, dfBetween, dfWithin, pValue, criticalValue, rejectH0, conclusion, interpretation, steps, chart: { dist: 'f', df: dfBetween, df2: dfWithin, stat: fStatistic, alternative: 'greater', alpha: alpha, statLabel: 'F', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== ANOVA SETUP ==========
@@ -445,10 +445,12 @@ function setupANOVALogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `F = ${result.fStatistic.toFixed(6)} | df = (${result.dfBetween}, ${result.dfWithin}) | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("anovaResultArea", result.chart);
         }
     });
     
