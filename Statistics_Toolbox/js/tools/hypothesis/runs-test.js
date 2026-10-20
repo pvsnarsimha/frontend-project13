@@ -106,9 +106,11 @@ function computeRunsTest(inputText, alpha) {
     
     // Calculate z-statistic
     let z = (runs - expectedRuns) / stdRuns;
-    const pValue = 2 * (1 - normCDF(Math.abs(z)));
+    const zPValue = 2 * (1 - normCDF(Math.abs(z)));
     const criticalZ = normInv(1 - alpha / 2);
-    const rejectH0 = Math.abs(z) > criticalZ;
+    // the exact distribution of the number of runs is cheap to compute, so it is used for the p-value (the z value is shown as the large-sample check)
+    const pValue = runsExactPValue(runs, n1, n2);
+    const rejectH0 = pValue < alpha;
     
     // Build run details table
     let runTableRows = '';
@@ -129,11 +131,11 @@ function computeRunsTest(inputText, alpha) {
         const val = sequence[i];
         const color = val === value1 ? '#28a745' : '#dc3545';
         if (i > 0 && sequence[i] !== sequence[i-1]) {
-            sequenceDisplay += `<span style="color: ${color}; font-weight: bold;"> ${val} </span>`;
+            sequenceDisplay += `<span style="color: ${textSafeColor(color)}; font-weight: bold;"> ${val} </span>`;
         } else if (i === 0) {
-            sequenceDisplay += `<span style="color: ${color}; font-weight: bold;">${val} </span>`;
+            sequenceDisplay += `<span style="color: ${textSafeColor(color)}; font-weight: bold;">${val} </span>`;
         } else {
-            sequenceDisplay += `<span style="color: ${color};">${val} </span>`;
+            sequenceDisplay += `<span style="color: ${textSafeColor(color)};">${val} </span>`;
         }
     }
     
@@ -237,7 +239,8 @@ function computeRunsTest(inputText, alpha) {
             <div><strong>Standard Deviation (σ_R):</strong> ${stdRuns.toFixed(4)}</div>
             <div><strong>z-statistic:</strong> ${z.toFixed(6)}</div>
             <div><strong>Critical z (α = ${alpha}, two-tailed):</strong> ±${criticalZ.toFixed(4)}</div>
-            <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
+            <div><strong>p-value (exact):</strong> ${pValue.toFixed(8)}</div>
+            <div><strong>p-value (normal approximation, for comparison):</strong> ${zPValue.toFixed(8)}</div>
             <div class="s-34b24f">
                 <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                 <strong>Conclusion:</strong> ${rejectH0 ? 'There IS sufficient evidence that the sequence is NOT random.' : 'There is NOT sufficient evidence to reject randomness. The sequence appears random.'}
@@ -252,7 +255,7 @@ function computeRunsTest(inputText, alpha) {
         </div>
     </div>`;
     
-    return { runs, expectedRuns, stdRuns, z, pValue, rejectH0, steps, chart: { dist: 'z', df: undefined, stat: z, alternative: 'two.sided', alpha: alpha, statLabel: 'z', critical: signedCritical('two.sided', criticalZ) } };
+    return { runs, expectedRuns, stdRuns, z, pValue, zPValue, rejectH0, steps, chart: { dist: 'z', df: undefined, stat: z, alternative: 'two.sided', alpha: alpha, statLabel: 'z', critical: signedCritical('two.sided', criticalZ) } };
 }
 
 // ========== SETUP FUNCTIONS ==========

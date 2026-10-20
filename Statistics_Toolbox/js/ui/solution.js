@@ -190,7 +190,7 @@
         });
         $$('table', root).forEach(t => {
             $$('td', t).forEach(td => { if ((td.textContent || '').trim().length > 34) td.classList.add('wrap'); });
-            const w = document.createElement('div'); w.className = 'rd-scroll'; t.parentNode.insertBefore(w, t); w.appendChild(t);
+            const w = document.createElement('div'); w.className = 'rd-scroll'; w.tabIndex = 0; w.setAttribute('role', 'region'); w.setAttribute('aria-label', 'Table (scrolls sideways)'); t.parentNode.insertBefore(w, t); w.appendChild(t);
         });
         const iface = el.closest('.stat-interface');
         const figHtml = iface ? scatterSvg(iface) : '';

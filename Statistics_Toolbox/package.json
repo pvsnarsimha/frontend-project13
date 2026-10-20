@@ -6,17 +6,22 @@
   "description": "StatLab: interactive statistics toolbox with step-by-step solutions (static site, no build step)",
   "scripts": {
     "test": "node --test",
-    "test:e2e": "node tests/e2e/smoke.js && node tests/e2e/sample.js && node tests/e2e/edge-cases.js && node tests/e2e/responsive.js && node tests/e2e/lazy-chartjs.js && node tests/e2e/ui-dom.js",
-    "test:e2e:quick": "node tests/e2e/smoke.js && node tests/e2e/sample.js && node tests/e2e/responsive.js && node tests/e2e/lazy-chartjs.js && node tests/e2e/ui-dom.js",
+    "test:e2e": "node tests/e2e/smoke.js && node tests/e2e/sample.js && node tests/e2e/edge-cases.js && node tests/e2e/responsive.js && node tests/e2e/lazy-chartjs.js && node tests/e2e/ui-dom.js && node tests/e2e/student-walkthrough.js && node tests/e2e/a11y.js && node tests/e2e/print.js && node tests/e2e/feedback.js",
+    "test:e2e:quick": "node tests/e2e/smoke.js && node tests/e2e/sample.js && node tests/e2e/responsive.js && node tests/e2e/lazy-chartjs.js && node tests/e2e/ui-dom.js && node tests/e2e/student-walkthrough.js && node tests/e2e/print.js && node tests/e2e/feedback.js",
     "test:all": "npm test && npm run test:e2e",
     "size": "node scripts/report-size.js",
     "sync:scripts": "node scripts/sync-script-tags.js",
-    "sync:styles": "node scripts/extract-styles.js"
+    "sync:styles": "node scripts/extract-styles.js",
+    "test:a11y": "node tests/e2e/a11y.js",
+    "test:e2e:all-browsers": "node scripts/all-browsers.js",
+    "build": "node scripts/build.js"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
+    "axe-core": "^4.14.0",
+    "esbuild": "^0.28.2",
     "playwright": "^1.56.1"
   }
 }

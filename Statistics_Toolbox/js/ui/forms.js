@@ -114,6 +114,16 @@
                 copyText(txt).then(ok => showToast(ok ? 'Solution copied to clipboard' : 'Copy is not available here: select the text and copy it manually'));
             });
             card.appendChild(c);
+            const pr = document.createElement('button'); pr.type = 'button'; pr.className = 'copy-btn print-btn'; pr.textContent = '🖨 Print / Save as PDF';
+            pr.addEventListener('click', () => {
+                // print only this result card (worked solution and its graphs): the CSS keeps just .print-target visible while body has .print-one
+                const target = card.parentElement || card;    // the result area: the worked solution card and the graph cards below it
+                target.classList.add('print-target'); document.body.classList.add('print-one');
+                const done = () => { target.classList.remove('print-target'); document.body.classList.remove('print-one'); window.removeEventListener('afterprint', done); };
+                window.addEventListener('afterprint', done);
+                if (typeof window.print === 'function') window.print(); else done();
+            });
+            card.appendChild(pr);
         });
     }
     const root = $('#interfaceRoot');

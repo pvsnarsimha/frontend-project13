@@ -268,10 +268,12 @@ function setupAndersonDarlingLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `A² = ${result.A2.toFixed(6)} | p ≈ ${result.pValue.toPrecision(3)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
             setHtml(stepsSpan, result.steps);
+            showNormalityCharts("adResultArea", data, false);
         }
     });
     

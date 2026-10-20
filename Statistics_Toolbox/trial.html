@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="vendor/fonts/fonts.css">
+    <link rel="stylesheet" href="css/trial.css">
+    <title>Student trial | StatLab</title>
+    <meta name="description" content="Try StatLab on textbook questions without help, record what happened, and see the results of a whole class.">
+</head>
+<body>
+<main>
+    <h1>Student trial</h1>
+    <p class="lead">Try five textbook questions <strong>without anyone explaining the tool</strong>. Start the timer for each question, find the tool yourself, and write down what was hard. <a href="Statistics.html">Open StatLab</a> in another tab and come back here to record each result. Nothing is sent anywhere: you download your session at the end and give the file to your teacher.</p>
+
+    <section aria-labelledby="who">
+        <h2 id="who">About you</h2>
+        <div class="card grid">
+            <div><label for="student">A label for you (no real name needed)</label><input id="student" placeholder="Example: S1"></div>
+            <div><label for="device">Device</label><select id="device"><option value="laptop">Laptop / desktop</option><option value="phone">Phone</option><option value="tablet">Tablet</option></select></div>
+            <div><label for="level">Level</label><select id="level"><option value="first-year">First year</option><option value="btech-ds">B.Tech data science / analytics</option><option value="other">Other</option></select></div>
+        </div>
+    </section>
+
+    <section aria-labelledby="tasks">
+        <h2 id="tasks">The questions</h2>
+        <div id="taskList"></div>
+    </section>
+
+    <section aria-labelledby="overall">
+        <h2 id="overall">At the end</h2>
+        <div class="card grid">
+            <div><label for="hardest">What was the hardest part?</label><textarea id="hardest"></textarea></div>
+            <div><label for="changeFirst">What would you change first?</label><textarea id="changeFirst"></textarea></div>
+            <div><label for="wishedFor">Which tool did you wish existed?</label><textarea id="wishedFor"></textarea></div>
+            <div><label for="wouldUse">Would you use this for homework or revision?</label><select id="wouldUse"><option value="">Choose</option><option value="yes">Yes</option><option value="maybe">Maybe</option><option value="no">No</option></select></div>
+        </div>
+        <div class="actions">
+            <button type="button" id="download">Download my session (JSON)</button>
+            <button type="button" id="copy" class="secondary">Copy as text</button>
+            <span id="status" role="status" class="note"></span>
+        </div>
+    </section>
+
+    <section aria-labelledby="teacher">
+        <h2 id="teacher">For the teacher: results of the whole class</h2>
+        <p class="note">Choose the session files the students downloaded. They are read in your browser only; nothing is uploaded.</p>
+        <div class="card"><label for="files">Session files (.json)</label><input id="files" type="file" accept=".json,application/json" multiple></div>
+        <div id="summary" aria-live="polite"></div>
+    </section>
+</main>
+<script src="js/core/feedback.js"></script>
+<script src="pages/trial.js"></script>
+</body>
+</html>

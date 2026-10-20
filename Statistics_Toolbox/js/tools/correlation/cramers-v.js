@@ -276,7 +276,7 @@ function computeCramersVWithSteps(inputText) {
             <h3 class="s-c7f0b4">📌 Interpretation</h3>
             <div class="s-45b8b7">
                 <div><strong>Cramér's V:</strong> ${cramersV.toFixed(6)}</div>
-                <div><strong>Interpretation:</strong> <span style="color: ${strengthColor}; font-weight: bold;">${interpretation}</span></div>
+                <div><strong>Interpretation:</strong> <span style="color: ${textSafeColor(strengthColor)}; font-weight: bold;">${interpretation}</span></div>
                 <div><strong>Degrees of Freedom for χ²:</strong> (${r}-1) × (${c}-1) = ${(r-1)*(c-1)}</div>
                 <div><strong>Chi-Square p-value:</strong> ${(1 - chiSquareCDF(chiSquare, (r-1)*(c-1))).toFixed(6)}</div>
                 <div class="s-8d2e44">

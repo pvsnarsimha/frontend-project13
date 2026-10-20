@@ -110,7 +110,7 @@ function computeCochranQTest(inputText, alpha) {
     for (let i = 0; i < n; i++) {
         dataRows += `<tr class="s-00049c">
             <td class="s-a7c3f4">${i+1}</td>
-            ${data[i].map(val => `<td style="padding: 8px; text-align: center; font-weight: ${val === 1 ? 'bold' : 'normal'}; color: ${val === 1 ? '#28a745' : '#6c757d'};">${val}</td>`).join('')}
+            ${data[i].map(val => `<td style="padding: 8px; text-align: center; font-weight: ${val === 1 ? 'bold' : 'normal'}; color: ${textSafeColor(val === 1 ? '#28a745' : '#6c757d')};">${val}</td>`).join('')}
             <td class="s-f8c27c">${rowTotals[i]}</td>
         </tr>`;
     }

@@ -5,7 +5,7 @@ const path = require('path');
 const launcher = require('./launch');      // BROWSER=chromium|firefox|webkit
 
 (async () => {
-    const file = process.argv[2] || path.join(__dirname, '..', '..', 'Statistics.html');
+    const file = process.argv[2] || path.resolve(__dirname, '..', '..', process.env.STATLAB_ROOT || '.', 'Statistics.html');
     const browser = await launcher.launch();
     const page = await browser.newPage();
     const problems = [];

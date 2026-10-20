@@ -23,7 +23,7 @@ const TWO_SAMPLE_CASES = {
 const UNDEFINED = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
 
 (async () => {
-    const file = process.argv[2] || path.join(__dirname, '..', '..', 'Statistics.html');
+    const file = process.argv[2] || path.resolve(__dirname, '..', '..', process.env.STATLAB_ROOT || '.', 'Statistics.html');
     const browser = await launcher.launch();
     const open = async () => {
         const page = await browser.newPage();

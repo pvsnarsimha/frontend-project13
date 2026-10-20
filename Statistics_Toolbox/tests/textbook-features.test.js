@@ -32,6 +32,17 @@ test('summary input: one-sample t, one-sample z, Welch t and two-proportion z ma
     }
 });
 
+test('pooled-variance two-sample t matches scipy (equal_var=True), from summary and from raw data', () => {
+    for (const [alt, want] of Object.entries(ref.summary.pooled)) {
+        const r = app.computeTwoSampleTFromSummary(30, 82, 8, 35, 78, 10, 0.05, ALT[alt], true);
+        close(r.tStatistic, want.t, 1e-10, `pooled t ${alt}`); close(r.pValue, want.p, 1e-9, `pooled p ${alt}`); assert.equal(r.df, 63);
+    }
+    for (const [alt, want] of Object.entries(ref.pooled_raw)) {
+        const r = app.computeTwoSampleTTest(ref.x, ref.y, 0.05, ALT[alt], true);
+        close(r.tStatistic, want.t, 1e-10, `pooled raw t ${alt}`); close(r.pValue, want.p, 1e-9, `pooled raw p ${alt}`);
+    }
+});
+
 test('summary input: raw data and its own summary give the same test result', () => {
     const data = [12, 15, 14, 16, 13, 15, 14, 17, 16, 15];
     const n = data.length, mean = data.reduce((a, b) => a + b) / n, sd = Math.sqrt(data.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1));
@@ -95,4 +106,60 @@ test('grouped data: value/frequency tables match the expanded sample, class tabl
     close(h.mean, 38.4, 1e-12, 'textbook mean'); close(h.median, 38, 1e-12, 'textbook median');
     assert.equal(app.computeGroupedDataWithSteps('10-20, -1').error, true);
     assert.equal(app.computeGroupedDataWithSteps('hello').error, true);
+});
+
+test('exact small-sample methods match scipy (Fisher, McNemar binomial) and brute-force enumeration (runs test)', () => {
+    ref.exact.fisher.forEach(([a, b, c, d, want]) => close(app.fisherExact2x2(a, b, c, d), want, 1e-10, `Fisher [${a},${b};${c},${d}]`));
+    ref.exact.mcnemar.forEach(([b, c, want]) => close(app.mcNemarExactPValue(b, c), want, 1e-10, `McNemar exact b=${b} c=${c}`));
+    for (const [n1, n2, table] of ref.exact.runs) {
+        for (const [r, [lower, upper]] of Object.entries(table)) close(app.runsExactPValue(+r, n1, n2), Math.min(1, 2 * Math.min(lower, upper)), 1e-10, `runs exact n1=${n1} n2=${n2} R=${r}`);
+        const pmf = app.runsExactPMF(n1, n2); close(pmf.reduce((s, p) => s + p, 0), 1, 1e-12, 'runs pmf sums to 1');
+    }
+});
+
+test('McNemar uses the exact binomial p-value for few discordant pairs and chi-square otherwise; chi-square 2x2 reports Fisher', () => {
+    const small = app.computeMcNemarTest('20, 3, 9, 18', 0.05), large = app.computeMcNemarTest('20, 15, 30, 18', 0.05);
+    assert.equal(small.exact, true); close(small.pValue, app.mcNemarExactPValue(3, 9), 1e-15, 'exact used');
+    assert.equal(large.exact, false); close(large.pValue, large.chiPValue, 1e-15, 'chi-square used');
+    const t = app.computeChisquareFromTable('3, 1\n1, 3', 0.05);
+    close(t.fisherP, app.fisherExact2x2(3, 1, 1, 3), 1e-15, 'Fisher reported for 2x2'); assert.equal(app.computeChisquareFromTable('3, 1, 2\n1, 3, 4', 0.05).fisherP, null);
+});
+
+test('one-way ANOVA from group summaries matches the definition (scipy) and the raw-data ANOVA on the same samples', () => {
+    const a = ref.summary.anova, r = app.computeANOVAFromSummary(a.rows.map(([name, n, mean, sd]) => ({ name, n, mean, sd })), 0.05);
+    close(r.fStatistic, a.F, 1e-12, 'F'); close(r.pValue, a.p, 1e-10, 'p'); assert.deepEqual([r.dfBetween, r.dfWithin], a.df);
+    // the same data as raw values: summary of each group -> same F as f_oneway
+    const g = ref.summary.anova_raw.groups, rows = g.map((v, i) => { const n = v.length, m = v.reduce((x, y) => x + y) / n; return { name: 'G' + i, n, mean: m, sd: Math.sqrt(v.reduce((x, y) => x + (y - m) ** 2, 0) / (n - 1)) }; });
+    close(app.computeANOVAFromSummary(rows, 0.05).fStatistic, ref.summary.anova_raw.F, 1e-10, 'F from the raw samples');
+    assert.equal(app.computeANOVAFromSummary([{ name: 'A', n: 5, mean: 1, sd: 0 }, { name: 'B', n: 5, mean: 2, sd: 0 }], 0.05).error, true);
+    assert.equal(app.computeANOVAFromSummary(app.parseAnovaSummaryRows('A, 12, 23.5\nB, 15, 29.8, 2.6'), 0.05).error, true);
+});
+
+test('trial summary: found-rate, median time, match-rate, notes and the "fix first" list come out right', () => {
+    const task = (id, foundTool, seconds, matched, notes = '') => ({ id, title: id, foundTool, seconds, matched, notes });
+    const sessions = [
+        { student: 'S1', tasks: [task('a', 'yes', 60, 'yes'), task('b', 'no', 300, 'no', 'could not find it')], overall: { wouldUse: 'yes', hardest: 'finding tool b' } },
+        { student: 'S2', tasks: [task('a', 'yes', 120, 'yes'), task('b', 'yes', 100, 'yes')], overall: { wouldUse: 'maybe' } },
+        { student: 'S3', tasks: [task('a', 'yes', 90, 'unsure'), task('b', 'no', 200, 'no')], overall: { wouldUse: 'yes', changeFirst: 'search' } },
+        { notASession: true }
+    ];
+    const plain = x => JSON.parse(JSON.stringify(x));      // objects made inside the app's vm context have another prototype
+    const sum = plain(app.summarizeTrial(sessions));
+    assert.equal(sum.students, 3);
+    const a = sum.tasks.find(t => t.id === 'a'), b = sum.tasks.find(t => t.id === 'b');
+    assert.equal(a.foundRate, 1); assert.equal(a.medianSeconds, 90); assert.equal(a.matchedRate, 1);       // "unsure" is not counted as a comparison
+    close(b.foundRate, 1 / 3, 1e-12, 'b found'); assert.equal(b.medianSeconds, 200); close(b.matchedRate, 1 / 3, 1e-12, 'b matched');
+    assert.deepEqual(sum.problems, ['b']); assert.deepEqual(sum.wouldUse, { yes: 2, maybe: 1, no: 0 });
+    assert.deepEqual(b.notes, [{ student: 'S1', note: 'could not find it' }]); assert.deepEqual(sum.hardest, ['finding tool b']);
+    assert.equal(app.summarizeTrial([]).students, 0);
+});
+
+test('feedback helpers: the pre-filled issue link carries the tool and the comment, saving without storage is reported not thrown', () => {
+    const url = app.feedbackIssueUrl({ tool: 'One-Sample t-test', rating: 'unclear', comment: 'I did not know what "s" meant & more' });
+    assert.ok(url.startsWith('https://github.com/pvsnarsimha/frontend-project13/issues/new?template=student-feedback.md'));
+    const body = decodeURIComponent(url.split('&body=')[1]);
+    assert.ok(body.includes('One-Sample t-test') && body.includes('I did not know what "s" meant & more') && body.includes('No'));
+    assert.equal(app.saveFeedback({ tool: 'x', rating: 'clear', comment: 'ok' }), null);      // no localStorage in the unit-test sandbox
+    assert.equal(app.loadFeedback().length, 0);
+    const json = JSON.parse(app.feedbackToJson([{ tool: 'a' }])); assert.equal(json.kind, 'statlab-feedback'); assert.equal(json.entries.length, 1);
 });

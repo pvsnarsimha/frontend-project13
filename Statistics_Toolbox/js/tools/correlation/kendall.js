@@ -262,7 +262,7 @@ function computeKendallWithSteps(xValues, yValues) {
         <div style="border-radius: 16px; padding: 20px; ${Math.abs(tau) >= 0.7 ? 'background: #d4edda; border-left: 6px solid #28a745;' : (Math.abs(tau) >= 0.3 ? 'background: #fff3cd; border-left: 6px solid #ffc107;' : 'background: #f8d7da; border-left: 6px solid #dc3545;')}">
             <h3 class="s-b140c2 gen-flex"><span>📌</span> Interpretation</h3>
             <div class="s-45b8b7">
-                <div><strong>Kendall's τ:</strong> ${tau.toFixed(6)} → <strong style="color: ${tau > 0 ? '#28a745' : '#dc3545'};">${tau > 0 ? 'Positive' : 'Negative'}</strong> ordinal association</div>
+                <div><strong>Kendall's τ:</strong> ${tau.toFixed(6)} → <strong style="color: ${textSafeColor(tau > 0 ? '#28a745' : '#dc3545')};">${tau > 0 ? 'Positive' : 'Negative'}</strong> ordinal association</div>
                 <div><strong>Strength:</strong> ${Math.abs(tau) >= 0.7 ? '🔥 Strong' : (Math.abs(tau) >= 0.5 ? '📊 Moderate' : (Math.abs(tau) >= 0.3 ? '⚠️ Weak' : '💨 Very Weak or No'))} association</div>
                 <div><strong>Agreement Rate:</strong> ${((concordant / totalPairs) * 100).toFixed(1)}% of pairs are concordant</div>
                 <div><strong>Disagreement Rate:</strong> ${((discordant / totalPairs) * 100).toFixed(1)}% of pairs are discordant</div>

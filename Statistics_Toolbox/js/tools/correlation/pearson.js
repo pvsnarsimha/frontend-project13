@@ -200,7 +200,7 @@ function computePearsonWithSteps(xValues, yValues) {
         <div style="border-radius: 16px; padding: 20px; ${Math.abs(r) >= 0.7 ? 'background: #d4edda; border-left: 6px solid #28a745;' : (Math.abs(r) >= 0.3 ? 'background: #fff3cd; border-left: 6px solid #ffc107;' : 'background: #f8d7da; border-left: 6px solid #dc3545;')}">
             <h3 class="s-b140c2 gen-flex"><span>📌</span> Interpretation</h3>
             <div class="s-45b8b7">
-                <div><strong>Correlation Coefficient:</strong> r = ${r.toFixed(6)} → <strong style="color: ${r > 0 ? '#28a745' : '#dc3545'};">${r > 0 ? 'Positive' : 'Negative'}</strong> correlation</div>
+                <div><strong>Correlation Coefficient:</strong> r = ${r.toFixed(6)} → <strong style="color: ${textSafeColor(r > 0 ? '#28a745' : '#dc3545')};">${r > 0 ? 'Positive' : 'Negative'}</strong> correlation</div>
                 <div><strong>Strength:</strong> ${Math.abs(r) >= 0.9 ? '🔥 Very Strong' : (Math.abs(r) >= 0.7 ? '✅ Strong' : (Math.abs(r) >= 0.5 ? '📊 Moderate' : (Math.abs(r) >= 0.3 ? '⚠️ Weak' : '💨 Very Weak or No')))} ${Math.abs(r) >= 0.3 ? 'linear relationship' : 'linear correlation'}</div>
                 <div><strong>Coefficient of Determination (r²):</strong> ${(r*r).toFixed(6)} → ${((r*r)*100).toFixed(1)}% of variance in Y is explained by X</div>
                 <div class="s-0d79c9">

@@ -95,15 +95,15 @@ function computeModelSummary(actual, predicted, k = 1) {
     // Determine performance colors and icons
     const getPerformanceColor = (value, type) => {
         if (type === 'r2') {
-            if (value >= 0.8) return { color: '#10b981', bg: '#d1fae5', icon: '🎯', text: 'Excellent' };
+            if (value >= 0.8) return { color: '#047857', bg: '#d1fae5', icon: '🎯', text: 'Excellent' };
             if (value >= 0.6) return { color: '#f59e0b', bg: '#fed7aa', icon: '👍', text: 'Good' };
             if (value >= 0.4) return { color: '#f97316', bg: '#ffedd5', icon: '⚠️', text: 'Moderate' };
-            return { color: '#ef4444', bg: '#fee2e2', icon: '🔴', text: 'Poor' };
+            return { color: '#b91c1c', bg: '#fee2e2', icon: '🔴', text: 'Poor' };
         }
         if (type === 'error') {
-            if (value < 5) return { color: '#10b981', bg: '#d1fae5', icon: '✅' };
+            if (value < 5) return { color: '#047857', bg: '#d1fae5', icon: '✅' };
             if (value < 15) return { color: '#f59e0b', bg: '#fed7aa', icon: '⚠️' };
-            return { color: '#ef4444', bg: '#fee2e2', icon: '❌' };
+            return { color: '#b91c1c', bg: '#fee2e2', icon: '❌' };
         }
         return { color: '#6b7280', bg: '#f3f4f6', icon: '📊' };
     };

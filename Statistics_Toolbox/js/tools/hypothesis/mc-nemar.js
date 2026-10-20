@@ -63,7 +63,10 @@ function computeMcNemarTest(inputText, alpha) {
     
     const df = 1;
     const criticalValue = chiSquareCriticalValue(alpha, df);
-    const pValue = 1 - chiSquareCDF(chiSquare, df);
+    // few discordant pairs (b + c < 25): the chi-square approximation is unreliable, so the exact binomial p-value is used
+    const exact = b + c < 25;
+    const chiPValue = 1 - chiSquareCDF(chiSquare, df);
+    const pValue = exact ? mcNemarExactPValue(b, c) : chiPValue;
     const rejectH0 = pValue < alpha;
     
     // Build HTML table
@@ -139,7 +142,7 @@ function computeMcNemarTest(inputText, alpha) {
                 <strong>Step 3: Compare with critical value</strong><br>
                 Degrees of freedom = 1<br>
                 Critical value (α = ${alpha}) = ${criticalValue.toFixed(4)}<br>
-                p-value = ${pValue.toFixed(8)}<br><br>
+                p-value = ${pValue.toFixed(8)} ${exact ? '(exact binomial: b + c = ' + (b + c) + ' is below 25, so the chi-square approximation is not used; chi-square p would be ' + chiPValue.toFixed(8) + ')' : '(chi-square approximation)'}<br><br>
                 <strong>Decision rule:</strong> p-value ${rejectH0 ? '<' : '≥'} α (${alpha})<br>
                 <strong>Decision:</strong> ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}<br>
                 <strong>Conclusion:</strong> ${rejectH0 ? 'There is sufficient evidence that the proportions are different (significant change).' : 'There is NOT sufficient evidence of a difference between proportions.'}
@@ -147,7 +150,7 @@ function computeMcNemarTest(inputText, alpha) {
         </div>
     </div>`;
     
-    return { chiSquare, df, pValue, criticalValue, rejectH0, steps, chart: { dist: 'chisq', df: df, stat: chiSquare, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: criticalValue } } };
+    return { chiSquare, df, pValue, chiPValue, exact, criticalValue, rejectH0, steps, chart: { dist: 'chisq', df: df, stat: chiSquare, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== MCNEMAR'S TEST SETUP ==========

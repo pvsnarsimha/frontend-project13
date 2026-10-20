@@ -43,7 +43,7 @@ test('reference: Levene, Bartlett, Mood\'s median, ANOVA / Scheffé F and Bonfer
 
 test('reference: McNemar, phi, Cramér\'s V (statsmodels / scipy.stats.contingency)', () => {
     const mc = app.computeMcNemarTest(ref.mcnemar.table.join(', '), 0.05);
-    close(mc.chiSquare, ref.mcnemar.chi2, 1e-10, 'McNemar chi2'); close(mc.pValue, ref.mcnemar.p, 1e-9, 'McNemar p');
+    close(mc.chiSquare, ref.mcnemar.chi2, 1e-10, 'McNemar chi2'); close(mc.chiPValue, ref.mcnemar.p, 1e-9, 'McNemar chi-square p');
     close(Math.abs(app.computePhiWithSteps(ref.phi.table.join(', ')).phi), ref.phi.phi_abs, 1e-10, 'phi');
     const cv = app.computeCramersVWithSteps(ref.cramers.pairs.join('\n'));
     close(cv.cramersV, ref.cramers.V, 1e-10, "Cramér's V"); close(cv.chiSquare, ref.cramers.chi2, 1e-10, 'Cramér chi2');

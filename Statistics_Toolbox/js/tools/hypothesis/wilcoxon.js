@@ -172,7 +172,7 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
             <td class="s-a7c3f4">${idx + 1}</td>
             <td class="s-a7c3f4">${d.before}</td>
             <td class="s-a7c3f4">${d.after}</td>
-            <td style="padding: 8px; text-align: center; font-weight: bold; color: ${diffColor};">${sign}${Math.abs(d.diff).toFixed(4)}</td>
+            <td style="padding: 8px; text-align: center; font-weight: bold; color: ${textSafeColor(diffColor)};">${sign}${Math.abs(d.diff).toFixed(4)}</td>
             <td class="s-a7c3f4">${rank}</td>
             <td class="s-a7c3f4">${sign === '+' ? 'Positive' : (sign === '-' ? 'Negative' : 'Zero')}</td>
         </tr>`;

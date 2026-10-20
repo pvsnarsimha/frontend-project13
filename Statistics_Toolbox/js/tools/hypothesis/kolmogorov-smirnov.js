@@ -263,10 +263,12 @@ function setupKolmogorovSmirnovLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `D = ${result.D.toFixed(6)} | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showNormalityCharts("ksResultArea", data, true);
         }
     });
     

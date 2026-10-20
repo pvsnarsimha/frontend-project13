@@ -17,17 +17,10 @@ function renderANOVAInterface() {
             }
         ],
         inputs: [
+            inputModeItem("anovaMode", "🧮 Summary statistics (group, n, mean, s for each group)"),
             {
-                label: "Enter data with group labels (format: value:group):",
-                textarea: {
-                    id: "anovaData",
-                    rows: "5",
-                    placeholder: "Example:&#10;23:A, 25:A, 24:A, 22:A&#10;28:B, 30:B, 29:B, 31:B&#10;35:C, 33:C, 34:C, 36:C"
-                }
-            },
-            {
-                hint: "<strong>Format:</strong> value:group (comma or space separated)<br>\n                    <strong>Example:</strong> 23:A means value 23 belongs to group A",
-                hintAttrs: { style: HINT_STYLE }
+                html: modeGroupHtml("raw", '<label>Enter data with group labels (format: value:group):</label>\n<textarea id="anovaData" rows="5" placeholder="Example:&#10;23:A, 25:A, 24:A, 22:A&#10;28:B, 30:B, 29:B, 31:B&#10;35:C, 33:C, 34:C, 36:C"></textarea>\n<small style="' + HINT_STYLE + '"><strong>Format:</strong> value:group (comma or space separated)<br>\n<strong>Example:</strong> 23:A means value 23 belongs to group A</small>') +
+                    modeGroupHtml("summary", '<label>One line per group: name, n, mean, standard deviation:</label>\n<textarea id="anovaSummaryData" rows="5" placeholder="Example:&#10;A, 12, 23.5, 2.1&#10;B, 15, 29.8, 2.6&#10;C, 14, 34.5, 2.2">A, 12, 23.5, 2.1&#10;B, 15, 29.8, 2.6&#10;C, 14, 34.5, 2.2</textarea>\n<small style="' + HINT_STYLE + '">Each line: group name, sample size n, sample mean x̄, sample standard deviation s.</small>')
             },
             {
                 label: "Significance Level (α):",
@@ -51,6 +44,40 @@ function renderANOVAInterface() {
             valueText: "---"
         }
     });
+}
+
+// One-way ANOVA from the summary a textbook gives: one row per group {name, n, mean, sd}
+function computeANOVAFromSummary(rows, alpha) {
+    if (!Array.isArray(rows) || rows.length < 2) return { error: true, message: "Need at least 2 groups: one line per group, written name, n, mean, standard deviation." };
+    if (rows.some(r => !(r.n >= 2) || !Number.isInteger(r.n) || !isFinite(r.mean) || !(r.sd >= 0) || !isFinite(r.sd))) return { error: true, message: "Every group needs a whole-number sample size n of at least 2, a numeric mean and a standard deviation of 0 or more." };
+    const k = rows.length, N = rows.reduce((t, r) => t + r.n, 0);
+    const grand = rows.reduce((t, r) => t + r.n * r.mean, 0) / N;
+    const ssb = rows.reduce((t, r) => t + r.n * (r.mean - grand) * (r.mean - grand), 0), ssw = rows.reduce((t, r) => t + (r.n - 1) * r.sd * r.sd, 0);
+    const dfBetween = k - 1, dfWithin = N - k;
+    if (!(ssw > 0)) return { error: true, message: "Every group has standard deviation 0, so the within-group variation is 0 and F is undefined." };
+    const msb = ssb / dfBetween, msw = ssw / dfWithin, fStatistic = msb / msw;
+    const pValue = 1 - fCDF(fStatistic, dfBetween, dfWithin), criticalValue = fCriticalValue(alpha, dfBetween, dfWithin), rejectH0 = pValue < alpha;
+    const texts = testDecisionTexts(rejectH0, 'two.sided', 'the group means', 'are not all equal', '', '');
+    const steps = summaryTestHtml({
+        icon: 'F', title: 'One-Way ANOVA (from group summaries)', formula: 'F = MS_between / MS_within',
+        h0: 'H₀: μ₁ = μ₂ = … = μ_k', h1: 'H₁: at least one mean differs',
+        stats: rows.map(r => [escapeHtml(r.name), `n = ${r.n}, x̄ = ${+r.mean.toFixed(6)}, s = ${+r.sd.toFixed(6)}`]).concat([['Grand mean', grand.toFixed(6)], ['Total n', N]]),
+        steps: [
+            ['Sum of squares', `SS_between = Σ nⱼ(x̄ⱼ - x̄)² = ${ssb.toFixed(6)}<br>SS_within = Σ (nⱼ - 1)sⱼ² = ${ssw.toFixed(6)}`],
+            ['Degrees of freedom and mean squares', `df_between = k - 1 = ${dfBetween}, df_within = N - k = ${dfWithin}<br>MS_between = ${ssb.toFixed(6)} / ${dfBetween} = ${msb.toFixed(6)}<br>MS_within = ${ssw.toFixed(6)} / ${dfWithin} = ${msw.toFixed(6)}`],
+            ['F statistic', `F = MS_between / MS_within = ${msb.toFixed(6)} / ${msw.toFixed(6)}<br><div class="s-505d41">F = ${fStatistic.toFixed(8)}</div>`],
+            ['Critical value & p-value', `α = ${alpha}<br>Critical F(${dfBetween}, ${dfWithin}) = ${criticalValue.toFixed(6)}<br>p-value = ${pValue.toFixed(8)}<br>Decision rule: reject H₀ when p-value &lt; α → ${pValue.toFixed(6)} ${rejectH0 ? '&lt;' : '≥'} ${alpha}`]
+        ],
+        rejectH0, conclusion: [['F statistic', fStatistic.toFixed(6)], ['Degrees of freedom', `(${dfBetween}, ${dfWithin})`], ['Critical value', criticalValue.toFixed(6)], ['p-value', pValue.toFixed(8)]],
+        decision: texts.decision, interpretation: texts.interpretation, significance: significanceLine(pValue, alpha)
+    });
+    return { fStatistic, dfBetween, dfWithin, pValue, criticalValue, rejectH0, ssBetween: ssb, ssWithin: ssw, steps, chart: { dist: 'f', df: dfBetween, df2: dfWithin, stat: fStatistic, alternative: 'greater', alpha: alpha, statLabel: 'F', critical: { lower: null, upper: criticalValue } } };
+}
+
+// "A, 12, 23.5, 2.1" lines -> [{ name, n, mean, sd }]
+function parseAnovaSummaryRows(text) {
+    return text.split(/\r?\n/).map(l => l.trim()).filter(l => l).map(l => { const p = l.split(',').map(x => x.trim()); return { name: p[0], n: Number(p[1]), mean: Number(p[2]), sd: Number(p[3]), cells: p.length }; })
+        .map(r => (r.cells === 4 ? r : { name: r.name, n: NaN, mean: NaN, sd: NaN }));
 }
 
 // ========== ANOVA COMPUTATION ==========
@@ -427,7 +454,8 @@ function setupANOVALogic() {
     if (!computeBtn) return;
     
     computeBtn.addEventListener('click', () => {
-        const raw = document.getElementById("anovaData").value;
+        const summaryMode = document.querySelector('#statANOVAInterface [data-mode-select]').value === 'summary';
+        const raw = document.getElementById(summaryMode ? "anovaSummaryData" : "anovaData").value;
         const alpha = parseFloat(document.getElementById("anovaAlpha").value);
         const resultDiv = document.getElementById("anovaResultArea");
         const valueSpan = document.getElementById("anovaValueDisplay");
@@ -436,11 +464,12 @@ function setupANOVALogic() {
         if (!raw.trim()) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "No data";
-            setHtml(stepsSpan, "Please enter data in format 'value:group'");
+            setHtml(stepsSpan, summaryMode ? "Enter one line per group: name, n, mean, standard deviation" : "Please enter data in format 'value:group'");
+            hideStatChartCard('test');
             return;
         }
         
-        const result = computeANOVA(raw, alpha);
+        const result = summaryMode ? computeANOVAFromSummary(parseAnovaSummaryRows(raw), alpha) : computeANOVA(raw, alpha);
         resultDiv.style.display = "block";
         
         if (result.error) {
@@ -454,5 +483,5 @@ function setupANOVALogic() {
         }
     });
     
-    attachClearHandler("anovaClearBtn", "anovaData", "anovaResultArea");
+    attachClearHandler("anovaClearBtn", ["anovaData", "anovaSummaryData"], "anovaResultArea");
 }

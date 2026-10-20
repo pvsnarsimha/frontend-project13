@@ -126,7 +126,7 @@ function computeCovarianceWithSteps(xValues, yValues) {
         
         <div style="border-radius: 16px; padding: 20px; ${covariance > 0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : (covariance < 0 ? 'background: #f8d7da; border-left: 6px solid #dc3545;' : 'background: #fff3cd; border-left: 6px solid #ffc107;')}">
             <h3 class="s-3c2890"><span>📌</span> Interpretation</h3>
-            <div><strong>Covariance:</strong> ${covariance.toFixed(6)} → <strong style="color: ${covariance > 0 ? '#28a745' : (covariance < 0 ? '#dc3545' : '#ffc107')};">${covariance > 0 ? 'POSITIVE' : (covariance < 0 ? 'NEGATIVE' : 'ZERO')}</strong> relationship</div>
+            <div><strong>Covariance:</strong> ${covariance.toFixed(6)} → <strong style="color: ${textSafeColor(covariance > 0 ? '#28a745' : (covariance < 0 ? '#dc3545' : '#ffc107'))};">${covariance > 0 ? 'POSITIVE' : (covariance < 0 ? 'NEGATIVE' : 'ZERO')}</strong> relationship</div>
             <div>${covariance > 0 ? '✓ X and Y tend to move in the SAME direction' : (covariance < 0 ? '✓ X and Y tend to move in OPPOSITE directions' : '✓ No linear relationship between X and Y')}</div>
             <div class="s-0d79c9">
                 💡 <strong>Note:</strong> Covariance magnitude depends on units. For standardized comparison, use Pearson correlation (r = ${r.toFixed(6)}).

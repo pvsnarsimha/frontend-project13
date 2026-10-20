@@ -135,7 +135,7 @@ function computePairedTTest(before, after, alpha, alternative) {
             <td class="s-e784bc">${i+1}</td>
             <td class="s-a7c3f4">${d.before}</td>
             <td class="s-a7c3f4">${d.after}</td>
-            <td style="padding: 8px; text-align: center; font-weight: 600; color: ${diffColor};">${diffSign}${d.diff.toFixed(4)}</td>
+            <td style="padding: 8px; text-align: center; font-weight: 600; color: ${textSafeColor(diffColor)};">${diffSign}${d.diff.toFixed(4)}</td>
             <td class="s-804df9">${d.after} - ${d.before} = ${diffSign}${d.diff.toFixed(4)}</td>
         </tr>`;
     }
@@ -177,7 +177,7 @@ function computePairedTTest(before, after, alpha, alternative) {
                 </div>
                 <div class="s-63afdf">
                     <div class="s-42da0a">Mean Difference (\u0304d)</div>
-                    <div style="font-size: 20px; font-weight: 600; color: ${meanDiff > 0 ? '#28a745' : (meanDiff < 0 ? '#dc3545' : '#6c757d')};">${meanDiff > 0 ? '+' : ''}${meanDiff.toFixed(6)}</div>
+                    <div style="font-size: 20px; font-weight: 600; color: ${textSafeColor(meanDiff > 0 ? '#28a745' : (meanDiff < 0 ? '#dc3545' : '#6c757d'))};">${meanDiff > 0 ? '+' : ''}${meanDiff.toFixed(6)}</div>
                     <div class="s-d52d0d">= Average(After - Before)</div>
                 </div>
                 <div class="s-63afdf">

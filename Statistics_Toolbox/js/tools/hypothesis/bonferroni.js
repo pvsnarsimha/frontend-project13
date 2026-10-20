@@ -151,6 +151,7 @@ function setupBonferroniLogic() {
         if (!raw.trim()) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "No data";
+            hideAllStatCharts();
             setHtml(stepsSpan, "Please enter data in format 'value:group'");
             return;
         }
@@ -160,10 +161,12 @@ function setupBonferroniLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `α_adj = ${result.adjustedAlpha.toFixed(6)} | ${result.comparisons.filter(c => c.significant).length} significant comparisons`);
             setHtml(stepsSpan, result.steps);
+            showPairwiseChart("bonferroniResultArea", bonferroniChartRows(result.comparisons), "Bonferroni: difference of means with its adjusted interval", "Each bar is mean₁ − mean₂ ± t(α_adj/2) × SE. A bar that does not cross the dashed line at 0 is significant after the Bonferroni correction (red).");
         }
     });
     

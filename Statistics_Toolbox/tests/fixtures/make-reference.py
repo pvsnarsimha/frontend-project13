@@ -142,10 +142,38 @@ grid = {"norm_cdf": [[z_, float(st.norm.cdf(z_))] for z_ in (-3.1, -1, 0, 0.5, 1
         "f_crit": [[a_, d1, d2, float(st.f.ppf(1 - a_, d1, d2))] for a_ in (0.05, 0.01) for d1, d2 in ((2, 9), (5, 20), (1, 100))]}
 out["grid"] = grid
 
+# one-way ANOVA from group summaries (n, mean, sd): F and p from the definition, cross-checked against f_oneway on matching samples
+def anova_summary(rows):
+    k = len(rows); N = sum(r[1] for r in rows); gm = sum(r[1] * r[2] for r in rows) / N
+    ssb = sum(r[1] * (r[2] - gm) ** 2 for r in rows); ssw = sum((r[1] - 1) * r[3] ** 2 for r in rows)
+    F = (ssb / (k - 1)) / (ssw / (N - k)); return {"F": float(F), "p": float(st.f.sf(F, k - 1, N - k)), "df": [k - 1, N - k]}
+rows_ = [["A", 12, 23.5, 2.1], ["B", 15, 29.8, 2.6], ["C", 14, 34.5, 2.2]]
+out.setdefault("summary", {})["anova"] = {"rows": rows_, **anova_summary(rows_)}
+rng = np.random.default_rng(7); samples = [rng.normal(m_, s_, n_) for _, n_, m_, s_ in rows_]
+out["summary"]["anova_raw"] = {"groups": [g.tolist() for g in samples], "F": float(st.f_oneway(*samples).statistic), "p": float(st.f_oneway(*samples).pvalue)}
+
+# exact small-sample methods: Fisher 2x2, exact McNemar (binomial), exact runs test (brute-force enumeration of every arrangement)
+from itertools import combinations
+def runs_of(seq):
+    return 1 + sum(1 for i in range(1, len(seq)) if seq[i] != seq[i - 1])
+def runs_exact_p(n1, n2):
+    n = n1 + n2; counts = {}
+    for pos in combinations(range(n), n1):
+        seq = [0] * n
+        for i in pos: seq[i] = 1
+        r = runs_of(seq); counts[r] = counts.get(r, 0) + 1
+    tot = sum(counts.values())
+    return {str(r): [sum(v for k, v in counts.items() if k <= r) / tot, sum(v for k, v in counts.items() if k >= r) / tot] for r in counts}
+out["exact"] = {
+    "fisher": [[a_, b_, c_, d_, float(st.fisher_exact([[a_, b_], [c_, d_]])[1])] for a_, b_, c_, d_ in ((3, 1, 1, 3), (8, 2, 1, 5), (12, 5, 29, 15), (0, 6, 5, 1), (20, 15, 10, 25))],
+    "mcnemar": [[b_, c_, float(st.binomtest(min(b_, c_), b_ + c_, 0.5).pvalue)] for b_, c_ in ((3, 9), (0, 7), (5, 5), (2, 14), (10, 11))],
+    "runs": [[n1_, n2_, runs_exact_p(n1_, n2_)] for n1_, n2_ in ((5, 5), (4, 8), (7, 3), (9, 6))],
+}
+
 # summary-statistics input (textbook questions): the same tests from n / mean / sd / counts
 from scipy.stats import chi2_contingency
 from statsmodels.stats.proportion import proportions_ztest
-out["summary"] = {}
+out.setdefault("summary", {})
 # one-sample t from summary: t = (mean - mu0)/(s/sqrt(n)), p from the t distribution (computed here, not copied from the app)
 def t_from_summary(n, mean, s, mu0, alt):
     t = (mean - mu0) / (s / np.sqrt(n)); df = n - 1
@@ -154,6 +182,8 @@ def t_from_summary(n, mean, s, mu0, alt):
 out["summary"]["one_t"] = {alt: t_from_summary(25, 16.2, 2.5, 15, alt) for alt in ("two-sided", "less", "greater")}
 out["summary"]["one_z"] = {alt: {"z": float((15.8 - 15) / (2 / 6)), "p": float({"two-sided": 2 * st.norm.sf(abs((15.8 - 15) / (2 / 6))), "greater": st.norm.sf((15.8 - 15) / (2 / 6)), "less": st.norm.cdf((15.8 - 15) / (2 / 6))}[alt])} for alt in ("two-sided", "less", "greater")}
 out["summary"]["welch"] = {alt: dict(zip(("t", "p"), map(float, st.ttest_ind_from_stats(82, 8, 30, 78, 10, 35, equal_var=False, alternative=alt)))) for alt in ("two-sided", "less", "greater")}
+out["summary"]["pooled"] = {alt: dict(zip(("t", "p"), map(float, st.ttest_ind_from_stats(82, 8, 30, 78, 10, 35, equal_var=True, alternative=alt)))) for alt in ("two-sided", "less", "greater")}
+out["pooled_raw"] = {alt: dict(zip(("t", "p"), map(float, st.ttest_ind(x, y, equal_var=True, alternative=alt)))) for alt in ("two-sided", "less", "greater")}
 out["summary"]["two_prop"] = {alt: dict(zip(("z", "p"), map(float, proportions_ztest([45, 30], [120, 110], alternative={"two-sided": "two-sided", "greater": "larger", "less": "smaller"}[alt])))) for alt in ("two-sided", "less", "greater")}
 tbl = [[30, 20, 10], [20, 25, 15]]
 c2 = chi2_contingency(tbl, correction=False)

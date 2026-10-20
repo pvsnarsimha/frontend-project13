@@ -218,7 +218,7 @@ function computeDurbinWatson(residuals) {
             <div class="s-6961ce gen-grid gen-grid-many">
                 <div class="s-9f52da">
                     <div class="s-9a23a8">Test Statistic (d)</div>
-                    <div style="font-size: 28px; font-weight: 700; color: ${severityColor};">${durbinWatson.toFixed(4)}</div>
+                    <div style="font-size: 28px; font-weight: 700; color: ${textSafeColor(severityColor)};">${durbinWatson.toFixed(4)}</div>
                 </div>
                 <div class="s-9f52da">
                     <div class="s-9a23a8">Observations (n)</div>
@@ -226,7 +226,7 @@ function computeDurbinWatson(residuals) {
                 </div>
                 <div class="s-9f52da">
                     <div class="s-9a23a8">Verdict</div>
-                    <div style="font-size: 18px; font-weight: 700; color: ${severityColor};">${severity}</div>
+                    <div style="font-size: 18px; font-weight: 700; color: ${textSafeColor(severityColor)};">${severity}</div>
                 </div>
             </div>
             
