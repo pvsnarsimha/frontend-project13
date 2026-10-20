@@ -21,6 +21,7 @@ links straight into the right tool (`Statistics.html#tool=<id>` opens a tool dir
 
 * **Locally:** open `Statistics.html` in a browser. No install, no server.
 * **On the web (GitHub Pages):** repository Settings → Pages → "Deploy from a branch" → branch `main`, folder `/ (root)`. The root `index.html` forwards to the toolbox, and the site is a plain static site, so nothing is built.
+* **Minified build:** `npm run build` writes `dist/` (about 40% smaller to download). `.github/workflows/pages.yml` builds and publishes it on every push to `main` once Settings → Pages → Source is set to "GitHub Actions".
 * **Trying it with students:** `docs/student-trial.md` is a one-page script and note sheet for watching 3 to 5 students use it unaided.
 
 ## License
@@ -165,6 +166,8 @@ Rules for all tools:
 * **Print / Save as PDF** on every result card prints the worked solution with its graphs (`body.print-one` in `css/statlab.css`).
 * **Frequency Table / Grouped Data** (`groupeddata`): rows like `10-20, 5` (class, frequency) or `7, 3` (value, frequency) give the mean, median,
   quartiles, mode and spread by the textbook grouped-data formulas, with the histogram, frequency polygon and ogive.
+* **Each sample can be raw or summarised on its own** (the two-sample t-test has a switch per sample, so one group can be a list of values and the other n, mean and s), and one-way ANOVA accepts `group, n, mean, s` lines.
+* **Search finds tools in every module.** The search box filters the current module and lists matches from the other modules as one-click buttons.
 * `tests/textbook-features.test.js` checks all of this against SciPy / statsmodels / NumPy values (`tests/fixtures/make-reference.py`).
 
 ## Design notes
@@ -195,7 +198,7 @@ Rules for all tools:
 * **Classic scripts, not ES modules.** The page is meant to open straight from disk (`file://`), where browsers
   refuse to load ES modules. The cost is one shared global scope, which `tests/structure.test.js` polices
   (duplicate definitions, route integrity). Moving to modules would require serving the folder over http and a bundler.
-* **No build step** means no minification or tree-shaking: the page loads about 1.6 MB of script from disk, about 421 KB once a web server gzips it (`npm run size` prints both and CI enforces a budget; `tests/structure.test.js` fails if the 1.5 MB drifts more than 10%) (instant locally,
+* **No build step for the source, an optional one for hosting.** `npm run build` writes `dist/`: every script minified into one file (about 1.3 MB raw, **about 250 KB gzipped** instead of 424 KB) with the same behaviour; CI runs the browser suite against `dist/` and the Pages workflow publishes it. The source itself stays build-free: it loads about 1.6 MB of script from disk, about 424 KB once a web server gzips it (`npm run size` prints both and CI enforces a budget; `tests/structure.test.js` fails if the 1.5 MB drifts more than 10%) (instant locally,
   noticeable over a slow network if you host it). Chart.js and the fonts are vendored, so there are no CDN requests and
   the Content-Security-Policy only allows the page's own files.
 
@@ -212,7 +215,9 @@ Rules for all tools:
 | Anderson-Darling p | D'Agostino and Stephens polynomial formulas | approximate (3 digits) |
 | MANOVA F | Rao's approximation to Wilks' Lambda | exact for 1-2 dependent variables or 2-3 groups; the answer tile says "exact F" or "Rao F approximation" |
 | Mann-Whitney, Wilcoxon | **Exact** null distribution when there are no ties (Mann-Whitney: both samples ≤ 20; Wilcoxon: ≤ 50 non-zero pairs); otherwise the normal approximation | exact = SciPy `method="exact"` to 1e-12; with ties the tile says "normal approx." for small samples |
-| Runs test | Normal approximation | rough for fewer than about 10 runs |
+| Runs test | **Exact** distribution of the number of runs (the z value is shown for comparison) | exact (checked against brute-force enumeration of every arrangement) |
+| McNemar | **Exact binomial** p-value when there are fewer than 25 discordant pairs, otherwise chi-square with continuity correction | exact = SciPy `binomtest` to 1e-10 |
+| Chi-square test of independence, 2×2 | chi-square p-value, plus **Fisher's exact** p-value next to it (recommended when an expected count is below 5) | Fisher exact = SciPy `fisher_exact` to 1e-10 |
 | Kruskal-Wallis, Friedman, Cochran Q, Mood's median, chi-square tests | Asymptotic chi-square | needs reasonable sample sizes; expected counts below 5 weaken the p-value |
 | Sign test, binomial exact | Exact binomial | exact |
 
@@ -273,6 +278,9 @@ npm run test:all    # both
 * `.github/workflows/ci.yml` runs the unit tests on Node 20 and 22 and the browser test on every pull request
 * `tests/e2e/edge-cases.js`: every tool with one value, identical values, zeros, negatives and huge numbers: no freeze, no script error, and any NaN/Infinity comes with an explanation
 * `tests/e2e/responsive.js`: no tool makes the page scroll sideways at 360 px and 768 px
+* `tests/e2e/student-walkthrough.js`: a scripted first-time student finds five tools through the search box, types textbook questions (summary input, a table of counts, a frequency table) and must get the textbook answers and graphs
+* `tests/e2e/a11y.js`: axe-core (WCAG 2.0/2.1 A and AA) on every tool after its sample data has been calculated; `tests/e2e/print.js`: the print layout shows only the solution and its graphs and a PDF is produced
+* `npm run test:e2e:all-browsers` runs the browser suite in every installed Chromium, Firefox and WebKit and says which were not installed (CI runs all three on every pull request, the full suite including the edge-case sweep)
 * `tests/e2e/lazy-chartjs.js`: Chart.js is not fetched at page load, is fetched once on the first chart, and a failed fetch shows a message and can be retried
 * `tests/e2e/smoke.js`: every tool opens, sample data produces a result with no NaN/undefined, no script or console errors
 * `tests/e2e/sample.js`: sample data + Calculate for every tool: no NaN/Infinity, no entity debris in the sample, an "Answer:" label, a labelled (not live) worked-solution region, no duplicate ids, labelled charts, a labelled tab panel

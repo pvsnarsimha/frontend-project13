@@ -300,7 +300,7 @@ function computeTStatsWithSteps(xValues, yValues) {
                         <td class="s-02528c">${seIntercept.toFixed(6)}</td>
                         <td class="s-21d431">${tIntercept.toFixed(6)}</td>
                         <td class="s-02528c">${pIntercept.toFixed(6)}</td>
-                        <td style="text-align: center; ${Math.abs(tIntercept) > criticalT ? 'color: #28a745; font-weight: bold;' : 'color: #dc3545;'}">
+                        <td style="text-align: center; ${Math.abs(tIntercept) > criticalT ? 'color: #1e7e34; font-weight: bold;' : 'color: #b02a37;'}">
                             ${Math.abs(tIntercept) > criticalT ? '✓ Yes' : '✗ No'}
                         </td>
                     </tr>
@@ -310,7 +310,7 @@ function computeTStatsWithSteps(xValues, yValues) {
                         <td class="s-02528c">${seSlope.toFixed(6)}</td>
                         <td class="s-21d431">${tSlope.toFixed(6)}</td>
                         <td class="s-02528c">${pSlope.toFixed(6)}</td>
-                        <td style="text-align: center; ${Math.abs(tSlope) > criticalT ? 'color: #28a745; font-weight: bold;' : 'color: #dc3545;'}">
+                        <td style="text-align: center; ${Math.abs(tSlope) > criticalT ? 'color: #1e7e34; font-weight: bold;' : 'color: #b02a37;'}">
                             ${Math.abs(tSlope) > criticalT ? '✓ Yes' : '✗ No'}
                         </td>
                     </tr>

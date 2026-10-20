@@ -30,7 +30,7 @@ function buildPredictionRows(xValues, yValues, slope, intercept) {
             <td class="s-618bb3">${xValues[i]}</td>
             <td class="s-618bb3">${yValues[i]}</td>
             <td class="s-d9b386">${intercept.toFixed(4)} + ${slope.toFixed(4)}×${xValues[i]} = ${yPred.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; ${residual >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">${residual.toFixed(4)}</td>
+            <td style="padding: 10px; text-align: center; ${residual >= 0 ? 'color: #1e7e34;' : 'color: #b02a37;'}">${residual.toFixed(4)}</td>
             <td class="s-618bb3">${(residual * residual).toFixed(4)}</td>
         </tr>`;
     }

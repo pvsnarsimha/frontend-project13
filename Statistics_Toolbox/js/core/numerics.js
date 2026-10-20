@@ -726,3 +726,50 @@ function quantileType7(sorted, p) {
     const lo = Math.floor(h), hi = Math.ceil(h);
     return sorted[lo] + (h - lo) * (sorted[hi] - sorted[lo]);
 }
+
+// ---- Exact small-sample distributions (used instead of a normal / chi-square approximation) ----
+// log of the binomial coefficient C(n, k)
+function logChoose(n, k) {
+    return k < 0 || k > n ? -Infinity : logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1);
+}
+
+// Exact null distribution of the number of runs R in a random arrangement of n1 symbols of one kind and n2 of the other:
+// P(R = 2k) = 2·C(n1-1,k-1)·C(n2-1,k-1) / C(n,n1);  P(R = 2k+1) = [C(n1-1,k)·C(n2-1,k-1) + C(n1-1,k-1)·C(n2-1,k)] / C(n,n1).
+// Returns an array pmf where pmf[r] = P(R = r).
+function runsExactPMF(n1, n2) {
+    const n = n1 + n2, total = logChoose(n, n1), pmf = new Array(n + 2).fill(0);
+    for (let r = 2; r <= Math.min(n, 2 * Math.min(n1, n2) + 1); r++) {
+        const k = Math.floor(r / 2);
+        pmf[r] = r % 2 === 0
+            ? 2 * Math.exp(logChoose(n1 - 1, k - 1) + logChoose(n2 - 1, k - 1) - total)
+            : Math.exp(logChoose(n1 - 1, k) + logChoose(n2 - 1, k - 1) - total) + Math.exp(logChoose(n1 - 1, k - 1) + logChoose(n2 - 1, k) - total);
+    }
+    return pmf;
+}
+
+// Two-sided exact p-value of the runs test: twice the smaller tail, capped at 1
+function runsExactPValue(runs, n1, n2) {
+    const pmf = runsExactPMF(n1, n2);
+    let lower = 0, upper = 0;
+    pmf.forEach((p, r) => { if (r <= runs) lower += p; if (r >= runs) upper += p; });
+    return Math.min(1, 2 * Math.min(lower, upper));
+}
+
+// Fisher's exact test for [[a, b], [c, d]], two-sided: the total probability of every table (same margins) that is no more likely than the observed one.
+function fisherExact2x2(a, b, c, d) {
+    const r1 = a + b, r2 = c + d, c1 = a + c, n = r1 + r2;
+    const logP = x => logChoose(r1, x) + logChoose(r2, c1 - x) - logChoose(n, c1);
+    const lo = Math.max(0, c1 - r2), hi = Math.min(r1, c1), obs = logP(a);
+    let p = 0;
+    for (let x = lo; x <= hi; x++) { const lp = logP(x); if (lp <= obs + 1e-9) p += Math.exp(lp); }
+    return Math.min(1, p);
+}
+
+// Exact McNemar p-value: the discordant pairs b and c are Binomial(b + c, 1/2) under H0; two-sided = twice the smaller tail
+function mcNemarExactPValue(b, c) {
+    const m = b + c;
+    if (m === 0) return 1;
+    let tail = 0;
+    for (let k = 0, top = Math.min(b, c); k <= top; k++) tail += Math.exp(logChoose(m, k) - m * Math.LN2);
+    return Math.min(1, 2 * tail);
+}

@@ -179,7 +179,11 @@ document.querySelector('.main-panel').addEventListener('click', e => {
 function applyInputMode(select) {
     const iface = select.closest('.stat-interface');
     if (!iface) return;
-    iface.querySelectorAll('[data-mode]').forEach(group => { group.style.display = group.dataset.mode === select.value ? '' : 'none'; });
+    const name = select.dataset.modeGroup;
+    iface.querySelectorAll('[data-mode]').forEach(group => {
+        if ((group.dataset.modeGroup || '') !== (name || '')) return;       // a named switch only moves its own blocks
+        group.style.display = group.dataset.mode === select.value ? '' : 'none';
+    });
 }
 document.addEventListener('change', e => {
     const select = e.target.closest && e.target.closest('[data-mode-select]');

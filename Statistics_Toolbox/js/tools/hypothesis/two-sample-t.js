@@ -8,11 +8,15 @@ function renderTwoSampleTInterface() {
         formula: "📌 t = (x̄₁ - x̄₂) / √(s₁²/n₁ + s₂²/n₂)",
         desc: "Tests whether the means of two independent populations are significantly different (Welch's t-test by default, which does not assume equal variances; choose “equal variances” for the pooled t-test many textbooks teach).",
         inputs: [
-            inputModeItem("twoSampleMode", "🧮 Summary statistics (n, mean, s for each group)"),
+            inputModeItem("twoSampleMode1", "🧮 Summary statistics (n, mean, s)", "s1", "📥 Sample 1 is given as:"),
             {
-                html: modeGroupHtml("raw", '<label>📋 Enter Sample 1 data (comma, space, or line separated):</label>\n<textarea id="twoSampleData1" rows="3" placeholder="Example: 12, 15, 14, 16, 13, 15"></textarea>\n<label style="' + FIELD_GAP + '">📋 Enter Sample 2 data (comma, space, or line separated):</label>\n<textarea id="twoSampleData2" rows="3" placeholder="Example: 18, 20, 19, 21, 22, 20, 19"></textarea>') +
-                    modeGroupHtml("summary", summaryFieldsHtml([["twoSampleN1", "Sample 1 size n₁:", "30", 'min="2"'], ["twoSampleMean1", "Sample 1 mean x̄₁:", "82"], ["twoSampleSd1", "Sample 1 standard deviation s₁:", "8", 'min="0"'],
-                        ["twoSampleN2", "Sample 2 size n₂:", "35", 'min="2"'], ["twoSampleMean2", "Sample 2 mean x̄₂:", "78"], ["twoSampleSd2", "Sample 2 standard deviation s₂:", "10", 'min="0"']]))
+                html: modeGroupHtml("raw", '<label>📋 Enter Sample 1 data (comma, space, or line separated):</label>\n<textarea id="twoSampleData1" rows="3" placeholder="Example: 12, 15, 14, 16, 13, 15"></textarea>', "s1") +
+                    modeGroupHtml("summary", summaryFieldsHtml([["twoSampleN1", "Sample 1 size n₁:", "30", 'min="2"'], ["twoSampleMean1", "Sample 1 mean x̄₁:", "82"], ["twoSampleSd1", "Sample 1 standard deviation s₁:", "8", 'min="0"']]), "s1")
+            },
+            inputModeItem("twoSampleMode2", "🧮 Summary statistics (n, mean, s)", "s2", "📥 Sample 2 is given as:"),
+            {
+                html: modeGroupHtml("raw", '<label>📋 Enter Sample 2 data (comma, space, or line separated):</label>\n<textarea id="twoSampleData2" rows="3" placeholder="Example: 18, 20, 19, 21, 22, 20, 19"></textarea>', "s2") +
+                    modeGroupHtml("summary", summaryFieldsHtml([["twoSampleN2", "Sample 2 size n₂:", "35", 'min="2"'], ["twoSampleMean2", "Sample 2 mean x̄₂:", "78"], ["twoSampleSd2", "Sample 2 standard deviation s₂:", "10", 'min="0"']]), "s2")
             },
             {
                 label: "📊 Significance Level (α):",
@@ -219,30 +223,32 @@ function setupTwoSampleTLogic() {
     if (!computeBtn) return;
     
     computeBtn.addEventListener('click', () => {
-        const summaryMode = document.querySelector('#statTwoSampleTInterface [data-mode-select]').value === 'summary';
-        const raw1 = document.getElementById("twoSampleData1").value;
-        const raw2 = document.getElementById("twoSampleData2").value;
-        const sample1 = parseNumbersFromInput(raw1);
-        const sample2 = parseNumbersFromInput(raw2);
         const alpha = parseFloat(document.getElementById("twoSampleAlpha").value);
         const alternative = document.getElementById("twoSampleAlternative").value;
         const resultDiv = document.getElementById("twoSampleTResultArea");
         const valueSpan = document.getElementById("twoSampleTValueDisplay");
         const stepsSpan = document.getElementById("twoSampleTStepsDisplay");
+        const pooled = document.getElementById("twoSampleVariance").value === "pooled";
+        // each sample is either a list of values or a summary (n, mean, s); either way it is reduced to n, mean, s
+        const num = id => parseFloat(document.getElementById(id).value);
+        const readSample = i => {
+            if (document.getElementById("twoSampleMode" + i).value === 'summary') return { n: num("twoSampleN" + i), mean: num("twoSampleMean" + i), sd: num("twoSampleSd" + i) };
+            const values = parseNumbersFromInput(document.getElementById("twoSampleData" + i).value);
+            if (!values.length) return null;
+            const n = values.length, mean = values.reduce((x, y) => x + y, 0) / n;
+            return { n, mean, sd: n > 1 ? Math.sqrt(values.reduce((x, y) => x + (y - mean) * (y - mean), 0) / (n - 1)) : NaN };
+        };
+        const s1 = readSample(1), s2 = readSample(2);
         
-        if (!summaryMode && (!sample1.length || !sample2.length)) {
+        if (!s1 || !s2) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "No data";
-            stepsSpan.innerText = "Please enter both sample datasets.";
+            stepsSpan.innerText = "Please enter both samples (a list of values, or choose Summary statistics).";
             hideStatChartCard('test');
             return;
         }
         
-        const num = id => parseFloat(document.getElementById(id).value);
-        const pooled = document.getElementById("twoSampleVariance").value === "pooled";
-        const result = summaryMode
-            ? computeTwoSampleTFromSummary(num("twoSampleN1"), num("twoSampleMean1"), num("twoSampleSd1"), num("twoSampleN2"), num("twoSampleMean2"), num("twoSampleSd2"), alpha, alternative, pooled)
-            : computeTwoSampleTTest(sample1, sample2, alpha, alternative, pooled);
+        const result = computeTwoSampleTFromSummary(s1.n, s1.mean, s1.sd, s2.n, s2.mean, s2.sd, alpha, alternative, pooled);
         resultDiv.style.display = "block";
         
         if (result.error) {
@@ -256,5 +262,5 @@ function setupTwoSampleTLogic() {
         }
     });
     
-    attachClearHandler("twoSampleTClearBtn", ["twoSampleData1", "twoSampleData2"], "twoSampleTResultArea");
+    attachClearHandler("twoSampleTClearBtn", ["twoSampleData1", "twoSampleData2", "twoSampleN1", "twoSampleMean1", "twoSampleSd1", "twoSampleN2", "twoSampleMean2", "twoSampleSd2"], "twoSampleTResultArea");
 }

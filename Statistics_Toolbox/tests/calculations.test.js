@@ -141,7 +141,7 @@ test('z-tests, binomial, goodness of fit, Kruskal-Wallis, Friedman, Cochran Q an
     close(app.computeKruskalWallisTest('1:A\n2:A\n4:A\n5:A\n6:B\n8:B\n9:B\n3.5:B\n11:C\n12:C\n10:C\n7.5:C', 0.05).pValue, 0.0230698024654865, 1e-9);
     close(app.computeFriedmanTest('1, 2, 3\n2, 3, 1\n3, 1, 2\n1, 3, 2\n2, 1, 3\n1, 2, 3\n1.5, 2.5, 3.5\n2, 4, 5', 0.05).pValue, 0.1353352832366127, 1e-9);
     close(app.computeCochranQTest('1,1,0\n1,0,0\n1,1,1\n0,0,0\n1,1,0\n1,0,1\n0,1,0\n1,1,1', 0.05).pValue, 0.24659696394160646, 1e-9);
-    close(app.computeRunsTest('1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1', 0.05).pValue, 0.17252964335868348, 1e-9);
+    close(app.computeRunsTest('1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1', 0.05).zPValue, 0.17252964335868348, 1e-9);     // the normal approximation, still reported for comparison
 });
 
 test('rank-test decisions use the exact normal quantile (old normInv returned 2.41 for 1.96)', () => {

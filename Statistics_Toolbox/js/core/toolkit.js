@@ -132,12 +132,16 @@ function showDistributionParams(prefix, { skip = [], notes = {} } = {}) {
 // select with data-mode-select in the form and wrap each way of entering data in a data-mode group; the page-level handler in
 // app.js shows the group that matches the select (the summary group starts hidden).
 const INPUT_MODE_OPTIONS = [["raw", "📋 Raw data (a list of values)", true], ["summary", "🧮 Summary statistics (n, mean, standard deviation)"]];
-function inputModeItem(id, summaryText) {
-    return { label: "📥 What does your question give you?", select: { id, "data-mode-select": true, style: FIELD_STYLE },
+// group (optional): a name that pairs this select with the modeGroupHtml(..., group) blocks it switches, so one tool can have several
+// independent switches (the two-sample t-test lets each sample be raw data or a summary on its own)
+function inputModeItem(id, summaryText, group, label) {
+    const select = { id, "data-mode-select": true, style: FIELD_STYLE };
+    if (group) select["data-mode-group"] = group;
+    return { label: label || "📥 What does your question give you?", select,
              options: summaryText ? [INPUT_MODE_OPTIONS[0], ["summary", summaryText]] : INPUT_MODE_OPTIONS };
 }
-function modeGroupHtml(mode, innerHtml) {
-    return `<div data-mode="${mode}"${mode === 'raw' ? '' : ' style="display: none;"'}>${innerHtml}</div>`;
+function modeGroupHtml(mode, innerHtml, group) {
+    return `<div data-mode="${mode}"${group ? ` data-mode-group="${group}"` : ''}${mode === 'raw' ? '' : ' style="display: none;"'}>${innerHtml}</div>`;
 }
 // fields: [[id, label, defaultValue, extraAttributes?], ...] -> number inputs for the summary group
 function summaryFieldsHtml(fields) {

@@ -111,7 +111,7 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
             <td class="s-d9b386">${intercept.toFixed(4)} + ${slope.toFixed(4)}×${xValues[i]} = ${yPred.toFixed(4)}</td>
             <td class="s-618bb3">${yPred.toFixed(4)} - ${meanY.toFixed(4)} = ${regDev.toFixed(4)}</td>
             <td class="s-618bb3">(${regDev.toFixed(4)})² = ${regContribution.toFixed(4)}</td>
-            <td style="padding: 10px; text-align: center; ${resDev >= 0 ? 'color: #28a745;' : 'color: #dc3545;'}">${resDev.toFixed(4)}</td>
+            <td style="padding: 10px; text-align: center; ${resDev >= 0 ? 'color: #1e7e34;' : 'color: #b02a37;'}">${resDev.toFixed(4)}</td>
             <td class="s-618bb3">(${resDev.toFixed(4)})² = ${resContribution.toFixed(4)}</td>
             <td class="s-618bb3">${yValues[i]} - ${meanY.toFixed(4)} = ${totDev.toFixed(4)}</td>
             <td class="s-618bb3">(${totDev.toFixed(4)})² = ${totContribution.toFixed(4)}</td>

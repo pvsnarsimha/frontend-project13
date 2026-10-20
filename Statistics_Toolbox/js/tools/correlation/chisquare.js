@@ -133,6 +133,15 @@ function computeChisquareFromCounts(rowCategories, colCategories, observed, rowT
     // p-value from the exact chi-square distribution
     const pValue = 1 - chiSquareCDF(chiSquare, df);
     
+    // 2×2 table: Fisher's exact test needs no large-sample approximation, so it is reported next to the chi-square p-value
+    // (and recommended when an expected count is below 5)
+    const isTwoByTwo = rowCategories.length === 2 && colCategories.length === 2 && rowCategories.every(r => colCategories.every(c => Number.isInteger(observed[r][c])));
+    const fisherP = isTwoByTwo ? fisherExact2x2(observed[rowCategories[0]][colCategories[0]], observed[rowCategories[0]][colCategories[1]], observed[rowCategories[1]][colCategories[0]], observed[rowCategories[1]][colCategories[1]]) : null;
+    const lowExpected = calculationRows.some(r => r.expected < 5);
+    const fisherNote = fisherP === null
+        ? (lowExpected ? '<div><strong>⚠ Some expected counts are below 5:</strong> the chi-square p-value is unreliable here. Combine sparse categories or collect more data.</div>' : '')
+        : `<div><strong>Fisher's exact p-value (2×2):</strong> ${fisherP.toFixed(6)}${lowExpected ? ' ⚠ an expected count is below 5, so prefer this exact p-value to the chi-square one' : ' (exact, for comparison)'}</div>`;
+    
     // Determine conclusion
     let conclusion, interpretation, recommendation;
     if (chiSquare > criticalValue) {
@@ -286,6 +295,7 @@ function computeChisquareFromCounts(rowCategories, colCategories, observed, rowT
             <div><strong>Degrees of Freedom:</strong> df = ${df}</div>
             <div><strong>Critical Value (α = ${alpha}):</strong> ${criticalValue.toFixed(4)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(6)}</div>
+            ${fisherNote}
             <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}<br>
@@ -298,7 +308,7 @@ function computeChisquareFromCounts(rowCategories, colCategories, observed, rowT
         </div>
     </div>`;
     
-    return { chiSquare, df, criticalValue, pValue, alpha, conclusion, interpretation, steps, observed, expected: calculationRows, chart: { dist: 'chisq', df: df, stat: chiSquare, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: criticalValue } } };
+    return { chiSquare, df, criticalValue, pValue, fisherP, alpha, conclusion, interpretation, steps, observed, expected: calculationRows, chart: { dist: 'chisq', df: df, stat: chiSquare, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== CHI-SQUARE TEST SETUP ==========

@@ -107,3 +107,30 @@ test('grouped data: value/frequency tables match the expanded sample, class tabl
     assert.equal(app.computeGroupedDataWithSteps('10-20, -1').error, true);
     assert.equal(app.computeGroupedDataWithSteps('hello').error, true);
 });
+
+test('exact small-sample methods match scipy (Fisher, McNemar binomial) and brute-force enumeration (runs test)', () => {
+    ref.exact.fisher.forEach(([a, b, c, d, want]) => close(app.fisherExact2x2(a, b, c, d), want, 1e-10, `Fisher [${a},${b};${c},${d}]`));
+    ref.exact.mcnemar.forEach(([b, c, want]) => close(app.mcNemarExactPValue(b, c), want, 1e-10, `McNemar exact b=${b} c=${c}`));
+    for (const [n1, n2, table] of ref.exact.runs) {
+        for (const [r, [lower, upper]] of Object.entries(table)) close(app.runsExactPValue(+r, n1, n2), Math.min(1, 2 * Math.min(lower, upper)), 1e-10, `runs exact n1=${n1} n2=${n2} R=${r}`);
+        const pmf = app.runsExactPMF(n1, n2); close(pmf.reduce((s, p) => s + p, 0), 1, 1e-12, 'runs pmf sums to 1');
+    }
+});
+
+test('McNemar uses the exact binomial p-value for few discordant pairs and chi-square otherwise; chi-square 2x2 reports Fisher', () => {
+    const small = app.computeMcNemarTest('20, 3, 9, 18', 0.05), large = app.computeMcNemarTest('20, 15, 30, 18', 0.05);
+    assert.equal(small.exact, true); close(small.pValue, app.mcNemarExactPValue(3, 9), 1e-15, 'exact used');
+    assert.equal(large.exact, false); close(large.pValue, large.chiPValue, 1e-15, 'chi-square used');
+    const t = app.computeChisquareFromTable('3, 1\n1, 3', 0.05);
+    close(t.fisherP, app.fisherExact2x2(3, 1, 1, 3), 1e-15, 'Fisher reported for 2x2'); assert.equal(app.computeChisquareFromTable('3, 1, 2\n1, 3, 4', 0.05).fisherP, null);
+});
+
+test('one-way ANOVA from group summaries matches the definition (scipy) and the raw-data ANOVA on the same samples', () => {
+    const a = ref.summary.anova, r = app.computeANOVAFromSummary(a.rows.map(([name, n, mean, sd]) => ({ name, n, mean, sd })), 0.05);
+    close(r.fStatistic, a.F, 1e-12, 'F'); close(r.pValue, a.p, 1e-10, 'p'); assert.deepEqual([r.dfBetween, r.dfWithin], a.df);
+    // the same data as raw values: summary of each group -> same F as f_oneway
+    const g = ref.summary.anova_raw.groups, rows = g.map((v, i) => { const n = v.length, m = v.reduce((x, y) => x + y) / n; return { name: 'G' + i, n, mean: m, sd: Math.sqrt(v.reduce((x, y) => x + (y - m) ** 2, 0) / (n - 1)) }; });
+    close(app.computeANOVAFromSummary(rows, 0.05).fStatistic, ref.summary.anova_raw.F, 1e-10, 'F from the raw samples');
+    assert.equal(app.computeANOVAFromSummary([{ name: 'A', n: 5, mean: 1, sd: 0 }, { name: 'B', n: 5, mean: 2, sd: 0 }], 0.05).error, true);
+    assert.equal(app.computeANOVAFromSummary(app.parseAnovaSummaryRows('A, 12, 23.5\nB, 15, 29.8, 2.6'), 0.05).error, true);
+});

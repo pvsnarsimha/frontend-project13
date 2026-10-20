@@ -42,12 +42,27 @@ jobs:
           cache-dependency-path: Statistics_Toolbox/package-lock.json
       - run: npm ci
       - run: npx playwright install --with-deps ${{ matrix.browser }}
-      # Chromium runs everything (the slow edge-case sweep included); Firefox and WebKit run the quick suites,
-      # which exercise every tool, the sample data, phone widths, lazy Chart.js loading and the page structure.
-      - if: matrix.browser == 'chromium'
-        run: npm run test:e2e
-      - if: matrix.browser != 'chromium'
-        run: npm run test:e2e:quick
+      # Every browser runs the same full suite: every tool with sample data, the 7-minute edge-case sweep, phone widths, lazy Chart.js,
+      # the scripted first-time-student session, the print layout and (axe-core) the accessibility audit.
+      - run: npm run test:e2e
+
+  dist:
+    name: Minified build (dist/)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Statistics_Toolbox/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      # the minified site must behave exactly like the source site
+      - run: npm run test:e2e:quick
+        env:
+          STATLAB_ROOT: dist
 
   size:
     name: Script size budget

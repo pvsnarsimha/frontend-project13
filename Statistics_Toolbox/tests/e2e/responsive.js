@@ -6,7 +6,7 @@ const launcher = require('./launch');      // BROWSER=chromium|firefox|webkit
 const WIDTHS = [360, 768];
 
 (async () => {
-    const file = process.argv[2] || path.join(__dirname, '..', '..', 'Statistics.html');
+    const file = process.argv[2] || path.resolve(__dirname, '..', '..', process.env.STATLAB_ROOT || '.', 'Statistics.html');
     const browser = await launcher.launch();
     const problems = [];
     let checked = 0;

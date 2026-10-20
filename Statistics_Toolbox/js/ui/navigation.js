@@ -39,6 +39,21 @@ window.StatLabUI = window.StatLabUI || {};
     });
 
     const search = $('#toolSearch'), hint = $('#searchHint');
+    // The sidebar filter works on the current module; matches in the OTHER modules are listed below it, so a student who types "t-test"
+    // on the Descriptive tab still finds the tool (one click opens its module and the tool).
+    const others = document.createElement('div'); others.className = 'search-others'; others.id = 'searchOthers'; others.setAttribute('aria-live', 'polite');
+    if (hint.parentNode && typeof hint.parentNode.insertBefore === 'function') hint.parentNode.insertBefore(others, hint.nextSibling);      // (no real page in the unit tests)
+    const moduleName = sb => (tabTitles[sb.dataset.module] || sb.dataset.module);
+    function otherMatches(q, current) {
+        const out = [];
+        $$('.action-sidebar').forEach(sb => { if (sb !== current) $$('.stat-btn', sb).forEach(b => { if (b.textContent.toLowerCase().includes(q)) out.push({ btn: b, sb }); }); });
+        return out;
+    }
+    function openOther(m) {
+        const tab = $(`.tab[data-tab="${m.sb.dataset.module}"]`); if (tab) tab.click();
+        search.value = ''; applyFilter();
+        m.btn.click();
+    }
     // The hint promises "the tools in the current module", so only the visible sidebar is filtered;
     // hidden sidebars are always reset so they are complete when their tab is opened.
     function applyFilter() {
@@ -49,13 +64,28 @@ window.StatLabUI = window.StatLabUI || {};
             $$('.stat-btn', sb).forEach(b => { b.hidden = !!active && !b.textContent.toLowerCase().includes(q); });
             $$('.sidebar-sep', sb).forEach(d => { d.hidden = !!active; });
         });
+        others.textContent = '';
         if (!current) return;
         const btns = $$('.stat-btn', current), shown = btns.filter(b => !b.hidden).length;
-        hint.textContent = q ? (shown ? `${shown} of ${btns.length} tools match in this module. Press Enter to open the first.` : 'No match in this module. Try another tab or keyword.') : 'Filters the tools in the current module.';
+        const elsewhere = q ? otherMatches(q, current) : [];
+        hint.textContent = q ? (shown ? `${shown} of ${btns.length} tools match in this module. Press Enter to open the first.` : (elsewhere.length ? 'No match in this module, but found in another module:' : 'No match in this module or any other. Try another keyword.')) : 'Filters the tools in the current module.';
+        if (elsewhere.length) {
+            if (shown) { const lead = document.createElement('span'); lead.className = 'search-others-lead'; lead.textContent = 'Also in other modules: '; others.appendChild(lead); }
+            elsewhere.slice(0, 8).forEach(m => {
+                const bt = document.createElement('button'); bt.type = 'button'; bt.className = 'search-other';
+                bt.textContent = `${m.btn.textContent.trim()} · ${moduleName(m.sb)}`;
+                bt.addEventListener('click', () => openOther(m));
+                others.appendChild(bt);
+            });
+        }
     }
     search.addEventListener('input', applyFilter);
     search.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { const sb = visibleSidebar(); const b = sb && $$('.stat-btn', sb).find(x => !x.hidden); if (b) b.click(); }
+        if (e.key === 'Enter') {
+            const sb = visibleSidebar(); const b = sb && $$('.stat-btn', sb).find(x => !x.hidden);
+            if (b) b.click();
+            else { const q = (search.value || '').trim().toLowerCase(), m = q && sb ? otherMatches(q, sb)[0] : null; if (m) openOther(m); }
+        }
         if (e.key === 'Escape') { search.value = ''; applyFilter(); search.blur(); }
     });
     document.addEventListener('keydown', e => {

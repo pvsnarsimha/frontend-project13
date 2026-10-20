@@ -111,7 +111,8 @@ test('sample-data contract: tools offering "Try sample data" declare an "Example
 test('the app is self-contained: no external URLs in the page, styles or scripts (works offline)', () => {
     const files = ['Statistics.html', 'css/statlab.css', 'vendor/fonts/fonts.css', ...scriptList()];
     for (const rel of files) {
-        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        // the only allowed external reference is the footer's "send feedback" link (a normal hyperlink to the project's issue tracker, nothing is fetched)
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/<a href="https:\/\/github\.com\/pvsnarsimha\/frontend-project13\/issues\/new[^"]*" target="_blank" rel="noopener noreferrer">/g, '<a>');
         const external = [...src.matchAll(/(?:src|href)=["'](https?:)?\/\/[^"']+|url\(["']?https?:/g)].map(m => m[0]);
         deepEqual(external, [], `${rel} references an external resource`);
     }
@@ -163,7 +164,7 @@ test('the Clear buttons of two-input tools clear both fields', () => {
     assert.equal(byBtn.pearsonClearBtn.length, 2);
     assert.equal(byBtn.mannWhitneyClearBtn.length, 2);
     assert.equal(byBtn.ftestClearBtn.length, 2);
-    assert.equal(byBtn.twoSampleTClearBtn.length, 2);
+    assert.ok(byBtn.twoSampleTClearBtn.includes('twoSampleData1') && byBtn.twoSampleTClearBtn.includes('twoSampleData2'));     // both sample fields (and the summary fields)
 });
 
 test('stripEventHandlerAttributes removes on* attributes from tags but leaves text and other attributes alone', () => {

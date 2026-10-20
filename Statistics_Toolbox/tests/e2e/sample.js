@@ -10,7 +10,7 @@ const BAD_OUTPUT = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
 // config, rendered as data-parameter-only on the interface): number fields and drop-downs, no pasted data. No list to keep in sync here.
 
 (async () => {
-    const file = process.argv[2] || path.join(__dirname, '..', '..', 'Statistics.html');
+    const file = process.argv[2] || path.resolve(__dirname, '..', '..', process.env.STATLAB_ROOT || '.', 'Statistics.html');
     const browser = await launcher.launch();
     const page = await browser.newPage();
     const problems = [];
