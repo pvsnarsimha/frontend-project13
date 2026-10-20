@@ -2,10 +2,10 @@
 // and live re-rendering of the violin plot when the bandwidth slider moves.
 // Usage: node tests/e2e/ui-dom.js   (set CHROMIUM=/path/to/chromium to use an existing browser)
 const path = require('path');
-const { chromium } = require('playwright');
+const launcher = require('./launch');      // BROWSER=chromium|firefox|webkit
 (async () => {
   const file = process.argv[2] || path.join(__dirname, '..', '..', 'Statistics.html');
-  const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
+  const b = await launcher.launch();
   const p = await b.newPage();
   const errs = [];
   p.on('pageerror', e => errs.push('PAGEERROR ' + e.message));

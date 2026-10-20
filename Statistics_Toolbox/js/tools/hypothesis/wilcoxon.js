@@ -143,6 +143,16 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
         pValue = normCDF(z);
     }
     
+    // Small samples without ties among the |differences|: the exact p-value from the null distribution of W⁺ (2^n sign patterns)
+    // replaces the normal approximation (the same as SciPy's method="exact" with zeros dropped).
+    const EXACT_MAX_N = 50;
+    const exact = tieTerm === 0 && nEff <= EXACT_MAX_N;
+    if (exact) {
+        const tails = exactTailProbabilities(signedRankCounts(nEff), Wpos);
+        pValue = alternative === 'two.sided' ? Math.min(1, 2 * Math.min(tails.lower, tails.upper))
+            : (alternative === 'greater' ? tails.upper : tails.lower);
+    }
+    
     const criticalZ = normInv(1 - (alternative === 'two.sided' ? alpha / 2 : alpha));
     const rejectH0 = pValue < alpha;
     
@@ -217,20 +227,25 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
                 <strong>W = min(W⁺, W⁻) = ${W.toFixed(2)}</strong>
             </div>
             
-            <div class="s-6025fc">
+            ${exact ? `<div class="s-6025fc">
+                <strong>Step 3: Exact p-value</strong><br>
+                Non-zero differences used: n = ${nEff} of ${n}. There are no ties among the |differences|, so the p-value is computed exactly from the null distribution of W⁺:
+                all 2<sup>${nEff}</sup> = ${Math.pow(2, nEff)} sign patterns are counted (no normal approximation).<br>
+                p-value = ${pValue.toFixed(8)}
+            </div>` : `<div class="s-6025fc">
                 <strong>Step 3: Calculate z-score approximation</strong><br>
                 Non-zero differences used: n = ${nEff} of ${n}<br>
                 Expected W = n(n+1)/4 = ${expectedW.toFixed(2)}<br>
                 Standard Deviation = √[n(n+1)(2n+1)/24 − Σ(t³−t)/48] = ${stdW.toFixed(4)}<br>
                 z = (W⁺ − ExpectedW ∓ 0.5) / SD = ${z.toFixed(6)} (continuity correction 0.5 toward H₀; sign follows W⁺, so a one-sided test uses the matching tail)<br>
                 p-value = ${pValue.toFixed(8)}
-            </div>
+            </div>`}
         </div>
         
         <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
             <h3 class="s-c7f0b4">📌 Test Conclusion</h3>
             <div><strong>W Statistic:</strong> ${W.toFixed(2)}</div>
-            <div><strong>z-score:</strong> ${z.toFixed(6)}</div>
+            ${exact ? '' : `<div><strong>z-score:</strong> ${z.toFixed(6)}</div>`}
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
             <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
@@ -239,8 +254,8 @@ function computeWilcoxonTest(before, after, alpha, alternative) {
         </div>
     </div>`;
     
-    // the p-value uses the normal approximation, which is rough for fewer than ~10 non-zero pairs
-    return { W, Wpos, Wneg, z, pValue, rejectH0, conclusion, interpretation, steps, smallSample: nEff < 10 };
+    // exact when there are no ties among the |differences|; otherwise the normal approximation, which is rough for fewer than ~10 non-zero pairs
+    return { W, Wpos, Wneg, z, pValue, rejectH0, conclusion, interpretation, steps, exact, method: exact ? 'exact' : 'normal approximation', smallSample: !exact && nEff < 10 };
 }
 
 // ========== WILCOXON SETUP ==========
@@ -273,7 +288,7 @@ function setupWilcoxonLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);
         } else {
-            setHtml(valueSpan, `W = ${result.W.toFixed(2)} | p${result.smallSample ? ' (normal approx.)' : ''} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}${result.smallSample ? ' | ⚠ small sample: treat p as approximate' : ''}`);
+            setHtml(valueSpan, `W = ${result.W.toFixed(2)} | p${result.exact ? ' (exact)' : (result.smallSample ? ' (normal approx.)' : '')} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}${result.smallSample ? ' | ⚠ small sample: treat p as approximate' : ''}`);
             setHtml(stepsSpan, result.steps);
         }
     });

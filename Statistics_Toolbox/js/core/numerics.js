@@ -658,6 +658,43 @@ function olsRSquared(y, predictors) {
     return ssTot === 0 ? 0 : Math.min(1, Math.max(0, 1 - ssRes / ssTot));
 }
 
+// ---- Exact null distributions of the rank tests (small samples without ties) ----
+// Mann-Whitney: counts[u] = number of the C(m+n, m) equally likely arrangements with U = u, by the recursion
+// c(u; m, n) = c(u - n; m - 1, n) + c(u; m, n - 1). Exact integers while C(m+n, m) < 2^53 (m, n up to about 25).
+function mannWhitneyUCounts(m, n) {
+    const size = m * n + 1;
+    // table[i][j] = counts for sample sizes (i, j)
+    const table = Array.from({ length: m + 1 }, () => new Array(n + 1));
+    for (let i = 0; i <= m; i++) {
+        for (let j = 0; j <= n; j++) {
+            const c = new Array(i * j + 1).fill(0);
+            if (i === 0 || j === 0) { c[0] = 1; }
+            else {
+                const a = table[i - 1][j], b = table[i][j - 1];            // a: the largest value is from the first sample; b: from the second
+                for (let u = 0; u <= i * j; u++) c[u] = (u - j >= 0 && u - j < a.length ? a[u - j] : 0) + (u < b.length ? b[u] : 0);
+            }
+            table[i][j] = c;
+        }
+    }
+    return table[m][n].slice(0, size);
+}
+
+// Wilcoxon signed-rank: counts[w] = number of the 2^n sign patterns with W+ = w (subsets of {1, ..., n} with sum w).
+function signedRankCounts(n) {
+    const max = n * (n + 1) / 2, counts = new Array(max + 1).fill(0);
+    counts[0] = 1;
+    for (let rank = 1; rank <= n; rank++) for (let w = max; w >= rank; w--) counts[w] += counts[w - rank];
+    return counts;
+}
+
+// P(S <= k) and P(S >= k) from a table of counts (k is rounded to the nearest integer: the statistics are integers when there are no ties)
+function exactTailProbabilities(counts, k) {
+    const total = counts.reduce((a, b) => a + b, 0), kk = Math.round(k);
+    let lower = 0, upper = 0;
+    counts.forEach((c, v) => { if (v <= kk) lower += c; if (v >= kk) upper += c; });
+    return { lower: lower / total, upper: upper / total };
+}
+
 // ---- Shape statistics ----
 // The adjusted Fisher-Pearson skewness (G1) and the bias-corrected excess kurtosis (G2): the estimators the Skewness and
 // Kurtosis tools use (the same as Excel's SKEW / KURT and R's e1071 type 2). Every tool that shows a skewness or kurtosis

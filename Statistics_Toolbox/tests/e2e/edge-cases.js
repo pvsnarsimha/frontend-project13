@@ -3,7 +3,7 @@
 // the "Some values are not defined for this data" note, so users are told why instead of seeing a bare NaN.
 // Usage: node tests/e2e/edge-cases.js   (needs Playwright; set CHROMIUM=/path/to/chromium to use an existing browser)
 const path = require('path');
-const { chromium } = require('playwright');
+const launcher = require('./launch');      // BROWSER=chromium|firefox|webkit
 
 const CASES = {
     single: '5',
@@ -24,7 +24,7 @@ const UNDEFINED = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
 
 (async () => {
     const file = process.argv[2] || path.join(__dirname, '..', '..', 'Statistics.html');
-    const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
+    const browser = await launcher.launch();
     const open = async () => {
         const page = await browser.newPage();
         page.on('dialog', d => d.dismiss());

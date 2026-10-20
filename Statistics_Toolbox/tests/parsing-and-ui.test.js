@@ -114,9 +114,11 @@ test('Mann-Whitney: one-sided direction, continuity correction and tie correctio
 
 test('Wilcoxon signed-rank: one-sided direction, zeros dropped, ties corrected (scipy.stats.wilcoxon)', () => {
     const p = (b, a, alt) => app.computeWilcoxonTest(b, a, 0.05, alt).pValue;
-    near(p(A, B, 'two.sided'), 0.014432823938841816, 1e-10);
-    near(p(A, B, 'greater'), 0.9945865393614344, 1e-10);
-    near(p(A, B, 'less'), 0.007216411969420908, 1e-10);
+    // no zeros and no tied |d|: the exact p-value (scipy.stats.wilcoxon(..., method='exact'))
+    near(p(A, B, 'two.sided'), 0.009765625, 1e-12);
+    near(p(A, B, 'greater'), 0.9970703125, 1e-12);
+    near(p(A, B, 'less'), 0.0048828125, 1e-12);
+    assert.equal(app.computeWilcoxonTest(A, B, 0.05, 'two.sided').exact, true);
     const before = M1, after = [3, 4, 7, 8, 9, 10, 12, 14, 13, 22];       // zero differences and tied |d|
     near(p(before, after, 'two.sided'), 0.8241408957418852, 1e-10);
     near(p(before, after, 'greater'), 0.4120704478709426, 1e-10);

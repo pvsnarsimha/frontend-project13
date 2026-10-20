@@ -129,8 +129,12 @@ function computeRandomWithSteps() {
         return { error: true, message: "Maximum 1000 values can be generated at once." };
     }
     
-    const seedText = document.getElementById('randomSeed') ? document.getElementById('randomSeed').value : '';
-    const seed = seedText !== '' && !isNaN(parseInt(seedText)) ? parseInt(seedText) : null;
+    const seedText = document.getElementById('randomSeed') ? String(document.getElementById('randomSeed').value).trim() : '';
+    // a seed is a whole number or nothing: "42abc" or "3.7" used to be read as 42 / 3 without a word, so the user got a different seed than typed
+    if (seedText !== '' && !/^[+-]?\d+$/.test(seedText)) {
+        return { error: true, message: `The seed must be a whole number such as 42 (you entered "${seedText}"). Leave it empty for a different sequence every time.` };
+    }
+    const seed = seedText !== '' ? parseInt(seedText, 10) : null;
     const source = createRandomSource(seed);
     
     let params = {};

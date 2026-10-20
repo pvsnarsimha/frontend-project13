@@ -651,12 +651,16 @@ test('rank-test answer tiles say "approx" for small samples and not for large on
         el(prefix + 'ComputeBtn').handler();
         return els[prefix + 'ValueDisplay'].html;
     };
-    const small = runTile('setupMannWhitneyLogic', 'mannWhitney', null, { mannWhitneyData1: '1,2,3,4', mannWhitneyData2: '5,6,7,9', mannWhitneyAlpha: '0.05', mannWhitneyAlternative: 'two-sided' });
+    const exactTile = runTile('setupMannWhitneyLogic', 'mannWhitney', null, { mannWhitneyData1: '1,2,3,4', mannWhitneyData2: '5,6,7,9', mannWhitneyAlpha: '0.05', mannWhitneyAlternative: 'two-sided' });
+    assert.ok(/\(exact\)/.test(exactTile) && !/approx/.test(exactTile), exactTile);
+    const small = runTile('setupMannWhitneyLogic', 'mannWhitney', null, { mannWhitneyData1: '1,2,3,4', mannWhitneyData2: '4,6,7,9', mannWhitneyAlpha: '0.05', mannWhitneyAlternative: 'two-sided' });
     assert.ok(/approx/.test(small), small);
     const large = runTile('setupMannWhitneyLogic', 'mannWhitney', null, { mannWhitneyData1: '1,2,3,4,5,6', mannWhitneyData2: '5.5,6.5,7,9,10,11', mannWhitneyAlpha: '0.05', mannWhitneyAlternative: 'two-sided' });
     assert.ok(!/approx/.test(large), large);
-    const w = runTile('setupWilcoxonLogic', 'wilcoxon', null, { wilcoxonBeforeData: '1,2,3,4,5', wilcoxonAfterData: '2,4,3.5,6,8', wilcoxonAlpha: '0.05', wilcoxonAlternative: 'two-sided' });
-    assert.ok(/approx/.test(w), w);
+    const w = runTile('setupWilcoxonLogic', 'wilcoxon', null, { wilcoxonBeforeData: '1,2,3,4,5', wilcoxonAfterData: '2,4.5,3.2,6.7,8.9', wilcoxonAlpha: '0.05', wilcoxonAlternative: 'two-sided' });
+    assert.ok(/\(exact\)/.test(w), w);
+    const wTied = runTile('setupWilcoxonLogic', 'wilcoxon', null, { wilcoxonBeforeData: '1,2,3,4,5', wilcoxonAfterData: '2,3,4,5,7', wilcoxonAlpha: '0.05', wilcoxonAlternative: 'two-sided' });
+    assert.ok(/approx/.test(wTied), wTied);          // |d| = 1, 1, 1, 1, 2: tied, so the normal approximation
 });
 
 test("Cook's D: an infinite value is explained as leverage = 1 or as numerical overflow", () => {
@@ -678,4 +682,29 @@ test('binning: constant data is one bin, out-of-range breaks are errors, the cal
     assert.ok(!ok.error); assert.deepEqual(mine, [18, 14]);
     assert.equal(app.computeBinningWithSteps([1, 2, 3, 4], 'equal_width', 1e9).bins.length, 100);
     assert.equal(app.computeBinningWithSteps([1, 2, 3, 4], 'equal_width', NaN).bins.length, 5);
+});
+
+test('MANOVA states whether Rao\'s F is exact (p <= 2 variables or <= 3 groups) or an approximation', () => {
+    const rows = n => ['G, Y1, Y2, Y3', ...Array.from({ length: n * 4 }, (_, i) => `${'ABCDE'[Math.floor(i / 4)]}, ${1 + (i % 4) + Math.floor(i / 4) * 1.5 + (i * 7 % 5) / 3}, ${2 + (i * 3 % 7) / 2 + Math.floor(i / 4)}, ${1 + (i * 5 % 9) / 4 + (i % 2)}`)].join('\n');
+    assert.equal(app.computeMANOVA(rows(3), 0.05).fExact, true, '3 groups: exact');
+    const five = app.computeMANOVA(rows(5), 0.05);
+    assert.ok(!five.error, five.message);
+    assert.equal(five.fExact, false, '5 groups and 3 variables: approximation');
+});
+
+test('random seed: a whole number is used as typed; "42abc" or "3.7" is an error instead of a silently different seed', () => {
+    const run = seed => {
+        const els = { randomDistribution: { value: 'uniform' }, randomCount: { value: '3' }, randomMin: { value: '0' }, randomMax: { value: '1' }, randomSeed: { value: seed } };
+        const probe = loadApp();
+        probe.document.getElementById = id => els[id] || { value: '', style: {} };
+        return probe.computeRandomWithSteps();
+    };
+    const j = seed => JSON.stringify(run(seed).randomNumbers);          // compared as text: arrays from another vm context differ in prototype
+    assert.equal(j('42'), j(' 42 '), 'whitespace around a whole number is fine');
+    assert.notEqual(j('42'), j('43'));
+    for (const bad of ['42abc', '3.7', 'abc', '1e3']) {
+        const r = run(bad);
+        assert.ok(r.error && r.message.includes(bad), `${bad}: ${r.message}`);
+    }
+    assert.ok(!run('').error, 'an empty seed means unseeded');
 });
