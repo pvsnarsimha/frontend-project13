@@ -12,7 +12,14 @@ const launcher = require('./launch');      // BROWSER=chromium|firefox|webkit
   // The sanitiser test below inserts <img src=x>; that one deliberate failed request (and its console line) is expected
   let expectedMissing = 0;
   p.on('requestfailed', r => { if (/\/x$/.test(r.url())) expectedMissing++; else errs.push('REQUEST FAILED ' + r.url()); });
-  p.on('console', m => { if (m.type() === 'error') { if (/Failed to load resource/.test(m.text()) && expectedMissing > 0) { expectedMissing--; return; } errs.push('CONSOLE ' + m.text()); } });
+  p.on('console', m => {
+    if (m.type() !== 'error') return;
+    if (/Failed to load resource/.test(m.text()) && expectedMissing > 0) { expectedMissing--; return; }
+    // WebKit words the same failed load differently ("Not allowed to load local resource: file:///.../x") and may not fire requestfailed:
+    // any console error about the deliberate probe URL (a file named exactly "x") is the sanitiser test's own image, not an app error
+    if (/\/x\s*$/.test(m.text().trim())) return;
+    errs.push('CONSOLE ' + m.text());
+  });
   await p.goto('file://' + file);
   // Record every HTML string the tools hand to setHtml(), so block-level tags can be checked for balance below
   await p.evaluate(() => { const orig = window.setHtml; window.__html = []; window.__tool = ''; window.setHtml = (el, h) => { window.__html.push([window.__tool, String(h)]); return orig(el, h); }; });
