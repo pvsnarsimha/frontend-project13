@@ -72,7 +72,8 @@ function computeHazardWithSteps() {
     } else if (dist === 'weibull') {
         const shape = parseFloat(document.getElementById('hazardShape').value);
         const scale = parseFloat(document.getElementById('hazardScale').value);
-        if (!(shape > 0 && scale > 0 && isFinite(shape) && isFinite(scale))) return { error: true, message: "The Weibull distribution needs a shape k > 0 and a scale λ > 0." };
+        const weibullError = validateDistributionParams('weibull', { shape, scale });
+        if (weibullError) return { error: true, message: weibullError };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      WEIBULL DISTRIBUTION HAZARD                 ║\n`;
@@ -117,6 +118,8 @@ function computeHazardWithSteps() {
     } else if (dist === 'normal') {
         const mean = parseFloat(document.getElementById('hazardMean').value);
         const std = parseFloat(document.getElementById('hazardStd').value);
+        const normalError = validateDistributionParams('normal', { mean, stdDev: std });
+        if (normalError) return { error: true, message: normalError };
         
         steps += `╔══════════════════════════════════════════════════════════════════╗\n`;
         steps += `║                      NORMAL DISTRIBUTION HAZARD                  ║\n`;

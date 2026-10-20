@@ -44,6 +44,7 @@ function validateDistributionParams(dist, params, opts) {
         exponential: () => ok(params.rate) && params.rate > 0 ? null : 'The rate λ must be a number greater than 0.',
         uniform: () => ok(params.min) && ok(params.max) && params.min < params.max ? null : 'Uniform needs numbers with minimum a < maximum b.',
         beta: () => ok(params.alpha) && ok(params.beta) && params.alpha > 0 && params.beta > 0 ? null : 'Beta needs α > 0 and β > 0.',
+        weibull: () => ok(params.shape) && ok(params.scale) && params.shape > 0 && params.scale > 0 ? null : 'The Weibull distribution needs a shape k > 0 and a scale λ > 0.',
         poisson: () => ok(params.lambda) && params.lambda > 0 ? null : 'The Poisson mean λ must be a number greater than 0.',
         binomial: () => {
             if (!ok(params.n) || params.n < 1 || Math.floor(params.n) !== params.n) return 'The number of trials n must be a whole number of at least 1.';

@@ -549,3 +549,50 @@ test('partial correlation reports zero variance in any of X, Y, Z instead of NaN
         assert.ok(r.error && !/NaN/.test(r.message), r.message);
     }
 });
+
+test('binomial entropy: huge n is capped (asymptotic form) and agrees with the exact sum where both are available', () => {
+    const t0 = Date.now();
+    const huge = app.computeEntropyWithSteps('binomial', { n: 1e12, p: 0.5 }).entropy;
+    assert.ok(Date.now() - t0 < 500, 'no multi-million-term loop');
+    close(huge, 0.5 * Math.log(2 * Math.PI * Math.E * 2.5e11), 1e-9);
+    // just below the cap the exact sum and the expansion meet
+    const exactSide = app.computeEntropyWithSteps('binomial', { n: 2e8, p: 0.5 }).entropy;     // variance 5e7: exact sum
+    const asym = 0.5 * Math.log(2 * Math.PI * Math.E * 5e7);
+    close(exactSide, asym, 1e-5);       // the exact sum loses a few digits to logGamma rounding at this size
+});
+
+test('Beta PDF at the end points: diverging density is reported as +∞, never "Infinity" or NaN', () => {
+    const els = { pdfDistribution: { value: 'beta' }, pdfXValues: { value: '0, 0.5, 1' }, pdfAlpha: { value: '0.5' }, pdfBeta: { value: '0.5' } };
+    const probe = loadApp();
+    probe.document.getElementById = id => els[id] || { value: '', style: {} };
+    const r = probe.computePDFWithSteps();
+    assert.ok(!r.error, r.message);
+    assert.ok(/\+∞/.test(r.steps) && !/Infinity|NaN/.test(r.steps), r.steps);
+    assert.ok(Number.isFinite(r.results[1]));
+    assert.equal(r.resultStr.split(',')[0].trim(), '∞');
+});
+
+test('hazard and survival validate every distribution through validateDistributionParams', () => {
+    const run = (fn, prefix, dist, vals) => {
+        const els = { [prefix + 'Distribution']: { value: dist }, [prefix + 'XValues']: { value: '1, 2' }, [prefix + 'TValues']: { value: '1, 2' }, ...vals };
+        const probe = loadApp();
+        probe.document.getElementById = id => els[id] || { value: '1', style: {} };
+        return probe[fn]();
+    };
+    for (const [fn, prefix] of [['computeHazardWithSteps', 'hazard'], ['computeSurvivalWithSteps', 'survival']]) {
+        const n = run(fn, prefix, 'normal', { [prefix + 'Mean']: { value: '0' }, [prefix + 'Std']: { value: '-1' } });
+        assert.ok(n.error, `${fn}: normal with σ < 0`);
+        const w = run(fn, prefix, 'weibull', { [prefix + 'Shape']: { value: '0' }, [prefix + 'Scale']: { value: '2' } });
+        assert.ok(w.error && /Weibull/.test(w.message), `${fn}: weibull shape 0`);
+    }
+    assert.ok(app.validateDistributionParams('weibull', { shape: 1.5, scale: 2 }) === null);
+});
+
+test('log transform never prints a negative "reduction" or NaN, and reports skewness before and after', () => {
+    const r = app.computeLogTransformWithSteps([0.1, 0.2, 0.3, 0.5], 'natural');
+    assert.ok(!r.error, r.message);
+    assert.ok(!/reduction|NaN/.test(r.steps), r.steps);
+    assert.ok(/Skewness:/.test(r.steps));
+    const skewed = app.computeLogTransformWithSteps([1, 2, 4, 8, 16, 1000], 'natural');
+    assert.ok(/closer to symmetric/.test(skewed.steps));
+});
