@@ -93,6 +93,10 @@ function computeTukeyHSD(inputText, alpha) {
     }
     
     const dfWithin = totalN - k;
+    {
+        const guard = withinGroupError(dfWithin, ssWithin, 'Tukey HSD', 'values');
+        if (guard) return guard;
+    }
     const msWithin = ssWithin / dfWithin;
     
     // Calculate SS_between

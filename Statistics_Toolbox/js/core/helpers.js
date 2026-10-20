@@ -55,6 +55,20 @@ function validateDistributionParams(dist, params, opts) {
     return checks[dist] ? checks[dist]() : null;
 }
 
+// Guard for every procedure that divides by the pooled within-group variance (ANOVA, Tukey, Scheffe, Bonferroni, Levene):
+// returns an error result when the within-group degrees of freedom are below 1 (every group has a single value) or the
+// within-group sum of squares is 0 (no variation inside any group, so F and the t / q statistics are infinite), else null.
+function withinGroupError(dfWithin, ssWithin, testName, quantity) {
+    const q = quantity || 'values';
+    if (!(dfWithin >= 1)) {
+        return { error: true, message: `${testName} needs at least one group with two or more observations: with every group holding a single value there are no within-group degrees of freedom (N - k = ${dfWithin}), so the pooled variance cannot be estimated.` };
+    }
+    if (!(ssWithin > 0) || !isFinite(ssWithin)) {
+        return { error: true, message: `The ${q} do not vary inside any group (within-group sum of squares = 0), so the test statistic would be infinite and ${testName} is undefined. Add variation within the groups.` };
+    }
+    return null;
+}
+
 // Shows a validation message in the standard result area of a tool whose element ids start with `prefix`
 function showToolError(prefix, message) {
     const area = document.getElementById(prefix + 'ResultArea');

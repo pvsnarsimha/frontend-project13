@@ -86,7 +86,11 @@ function setupMGFLogic() {
             const stepsSpan = document.getElementById("mgfStepsDisplay");
             
             resultDiv.style.display = "block";
-            setHtml(valueSpan, `M_X(${t}) = ${result.mgfValue.toFixed(6)}`);
+            if (result.error) {
+                showToolError('mgf', result.message);
+                return;
+            }
+            setHtml(valueSpan, result.diverges ? `M_X(${t}) does not exist (the integral diverges)` : `M_X(${t}) = ${result.mgfValue.toFixed(6)}`);
             stepsSpan.innerText = result.steps;
         });
     }
@@ -98,8 +102,34 @@ function updateMGFParams() {
     showDistributionParams('mgf');
 }
 
+// ln M_X(t), computed without forming M_X(t) itself, so it stays finite when M_X(t) overflows (or is 0 by underflow)
+function logMGF(distType, params, t) {
+    if (distType === 'normal') return params.mean * t + 0.5 * params.stdDev * params.stdDev * t * t;
+    if (distType === 'poisson') return params.lambda * (Math.exp(t) - 1);
+    if (distType === 'binomial') {
+        // ln(1 - p + p e^t) without overflow: factor out e^t when t is large
+        const inner = t > 0 ? t + Math.log(params.p + (1 - params.p) * Math.exp(-t)) : Math.log(1 - params.p + params.p * Math.exp(t));
+        return params.n * inner;
+    }
+    if (distType === 'uniform') {
+        const { min, max } = params;
+        if (t === 0) return 0;
+        // (e^{tb} - e^{ta}) / (t(b - a)) with the larger exponent factored out
+        const hi = t > 0 ? t * max : t * min, lo = t > 0 ? t * min : t * max;
+        return hi + Math.log1p(-Math.exp(lo - hi)) - Math.log(Math.abs(t) * (max - min));
+    }
+    if (distType === 'exponential') return Math.log(params.rate / (params.rate - t));
+    return NaN;
+}
+
 // ========== MGF COMPUTATION - DETAILED ==========
 function computeMGFWithSteps(distType, params, t) {
+    // Cheap overflow check first: when M_X(t) = e^{ln M} cannot be held as a number, say so (and give ln M) instead of printing Infinity
+    const logM = logMGF(distType, params, t);
+    if (logM > 709) {
+        const lm = isFinite(logM) ? logM.toExponential(4) : 'a number beyond 1e308';
+        return { error: true, message: `M_X(${t}) is too large to display: ln M_X(t) = ${lm}, so M_X(t) = e^(${lm}) exceeds the largest number a computer can hold (about e^709.78). Use a smaller |t| or smaller parameters.` };
+    }
     let steps = `╔══════════════════════════════════════════════════════════════════╗\n`;
     steps += `║           MOMENT GENERATING FUNCTION M_X(t) CALCULATION            ║\n`;
     steps += `╚══════════════════════════════════════════════════════════════════╝\n\n`;
@@ -339,5 +369,8 @@ function computeMGFWithSteps(distType, params, t) {
     steps += `      • E[X²] = M''_X(0)\n`;
     steps += `      • Var[X] = M''_X(0) - [M'_X(0)]²\n`;
     
-    return { mgfValue, steps };
+    if (distType !== 'exponential' && !isFinite(mgfValue)) {
+        return { error: true, message: 'M_X(t) could not be evaluated as a finite number for these inputs. Use a smaller |t| or smaller parameters.' };
+    }
+    return { mgfValue, diverges: !isFinite(mgfValue), steps };
 }

@@ -474,3 +474,78 @@ test('a seeded random source is reproducible and independent of other sources', 
     assert.deepEqual(draw(a2), first);
     assert.notDeepEqual(draw(app.createRandomSource(8)), first);
 });
+
+test('within-group guards: single-value groups and zero within-group variation give an error, not NaN or Infinity', () => {
+    const singles = '1:A, 2:B, 3:C';
+    const flat = '5:A, 5:A, 7:B, 7:B';
+    for (const [fn, label] of [['computeANOVA', 'ANOVA'], ['computeTukeyHSD', 'Tukey'], ['computeScheffeTest', 'Scheffe'], ['computeBonferroniCorrection', 'Bonferroni'], ['computeLeveneTest', 'Levene']]) {
+        assert.equal(typeof app[fn], 'function', fn);
+        for (const input of [singles, flat]) {
+            const r = app[fn](input, 0.05);
+            assert.ok(r.error, `${label} on "${input}" should be an error`);
+            assert.ok(!/NaN|Infinity/.test(r.message), `${label}: ${r.message}`);
+        }
+    }
+});
+
+test('MGF reports an overflow with ln M instead of printing Infinity', () => {
+    for (const [dist, params, t] of [['normal', { mean: 0, stdDev: 10 }, 100], ['poisson', { lambda: 5 }, 800], ['binomial', { n: 1000, p: 0.5 }, 5], ['uniform', { min: 0, max: 10 }, 100]]) {
+        const r = app.computeMGFWithSteps(dist, params, t);
+        assert.ok(r.error, `${dist}: expected an overflow error`);
+        assert.ok(/ln M_X/.test(r.message) && !/Infinity|NaN/.test(r.message.replace(/ /g, " ")), r.message);
+    }
+    const ok = app.computeMGFWithSteps('normal', { mean: 1, stdDev: 2 }, 0.5);
+    close(ok.mgfValue, Math.exp(0.5 + 0.5), 1e-12);
+    close(app.computeMGFWithSteps('uniform', { min: 0, max: 2 }, 1).mgfValue, (Math.exp(2) - 1) / 2, 1e-12);
+    assert.ok(app.computeMGFWithSteps('exponential', { rate: 1 }, 2).diverges);
+});
+
+test('overall F test decision follows the p-value', () => {
+    const x = [1, 2, 3, 4, 5, 6, 7, 8], y = [1.2, 1.9, 3.3, 3.8, 5.4, 5.9, 7.2, 7.7];
+    const r = app.computeFTestOverallWithSteps(x, y, 0.05);
+    assert.ok(!r.error, r.message);
+    assert.equal(r.rejectH0, r.pValue < 0.05);
+});
+
+test('category and group labels typed by the user are HTML-escaped in chi-square, contingency, ANCOVA and MANOVA output', () => {
+    const evil = '<img src=x onerror=alert(1)>';
+    const pairs = [`${evil}, yes`, `${evil}, no`, 'b, yes', 'b, no', `${evil}, yes`, 'b, no', 'b, yes', `${evil}, no`].join('\n');
+    const out = [
+        app.computeChisquareWithSteps(pairs, 0.05),
+        app.computeContingencyTableWithSteps(pairs)
+    ];
+    const ancova = ['1,' + evil + ',2', '2,' + evil + ',3', '3,' + evil + ',4', '4,b,2', '6,b,3', '7,b,5', '9,b,6'].join('\n');
+    out.push(app.computeANCOVA(ancova, 0.05));
+    const manova = [`${evil}, 1, 2`, `${evil}, 2, 3`, `${evil}, 3, 3`, `${evil}, 2, 5`, 'b, 6, 7', 'b, 7, 9', 'b, 8, 8', 'b, 9, 12'].join('\n');
+    out.push(app.computeMANOVA(manova, 0.05));
+    out.forEach((r, i) => {
+        assert.ok(r.steps, `tool ${i}: ${r.message}`);
+        assert.ok(!r.steps.includes('<img'), `tool ${i} leaks raw markup`);
+        assert.ok(r.steps.includes('&lt;img'), `tool ${i} shows the label as text`);
+    });
+});
+
+test('histogram: bin labels state which edge belongs to which bin, and every value lands in exactly one bin', () => {
+    const data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0.1, 0.2, 0.3, 9.9];
+    for (const bins of [3, 5, 7, 10]) {
+        const r = app.computeHistogramWithSteps(data, bins);
+        assert.ok(!r.error);
+        assert.equal(r.frequencies.reduce((a, b) => a + b, 0), data.length, `${bins} bins lose or double count a value`);
+        assert.ok(r.binLabels.slice(0, -1).every(l => /^\[.*\)$/.test(l)), 'half-open bins use [a, b)');
+        assert.ok(/^\[.*\]$/.test(r.binLabels[r.binLabels.length - 1]), 'the last bin is closed');
+    }
+    assert.ok(app.computeHistogramWithSteps([4, 4, 4], 3).error, 'constant data is an error, not a divide by zero');
+});
+
+test('small-sample flags reach the answer tiles of the rank tests and chi-square goodness of fit', () => {
+    assert.equal(app.computeKruskalWallisTest('1:A\n2:A\n3:A\n4:B\n5:B\n6:B', 0.05).smallSample, true);
+    assert.equal(app.computeChiSquareGoodnessTest([3, 4, 5], [4, 4, 4], 0.05).smallSample, true);
+    assert.equal(app.computeChiSquareGoodnessTest([30, 40, 50], [40, 40, 40], 0.05).smallSample, false);
+});
+
+test('partial correlation reports zero variance in any of X, Y, Z instead of NaN', () => {
+    for (const [x, y, z] of [[[1, 1, 1, 1], [1, 2, 3, 4], [2, 1, 4, 3]], [[1, 2, 3, 4], [5, 5, 5, 5], [2, 1, 4, 3]], [[1, 2, 3, 4], [1, 2, 4, 3], [7, 7, 7, 7]]]) {
+        const r = app.computePartialCorrelationWithSteps(x, y, z);
+        assert.ok(r.error && !/NaN/.test(r.message), r.message);
+    }
+});

@@ -55,7 +55,7 @@ function computeChisquareWithSteps(inputText, alpha = 0.05) {
         if (line === "") continue;
         const parts = line.split(',').map(s => s.trim());
         if (parts.length >= 2) {
-            pairs.push({ row: parts[0], col: parts[1] });
+            pairs.push({ row: escapeHtml(parts[0]), col: escapeHtml(parts[1]) });   // category labels reach the HTML steps, so they are escaped once, here
         }
     }
     

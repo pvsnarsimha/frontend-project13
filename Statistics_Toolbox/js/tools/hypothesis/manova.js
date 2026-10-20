@@ -68,7 +68,7 @@ function computeMANOVA(inputText, alpha) {
             const nonNumeric = values.slice(1).some(v => typeof v !== 'number');
             if (nonNumeric && data.length === 0) continue;   // header row such as "Group, Y1, Y2, Y3"
             if (nonNumeric) {
-                return { error: true, message: `Line ${i + 1} ("${line}") has a non-numeric value. After the group label every value must be a number.` };
+                return { error: true, message: `Line ${i + 1} ("${escapeHtml(line)}") has a non-numeric value. After the group label every value must be a number.` };
             }
             data.push(values);
         }
@@ -79,7 +79,7 @@ function computeMANOVA(inputText, alpha) {
     }
     
     // Extract data
-    const groups = [...new Set(data.map(row => row[0].toString()))];
+    const groups = [...new Set(data.map(row => escapeHtml(row[0].toString())))];   // labels reach the HTML steps: escaped once, here
     const k = groups.length;
     const p = data[0].length - 1;
     const n = data.length;
@@ -97,7 +97,7 @@ function computeMANOVA(inputText, alpha) {
     for (let j = 0; j < p; j++) {
         y.push(data.map(row => parseFloat(row[j + 1])));
     }
-    let group = data.map(row => row[0].toString());
+    let group = data.map(row => escapeHtml(row[0].toString()));
     
     // ========== STEP 1: Grand Means ==========
     let grandMeans = [];

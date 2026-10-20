@@ -117,6 +117,10 @@ function computeLeveneTest(inputText, alpha) {
     
     let dfBetween = k - 1;
     let dfWithin = totalN - k;
+    {
+        const guard = withinGroupError(dfWithin, ssWithin, 'Levene\'s test', 'absolute deviations from the group means');
+        if (guard) return guard;
+    }
     let msBetween = ssBetween / dfBetween;
     let msWithin = ssWithin / dfWithin;
     let fStatistic = msBetween / msWithin;

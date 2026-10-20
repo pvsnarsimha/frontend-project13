@@ -147,7 +147,9 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
     // ========== STEP 7: Critical value and p-value ==========
     const criticalValue = fCriticalValue(alpha, dfReg, dfRes);
     const pValue = 1 - fCDF(fStatistic, dfReg, dfRes);
-    const rejectH0 = fStatistic > criticalValue;
+    // One decision rule, used for the verdict AND the displayed comparison: reject when p < alpha. (Comparing F with a
+    // separately computed critical value could disagree with the p-value in the far tail or right at the boundary.)
+    const rejectH0 = pValue < alpha;
     
     // ========== Build complete HTML with all detailed steps ==========
     let steps = `<div class="s-9217e5">
@@ -431,7 +433,7 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
                 <strong>Null Hypothesis (H₀):</strong> β₁ = 0 (The model explains no variance)<br>
                 <strong>Alternative Hypothesis (H₁):</strong> β₁ ≠ 0 (The model is useful)<br>
                 <strong>Decision Rule:</strong> Reject H₀ if F > ${criticalValue.toFixed(4)}<br>
-                <strong>Comparison:</strong> ${fStatistic.toFixed(4)} ${fStatistic > criticalValue ? '>' : '<'} ${criticalValue.toFixed(4)}<br><br>
+                <strong>Comparison:</strong> ${fStatistic.toFixed(4)} ${fStatistic > criticalValue ? '>' : '<'} ${criticalValue.toFixed(4)} (p = ${pValue.toFixed(6)} ${rejectH0 ? '<' : '≥'} α = ${alpha})<br><br>
                 
                 <strong class="s-b72ae1">Decision: ${rejectH0 ? 'REJECT H₀' : 'FAIL TO REJECT H₀'}</strong><br><br>
                 

@@ -141,6 +141,9 @@ function computeHistogramWithSteps(numbers, numBins) {
     const minVal = Math.min(...numbers);
     const maxVal = Math.max(...numbers);
     const range = maxVal - minVal;
+    if (!(range > 0)) {
+        return { error: true, message: "All values are identical, so the range is 0 and there is nothing to divide into bins. Enter values that vary." };
+    }
     
     // Calculate optimal bin width using Sturges' rule
     const sturgesBins = Math.ceil(Math.log2(n) + 1);
@@ -152,7 +155,7 @@ function computeHistogramWithSteps(numbers, numBins) {
     const q3 = quantileType7(sorted, 0.75);
     const iqr = q3 - q1;
     const fdWidth = 2 * iqr / Math.pow(n, 1/3);
-    const fdBins = Math.ceil(range / fdWidth);
+    const fdBins = fdWidth > 0 ? Math.ceil(range / fdWidth) : null;      // null when IQR = 0 (more than half the values equal)
     
     // Calculate bin width
     const binWidth = range / numBins;
@@ -164,10 +167,12 @@ function computeHistogramWithSteps(numbers, numBins) {
     let binCalculations = [];
     
     for (let i = 0; i < numBins; i++) {
+        // each upper edge is the next bin's lower edge, computed the same way, so no value can fall in a gap or in two bins
         let lower = minVal + (i * binWidth);
-        let upper = (i === numBins - 1) ? maxVal : lower + binWidth;
+        let upper = (i === numBins - 1) ? maxVal : minVal + ((i + 1) * binWidth);
         binRanges.push({ lower, upper, width: binWidth });
-        binLabels.push(`${lower.toFixed(4)} – ${upper.toFixed(4)}`);
+        // interval notation: every bin includes its lower edge and excludes its upper edge, except the last, which includes both
+        binLabels.push(i === numBins - 1 ? `[${lower.toFixed(4)}, ${upper.toFixed(4)}]` : `[${lower.toFixed(4)}, ${upper.toFixed(4)})`);
         
         let count = 0;
         let valuesInBin = [];
@@ -186,7 +191,7 @@ function computeHistogramWithSteps(numbers, numBins) {
             }
         }
         bins[i] = count;
-        binCalculations.push(`Bin ${i+1}: [${lower.toFixed(4)}, ${upper.toFixed(4)}) → ${count} values → ${valuesInBin.join(', ')}`);
+        binCalculations.push(`Bin ${i+1}: ${binLabels[i]} → ${count} values → ${valuesInBin.join(', ')}`);
     }
     
     // Calculate statistics
@@ -237,7 +242,7 @@ function computeHistogramWithSteps(numbers, numBins) {
     
     steps += `📊 STEP 3: Optimal Bin Width Recommendations\n`;
     steps += `   • Sturges' Rule: k = ⌈log₂(n) + 1⌉ = ⌈log₂(${n}) + 1⌉ = ${sturgesBins} bins → width = ${sturgesWidth.toFixed(6)}\n`;
-    steps += `   • Freedman-Diaconis Rule: bin width = 2 × IQR / n^(1/3) = 2 × ${iqr.toFixed(4)} / ${Math.pow(n, 1/3).toFixed(4)} = ${fdWidth.toFixed(6)} → ${fdBins} bins\n`;
+    steps += `   • Freedman-Diaconis Rule: bin width = 2 × IQR / n^(1/3) = 2 × ${iqr.toFixed(4)} / ${Math.pow(n, 1/3).toFixed(4)} = ${fdWidth.toFixed(6)} → ${fdBins === null ? 'not usable (IQR = 0)' : fdBins + ' bins'}\n`;
     steps += `   • Your selection: ${numBins} bins → width = ${binWidth.toFixed(6)}\n\n`;
     
     steps += `🔢 STEP 4: Bin Construction\n`;

@@ -69,6 +69,9 @@ function computePartialCorrelationWithSteps(x, y, z) {
         yz_sumBB += dz * dz;
         yz_details += `      (${y[i]} - ${meanY.toFixed(4)}) × (${z[i]} - ${meanZ.toFixed(4)}) = ${dy.toFixed(4)} × ${dz.toFixed(4)} = ${product.toFixed(4)}\n`;
     }
+    if (yz_sumAA === 0) {
+        return { error: true, message: "Partial correlation is undefined: all Y values are identical (zero variance)." };
+    }
     const r_yz = yz_sumAB / Math.sqrt(yz_sumAA * yz_sumBB);
     
     // ========== PARTIAL CORRELATION ==========

@@ -160,6 +160,11 @@ function computeANOVA(inputText, alpha) {
     let dfWithin = totalN - k;
     let dfTotal = totalN - 1;
     
+    {
+        const guard = withinGroupError(dfWithin, ssWithin, 'ANOVA', 'values');
+        if (guard) return guard;
+    }
+    
     let msBetween = ssBetween / dfBetween;
     let msWithin = ssWithin / dfWithin;
     let fStatistic = msBetween / msWithin;

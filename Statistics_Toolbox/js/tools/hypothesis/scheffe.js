@@ -94,6 +94,10 @@ function computeScheffeTest(inputText, alpha) {
     }
     
     const dfWithin = totalN - k;
+    {
+        const guard = withinGroupError(dfWithin, ssWithin, 'Scheffé test', 'values');
+        if (guard) return guard;
+    }
     const msWithin = ssWithin / dfWithin;
     
     // Calculate SS_between

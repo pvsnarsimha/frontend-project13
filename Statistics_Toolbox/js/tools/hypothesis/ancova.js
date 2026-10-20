@@ -83,7 +83,7 @@ function computeANCOVA(inputText, alpha) {
     let y = data.map(row => parseFloat(row[0]));
     
     // Second column is Group (categorical)
-    let group = data.map(row => row[1].toString());
+    let group = data.map(row => escapeHtml(row[1].toString()));   // labels reach the HTML steps: escaped once, here
     
     // Third column is the covariate (single-covariate ANCOVA; extra columns are ignored)
     let cov = data.map(row => parseFloat(row[2]));
