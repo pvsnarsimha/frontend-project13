@@ -132,3 +132,17 @@ test('studentizedRangeCritical is memoized on (alpha, k, df) without mixing up t
     assert.notEqual(app.studentizedRangeCritical(0.01, 3, 10), a);
     assert.ok(Number.isNaN(app.studentizedRangeCritical(0.05, 1, 10)));
 });
+
+test('symmetric and generalized eigenvalues: always real, agree with the general routine', () => {
+    const s = app.symmetricEigenvalues([[2, 1, 0], [1, 2, 0], [0, 0, 5]]);
+    [5, 3, 1].forEach((v, i) => close(s[i], v, 1e-10));
+    // eigenvalues of W^-1 B for symmetric B and SPD W: 2x2 closed form check, B = diag(2, 3), W = diag(1, 3) -> 2, 1
+    const g = app.generalizedSymmetricEigenvalues([[2, 0], [0, 3]], [[1, 0], [0, 3]]);
+    close(g[0], 2, 1e-12); close(g[1], 1, 1e-12);
+    assert.equal(app.generalizedSymmetricEigenvalues([[1, 0], [0, 1]], [[1, 2], [2, 1]]), null, 'indefinite W is rejected');
+});
+
+test('computeEigenvalues gives NaN, not wrong real numbers, for a rotation (complex eigenvalues)', () => {
+    assert.ok(app.computeEigenvalues([[0, -1], [1, 0]]).every(Number.isNaN));
+    assert.ok(app.computeEigenvalues([[0, -1, 0], [1, 0, 0], [0, 0, 2]]).every(Number.isNaN));
+});

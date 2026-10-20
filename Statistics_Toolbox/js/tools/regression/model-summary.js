@@ -83,7 +83,10 @@ function computeModelSummary(actual, predicted, k = 1) {
     const rSquared = 1 - (ssRes / ssTot);
     const dfRes = n - k - 1;                       // residual degrees of freedom for k predictors
     const adjRSquared = 1 - ((1 - rSquared) * (n - 1) / dfRes);
+    // RMSE divides by n (the average size of the prediction error on these points); the residual standard error
+    // divides by the residual df n - k - 1 (the estimate of sigma). Both are shown and labelled.
     const rmse = Math.sqrt(ssRes / n);
+    const rse = Math.sqrt(ssRes / dfRes);
     const mae = residuals.reduce((sum, r) => sum + Math.abs(r), 0) / n;
     // A percentage error is undefined where the actual value is 0, so those points are left out of MAPE (and the count says so)
     const mapeCount = actual.filter(a => a !== 0).length;
@@ -107,6 +110,10 @@ function computeModelSummary(actual, predicted, k = 1) {
     
     const r2Perf = getPerformanceColor(rSquared, 'r2');
     const mapePerf = getPerformanceColor(mape, 'error');
+    const mapeDefined = isFinite(mape);                         // NaN when every actual value is 0
+    const mapeText = mapeDefined ? mape.toFixed(1) : 'N/A';
+    const mapeText2 = mapeDefined ? mape.toFixed(2) : 'N/A';
+    const mapeVerdict = !mapeDefined ? 'Not defined' : (mape < 10 ? 'High Accuracy' : (mape < 20 ? 'Moderate Accuracy' : 'Low Accuracy'));
     
     // Build detailed calculation strings
     const ssResCalculation = residualDetails.map(function(r, idx) {
@@ -171,7 +178,8 @@ function computeModelSummary(actual, predicted, k = 1) {
         '<span class="s-530413">🎯</span>',
         '</div>',
         '<div class="s-be29f3 gen-big">' + rmse.toFixed(4) + '</div>',
-        '<div class="s-137d30">Root Mean Square Error</div></div>',
+        '<div class="s-137d30">Root Mean Square Error (÷ n)</div>',
+        '<div class="s-cc2b6b"><span class="s-1f89fd">Residual std. error (÷ ' + dfRes + ' df) = ' + rse.toFixed(4) + '</span></div></div>',
         
         // MAE Card (with Mean Y)
         '<div class="s-713960 gen-pad">',
@@ -191,9 +199,9 @@ function computeModelSummary(actual, predicted, k = 1) {
         '<span class="s-1d267a">MAPE</span>',
         '<span class="s-530413">%</span>',
         '</div>',
-        '<div class="s-be29f3 gen-big">' + mape.toFixed(1) + '<span class="s-2faf9e">%</span></div>',
+        '<div class="s-be29f3 gen-big">' + mapeText + (mapeDefined ? '<span class="s-2faf9e">%</span>' : '') + '</div>',
         '<div class="s-137d30">',
-        '<span style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: ' + mapePerf.bg + '; color: ' + mapePerf.color + ';">' + mapePerf.icon + ' ' + (mape < 10 ? 'High Accuracy' : (mape < 20 ? 'Moderate Accuracy' : 'Low Accuracy')) + '</span>',
+        '<span style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: ' + mapePerf.bg + '; color: ' + mapePerf.color + ';">' + mapePerf.icon + ' ' + mapeVerdict + '</span>',
         '</div></div>',
         
         // Sum of Squares Card
@@ -296,7 +304,8 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('<strong>Formula:</strong> RMSE = √(SS<sub>res</sub>/n)<br><br>');
     steps.push('<strong>Step 1:</strong> SS<sub>res</sub>/n = ' + ssRes.toFixed(4) + ' / ' + n + ' = ' + (ssRes/n).toFixed(4) + '<br>');
     steps.push('<strong>Step 2:</strong> √(' + (ssRes/n).toFixed(4) + ') = <strong>' + rmse.toFixed(6) + '</strong><br><br>');
-    steps.push('<span>📖 Typical prediction error: ±' + rmse.toFixed(4) + ' units</span>');
+    steps.push('<span>📖 Typical prediction error: ±' + rmse.toFixed(4) + ' units</span><br><br>');
+    steps.push('<strong>Not the same as the residual standard error:</strong> RSE = √(SS<sub>res</sub>/(n-k-1)) = √(' + ssRes.toFixed(4) + ' / ' + dfRes + ') = <strong>' + rse.toFixed(6) + '</strong> (divides by the residual df, as regression software reports it).');
     steps.push('</div></div>');
     
     // MAE Expandable
@@ -318,7 +327,7 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('<div class="s-58dab4">');
     steps.push('<div class="s-d1792e gen-flex" data-toggle-metric="1">');
     steps.push('<span class="s-48f582">% MAPE (Mean Absolute Percentage Error)</span>');
-    steps.push('<span class="s-5e6201">' + mape.toFixed(2) + '%</span>');
+    steps.push('<span class="s-5e6201">' + mapeText2 + (mapeDefined ? '%' : '') + '</span>');
     steps.push('</div>');
     steps.push('<div class="metric-formula" style="background: #f1f5f9; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 12px; margin-top: 8px; display: none; border-left: 3px solid #1e3a5f;">');
     steps.push('<strong>Formula:</strong> MAPE = (100/n) × Σ|(yᵢ - ŷᵢ)/yᵢ|<br><br>');
@@ -326,7 +335,7 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('<strong>Sum of percentages = ' + sumMape.toFixed(2) + '%</strong><br><br>');
     steps.push('<strong>Step 2 - Divide by n:</strong><br>');
     steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + mapeCount + (mapeCount < n ? ' (points with actual = 0 are excluded)' : '') + '<br>');
-    steps.push('<strong>MAPE = ' + mape.toFixed(2) + '%</strong>');
+    steps.push(mapeDefined ? '<strong>MAPE = ' + mape.toFixed(2) + '%</strong>' : '<strong>MAPE = N/A</strong> (every actual value is 0, so no percentage error exists)');
     steps.push('</div></div>');
     steps.push('</div></div>');
     
@@ -387,7 +396,8 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('<div class="s-2eeaac">');
     steps.push('SS<sub>res</sub>/n = ' + ssRes.toFixed(4) + ' / ' + n + ' = ' + (ssRes/n).toFixed(4) + '<br>');
     steps.push('RMSE = √(' + (ssRes/n).toFixed(4) + ')<br>');
-    steps.push('<strong>RMSE = ' + rmse.toFixed(6) + '</strong>');
+    steps.push('<strong>RMSE = ' + rmse.toFixed(6) + '</strong><br>');
+    steps.push('Residual standard error (÷ n-k-1 = ' + dfRes + ') = √(' + (ssRes/dfRes).toFixed(4) + ') = <strong>' + rse.toFixed(6) + '</strong>');
     steps.push('</div></div>');
     
     // MAE Calculation
@@ -407,7 +417,7 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('<div class="s-52b70c">');
     steps.push(mapeCalculation.replace(/\n/g, '<br>'));
     steps.push('<br><strong>Sum of % = ' + sumMape.toFixed(2) + '%</strong><br>');
-    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + mapeCount + ' = <strong>' + mape.toFixed(2) + '%</strong>');
+    steps.push('MAPE = ' + sumMape.toFixed(2) + ' / ' + mapeCount + ' = <strong>' + (mapeDefined ? mapeText2 + '%' : 'N/A') + '</strong>');
     steps.push('</div></div>');
     
     steps.push('</div></div>');
@@ -420,7 +430,7 @@ function computeModelSummary(actual, predicted, k = 1) {
     steps.push('<div class="s-0e0d76">');
     steps.push('<strong>R² = ' + (rSquared * 100).toFixed(1) + '%</strong> — ' + (rSquared >= 0.7 ? 'The model explains a substantial portion of variance, indicating strong predictive power.' : (rSquared >= 0.4 ? 'The model shows moderate explanatory power, but there may be room for improvement.' : 'The model explains limited variance, suggesting other factors may be important.')) + '<br><br>');
     steps.push('<strong>RMSE = ' + rmse.toFixed(4) + '</strong> vs <strong>MAE = ' + mae.toFixed(4) + '</strong> — ' + ((rmse - mae) > (rmse * 0.2) ? 'The larger RMSE compared to MAE suggests presence of some larger prediction errors/outliers.' : 'RMSE and MAE are close, indicating consistent prediction errors across observations.') + '<br><br>');
-    steps.push('<strong>MAPE = ' + mape.toFixed(1) + '%</strong> — ' + (mape < 10 ? 'Excellent forecasting accuracy (highly reliable predictions).' : (mape < 20 ? 'Good forecasting accuracy with acceptable error margins.' : 'Moderate accuracy; consider model refinement or additional predictors.')));
+    steps.push('<strong>MAPE = ' + mapeText + (mapeDefined ? '%' : '') + '</strong> — ' + (!mapeDefined ? 'Not defined because every actual value is 0.' : mape < 10 ? 'Excellent forecasting accuracy (highly reliable predictions).' : (mape < 20 ? 'Good forecasting accuracy with acceptable error margins.' : 'Moderate accuracy; consider model refinement or additional predictors.')));
     steps.push('</div></div>');
     
     steps.push('</div>');
@@ -431,6 +441,7 @@ function computeModelSummary(actual, predicted, k = 1) {
         rSquared: rSquared, 
         adjRSquared: adjRSquared, 
         rmse: rmse, 
+        rse: rse,
         mae: mae, 
         mape: mape, 
         ssRes: ssRes, 

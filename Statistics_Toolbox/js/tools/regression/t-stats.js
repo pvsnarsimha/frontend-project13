@@ -52,7 +52,6 @@ function computeTStatsWithSteps(xValues, yValues) {
     
     // ========== STEP 1: Build complete deviation table ==========
     const deviationRows = buildDeviationRows(xValues, yValues, meanX, meanY);
-    let numerator = 0, denominator = 0;
     let sumX = 0, sumY = 0;
     let xyProducts = [], xxSquares = [];
     
@@ -61,8 +60,6 @@ function computeTStatsWithSteps(xValues, yValues) {
         const yDev = yValues[i] - meanY;
         const product = xDev * yDev;
         const xSq = xDev * xDev;
-        numerator += product;
-        denominator += xSq;
         sumX += xValues[i];
         sumY += yValues[i];
         xyProducts.push(product);
@@ -71,22 +68,23 @@ function computeTStatsWithSteps(xValues, yValues) {
     }
     
     // ========== STEP 2: Calculate β̂ coefficients ==========
-    if (!(denominator > 0)) {
+    const core = simpleRegressionCore(xValues, yValues);   // the shared formulas (core/helpers.js); this file only builds the display tables
+    if (!core) {
         return { error: true, message: "All X values are identical, so Σ(x - x̄)² = 0 and the slope is undefined. Enter X values that vary." };
     }
-    const core = simpleRegressionCore(xValues, yValues);   // the shared formulas (core/helpers.js); the loops below only build the display tables
+    const numerator = core.sxy, denominator = core.sxx;
     if (!(core.ssTot > 0)) {
         return { error: true, message: "All Y values are identical, so the slope is 0 and there is no variation to test (R² is undefined). Enter Y values that vary." };
     }
-    if (core.ssRes <= 1e-12 * core.ssTot) {
-        return { error: true, message: "The line fits the data perfectly (residual sum of squares ≈ 0), so the standard errors are 0 and the t statistics are infinite. Inference needs some scatter around the line." };
+    if (isPerfectFit(core.ssRes, core.ssTot)) {
+        return { error: true, message: PERFECT_FIT_MESSAGE };
     }
     const slope = core.slope;
     const intercept = core.intercept;
     
     // ========== STEP 3: Build predictions and residuals table ==========
     const predictionsRows = buildPredictionRows(xValues, yValues, slope, intercept);
-    let ssRes = 0;
+    const ssRes = core.ssRes;
     let residuals = [];
     let predictions = [];
     
@@ -95,7 +93,6 @@ function computeTStatsWithSteps(xValues, yValues) {
         const residual = yValues[i] - yPred;
         predictions.push(yPred);
         residuals.push(residual);
-        ssRes += residual * residual;
         
     }
     

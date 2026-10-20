@@ -200,7 +200,7 @@ function computeMultipleLinearRegression(dataMatrix) {
             throw Object.assign(new Error(`X'X is numerically singular (condition number ≈ ${cond.toExponential(1)})`), { kind: "condition" });
         }
         if (cond > 1e6) {
-            stepLog += `<div class="s-847a0d">⚠️ Near-collinearity: the condition number of X'X is ≈ ${cond.toExponential(1)}. Two or more predictors are almost linearly dependent, so individual coefficients may be unreliable even though the fit looks fine. Consider removing or combining correlated predictors (see VIF).</div>`;
+            stepLog += `<div class="s-847a0d">⚠️ Near-collinearity: the condition number of X'X is ≈ ${cond.toExponential(1)} (a different yardstick from the VIF: it is the matrix's overall sensitivity, so it can be high while every single VIF is below 10 when predictors are on very different scales). Two or more predictors may be almost linearly dependent, so individual coefficients may be unreliable even though the fit looks fine. Consider removing or combining correlated predictors (see VIF).</div>`;
         }
         
         stepLog += '</div>';
@@ -314,7 +314,7 @@ function computeMultipleLinearRegression(dataMatrix) {
                     ${xtxDetails}
                 </div>
                 <div class="s-70ea45">
-                    <div class="s-c34ee8">Result: X<sup>T</sup>X = </div>
+                    <div class="s-c34ee8">Result: X<sup>T</sup>X${centred ? ' (of the centred predictors)' : ''} = </div>
                     <table class="s-db1a34">
                         ${Array(p+1).fill().map((_, i) => `<tr>${Array(p+1).fill().map((_, j) => `<td class="s-d58239">${XtX[i][j].toFixed(2)}</td>`).join('')}</tr>`).join('')}
                     </table>
@@ -367,7 +367,7 @@ function computeMultipleLinearRegression(dataMatrix) {
                         ${inverseSteps}
                     </details>
                     <div class="s-417688">
-                        <div class="s-c34ee8">Result: (X<sup>T</sup>X)<sup>-1</sup> = </div>
+                        <div class="s-c34ee8">Result: (X<sup>T</sup>X)<sup>-1</sup>${centred ? ' (of the centred predictors)' : ''} = </div>
                         <table class="s-db1a34">
                             ${Array(p+1).fill().map((_, i) => `<tr>${Array(p+1).fill().map((_, j) => `<td class="s-d58239">${XtX_inv[i][j].toFixed(4)}</td>`).join('')}</tr>`).join('')}
                         </table>
@@ -450,6 +450,7 @@ function computeMultipleLinearRegression(dataMatrix) {
         p, 
         yMean,
         coefficients: coefficients,
+        centred,                       // true: XtX / XtX_inv / Xty are for the centred predictors (the coefficients are converted back)
         XtX: XtX,
         Xty: Xty,
         XtX_inv: XtX_inv,

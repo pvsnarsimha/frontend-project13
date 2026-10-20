@@ -130,8 +130,8 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
     if (!(ssTot > 0)) {
         return { error: true, message: "All Y values are identical, so the total sum of squares is 0 and the F test is undefined. Enter Y values that vary." };
     }
-    if (ssRes <= 1e-12 * ssTot) {
-        return { error: true, message: "The line fits the data perfectly (residual sum of squares ≈ 0), so MSE = 0 and F is infinite. The F test needs some unexplained variation." };
+    if (isPerfectFit(ssRes, ssTot)) {
+        return { error: true, message: PERFECT_FIT_MESSAGE };
     }
     
     const msReg = ssReg / dfReg;

@@ -237,8 +237,13 @@ function computeMANOVA(inputText, alpha) {
     if (!W_inv) {
         return { error: true, message: "The within-group covariance matrix is singular, so MANOVA cannot be computed. This happens when a dependent variable is constant within the groups, two dependent variables are perfectly correlated (one is a multiple or sum of another), or there are too few observations per group (each group needs more observations than there are dependent variables). Remove the redundant variable or add more data." };
     }
-    let B_Winv = multiplyMatrices(B, W_inv);
-    let eigenvalues = computeEigenvalues(B_Winv);
+    // B and W are symmetric, so the eigenvalues of W^-1 B (the same as those of B W^-1) are found in the symmetric form
+    // L^-1 B L^-T (W = L L'), which is always real; the non-symmetric QR route is not used here.
+    let eigenvalues = generalizedSymmetricEigenvalues(B, W);
+    if (!eigenvalues || eigenvalues.some(v => !isFinite(v))) {
+        return { error: true, message: "The eigenvalues of the between/within matrices could not be computed (the within-group matrix is not positive definite). Check for constant or perfectly correlated dependent variables." };
+    }
+    eigenvalues = eigenvalues.map(v => v < 0 && v > -1e-10 ? 0 : v);      // rounding noise below zero
     
     // ========== STEP 7: Test Statistics ==========
     let wilksLambda = 1;
@@ -264,11 +269,16 @@ function computeMANOVA(inputText, alpha) {
         return { error: true, message: `There are too few observations for Rao's F approximation here (denominator degrees of freedom = ${+df2.toFixed(4)}, which must be positive). Add more observations per group or drop a dependent variable.` };
     }
     let fStatistic = 0;
-    if (wilksLambda > 0 && wilksLambda < 1) {
+    if (!(wilksLambda > 0)) {
+        return { error: true, message: "Wilks' Lambda is 0: the groups are separated perfectly (or the eigenvalues overflow), so F would be infinite. Add within-group variation or check the data." };
+    }
+    if (wilksLambda < 1) {
         const root = Math.pow(wilksLambda, 1 / raoT);
         fStatistic = (1 - root) / root * df2 / df1;
     }
-    if (isNaN(fStatistic) || !isFinite(fStatistic)) fStatistic = 0;
+    if (!isFinite(fStatistic)) {
+        return { error: true, message: "The F statistic is not finite for these data (the eigenvalues are too large or degenerate). Rescale the data or check for near-perfect group separation." };
+    }
     
     const criticalValue = fCriticalValue(alpha, df1, df2);
     const pValue = 1 - fCDF(fStatistic, df1, df2);

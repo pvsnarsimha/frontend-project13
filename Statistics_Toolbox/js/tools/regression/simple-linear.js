@@ -107,14 +107,17 @@ function computeSimpleLinearRegression(xValues, yValues) {
     const seIntercept = residualStdError * Math.sqrt(1/n + Math.pow(meanX, 2) / denominator);
     
     // t-statistics and p-values
-    const tSlope = slope / seSlope;
-    const tIntercept = intercept / seIntercept;
-    const pSlope = 2 * (1 - tCDF(Math.abs(tSlope), n - 2));
-    const pIntercept = 2 * (1 - tCDF(Math.abs(tIntercept), n - 2));
+    // On a perfect fit the standard errors are 0, so t and F are infinite: reported as null ("undefined"), as in the other regression tools
+    const perfect = isPerfectFit(ssRes, ssTot);
+    const tSlope = perfect ? null : slope / seSlope;
+    const tIntercept = perfect ? null : intercept / seIntercept;
+    const pSlope = perfect ? null : 2 * (1 - tCDF(Math.abs(tSlope), n - 2));
+    const pIntercept = perfect ? null : 2 * (1 - tCDF(Math.abs(tIntercept), n - 2));
     
     // F-statistic for overall model
-    const fStatistic = (rSquared / 1) / ((1 - rSquared) / (n - 2));
-    const pF = 1 - fCDF(fStatistic, 1, n - 2);
+    const fStatistic = perfect ? null : (rSquared / 1) / ((1 - rSquared) / (n - 2));
+    const pF = perfect ? null : 1 - fCDF(fStatistic, 1, n - 2);
+    const fmt = (v, d) => v === null ? 'undefined (perfect fit)' : v.toFixed(d);
     
     // Build calculation table HTML
     let calcTableRows = '';
@@ -239,8 +242,8 @@ function computeSimpleLinearRegression(xValues, yValues) {
             <div class="s-6025fc">
                 <strong>Overall Model F-test:</strong><br>
                 F = (R² / k) / ((1 - R²) / (n - k - 1))<br>
-                F = ${fStatistic.toFixed(6)}<br>
-                p-value = ${pF.toFixed(8)}<br>
+                F = ${fmt(fStatistic, 6)}<br>
+                p-value = ${fmt(pF, 8)}<br>
                 <strong>Regression equation:</strong> ŷ = ${intercept.toFixed(4)} + ${slope.toFixed(4)}·x
             </div>
         </div>
@@ -252,12 +255,12 @@ function computeSimpleLinearRegression(xValues, yValues) {
             <div><strong>R-squared:</strong> ${(rSquared * 100).toFixed(1)}% of variance explained</div>
             <div class="s-8d2e44">
                 💡 <strong>Model:</strong> ŷ = ${intercept.toFixed(4)} + ${slope.toFixed(4)}·x<br>
-                💡 <strong>Coefficient Statistics:</strong> t<sub>slope</sub> = ${tSlope.toFixed(4)} (p = ${pSlope.toFixed(6)})
+                💡 <strong>Coefficient Statistics:</strong> t<sub>slope</sub> = ${fmt(tSlope, 4)} (p = ${fmt(pSlope, 6)})
             </div>
         </div>
     </div>`;
     
-    return { slope, intercept, rSquared, adjRSquared, fStatistic, pF, steps };
+    return { slope, intercept, rSquared, adjRSquared, fStatistic, pF, perfectFit: perfect, steps };
 }
 
 // ========== REGRESSION SETUP FUNCTIONS ==========
@@ -281,7 +284,7 @@ function setupSimpleLinearLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);
         } else {
-            setHtml(valueSpan, `ŷ = ${result.intercept.toFixed(4)} + ${result.slope.toFixed(4)}x | R² = ${result.rSquared.toFixed(4)}`);
+            setHtml(valueSpan, `ŷ = ${result.intercept.toFixed(4)} + ${result.slope.toFixed(4)}x | R² = ${result.rSquared.toFixed(4)} | adjusted R² = ${result.adjRSquared.toFixed(4)}`);
             setHtml(stepsSpan, result.steps);
         }
     });

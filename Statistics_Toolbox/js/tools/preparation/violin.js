@@ -105,8 +105,8 @@ function computeViolinWithSteps(numbers, bandwidth) {
     
     // Calculate statistics for display
     const variancePop = variance;
-    const skewness = numbers.reduce((a, b) => a + Math.pow((b - mean) / stdDev, 3), 0) / n;
-    const kurtosis = numbers.reduce((a, b) => a + Math.pow((b - mean) / stdDev, 4), 0) / n - 3;
+    const skewness = sampleSkewness(numbers);            // the Skewness / Kurtosis tools' estimators (null when undefined)
+    const kurtosis = sampleExcessKurtosis(numbers);
     
     // Build statistics table
     let statsTable = `
@@ -143,13 +143,13 @@ function computeViolinWithSteps(numbers, bandwidth) {
                 </tr>
                 <tr class="s-b490b8">
                     <td class="s-31373e">Skewness (γ₁)</td>
-                    <td class="s-02528c">${skewness.toFixed(4)}</td>
-                    <td class="s-02528c">${Math.abs(skewness) < 0.1 ? 'Symmetric' : (skewness > 0 ? 'Right-skewed' : 'Left-skewed')}</td>
+                    <td class="s-02528c">${skewness === null ? 'N/A' : skewness.toFixed(4)}</td>
+                    <td class="s-02528c">${skewness === null ? 'Needs at least 3 distinct values' : (Math.abs(skewness) < 0.1 ? 'Symmetric' : (skewness > 0 ? 'Right-skewed' : 'Left-skewed'))}</td>
                 </tr>
                 <tr class="s-b490b8">
                     <td class="s-31373e">Kurtosis (γ₂)</td>
-                    <td class="s-02528c">${kurtosis.toFixed(4)}</td>
-                    <td class="s-02528c">${Math.abs(kurtosis) < 0.5 ? 'Mesokurtic (normal-like)' : (kurtosis > 0 ? 'Leptokurtic (heavy tails)' : 'Platykurtic (light tails)')}</td>
+                    <td class="s-02528c">${kurtosis === null ? 'N/A' : kurtosis.toFixed(4)}</td>
+                    <td class="s-02528c">${kurtosis === null ? 'Needs at least 4 distinct values' : (Math.abs(kurtosis) < 0.5 ? 'Mesokurtic (normal-like)' : (kurtosis > 0 ? 'Leptokurtic (heavy tails)' : 'Platykurtic (light tails)'))}</td>
                 </tr>
                 <tr class="s-b490b8">
                     <td class="s-31373e">IQR (Interquartile Range)</td>

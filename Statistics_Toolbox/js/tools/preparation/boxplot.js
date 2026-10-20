@@ -59,7 +59,7 @@ function computeBoxplotWithSteps(numbers) {
     // Calculate additional statistics
     const variance = numbers.reduce((a,b) => a + Math.pow(b - mean, 2), 0) / n;
     const stdDev = Math.sqrt(variance);
-    const skewness = numbers.reduce((a,b) => a + Math.pow((b - mean)/stdDev, 3), 0) / n;
+    const skewness = sampleSkewness(numbers);      // the Skewness tool's estimator (null when undefined)
     
     // Build quartile calculation table
     let quartileTable = `

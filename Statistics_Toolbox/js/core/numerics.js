@@ -519,17 +519,99 @@ function inverseMatrix(matrix) {
     return augmented.map(row => row.slice(n));
 }
 
+// Eigenvalues (largest first) of a real SYMMETRIC matrix by the cyclic Jacobi method. It always converges and every
+// eigenvalue is real, so this is the routine to use for covariance, SSCP and correlation matrices.
+function symmetricEigenvalues(matrix) {
+    const n = matrix.length;
+    const A = matrix.map(r => r.slice());
+    for (let sweep = 0; sweep < 100; sweep++) {
+        let off = 0, scale = 0;
+        for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { scale += Math.abs(A[i][j]); if (i !== j) off += Math.abs(A[i][j]); }
+        if (off <= 1e-14 * (scale || 1)) break;
+        for (let p = 0; p < n - 1; p++) {
+            for (let q = p + 1; q < n; q++) {
+                if (A[p][q] === 0) continue;
+                const theta = (A[q][q] - A[p][p]) / (2 * A[p][q]);
+                const t = Math.sign(theta || 1) / (Math.abs(theta) + Math.sqrt(theta * theta + 1));
+                const c = 1 / Math.sqrt(t * t + 1), s = t * c;
+                for (let k = 0; k < n; k++) {
+                    const akp = A[k][p], akq = A[k][q];
+                    A[k][p] = c * akp - s * akq;
+                    A[k][q] = s * akp + c * akq;
+                }
+                for (let k = 0; k < n; k++) {
+                    const apk = A[p][k], aqk = A[q][k];
+                    A[p][k] = c * apk - s * aqk;
+                    A[q][k] = s * apk + c * aqk;
+                }
+            }
+        }
+    }
+    return A.map((r, i) => r[i]).sort((x, y) => y - x);
+}
+
+// Cholesky factor L (lower triangular, A = L L') of a symmetric positive-definite matrix, or null when A is not positive definite.
+function choleskyLower(A) {
+    const n = A.length;
+    const L = Array.from({ length: n }, () => new Array(n).fill(0));
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j <= i; j++) {
+            let sum = A[i][j];
+            for (let k = 0; k < j; k++) sum -= L[i][k] * L[j][k];
+            if (i === j) {
+                if (!(sum > 0)) return null;
+                L[i][i] = Math.sqrt(sum);
+            } else {
+                L[i][j] = sum / L[j][j];
+            }
+        }
+    }
+    return L;
+}
+
+// Eigenvalues (largest first) of W^-1 B for a symmetric B and a symmetric positive-definite W, which is what MANOVA needs
+// (B W^-1 has the same eigenvalues). Solved in the symmetric form L^-1 B L^-T with W = L L', so the result is always real.
+// Returns null when W is not positive definite.
+function generalizedSymmetricEigenvalues(B, W) {
+    const L = choleskyLower(W);
+    if (!L) return null;
+    const n = B.length;
+    // C = L^-1 B (forward substitution on each column), then S = C L^-T = (L^-1 C')'
+    const solveLower = M => {
+        const X = M.map(r => r.slice());
+        for (let col = 0; col < n; col++) {
+            for (let i = 0; i < n; i++) {
+                let sum = X[i][col];
+                for (let k = 0; k < i; k++) sum -= L[i][k] * X[k][col];
+                X[i][col] = sum / L[i][i];
+            }
+        }
+        return X;
+    };
+    const C = solveLower(B);
+    const S = transposeMatrix(solveLower(transposeMatrix(C)));
+    const sym = S.map((r, i) => r.map((v, j) => (v + S[j][i]) / 2));       // remove rounding asymmetry
+    return symmetricEigenvalues(sym);
+}
+
+// Eigenvalues (largest first) of a general square matrix, valid ONLY when they are all real. Shifted QR iteration; if the
+// iteration does not settle (complex eigenvalues) or a 2x2 matrix has a negative discriminant, every entry is NaN rather
+// than a wrong real number. For symmetric matrices (covariance, SSCP) use symmetricEigenvalues; for MANOVA's B W^-1 use
+// generalizedSymmetricEigenvalues.
 function computeEigenvalues(matrix) {
-    // Eigenvalues (largest first) of a square matrix with real eigenvalues, such as B * W^-1 in MANOVA.
     const n = matrix.length;
     if (n === 1) return [matrix[0][0]];
     if (n === 2) {
         const [[a, b], [c, d]] = matrix;
-        const trace = a + d, disc = Math.max(0, trace * trace - 4 * (a * d - b * c));
+        const trace = a + d, rawDisc = trace * trace - 4 * (a * d - b * c);
+        if (rawDisc < -1e-12 * Math.max(1, trace * trace)) return [NaN, NaN];       // complex pair
+        const disc = Math.max(0, rawDisc);
         return [(trace + Math.sqrt(disc)) / 2, (trace - Math.sqrt(disc)) / 2];
     }
+    if (matrix.every((r, i) => r.every((v, j) => v === matrix[j][i]))) return symmetricEigenvalues(matrix);
     // Shifted QR iteration (Gram-Schmidt QR)
     let A = matrix.map(r => r.slice());
+    let converged = false;
     for (let iter = 0; iter < 1000; iter++) {
         const mu = A[n - 1][n - 1];
         const M = A.map((r, i) => r.map((v, j) => v - (i === j ? mu : 0)));
@@ -547,8 +629,9 @@ function computeEigenvalues(matrix) {
         A = R.map((r, i) => r.map((_, j) => r.reduce((s, _x, k) => s + R[i][k] * Q[k][j], 0) + (i === j ? mu : 0)));
         let off = 0;
         for (let i = 1; i < n; i++) for (let j = 0; j < i; j++) off += Math.abs(A[i][j]);
-        if (off < 1e-12) break;
+        if (off < 1e-12) { converged = true; break; }
     }
+    if (!converged) return new Array(n).fill(NaN);
     return A.map((r, i) => r[i]).sort((x, y) => y - x);
 }
 
@@ -573,6 +656,29 @@ function olsRSquared(y, predictors) {
         ssTot += (y[i] - yMean) * (y[i] - yMean);
     }
     return ssTot === 0 ? 0 : Math.min(1, Math.max(0, 1 - ssRes / ssTot));
+}
+
+// ---- Shape statistics ----
+// The adjusted Fisher-Pearson skewness (G1) and the bias-corrected excess kurtosis (G2): the estimators the Skewness and
+// Kurtosis tools use (the same as Excel's SKEW / KURT and R's e1071 type 2). Every tool that shows a skewness or kurtosis
+// number calls these, so the same data can never give two different answers. null when it is undefined
+// (n < 3 for skewness, n < 4 for kurtosis, or no spread).
+function sampleSkewness(values) {
+    const n = values.length;
+    if (n < 3) return null;
+    const mean = values.reduce((a, b) => a + b, 0) / n;
+    const s = Math.sqrt(values.reduce((a, v) => a + (v - mean) * (v - mean), 0) / (n - 1));
+    if (!(s > 0)) return null;
+    return (n / ((n - 1) * (n - 2))) * values.reduce((a, v) => a + Math.pow((v - mean) / s, 3), 0);
+}
+function sampleExcessKurtosis(values) {
+    const n = values.length;
+    if (n < 4) return null;
+    const mean = values.reduce((a, b) => a + b, 0) / n;
+    const s = Math.sqrt(values.reduce((a, v) => a + (v - mean) * (v - mean), 0) / (n - 1));
+    if (!(s > 0)) return null;
+    const fourth = values.reduce((a, v) => a + Math.pow((v - mean) / s, 4), 0);
+    return (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3)) * fourth - (3 * (n - 1) * (n - 1)) / ((n - 2) * (n - 3));
 }
 
 // ---- Quantiles ----

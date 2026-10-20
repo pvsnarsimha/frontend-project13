@@ -33,15 +33,13 @@ function computeStemLeafWithSteps(numbers) {
     const mean = sorted.reduce((a,b) => a+b, 0) / n;
     // Shape verdict from the adjusted Fisher-Pearson skewness (same formula as the Skewness tool), not from stem sizes
     let shapeLabel = 'not enough data to judge (needs at least 3 distinct values)';
-    if (n >= 3) {
-        const s2 = sorted.reduce((a, v) => a + (v - mean) * (v - mean), 0) / (n - 1);
-        if (s2 > 0) {
-            const g = (n / ((n - 1) * (n - 2))) * sorted.reduce((a, v) => a + Math.pow((v - mean) / Math.sqrt(s2), 3), 0);
-            shapeLabel = Math.abs(g) < 0.5 ? `approximately symmetric (skewness = ${g.toFixed(2)})`
-                : `${g > 0 ? 'right' : 'left'}-skewed (skewness = ${g.toFixed(2)})`;
-        }
+    const g = sampleSkewness(sorted);
+    if (g !== null) {
+        shapeLabel = Math.abs(g) < 0.5 ? `approximately symmetric (skewness = ${g.toFixed(2)})`
+            : `${g > 0 ? 'right' : 'left'}-skewed (skewness = ${g.toFixed(2)})`;
     }
     
+    const hasDecimals = sorted.some(v => !Number.isInteger(v));
     // Intelligent stem unit detection
     let stemUnit = 1;
     let leafDigits = 1;
@@ -57,17 +55,18 @@ function computeStemLeafWithSteps(numbers) {
         stemUnit = 10;
         leafDigits = 1;
         unitName = "tens";
-        stemFormula = `Stem = floor(value / 10), Leaf = value % 10`;
-    } else if (range < 1) {
+        stemFormula = `Stem = floor(value / 10), Leaf = units digit.${hasDecimals ? ' Decimals are cut off, not rounded.' : ''}`;
+    } else if (range < 1 || (hasDecimals && range < 30)) {
+        // Decimal data with a modest range keeps its tenths digit: 12.7 is stem 12, leaf 7 (not 12.3 and 12.7 both shown as "2")
         stemUnit = 0.1;
         leafDigits = 1;
         unitName = "tenths";
-        stemFormula = `Stem = floor(value), Leaf = round((value - stem) × 10)`;
+        stemFormula = `Stem = floor(value), Leaf = round((value - stem) × 10) (the tenths digit)`;
     } else {
         stemUnit = 1;
         leafDigits = 1;
         unitName = "units";
-        stemFormula = `Stem = floor(value / 10), Leaf = value % 10`;
+        stemFormula = `Stem = floor(value / 10), Leaf = units digit.${hasDecimals ? ' Decimals are cut off, not rounded.' : ''}`;
     }
     
     // Build stem-and-leaf plot
@@ -144,7 +143,9 @@ function computeStemLeafWithSteps(numbers) {
     
     plotLines.push('╚══════════════════════════════════════════════════════════════════════════════╝');
     plotLines.push('');
-    plotLines.push(leafDigits === 2 ? `Key: ${stems.length ? stems[0] : 0} | ${'05'} means ${stems.length ? stems[0] * 100 + 5 : 5} (stem = hundreds, leaf = last two digits)` : `Key: Stem represents ${stemUnit}s place | Leaf represents units place`);
+    plotLines.push(leafDigits === 2 ? `Key: ${stems.length ? stems[0] : 0} | ${'05'} means ${stems.length ? stems[0] * 100 + 5 : 5} (stem = hundreds, leaf = last two digits)` : stemUnit === 0.1
+        ? `Key: ${stems.length ? stems[0] : 0} | 7 means ${stems.length ? stems[0] : 0}.7 (stem = whole part, leaf = tenths digit)`
+        : `Key: Stem represents the tens place | Leaf represents the units place`);
     plotLines.push(`Stem unit: ${unitName} (${stemFormula})`);
     plotLines.push(`Depth: Cumulative frequency from the nearest extreme`);
     
@@ -343,7 +344,7 @@ ${plotLines.join('\n')}
             • Distribution shape: ${shapeLabel}<br>
             • Most frequent stem: ${stems.reduce((a,b) => stemMap.get(a).length > stemMap.get(b).length ? a : b)} (${Math.max(...stems.map(s => stemMap.get(s).length))} observations)<br>
             • Data spread: ${minVal} to ${maxVal} (Range: ${range.toFixed(2)})<br>
-            • Center tendency: Mean = ${mean.toFixed(4)} | Median = ${sorted[Math.floor(n/2)].toFixed(4)}
+            • Center tendency: Mean = ${mean.toFixed(4)} | Median = ${quantileType7(sorted, 0.5).toFixed(4)}
         </div>
     </div>
 </div>`;

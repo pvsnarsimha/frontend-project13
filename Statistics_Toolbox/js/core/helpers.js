@@ -164,6 +164,15 @@ function binomialPMF(n, k, p) {
 
 // Simple linear regression y = b0 + b1·x: the formulas shared by the simple-linear, standard-error, t-statistic and F-test tools.
 // Returns null when x does not vary (Σ(x - x̄)² = 0), where the slope is undefined.
+// One rule for a perfect fit, shared by every regression tool: a residual sum of squares at rounding level relative to the
+// total sum of squares. Descriptive tools (simple regression, model summary) still report R² = 1; the inference tools
+// (standard errors, t statistics, overall F) stop with PERFECT_FIT_MESSAGE because their divisors are zero.
+const PERFECT_FIT_REL_TOL = 1e-12;
+function isPerfectFit(ssRes, ssTot) {
+    return ssRes <= PERFECT_FIT_REL_TOL * ssTot;
+}
+const PERFECT_FIT_MESSAGE = "The line fits the data perfectly (residual sum of squares ≈ 0), so the standard errors are 0 and the t and F statistics are infinite. Inference needs some scatter around the line.";
+
 function simpleRegressionCore(x, y) {
     const n = x.length;
     const meanX = x.reduce((a, b) => a + b, 0) / n, meanY = y.reduce((a, b) => a + b, 0) / n;
