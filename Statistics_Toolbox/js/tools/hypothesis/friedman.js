@@ -310,7 +310,7 @@ function computeFriedmanTest(inputText, alpha) {
         </div>
     </div>`;
     
-    return { chiSq, df, pValue, criticalValue, rejectH0, steps };
+    return { chiSq, df, pValue, criticalValue, rejectH0, steps, chart: { dist: 'chisq', df: df, stat: chiSq, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== FRIEDMAN SETUP ==========
@@ -337,10 +337,12 @@ function setupFriedmanLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `χ² = ${result.chiSq.toFixed(6)} | df = ${result.df} | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("friedmanResultArea", result.chart);
         }
     });
     

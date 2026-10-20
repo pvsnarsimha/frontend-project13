@@ -294,10 +294,12 @@ function setupKendallLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);  // Changed to innerHTML
         } else {
             setHtml(valueSpan, `τ-b = ${result.tau.toFixed(6)}`);
-            setHtml(stepsSpan, result.steps);  // Changed to innerHTML
+            setHtml(stepsSpan, result.steps);
+            showFitCharts("kendallResultArea", xValues, yValues, { xName: "x", yName: "y" });  // Changed to innerHTML
         }
     });
     

@@ -176,7 +176,7 @@ function computeOneProportionZTest(successes, n, p0, alpha, alternative) {
         </div>
     </div>`;
     
-    return { zStatistic, pValue, criticalZ, rejectH0, pHat, n, steps };
+    return { zStatistic, pValue, criticalZ, rejectH0, pHat, n, steps, chart: { dist: 'z', df: undefined, stat: zStatistic, alternative: alternative, alpha: alpha, statLabel: 'z', critical: signedCritical(alternative, criticalZ) } };
 }
 
 function setupOneProportionZLogic() {
@@ -196,11 +196,13 @@ function setupOneProportionZLogic() {
         resultDiv.style.display = "block";
         if (result.error) {
             valueSpan.textContent = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, "⚠️ " + escapeHtml(result.message));
             return;
         }
         setHtml(valueSpan, `z = ${result.zStatistic?.toFixed(6) || 'Error'} | p = ${result.pValue?.toFixed(6) || 'Error'}`);
         setHtml(stepsSpan, result.steps || "Calculation completed.");
+            showTestChart("onePropZResultArea", result.chart);
     });
     attachClearHandler("onePropZClearBtn", ["propSuccesses", "propSampleSize"], "onePropZResultArea");
 }

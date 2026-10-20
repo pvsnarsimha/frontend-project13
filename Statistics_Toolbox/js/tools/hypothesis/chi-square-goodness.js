@@ -245,7 +245,7 @@ function computeChiSquareGoodnessTest(observed, expected, alpha) {
     
     // the chi-square approximation needs every expected count to be at least 5 (a common rule of thumb)
     const smallSample = expected.some(e => e < 5);
-    return { chiSquare, df, criticalValue, pValue, rejectH0, smallSample, steps };
+    return { chiSquare, df, criticalValue, pValue, rejectH0, smallSample, steps, chart: { dist: 'chisq', df: df, stat: chiSquare, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: criticalValue } } };
 }
 
 function setupChiSquareGoodnessLogic() {
@@ -267,10 +267,12 @@ function setupChiSquareGoodnessLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `χ² = ${result.chiSquare.toFixed(6)} | df = ${result.df} | p = ${result.pValue.toFixed(6)}${result.smallSample ? ' | ⚠ expected count < 5: approximation unreliable' : ''}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("goodnessResultArea", result.chart);
         }
     });
     

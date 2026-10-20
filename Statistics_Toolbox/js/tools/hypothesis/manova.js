@@ -347,7 +347,7 @@ function computeMANOVA(inputText, alpha) {
     // Rao's F for Wilks' Lambda is an exact F distribution when p <= 2 dependent variables or q = k - 1 <= 2 (up to 3 groups);
     // otherwise it is an approximation, and the tile says so
     const fExact = p <= 2 || q <= 2;
-    return { eigenvalues, wilksLambda, pillaiTrace, hotellingTrace, roysRoot, fStatistic, df1, df2, pValue, rejectH0, fExact, steps };
+    return { eigenvalues, wilksLambda, pillaiTrace, hotellingTrace, roysRoot, fStatistic, df1, df2, pValue, rejectH0, fExact, steps, chart: { dist: 'f', df: df1, df2: df2, stat: fStatistic, alternative: 'greater', alpha: alpha, statLabel: 'F', critical: { lower: null, upper: criticalValue } } };
 }
 
 function setupMANOVALogic() {
@@ -373,10 +373,12 @@ function setupMANOVALogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `Λ = ${result.wilksLambda.toFixed(4)} | F = ${result.fStatistic.toFixed(4)} | p = ${result.pValue.toFixed(6)}${result.fExact ? ' (exact F)' : ' | ⚠ Rao F approximation (more than 2 variables and more than 3 groups)'}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("manovaResultArea", result.chart);
         }
     });
     

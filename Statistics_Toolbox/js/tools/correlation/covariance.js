@@ -155,10 +155,12 @@ function setupCovarianceLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);  // Changed to innerHTML
         } else {
             setHtml(valueSpan, `Cov = ${result.covariance.toFixed(6)}`);
-            setHtml(stepsSpan, result.steps);  // Changed to innerHTML
+            setHtml(stepsSpan, result.steps);
+            showFitCharts("covarianceResultArea", xValues, yValues, { xName: "x", yName: "y" });  // Changed to innerHTML
         }
     });
     

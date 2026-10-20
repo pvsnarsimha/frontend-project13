@@ -196,10 +196,12 @@ function setupModelSummaryLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `R² = ${result.rSquared.toFixed(4)} | RMSE = ${result.rmse.toFixed(4)} | MAE = ${result.mae.toFixed(4)}`);
             setHtml(stepsSpan, result.steps);
+            showActualVsPredictedCharts("modelSummaryResultArea", actual, predicted);
         }
     });
     

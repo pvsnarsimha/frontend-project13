@@ -200,11 +200,13 @@ function setupPMFLogic() {
             if (result.error) {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = 'Error';
+                hideAllStatCharts();
                 setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
             } else {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = result.resultStr;
                 stepsSpan.innerText = result.steps;
+                showDistributionGraph('pmfResultArea', 'pmf', 'pmf', parseNumbersFromInput(document.getElementById('pmfXValues').value));
             }
         });
     }

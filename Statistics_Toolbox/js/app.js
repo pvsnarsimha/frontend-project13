@@ -33,6 +33,8 @@ const STAT_ROUTES = {
     pmf: [renderPMFInterface, setupPMFLogic],
     survival: [renderSurvivalInterface, setupSurvivalLogic],
     hazard: [renderHazardInterface, setupHazardLogic],
+    probcalc: [renderProbCalcInterface, setupProbCalcLogic],
+    groupeddata: [renderGroupedDataInterface, setupGroupedDataLogic],
     pearson: [renderPearsonInterface, setupPearsonLogic],
     spearman: [renderSpearmanInterface, setupSpearmanLogic],
     kendall: [renderKendallInterface, setupKendallLogic],
@@ -80,6 +82,7 @@ const STAT_ROUTES = {
     phi: [renderPhiInterface, setupPhiLogic],
     onesamplez: [renderOneSampleZInterface, setupOneSampleZLogic],
     oneproportionz: [renderOneProportionZInterface, setupOneProportionZLogic],
+    twoproportionz: [renderTwoProportionZInterface, setupTwoProportionZLogic],
     binomialexact: [renderBinomialExactInterface, setupBinomialExactLogic],
     winsorize: [renderWinsorizeInterface, setupWinsorizeLogic],
     boxcox: [renderBoxCoxInterface, setupBoxCoxLogic],
@@ -170,6 +173,17 @@ document.querySelector('.main-panel').addEventListener('click', e => {
     if (!btn) return;
     if (btn.dataset.action === 'visualize') { visualizeCurrentData(); return; }
     if (btn.dataset.stat) { switchToStat(btn.dataset.stat); focusToolTitle(); }
+});
+
+// Raw data / summary statistics switch (see inputModeItem in core/toolkit.js): show the input group that matches the select
+function applyInputMode(select) {
+    const iface = select.closest('.stat-interface');
+    if (!iface) return;
+    iface.querySelectorAll('[data-mode]').forEach(group => { group.style.display = group.dataset.mode === select.value ? '' : 'none'; });
+}
+document.addEventListener('change', e => {
+    const select = e.target.closest && e.target.closest('[data-mode-select]');
+    if (select) applyInputMode(select);
 });
 
 // Tabs: click, Enter/Space, and arrow-key navigation (WAI-ARIA tabs pattern)

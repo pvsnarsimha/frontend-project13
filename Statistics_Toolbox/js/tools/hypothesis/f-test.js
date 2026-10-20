@@ -327,7 +327,7 @@ function computeFTest(sample1, sample2, alpha, alternative) {
         </div>
     </div>`;
     
-    return { fStatistic, df1, df2, pValue, criticalValue, rejectH0, conclusion, interpretation, steps };
+    return { fStatistic, df1, df2, pValue, criticalValue, rejectH0, conclusion, interpretation, steps, chart: { dist: 'f', df: df1, df2: df2, stat: fStatistic, alternative: alternative === 'less' ? 'less' : (alternative === 'greater' ? 'greater' : 'two.sided'), alpha: alpha, statLabel: 'F', critical: alternative === 'less' ? { lower: criticalValue, upper: null } : { lower: null, upper: criticalValue } } };
 }
 
 // ========== F-TEST SETUP ==========
@@ -358,10 +358,12 @@ function setupFTestLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `F = ${result.fStatistic.toFixed(6)} | df = (${result.df1}, ${result.df2}) | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("ftestResultArea", result.chart);
         }
     });
     

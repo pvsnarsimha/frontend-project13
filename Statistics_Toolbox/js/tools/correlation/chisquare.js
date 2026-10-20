@@ -9,17 +9,10 @@ function renderChisquareInterface() {
         formula: "📌 χ² = Σ (Oᵢⱼ - Eᵢⱼ)² / Eᵢⱼ",
         desc: "Tests whether two categorical variables are independent. Null hypothesis: variables are independent.",
         inputs: [
+            inputModeItem("chisquareMode", "🧮 Table of counts (as given in a textbook)"),
             {
-                label: "📋 Enter data as comma-separated pairs (category1, category2):",
-                textarea: {
-                    id: "chisquareData",
-                    rows: "4",
-                    placeholder: "Example:&#10;Red, Apple&#10;Green, Apple&#10;Red, Orange&#10;Red, Apple&#10;Green, Orange&#10;Red, Orange"
-                }
-            },
-            {
-                hint: "Each line: value for Row Variable, value for Column Variable",
-                hintAttrs: { style: HINT_STYLE }
+                html: modeGroupHtml("raw", '<label>📋 Enter data as comma-separated pairs (category1, category2):</label>\n<textarea id="chisquareData" rows="4" placeholder="Example:&#10;Red, Apple&#10;Green, Apple&#10;Red, Orange&#10;Red, Apple&#10;Green, Orange&#10;Red, Orange"></textarea>\n<small style="' + HINT_STYLE + '">Each line: value for Row Variable, value for Column Variable</small>') +
+                    modeGroupHtml("summary", '<label>📋 Observed counts, one table row per line:</label>\n<textarea id="chisquareTable" rows="4" placeholder="Example:&#10;30, 20, 10&#10;20, 25, 15">30, 20, 10&#10;20, 25, 15</textarea>\n<small style="' + HINT_STYLE + '">Each line is a row of the table; separate the counts with commas or spaces.</small>')
             },
             {
                 label: "📊 Significance Level (α):",
@@ -89,7 +82,35 @@ function computeChisquareWithSteps(inputText, alpha = 0.05) {
         colTotals[pair.col]++;
     }
     
-    const grandTotal = pairs.length;
+    return computeChisquareFromCounts(rowCategories, colCategories, observed, rowTotals, colTotals, pairs.length, alpha);
+}
+
+// The same test from a table of counts, one line per row ("20, 30, 10"), as a textbook gives it
+function computeChisquareFromTable(tableText, alpha = 0.05) {
+    const rows = tableText.trim().split(/\r?\n/).map(l => l.trim()).filter(l => l !== "").map(l => l.split(/[,\s]+/).filter(v => v !== "").map(Number));
+    if (rows.length < 2 || rows[0].length < 2) return { error: true, message: "Enter a table with at least 2 rows and 2 columns of counts, one row per line." };
+    if (rows.some(r => r.length !== rows[0].length)) return { error: true, message: "Every row of the table must have the same number of counts." };
+    if (rows.some(r => r.some(v => !(v >= 0) || !isFinite(v)))) return { error: true, message: "The counts must be numbers that are 0 or more." };
+    const rowCategories = rows.map((_, i) => "Row " + (i + 1));
+    const colCategories = rows[0].map((_, j) => "Col " + (j + 1));
+    const observed = Object.create(null), rowTotals = Object.create(null), colTotals = Object.create(null);
+    colCategories.forEach(c => { colTotals[c] = 0; });
+    let grandTotal = 0;
+    rows.forEach((r, i) => {
+        observed[rowCategories[i]] = Object.create(null);
+        rowTotals[rowCategories[i]] = 0;
+        r.forEach((v, j) => {
+            observed[rowCategories[i]][colCategories[j]] = v;
+            rowTotals[rowCategories[i]] += v;
+            colTotals[colCategories[j]] += v;
+            grandTotal += v;
+        });
+    });
+    if (Object.values(rowTotals).some(t => t === 0) || Object.values(colTotals).some(t => t === 0)) return { error: true, message: "A row or a column of the table adds up to 0, so its expected counts are 0 and χ² is undefined. Remove it." };
+    return computeChisquareFromCounts(rowCategories, colCategories, observed, rowTotals, colTotals, grandTotal, alpha);
+}
+
+function computeChisquareFromCounts(rowCategories, colCategories, observed, rowTotals, colTotals, grandTotal, alpha) {
     const df = (rowCategories.length - 1) * (colCategories.length - 1);
     
     // Calculate expected frequencies and chi-square
@@ -277,7 +298,7 @@ function computeChisquareWithSteps(inputText, alpha = 0.05) {
         </div>
     </div>`;
     
-    return { chiSquare, df, criticalValue, pValue, alpha, conclusion, interpretation, steps, observed, expected: calculationRows };
+    return { chiSquare, df, criticalValue, pValue, alpha, conclusion, interpretation, steps, observed, expected: calculationRows, chart: { dist: 'chisq', df: df, stat: chiSquare, alternative: 'greater', alpha: alpha, statLabel: 'χ²', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== CHI-SQUARE TEST SETUP ==========
@@ -286,7 +307,8 @@ function setupChisquareLogic() {
     if (!computeBtn) return;
     
     computeBtn.addEventListener('click', () => {
-        const raw = document.getElementById("chisquareData").value;
+        const tableMode = document.querySelector('#statChisquareInterface [data-mode-select]').value === 'summary';
+        const raw = document.getElementById(tableMode ? "chisquareTable" : "chisquareData").value;
         const alphaSelect = document.getElementById("chisquareAlpha");
         const alpha = parseFloat(alphaSelect.value);
         const resultDiv = document.getElementById("chisquareResultArea");
@@ -296,21 +318,24 @@ function setupChisquareLogic() {
         if (!raw.trim()) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "No data";
-            stepsSpan.innerText = "Enter data pairs (category1, category2)";
+            stepsSpan.innerText = tableMode ? "Enter the table of counts" : "Enter data pairs (category1, category2)";
+            hideAllStatCharts();
             return;
         }
         
-        const result = computeChisquareWithSteps(raw, alpha);
+        const result = tableMode ? computeChisquareFromTable(raw, alpha) : computeChisquareWithSteps(raw, alpha);
         resultDiv.style.display = "block";
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
             setHtml(valueSpan, `χ² = ${result.chiSquare.toFixed(6)} | df = ${result.df} | p = ${result.pValue.toFixed(6)} | α = ${result.alpha}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("chisquareResultArea", result.chart);
         }
     });
     
-    attachClearHandler("chisquareClearBtn", "chisquareData", "chisquareResultArea");
+    attachClearHandler("chisquareClearBtn", ["chisquareData", "chisquareTable"], "chisquareResultArea");
 }

@@ -78,6 +78,7 @@
             <button type="button" class="stat-btn" id="btnCV" data-stat="cv"><span class="btn-icon" aria-hidden="true">📊</span> Coefficient of Variation</button>
             <button type="button" class="stat-btn" id="btnSkewness" data-stat="skewness"><span class="btn-icon" aria-hidden="true">📈</span> Skewness</button>
             <button type="button" class="stat-btn" id="btnKurtosis" data-stat="kurtosis"><span class="btn-icon" aria-hidden="true">🎯</span> Kurtosis</button>
+            <button type="button" class="stat-btn" id="btnGrouped" data-stat="groupeddata"><span class="btn-icon" aria-hidden="true">📚</span> Frequency Table / Grouped Data</button>
             <button type="button" class="stat-btn" id="btnFiveNum" data-stat="fivenum"><span class="btn-icon" aria-hidden="true">📦</span> Five-Number Summary</button>
             <button type="button" class="stat-btn" id="btnSumSquares" data-stat="sumsquares"><span class="btn-icon" aria-hidden="true">🔲</span> Sum of Squares (SS)</button>
             <button type="button" class="stat-btn" id="btnMeanAbsDev" data-stat="meanabsdev"><span class="btn-icon" aria-hidden="true">📊</span> Mean Absolute Deviation</button>
@@ -116,6 +117,7 @@
             <button type="button" class="stat-btn" id="probMGF" data-stat="mgf"><span class="btn-icon" aria-hidden="true">🔢</span> Moment Generating Function (MGF)</button>
             <button type="button" class="stat-btn" id="probPMF" data-stat="pmf"><span class="btn-icon" aria-hidden="true">🎲</span> Probability Mass (PMF)</button>
             <button type="button" class="stat-btn" id="probSurvival" data-stat="survival"><span class="btn-icon" aria-hidden="true">📉</span> Survival Function (1-CDF)</button>
+            <button type="button" class="stat-btn" id="probCalc" data-stat="probcalc"><span class="btn-icon" aria-hidden="true">🧮</span> Probability Calculator (shaded)</button>
             <button type="button" class="stat-btn" id="probHazard" data-stat="hazard"><span class="btn-icon" aria-hidden="true">⚠️</span> Hazard Function</button>
             <button type="button" class="stat-btn" id="probEntropy" data-stat="entropy"><span class="btn-icon" aria-hidden="true">📊</span> Distribution Entropy</button>
             <button type="button" class="stat-btn" id="probDistSkewness" data-stat="distSkewness"><span class="btn-icon" aria-hidden="true">📈</span> Distribution Skewness</button>
@@ -152,6 +154,7 @@
             <button type="button" class="stat-btn" id="hypFriedman" data-stat="friedman"><span class="btn-icon" aria-hidden="true">χ²</span> Friedman Test</button>
             <button type="button" class="stat-btn" id="hypOneSampleZ" data-stat="onesamplez"><span class="btn-icon" aria-hidden="true">z</span> One-Sample z-test (Known Variance)</button>
             <button type="button" class="stat-btn" id="hypOneSamplePropZ" data-stat="oneproportionz"><span class="btn-icon" aria-hidden="true">p</span> One-Sample Proportion z-test</button>
+            <button type="button" class="stat-btn" id="hypTwoSamplePropZ" data-stat="twoproportionz"><span class="btn-icon" aria-hidden="true">p</span> Two-Proportion z-test</button>
             <button type="button" class="stat-btn" id="hypBinomialExact" data-stat="binomialexact"><span class="btn-icon" aria-hidden="true">B</span> Binomial Exact Test</button>
             <button type="button" class="stat-btn" id="hypChiSquareGoodness" data-stat="chisquaregoodness"><span class="btn-icon" aria-hidden="true">χ²</span> Chi-Square Goodness-of-Fit Test</button>
             <button type="button" class="stat-btn" id="hypKolmogorovSmirnov" data-stat="kolmogorovsmirnov"><span class="btn-icon" aria-hidden="true">D</span> Kolmogorov-Smirnov Test (Normality)</button>
@@ -208,10 +211,15 @@
 <script src="js/core/charts.js"></script>
 <script src="js/core/helpers.js"></script>
 <script src="js/core/distributions.js"></script>
+<script src="js/core/density.js"></script>
+<script src="js/core/stat-charts.js"></script>
+<script src="js/core/dist-graphs.js"></script>
+<script src="js/core/summary-tests.js"></script>
 <script src="js/tools/descriptive/cv.js"></script>
 <script src="js/tools/descriptive/deciles.js"></script>
 <script src="js/tools/descriptive/five-num.js"></script>
 <script src="js/tools/descriptive/geometric.js"></script>
+<script src="js/tools/descriptive/grouped-data.js"></script>
 <script src="js/tools/descriptive/harmonic.js"></script>
 <script src="js/tools/descriptive/iqr.js"></script>
 <script src="js/tools/descriptive/kurtosis.js"></script>
@@ -258,6 +266,7 @@
 <script src="js/tools/probability/mgf.js"></script>
 <script src="js/tools/probability/pdf.js"></script>
 <script src="js/tools/probability/pmf.js"></script>
+<script src="js/tools/probability/probcalc.js"></script>
 <script src="js/tools/probability/quantile.js"></script>
 <script src="js/tools/probability/random.js"></script>
 <script src="js/tools/probability/survival.js"></script>
@@ -309,6 +318,7 @@
 <script src="js/tools/hypothesis/shapiro-wilk.js"></script>
 <script src="js/tools/hypothesis/sign-test.js"></script>
 <script src="js/tools/hypothesis/tukey-hsd.js"></script>
+<script src="js/tools/hypothesis/two-proportion-z.js"></script>
 <script src="js/tools/hypothesis/two-sample-t.js"></script>
 <script src="js/tools/hypothesis/wilcoxon.js"></script>
 <script src="js/tools/regression/f-test-overall.js"></script>

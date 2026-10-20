@@ -8,14 +8,11 @@ function renderTwoSampleTInterface() {
         formula: "📌 t = (x̄₁ - x̄₂) / √(s₁²/n₁ + s₂²/n₂)",
         desc: "Tests whether the means of two independent populations are significantly different (Welch's t-test, does not assume equal variances).",
         inputs: [
+            inputModeItem("twoSampleMode", "🧮 Summary statistics (n, mean, s for each group)"),
             {
-                label: "📋 Enter Sample 1 data (comma, space, or line separated):",
-                textarea: { id: "twoSampleData1", rows: "3", placeholder: "Example: 12, 15, 14, 16, 13, 15" }
-            },
-            {
-                label: "📋 Enter Sample 2 data (comma, space, or line separated):",
-                labelAttrs: { style: FIELD_GAP },
-                textarea: { id: "twoSampleData2", rows: "3", placeholder: "Example: 18, 20, 19, 21, 22, 20, 19" }
+                html: modeGroupHtml("raw", '<label>📋 Enter Sample 1 data (comma, space, or line separated):</label>\n<textarea id="twoSampleData1" rows="3" placeholder="Example: 12, 15, 14, 16, 13, 15"></textarea>\n<label style="' + FIELD_GAP + '">📋 Enter Sample 2 data (comma, space, or line separated):</label>\n<textarea id="twoSampleData2" rows="3" placeholder="Example: 18, 20, 19, 21, 22, 20, 19"></textarea>') +
+                    modeGroupHtml("summary", summaryFieldsHtml([["twoSampleN1", "Sample 1 size n₁:", "30", 'min="2"'], ["twoSampleMean1", "Sample 1 mean x̄₁:", "82"], ["twoSampleSd1", "Sample 1 standard deviation s₁:", "8", 'min="0"'],
+                        ["twoSampleN2", "Sample 2 size n₂:", "35", 'min="2"'], ["twoSampleMean2", "Sample 2 mean x̄₂:", "78"], ["twoSampleSd2", "Sample 2 standard deviation s₂:", "10", 'min="0"']]))
             },
             {
                 label: "📊 Significance Level (α):",
@@ -64,16 +61,21 @@ function computeTwoSampleTTest(sample1, sample2, alpha, alternative) {
     const n1 = sample1.length;
     const n2 = sample2.length;
     
-    const sum1 = sample1.reduce((a, b) => a + b, 0);
-    const sum2 = sample2.reduce((a, b) => a + b, 0);
-    const mean1 = sum1 / n1;
-    const mean2 = sum2 / n2;
-    
-    // Calculate sample variances
-    const var1 = sample1.reduce((a, b) => a + Math.pow(b - mean1, 2), 0) / (n1 - 1);
-    const var2 = sample2.reduce((a, b) => a + Math.pow(b - mean2, 2), 0) / (n2 - 1);
-    const stdDev1 = Math.sqrt(var1);
-    const stdDev2 = Math.sqrt(var2);
+    const mean1 = sample1.reduce((a, b) => a + b, 0) / n1;
+    const mean2 = sample2.reduce((a, b) => a + b, 0) / n2;
+    const stdDev1 = Math.sqrt(sample1.reduce((a, b) => a + Math.pow(b - mean1, 2), 0) / (n1 - 1));
+    const stdDev2 = Math.sqrt(sample2.reduce((a, b) => a + Math.pow(b - mean2, 2), 0) / (n2 - 1));
+    return computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, alpha, alternative);
+}
+
+// The same Welch test from the summary a textbook question gives: n, x̄ and s for each group
+function computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, alpha, alternative) {
+    if (!(n1 >= 2 && n2 >= 2) || !Number.isInteger(n1) || !Number.isInteger(n2)) return { error: true, message: "Each sample size must be a whole number of at least 2." };
+    if (!isFinite(mean1) || !isFinite(mean2)) return { error: true, message: "Enter both sample means as numbers." };
+    if (!(stdDev1 >= 0 && stdDev2 >= 0) || !isFinite(stdDev1) || !isFinite(stdDev2)) return { error: true, message: "Each sample standard deviation must be a number that is 0 or more." };
+    if (stdDev1 === 0 && stdDev2 === 0) return { error: true, message: "Both standard deviations are 0, so the standard error is 0 and the t statistic is undefined." };
+    const var1 = stdDev1 * stdDev1;
+    const var2 = stdDev2 * stdDev2;
     
     // Standard error
     const se = Math.sqrt(var1 / n1 + var2 / n2);
@@ -207,7 +209,7 @@ function computeTwoSampleTTest(sample1, sample2, alpha, alternative) {
         </div>
     </div>`;
     
-    return { tStatistic, df, pValue, criticalValue, rejectH0, conclusion, interpretation, mean1, mean2, stdDev1, stdDev2, steps };
+    return { tStatistic, df, pValue, criticalValue, rejectH0, conclusion, interpretation, mean1, mean2, stdDev1, stdDev2, steps, chart: { dist: 't', df: df, stat: tStatistic, alternative: alternative, alpha: alpha, statLabel: 't', critical: signedCritical(alternative, criticalValue) } };
 }
 
 function setupTwoSampleTLogic() {
@@ -215,6 +217,7 @@ function setupTwoSampleTLogic() {
     if (!computeBtn) return;
     
     computeBtn.addEventListener('click', () => {
+        const summaryMode = document.querySelector('#statTwoSampleTInterface [data-mode-select]').value === 'summary';
         const raw1 = document.getElementById("twoSampleData1").value;
         const raw2 = document.getElementById("twoSampleData2").value;
         const sample1 = parseNumbersFromInput(raw1);
@@ -225,22 +228,28 @@ function setupTwoSampleTLogic() {
         const valueSpan = document.getElementById("twoSampleTValueDisplay");
         const stepsSpan = document.getElementById("twoSampleTStepsDisplay");
         
-        if (!sample1.length || !sample2.length) {
+        if (!summaryMode && (!sample1.length || !sample2.length)) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "No data";
             stepsSpan.innerText = "Please enter both sample datasets.";
+            hideStatChartCard('test');
             return;
         }
         
-        const result = computeTwoSampleTTest(sample1, sample2, alpha, alternative);
+        const num = id => parseFloat(document.getElementById(id).value);
+        const result = summaryMode
+            ? computeTwoSampleTFromSummary(num("twoSampleN1"), num("twoSampleMean1"), num("twoSampleSd1"), num("twoSampleN2"), num("twoSampleMean2"), num("twoSampleSd2"), alpha, alternative)
+            : computeTwoSampleTTest(sample1, sample2, alpha, alternative);
         resultDiv.style.display = "block";
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `t = ${result.tStatistic.toFixed(6)} | df = ${result.df.toFixed(2)} | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("twoSampleTResultArea", result.chart);
         }
     });
     

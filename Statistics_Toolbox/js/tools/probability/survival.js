@@ -225,11 +225,13 @@ function setupSurvivalLogic() {
             if (result.error) {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = 'Error';
+                hideAllStatCharts();
                 setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
             } else {
                 resultDiv.style.display = 'block';
                 valueSpan.innerText = result.resultStr;
                 stepsSpan.innerText = result.steps;
+                showDistributionGraph('survivalResultArea', 'survival', 'survival', parseNumbersFromInput(document.getElementById('survivalXValues').value));
             }
         });
     }

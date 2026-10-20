@@ -141,5 +141,50 @@ grid = {"norm_cdf": [[z_, float(st.norm.cdf(z_))] for z_ in (-3.1, -1, 0, 0.5, 1
         "chi2_crit": [[a_, df, float(st.chi2.ppf(1 - a_, df))] for a_ in (0.05, 0.01) for df in (1, 5, 20)],
         "f_crit": [[a_, d1, d2, float(st.f.ppf(1 - a_, d1, d2))] for a_ in (0.05, 0.01) for d1, d2 in ((2, 9), (5, 20), (1, 100))]}
 out["grid"] = grid
+
+# summary-statistics input (textbook questions): the same tests from n / mean / sd / counts
+from scipy.stats import chi2_contingency
+from statsmodels.stats.proportion import proportions_ztest
+out["summary"] = {}
+# one-sample t from summary: t = (mean - mu0)/(s/sqrt(n)), p from the t distribution (computed here, not copied from the app)
+def t_from_summary(n, mean, s, mu0, alt):
+    t = (mean - mu0) / (s / np.sqrt(n)); df = n - 1
+    p = {"two-sided": 2 * st.t.sf(abs(t), df), "greater": st.t.sf(t, df), "less": st.t.cdf(t, df)}[alt]
+    return {"t": float(t), "p": float(p)}
+out["summary"]["one_t"] = {alt: t_from_summary(25, 16.2, 2.5, 15, alt) for alt in ("two-sided", "less", "greater")}
+out["summary"]["one_z"] = {alt: {"z": float((15.8 - 15) / (2 / 6)), "p": float({"two-sided": 2 * st.norm.sf(abs((15.8 - 15) / (2 / 6))), "greater": st.norm.sf((15.8 - 15) / (2 / 6)), "less": st.norm.cdf((15.8 - 15) / (2 / 6))}[alt])} for alt in ("two-sided", "less", "greater")}
+out["summary"]["welch"] = {alt: dict(zip(("t", "p"), map(float, st.ttest_ind_from_stats(82, 8, 30, 78, 10, 35, equal_var=False, alternative=alt)))) for alt in ("two-sided", "less", "greater")}
+out["summary"]["two_prop"] = {alt: dict(zip(("z", "p"), map(float, proportions_ztest([45, 30], [120, 110], alternative={"two-sided": "two-sided", "greater": "larger", "less": "smaller"}[alt])))) for alt in ("two-sided", "less", "greater")}
+tbl = [[30, 20, 10], [20, 25, 15]]
+c2 = chi2_contingency(tbl, correction=False)
+out["summary"]["chisq_table"] = {"table": tbl, "chi2": float(c2[0]), "p": float(c2[1]), "df": int(c2[2])}
+
+# distribution densities / probabilities behind the graphs and the Probability Calculator
+out["density"] = {
+    "t_pdf": [[x_, df, float(st.t.pdf(x_, df))] for x_ in (-2.5, 0, 1.3) for df in (1, 5, 30)],
+    "chi2_pdf": [[x_, df, float(st.chi2.pdf(x_, df))] for x_ in (0.5, 3, 9) for df in (2, 4, 10)],
+    "f_pdf": [[x_, a_, b_, float(st.f.pdf(x_, a_, b_))] for x_ in (0.4, 1.5, 4) for a_, b_ in ((4, 12), (2, 9), (10, 30))],
+    "exp_pdf": [[x_, r_, float(st.expon.pdf(x_, scale=1 / r_))] for x_ in (0.2, 1, 3) for r_ in (0.5, 2)],
+    "poisson_pmf": [[k_, l_, float(st.poisson.pmf(k_, l_))] for k_ in (0, 3, 10) for l_ in (0.7, 4, 12)],
+    "weibull_cdf": [[x_, k_, l_, float(st.weibull_min.cdf(x_, k_, scale=l_))] for x_ in (0.5, 2, 5) for k_, l_ in ((1.5, 2), (0.8, 1))],
+}
+out["probcalc"] = [
+    ["normal", {"mean": 0, "stdDev": 1}, "between", -1, 2, float(st.norm.cdf(2) - st.norm.cdf(-1))],
+    ["t", {"df": 10}, "gt", 2.228, 0, float(st.t.sf(2.228, 10))],
+    ["chisq", {"df": 4}, "ge", 9.488, 0, float(st.chi2.sf(9.488, 4))],
+    ["f", {"df1": 4, "df2": 12}, "gt", 3.26, 0, float(st.f.sf(3.26, 4, 12))],
+    ["binomial", {"n": 10, "p": 0.4}, "between", 3, 5, float(st.binom.cdf(5, 10, 0.4) - st.binom.cdf(2, 10, 0.4))],
+    ["binomial", {"n": 10, "p": 0.4}, "lt", 3, 0, float(st.binom.cdf(2, 10, 0.4))],
+    ["poisson", {"lambda": 4}, "ge", 6, 0, float(st.poisson.sf(5, 4))],
+    ["poisson", {"lambda": 4}, "eq", 2, 0, float(st.poisson.pmf(2, 4))],
+    ["exponential", {"rate": 0.5}, "outside", 1, 4, float(1 - (st.expon.cdf(4, scale=2) - st.expon.cdf(1, scale=2)))],
+    ["normal", {"mean": 100, "stdDev": 15}, "le", 85, 0, float(st.norm.cdf(85, 100, 15))],
+]
+
+# grouped data: class midpoints expanded to a plain sample; value/frequency table expanded with np.repeat
+vals = np.array([2, 3, 5, 8]); fr = np.array([4, 7, 5, 2]); exp = np.repeat(vals, fr)
+out["grouped_values"] = {"text": "2, 4\n3, 7\n5, 5\n8, 2", "n": int(exp.size), "mean": float(exp.mean()), "median": float(np.median(exp)), "sd": float(exp.std(ddof=1))}
+mids = np.array([15, 25, 35, 45, 55]); cf_ = np.array([4, 10, 18, 6, 2]); mexp = np.repeat(mids, cf_)
+out["grouped_classes"] = {"text": "10-20, 4\n20-30, 10\n30-40, 18\n40-50, 6\n50-60, 2", "n": int(mexp.size), "mean": float(mexp.mean()), "sd": float(mexp.std(ddof=1))}
 json.dump(out, open(os.path.join(os.path.dirname(__file__), "reference-values.json"), "w"), indent=1)
 print("wrote reference-values.json")

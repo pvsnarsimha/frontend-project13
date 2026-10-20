@@ -241,7 +241,7 @@ function computeSignTest(data, hypothesizedMedian, alpha, alternative) {
         </div>
     </div>`;
     
-    return { testStatistic, nonZero, pValue, rejectH0, positives, negatives, zeros, steps };
+    return { testStatistic, nonZero, pValue, rejectH0, positives, negatives, zeros, steps, chart: nonZero > 0 ? { kind: 'binomial', n: nonZero, p0: 0.5, k: alternative === 'two.sided' ? Math.min(positives, negatives) : positives, alternative: alternative, alpha: alpha } : null };
 }
 
 function binomialCumulative(k, n, p) {
@@ -286,10 +286,12 @@ function setupSignTestLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `Test stat = ${result.testStatistic} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
             setHtml(stepsSpan, result.steps);
+        showTestChart("signResultArea", result.chart);
         }
     });
     

@@ -8,9 +8,10 @@ function renderOneSampleTInterface() {
         formula: "📌 t = (x̄ - μ₀) / (s / √n)",
         desc: "Tests whether the sample mean is significantly different from a hypothesized population mean (μ₀).",
         inputs: [
+            inputModeItem("oneSampleMode"),
             {
-                label: "📋 Enter sample data (comma, space, or line separated):",
-                textarea: { id: "oneSampleData", rows: "3", placeholder: "Example: 12, 15, 14, 16, 13, 15, 14, 17, 16, 15" }
+                html: modeGroupHtml("raw", '<label>📋 Enter sample data (comma, space, or line separated):</label>\n<textarea id="oneSampleData" rows="3" placeholder="Example: 12, 15, 14, 16, 13, 15, 14, 17, 16, 15"></textarea>') +
+                    modeGroupHtml("summary", summaryFieldsHtml([["oneSampleN", "Sample size n:", "25", 'min="2"'], ["oneSampleMean", "Sample mean x̄:", "16.2"], ["oneSampleSd", "Sample standard deviation s:", "2.5", 'min="0"']]))
             },
             {
                 label: "📊 Hypothesized Population Mean (μ₀):",
@@ -74,6 +75,14 @@ function computeOneSampleTTest(data, mu0, alpha, alternative) {
     if (!(stdDev > 0)) {
         return { error: true, message: "All values are identical, so the sample standard deviation is 0 and the t statistic is undefined (the standard error is 0). Enter values that vary." };
     }
+    return computeOneSampleTFromSummary(n, mean, stdDev, mu0, alpha, alternative);
+}
+
+// The same test from the summary a textbook question gives: n, x̄ and s (computeOneSampleTTest reduces raw data to these)
+function computeOneSampleTFromSummary(n, mean, stdDev, mu0, alpha, alternative) {
+    if (!(n >= 2) || !Number.isInteger(n)) return { error: true, message: "The sample size n must be a whole number of at least 2." };
+    if (!isFinite(mean) || !isFinite(mu0)) return { error: true, message: "Enter the sample mean and μ₀ as numbers." };
+    if (!(stdDev > 0) || !isFinite(stdDev)) return { error: true, message: "The sample standard deviation s must be a number greater than 0." };
     
     // Calculate t-statistic
     const standardError = stdDev / Math.sqrt(n);
@@ -193,7 +202,7 @@ function computeOneSampleTTest(data, mu0, alpha, alternative) {
         </div>
     </div>`;
     
-    return { tStatistic, df, pValue, criticalValue, rejectH0, conclusion, interpretation, mean, stdDev, steps };
+    return { tStatistic, df, pValue, criticalValue, rejectH0, conclusion, interpretation, mean, stdDev, steps, chart: { dist: 't', df: df, stat: tStatistic, alternative: alternative, alpha: alpha, statLabel: 't', critical: signedCritical(alternative, criticalValue) } };
 }
 
 // ========== SETUP FUNCTIONS ==========
@@ -202,6 +211,7 @@ function setupOneSampleTLogic() {
     if (!computeBtn) return;
     
     computeBtn.addEventListener('click', () => {
+        const summaryMode = document.querySelector('#statOneSampleTInterface [data-mode-select]').value === 'summary';
         const raw = document.getElementById("oneSampleData").value;
         const data = parseNumbersFromInput(raw);
         const mu0 = parseFloat(document.getElementById("hypothesizedMean").value);
@@ -211,22 +221,28 @@ function setupOneSampleTLogic() {
         const valueSpan = document.getElementById("oneSampleTValueDisplay");
         const stepsSpan = document.getElementById("oneSampleTStepsDisplay");
         
-        if (!data.length) {
+        if (!summaryMode && !data.length) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "No data";
             stepsSpan.innerText = "Please enter sample data.";
+            hideStatChartCard('test');
             return;
         }
         
-        const result = computeOneSampleTTest(data, mu0, alpha, alternative);
+        const result = summaryMode
+            ? computeOneSampleTFromSummary(parseFloat(document.getElementById("oneSampleN").value), parseFloat(document.getElementById("oneSampleMean").value),
+                parseFloat(document.getElementById("oneSampleSd").value), mu0, alpha, alternative)
+            : computeOneSampleTTest(data, mu0, alpha, alternative);
         resultDiv.style.display = "block";
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `t = ${result.tStatistic.toFixed(6)} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("oneSampleTResultArea", result.chart);
         }
     });
     

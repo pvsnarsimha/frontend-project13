@@ -268,7 +268,7 @@ function computeKruskalWallisTest(inputText, alpha) {
     
     // the chi-square approximation to H is unreliable when a group has fewer than 5 values
     const smallSample = [...groupSizes.values()].some(s => s < 5);
-    return { H, df, pValue, criticalValue, rejectH0, smallSample, steps };
+    return { H, df, pValue, criticalValue, rejectH0, smallSample, steps, chart: { dist: 'chisq', df: df, stat: H, alternative: 'greater', alpha: alpha, statLabel: 'H (χ²)', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== KRUSKAL-WALLIS SETUP ==========
@@ -295,10 +295,12 @@ function setupKruskalWallisLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `H = ${result.H.toFixed(6)} | df = ${result.df} | p = ${result.pValue.toFixed(6)}${result.smallSample ? ' | ⚠ small groups: chi-square approximation' : ''}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("kruskalResultArea", result.chart);
         }
     });
     

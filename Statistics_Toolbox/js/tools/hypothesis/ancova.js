@@ -455,7 +455,7 @@ function computeANCOVA(inputText, alpha) {
         </div>
     </div>`;
     
-    return { fStatistic, dfBetween, dfWithin, pValue, rejectH0, steps, adjustedMeans };
+    return { fStatistic, dfBetween, dfWithin, pValue, rejectH0, steps, adjustedMeans, chart: { dist: 'f', df: dfBetween, df2: dfWithin, stat: fStatistic, alternative: 'greater', alpha: alpha, statLabel: 'F', critical: { lower: null, upper: fCriticalValue(alpha, dfBetween, dfWithin) } } };
 }
 
 // ========== SETUP FUNCTIONS ==========
@@ -482,10 +482,12 @@ function setupANCOVALogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideStatChartCard('test');
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `F = ${result.fStatistic.toFixed(4)} | df = (${result.dfBetween}, ${result.dfWithin}) | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("ancovaResultArea", result.chart);
         }
     });
     

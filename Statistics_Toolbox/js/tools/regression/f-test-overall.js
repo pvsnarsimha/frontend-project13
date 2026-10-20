@@ -469,7 +469,7 @@ function computeFTestOverallWithSteps(xValues, yValues, alpha) {
         </div>
     </div>`;
     
-    return { fStatistic, dfReg, dfRes, pValue, criticalValue, rejectH0, rSquared, adjRSquared, steps };
+    return { fStatistic, dfReg, dfRes, pValue, criticalValue, rejectH0, rSquared, adjRSquared, steps, chart: { dist: 'f', df: dfReg, df2: dfRes, stat: fStatistic, alternative: 'greater', alpha: alpha, statLabel: 'F', critical: { lower: null, upper: criticalValue } } };
 }
 
 // ========== F-TEST OVERALL SETUP ==========
@@ -492,10 +492,13 @@ function setupFTestOverallLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `F = ${result.fStatistic.toFixed(6)} | p = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}`);
             setHtml(stepsSpan, result.steps);
+            showTestChart("ftestOverallResultArea", result.chart);
+            showFitCharts("ftestOverallResultArea", xValues, yValues, { xName: "x", yName: "y" });
         }
     });
     

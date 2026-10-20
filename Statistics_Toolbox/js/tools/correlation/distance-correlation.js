@@ -442,10 +442,12 @@ function setupDistanceCorrelationLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `dCor = ${result.dCor.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showFitCharts("distCorrResultArea", xValues, yValues, { xName: "x", yName: "y" });
         }
     });
     
