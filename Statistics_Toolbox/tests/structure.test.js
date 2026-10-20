@@ -394,3 +394,15 @@ test('README states the real amount of script (within 10%)', () => {
     const actualMB = bytes / 1e6;
     assert.ok(Math.abs(actualMB - parseFloat(m[1])) / actualMB <= 0.1, `README says ${m[1]} MB, the scripts are ${actualMB.toFixed(2)} MB`);
 });
+
+test('the size budget has one number: report-size.js, the README prose and the real gzip size agree', () => {
+    const zlib = require('zlib');
+    const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+    const budgetInScript = Number(fs.readFileSync(path.join(ROOT, 'scripts/report-size.js'), 'utf8').match(/scriptGzipKB:\s*(\d+)/)[1]);
+    const budgetInReadme = Number(readme.match(/one budget, (\d+) KB gzipped/)[1]);
+    assert.equal(budgetInReadme, budgetInScript, 'README and report-size.js state different gzip budgets');
+    const gzipKB = scriptList().reduce((t, rel) => t + zlib.gzipSync(fs.readFileSync(path.join(ROOT, rel)), { level: 9 }).length, 0) / 1024;
+    assert.ok(gzipKB <= budgetInScript, `scripts are ${gzipKB.toFixed(0)} KB gzipped, over the ${budgetInScript} KB budget`);
+    const stated = Number(readme.match(/about (\d+) KB gzipped once a web server/)[1]);
+    assert.ok(Math.abs(stated - gzipKB) / gzipKB <= 0.05, `README says ${stated} KB gzipped, the scripts are ${gzipKB.toFixed(0)} KB`);
+});

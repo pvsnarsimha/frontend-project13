@@ -124,7 +124,7 @@ let currentStat = null;
 
 function switchToStat(statType) {
     const route = STAT_ROUTES[statType] || STAT_ROUTES.mean;
-    if (!STAT_ROUTES[statType]) statType = 'mean';
+    if (!STAT_ROUTES[statType]) { notifyUser(`Unknown tool "${String(statType).slice(0, 40)}": showing the mean instead.`); statType = 'mean'; }
     currentStat = statType;
 
     // A different tool means different data: close the chart panel and release every Chart.js instance

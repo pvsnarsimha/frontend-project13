@@ -3,6 +3,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { loadApp } = require('./load-app');
+const fs = require('fs');
+const path = require('path');
+const { ROOT } = require('./load-app');
 
 const app = loadApp();
 const close = (a, e, tol, msg) => assert.ok(Math.abs(a - e) <= tol, `${msg || ''} expected ${e}, got ${a}`);
@@ -707,4 +710,49 @@ test('random seed: a whole number is used as typed; "42abc" or "3.7" is an error
         assert.ok(r.error && r.message.includes(bad), `${bad}: ${r.message}`);
     }
     assert.ok(!run('').error, 'an empty seed means unseeded');
+});
+
+test('Cramér\'s V escapes category labels ("<b>x</b>" must not reach the page as markup)', () => {
+    const r = app.computeCramersVWithSteps('<b>x</b>, yes\n<b>x</b>, no\ny, yes\ny, no\n<b>x</b>, yes\ny, no');
+    assert.ok(!r.error, r.message);
+    assert.ok(!r.steps.includes('<b>x</b>'), 'the raw tag reached the worked solution');
+    assert.ok(r.steps.includes('&lt;b&gt;x&lt;/b&gt;'), 'the label should appear escaped');
+});
+
+test('tidyNumber: documented behaviour for tiny values (under 1e-10 prints as 0, whole numbers lose the decimal point)', () => {
+    const tidy = app.tidyNumber;
+    assert.equal(tidy(3e-11), '0');
+    assert.equal(tidy(-3e-11), '0');
+    assert.equal(tidy(2e-10), '2e-10');          // 10 decimals: below that, digits are lost (1.5e-10 prints as 1e-10), which is fine for worked steps
+    assert.equal(tidy(7.100000000000001), '7.1');
+    assert.equal(tidy(3), '3');
+    assert.equal(tidy(Infinity), 'Infinity');
+    assert.ok(/1e-10 in size/.test(fs.readFileSync(path.join(ROOT, 'js/core/helpers.js'), 'utf8')), 'the rounding behaviour is documented next to tidyNumber');
+});
+
+test('Tukey HSD stays fast for 6 groups with about 100 degrees of freedom (the studentized-range integration)', () => {
+    const rows = []; let v = 0;
+    for (const g of 'ABCDEF') for (let i = 0; i < 17; i++) rows.push(`${(10 + (g.charCodeAt(0) - 65) * 1.5 + Math.sin(v++) * 3).toFixed(3)}:${g}`);
+    rows.push('11.2:A', '12.9:B', '10.1:C', '13.3:D');          // N = 106, df = 100
+    const t0 = Date.now(), r = app.computeTukeyHSD(rows.join(', '), 0.05), ms = Date.now() - t0;
+    assert.ok(!r.error, r.message);
+    assert.equal(r.comparisons.length, 15);
+    assert.ok(ms < 2000, `Tukey took ${ms} ms for k = 6, df = 100 (budget 2000 ms)`);
+});
+
+test('Durbin-Watson states the limits of its reference table (n = 15 to 50, 1 to 5 predictors)', () => {
+    const r = app.computeDurbinWatsonWithSteps ? app.computeDurbinWatsonWithSteps('1, 2, 3, 4, 5, 6, 7, 8, 9, 10', '2.1, 3.9, 6.2, 7.8, 10.3, 11.9, 14.2, 15.8, 18.1, 20.2') : null;
+    const src = fs.readFileSync(path.join(ROOT, 'js/tools/correlation/durbin-watson.js'), 'utf8');
+    assert.ok(/n = 15 to 50/.test(src) && /1 to 5 predictors/.test(src), 'the reference-table note states its range');
+    if (r && r.steps) assert.ok(/n = 15 to 50/.test(r.steps), 'the note is part of the rendered solution');
+});
+
+test('an unknown tool id tells the user instead of silently showing the mean; the app has a single (light) colour scheme', () => {
+    const fresh = loadApp(); const messages = [];
+    fresh.notifyUser = m => messages.push(m);
+    fresh.switchToStat('no-such-tool');
+    assert.equal(messages.length, 1); assert.ok(/no-such-tool/.test(messages[0]));
+    assert.equal(fresh.get('currentStat'), 'mean');
+    for (const css of ['css/statlab.css', 'css/tool-panels.css', 'css/responsive.css', 'css/guide.css', 'css/trial.css'])
+        assert.ok(!/prefers-color-scheme:\s*dark/.test(fs.readFileSync(path.join(ROOT, css), 'utf8')), `${css} must not define a dark theme the other pages lack`);
 });
