@@ -133,10 +133,10 @@ function computeFriedmanTest(inputText, alpha) {
     // Build ranking table for each subject
     let rankingRows = '';
     for (let item of rankingDetails) {
-        rankingRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${item.subject}</td>`;
+        rankingRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${item.subject}</td>`;
         for (let j = 0; j < k; j++) {
-            rankingRows += `<td style="padding: 8px; text-align: center;">${item.values[j]} → Rank ${item.ranks[j]}</td>`;
+            rankingRows += `<td class="s-a7c3f4">${item.values[j]} → Rank ${item.ranks[j]}</td>`;
         }
         rankingRows += `</tr>`;
     }
@@ -145,39 +145,39 @@ function computeFriedmanTest(inputText, alpha) {
     let colSumRows = '';
     for (let j = 0; j < k; j++) {
         colSumRows += `<tr>
-            <td style="padding: 8px; text-align: center;">Condition ${j + 1}</td>
-            <td style="padding: 8px; text-align: center;">${colRankSums[j].toFixed(2)}</td>
-            <td style="padding: 8px; text-align: center;">${Math.pow(colRankSums[j], 2).toFixed(2)}</td>
+            <td class="s-a7c3f4">Condition ${j + 1}</td>
+            <td class="s-a7c3f4">${colRankSums[j].toFixed(2)}</td>
+            <td class="s-a7c3f4">${Math.pow(colRankSums[j], 2).toFixed(2)}</td>
         </tr>`;
     }
     
-    let steps = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 32px;">χ²</span>
-                <h2 style="margin: 0;">Friedman Test</h2>
+    let steps = `<div class="s-9217e5">
+        <div class="s-83bd0e gen-pad">
+            <div class="s-4c6057 gen-flex">
+                <span class="s-1f18a8 gen-big">χ²</span>
+                <h2 class="s-f8a94d">Friedman Test</h2>
             </div>
-            <p style="margin: 8px 0 0 0; opacity: 0.9;">Non-parametric alternative to repeated measures ANOVA</p>
-            <p style="margin: 4px 0 0 0; opacity: 0.75;">H₀: All conditions have the same distribution | H₁: At least one condition differs</p>
+            <p class="s-259079">Non-parametric alternative to repeated measures ANOVA</p>
+            <p class="s-20a400">H₀: All conditions have the same distribution | H₁: At least one condition differs</p>
         </div>
         
         <!-- Formula Explanation Section -->
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📖 Understanding the Friedman Test Formula</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace; font-size: 16px; text-align: center; margin-bottom: 20px;">
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📖 Understanding the Friedman Test Formula</h3>
+            <div class="s-6025fc">
+                <div class="s-da7e8e">
                     <strong>χ² = (12 / [n × k × (k+1)]) × Σ(Rⱼ²) - 3n(k+1)</strong>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div style="background: #e8f4f8; padding: 12px; border-radius: 8px;">
+                <div class="s-800734 gen-grid">
+                    <div class="s-b93f03">
                         <strong>📊 Variables:</strong><br>
                         • <strong>n</strong> = Number of subjects (rows)<br>
                         • <strong>k</strong> = Number of conditions (columns)<br>
                         • <strong>Rⱼ</strong> = Sum of ranks for condition j<br>
                         • <strong>Σ(Rⱼ²)</strong> = Sum of squared column rank sums
                     </div>
-                    <div style="background: #e8f4f8; padding: 12px; border-radius: 8px;">
+                    <div class="s-b93f03">
                         <strong>🔢 Step-by-Step:</strong><br>
                         1. Rank values WITHIN each subject (row)<br>
                         2. Sum ranks for each condition (column): Rⱼ<br>
@@ -186,12 +186,12 @@ function computeFriedmanTest(inputText, alpha) {
                     </div>
                 </div>
                 
-                <div style="margin-top: 16px; background: #d4edda; padding: 12px; border-radius: 8px;">
+                <div class="s-319ae0">
                     <strong>💡 Intuition:</strong> If conditions are similar, ranks will be evenly distributed across columns → χ² is small.<br>
                     If conditions differ, ranks will cluster in certain columns → χ² is large.
                 </div>
                 
-                <div style="margin-top: 16px; background: #fff3cd; padding: 12px; border-radius: 8px;">
+                <div class="s-edac2c">
                     <strong>⚠️ Important:</strong> The Friedman test ranks WITHIN each row separately!<br>
                     For each subject, the smallest value gets rank 1, next gets rank 2, etc.<br>
                     This removes subject-to-subject variability.
@@ -199,67 +199,67 @@ function computeFriedmanTest(inputText, alpha) {
             </div>
         </div>
         
-        <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">📊 Data Summary</h3>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                <div style="background: white; padding: 12px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 12px; color: #6c757d;">Subjects (n)</div>
-                    <div style="font-size: 32px; font-weight: bold;">${n}</div>
-                    <div style="font-size: 11px;">Number of rows</div>
+        <div class="s-f652ac gen-pad">
+            <h3 class="s-d163b6">📊 Data Summary</h3>
+            <div class="s-9f129a gen-grid gen-grid-many">
+                <div class="s-46421d">
+                    <div class="s-42da0a">Subjects (n)</div>
+                    <div class="s-b3bc14 gen-big">${n}</div>
+                    <div class="s-d52d0d">Number of rows</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 12px; color: #6c757d;">Conditions (k)</div>
-                    <div style="font-size: 32px; font-weight: bold;">${k}</div>
-                    <div style="font-size: 11px;">Number of columns</div>
+                <div class="s-46421d">
+                    <div class="s-42da0a">Conditions (k)</div>
+                    <div class="s-b3bc14 gen-big">${k}</div>
+                    <div class="s-d52d0d">Number of columns</div>
                 </div>
-                <div style="background: white; padding: 12px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 12px; color: #6c757d;">Total Observations</div>
-                    <div style="font-size: 32px; font-weight: bold;">${n * k}</div>
-                    <div style="font-size: 11px;">n × k</div>
+                <div class="s-46421d">
+                    <div class="s-42da0a">Total Observations</div>
+                    <div class="s-b3bc14 gen-big">${n * k}</div>
+                    <div class="s-d52d0d">n × k</div>
                 </div>
             </div>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white;">📋 Step 1: Rank Values Within Each Subject (Row)</h3>
-            <div style="padding: 12px; background: #e8f4f8; font-size: 13px;">
+        <div class="s-2311e6">
+            <h3 class="s-10bf27">📋 Step 1: Rank Values Within Each Subject (Row)</h3>
+            <div class="s-d3acac">
                 <strong>How ranking works:</strong> For each subject, the smallest value gets rank 1, next gets rank 2, etc.<br>
                 If there are ties, average ranks are assigned.
             </div>
-            <table style="width: 100%; border-collapse: collapse;">
+            <table class="s-897d74 gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef;">
-                        <th style="padding: 10px;">Subject</th>
-                        ${Array(k).fill().map((_, i) => `<th style="padding: 10px;">Condition ${i + 1} (Value → Rank)</th>`).join('')}
+                    <tr class="s-bfd0ae">
+                        <th class="s-a756db">Subject</th>
+                        ${Array(k).fill().map((_, i) => `<th class="s-a756db">Condition ${i + 1} (Value → Rank)</th>`).join('')}
                     </tr>
                 </thead>
                 <tbody>${rankingRows}</tbody>
             </table>
         </div>
         
-        <div style="background: white; border-radius: 16px; margin-bottom: 24px; overflow-x: auto;">
-            <h3 style="margin: 0; padding: 16px; background: #1a5490; color: white;">📋 Step 2: Calculate Column Rank Sums (Rⱼ)</h3>
-            <div style="padding: 12px; background: #e8f4f8; font-size: 13px;">
+        <div class="s-2311e6">
+            <h3 class="s-10bf27">📋 Step 2: Calculate Column Rank Sums (Rⱼ)</h3>
+            <div class="s-d3acac">
                 <strong>Formula:</strong> Rⱼ = Sum of ranks in column j (across all subjects)
             </div>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead><tr style="background: #e9ecef;"><th>Condition</th><th>Rⱼ (Sum of Ranks)</th><th>Rⱼ²</th></tr></thead>
+            <table class="s-897d74 gen-sized">
+                <thead><tr class="s-bfd0ae"><th>Condition</th><th>Rⱼ (Sum of Ranks)</th><th>Rⱼ²</th></tr></thead>
                 <tbody>${colSumRows}
-                    <tr style="background: #e9ecef; font-weight: bold;">
-                        <td style="padding: 8px;">Σ (Sum) →</td>
-                        <td style="padding: 8px; text-align: center;">${colRankSums.reduce((a,b)=>a+b,0).toFixed(2)}</td>
-                        <td style="padding: 8px; text-align: center;">${sumRjSquared.toFixed(2)}</td>
+                    <tr class="s-17b154">
+                        <td class="s-641001">Σ (Sum) →</td>
+                        <td class="s-a7c3f4">${colRankSums.reduce((a,b)=>a+b,0).toFixed(2)}</td>
+                        <td class="s-a7c3f4">${sumRjSquared.toFixed(2)}</td>
                     </tr>
                 </tbody>
             </table>
-            <div style="padding: 12px; background: #d4edda; font-size: 13px; margin-top: 8px;">
+            <div class="s-4aae2c">
                 <strong>✅ Check:</strong> Total sum of all ranks should equal n × k(k+1)/2 = ${n} × ${k}×${k+1}/2 = ${n * k * (k+1) / 2}
             </div>
         </div>
         
-        <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="margin: 0 0 16px 0; color: #1a5490;">🔢 Step 3: Calculate Friedman χ² Statistic</h3>
-            <div style="background: white; border-radius: 12px; padding: 16px;">
+        <div class="s-272f59 gen-pad">
+            <h3 class="s-d163b6">🔢 Step 3: Calculate Friedman χ² Statistic</h3>
+            <div class="s-6025fc">
                 <strong>Formula:</strong> χ² = (12 / [n × k × (k+1)]) × Σ(Rⱼ²) - 3n(k+1)<br><br>
                 
                 <strong>Step 3a: Calculate the denominator</strong><br>
@@ -276,9 +276,9 @@ function computeFriedmanTest(inputText, alpha) {
                 3n(k+1) = 3 × ${n} × ${k+1} = ${3 * n * (k+1)}<br><br>
                 
                 <strong>Step 3e: Final χ²</strong><br>
-                χ² = ${((12 / (n * k * (k+1))) * sumRjSquared).toFixed(4)} - ${3 * n * (k+1)} = ${chiSqUncorrected.toFixed(6)}${tieTerm > 0 ? `<br><br>Ties present → divide by C = 1 - Σ(t³ - t) / [n·k·(k²-1)] = 1 - ${tieTerm} / ${n * k * (k * k - 1)} = ${tieCorrection.toFixed(6)}<br>Corrected χ² = ${chiSqUncorrected.toFixed(6)} / ${tieCorrection.toFixed(6)} = ` : ' = '}<strong style="color: #1a5490; font-size: 18px;">${chiSq.toFixed(6)}</strong>
+                χ² = ${((12 / (n * k * (k+1))) * sumRjSquared).toFixed(4)} - ${3 * n * (k+1)} = ${chiSqUncorrected.toFixed(6)}${tieTerm > 0 ? `<br><br>Ties present → divide by C = 1 - Σ(t³ - t) / [n·k·(k²-1)] = 1 - ${tieTerm} / ${n * k * (k * k - 1)} = ${tieCorrection.toFixed(6)}<br>Corrected χ² = ${chiSqUncorrected.toFixed(6)} / ${tieCorrection.toFixed(6)} = ` : ' = '}<strong class="s-bbce95">${chiSq.toFixed(6)}</strong>
                 
-                <div style="margin-top: 16px;">
+                <div class="s-c803e1">
                     <strong>Degrees of Freedom:</strong> df = k - 1 = ${k} - 1 = ${df}<br>
                     <strong>Critical value (α = ${alpha}):</strong> ${criticalValue.toFixed(6)}<br>
                     <strong>p-value:</strong> ${pValue.toFixed(8)}
@@ -286,21 +286,21 @@ function computeFriedmanTest(inputText, alpha) {
             </div>
         </div>
         
-        <div style="border-radius: 16px; padding: 20px; ${rejectH0 ? 'background: #d4edda; border-left: 6px solid #28a745;' : 'background: #f8d7da; border-left: 6px solid #dc3545;'}">
-            <h3 style="margin: 0 0 12px 0;">📌 Test Conclusion</h3>
+        <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
+            <h3 class="s-c7f0b4">📌 Test Conclusion</h3>
             <div><strong>χ² Statistic:</strong> ${chiSq.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> ${df}</div>
             <div><strong>Critical Value:</strong> ${criticalValue.toFixed(6)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
-            <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+            <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
                 <strong>Interpretation:</strong> ${interpretation}<br>
-                ${rejectH0 ? '✓ χ² > Critical value → Reject H₀, conditions differ significantly' : '✗ χ² < Critical value → Cannot reject H₀, conditions are similar'}
+                ${rejectH0 ? '✓ p-value < α → Reject H₀, conditions differ significantly' : '✗ p-value ≥ α → Cannot reject H₀, conditions are similar'}
                 ${pValue < alpha ? '✓ p-value < α → Statistically significant' : '✗ p-value > α → Not statistically significant'}
             </div>
         </div>
         
-        <div style="margin-top: 20px; padding: 16px; background: #e8f4f8; border-radius: 12px; font-size: 13px;">
+        <div class="s-afe18c">
             <strong>📚 Summary of Friedman Test:</strong><br><br>
             • <strong>What it does:</strong> Tests if multiple related groups (conditions) have the same distribution<br>
             • <strong>When to use:</strong> Repeated measures design with ordinal data or violated normality assumption<br>

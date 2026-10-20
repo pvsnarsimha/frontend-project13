@@ -10,7 +10,7 @@ function renderQQPlotInterface() {
                 desc: "<strong>What is a Q-Q Plot?</strong><br>\n                    A Q-Q plot compares the distribution of your data to a theoretical normal distribution.\n                    If the points fall approximately along a straight diagonal line, the data is likely normally distributed."
             },
             {
-                desc: "<strong>Interpretation:</strong><br>\n                    • <span style=\"color: #28a745;\">Points follow the line</span> → Data is normally distributed<br>\n                    • <span style=\"color: #dc3545;\">S-shaped curve</span> → Heavy tails or light tails<br>\n                    • <span style=\"color: #ffc107;\">Curved pattern</span> → Skewed distribution",
+                desc: "<strong>Interpretation:</strong><br>\n                    • <span class=\"s-7773e9\">Points follow the line</span> → Data is normally distributed<br>\n                    • <span class=\"s-81c63c\">S-shaped curve</span> → Heavy tails or light tails<br>\n                    • <span class=\"s-2673ca\">Curved pattern</span> → Skewed distribution",
                 attrs: { style: CARD_GAP }
             }
         ],
@@ -103,13 +103,13 @@ function computeQQPlotWithSteps(numbers) {
     // Build ALL correlation rows (no truncation!)
     let allCorrRows = '';
     for (let d of xyDetails) {
-        allCorrRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${d.i}</td>
-            <td style="padding: 8px; text-align: center; font-family: monospace;">${d.x}</td>
-            <td style="padding: 8px; text-align: center; font-family: monospace;">${d.y}</td>
-            <td style="padding: 8px; text-align: center;">${d.xy}</td>
-            <td style="padding: 8px; text-align: center;">${d.x2}</td>
-            <td style="padding: 8px; text-align: center;">${d.y2}</td>
+        allCorrRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${d.i}</td>
+            <td class="s-fce575">${d.x}</td>
+            <td class="s-fce575">${d.y}</td>
+            <td class="s-a7c3f4">${d.xy}</td>
+            <td class="s-a7c3f4">${d.x2}</td>
+            <td class="s-a7c3f4">${d.y2}</td>
         </tr>`;
     }
     
@@ -117,84 +117,84 @@ function computeQQPlotWithSteps(numbers) {
     let allCalcRows = '';
     for (let d of calculationDetails) {
         let typeLabel = d.calculationType === "central" ? "📊 Central" : (d.calculationType === "tail" ? "📈 Tail" : "⚪ Edge");
-        allCalcRows += `<tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 8px; text-align: center;">${d.i}</td>
-            <td style="padding: 8px; text-align: center;">${d.value.toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center;">${d.probability}</td>
-            <td style="padding: 8px; text-align: center;">${d.q}</td>
-            <td style="padding: 8px; text-align: center;">
+        allCalcRows += `<tr class="s-00049c">
+            <td class="s-a7c3f4">${d.i}</td>
+            <td class="s-a7c3f4">${d.value.toFixed(4)}</td>
+            <td class="s-a7c3f4">${d.probability}</td>
+            <td class="s-a7c3f4">${d.q}</td>
+            <td class="s-a7c3f4">
                 <details>
-                    <summary style="cursor: pointer; display: inline-block; font-weight: bold; color: #1a5490;">${d.zScore}</summary>
-                    <div style="background: #f8f9fa; padding: 15px; margin-top: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; white-space: pre-wrap; text-align: left; max-height: 400px; overflow-y: auto;">
+                    <summary class="s-461129">${d.zScore}</summary>
+                    <div class="s-d52693">
                         ${d.detailedSteps.replace(/\n/g, '<br>')}
                     </div>
                 </details>
-                <span style="font-size: 10px; color: #666;">(${typeLabel})</span>
+                <span class="s-d770c8">(${typeLabel})</span>
             </td>
         </tr>`;
     }
     
     let steps = `
-<div style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;">
+<div class="s-3097a8">
     
     <!-- Header -->
-    <div style="background: linear-gradient(135deg, #1a5490 0%, #0d3b66 100%); color: white; padding: 30px; border-radius: 20px; margin-bottom: 25px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+    <div class="s-aedb37">
+        <div class="s-b15718 gen-flex">
             <div>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <span style="font-size: 48px;">📈</span>
+                <div class="s-e9f44b gen-flex">
+                    <span class="s-93df4f gen-big">📈</span>
                     <div>
-                        <h1 style="margin: 0; font-size: 28px;">Q-Q Plot Analysis</h1>
-                        <p style="margin: 8px 0 0 0; opacity: 0.9;">Quantile-Quantile Plot for Normality Assessment</p>
+                        <h1 class="s-b80b8c">Q-Q Plot Analysis</h1>
+                        <p class="s-259079">Quantile-Quantile Plot for Normality Assessment</p>
                     </div>
                 </div>
             </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 15px 25px; border-radius: 16px; text-align: center;">
-                <div style="font-size: 11px; opacity: 0.8;">SAMPLE SIZE</div>
-                <div style="font-size: 36px; font-weight: 700;">${n}</div>
+            <div class="s-f85ed7">
+                <div class="s-7ce57c">SAMPLE SIZE</div>
+                <div class="s-ae9e1c gen-big">${n}</div>
             </div>
         </div>
     </div>
     
     <!-- KPI Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px;">
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #28a745;">
-            <div style="font-size: 11px; color: #6c757d;">MEAN</div>
-            <div style="font-size: 24px; font-weight: 700; color: #28a745;">${mean.toFixed(4)}</div>
+    <div class="s-3d837c gen-grid">
+        <div class="s-9ca8be">
+            <div class="s-033765">MEAN</div>
+            <div class="s-d3b644">${mean.toFixed(4)}</div>
         </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #17a2b8;">
-            <div style="font-size: 11px; color: #6c757d;">STD DEVIATION</div>
-            <div style="font-size: 24px; font-weight: 700; color: #17a2b8;">${stdDev.toFixed(4)}</div>
+        <div class="s-0b060f">
+            <div class="s-033765">STD DEVIATION</div>
+            <div class="s-3c6f5f">${stdDev.toFixed(4)}</div>
         </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #ffc107;">
-            <div style="font-size: 11px; color: #6c757d;">CORRELATION</div>
-            <div style="font-size: 24px; font-weight: 700; color: #ffc107;">${correlation.toFixed(4)}</div>
+        <div class="s-f94899">
+            <div class="s-033765">CORRELATION</div>
+            <div class="s-7fdc7a">${correlation.toFixed(4)}</div>
         </div>
-        <div style="background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 4px solid #1a5490;">
-            <div style="font-size: 11px; color: #6c757d;">RANGE</div>
-            <div style="font-size: 24px; font-weight: 700;">${(Math.max(...numbers) - Math.min(...numbers)).toFixed(4)}</div>
+        <div class="s-fd7545">
+            <div class="s-033765">RANGE</div>
+            <div class="s-c2434f">${(Math.max(...numbers) - Math.min(...numbers)).toFixed(4)}</div>
         </div>
     </div>
     
     <!-- Step 1: Understanding Q-Q Plot -->
-    <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #1a5490; color: white; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px;">1</span>
+    <div class="s-bfd155 gen-pad">
+        <h2 class="s-13101f gen-flex">
+            <span class="s-09767f gen-sized">1</span>
             📖 Understanding Q-Q Plots
         </h2>
         
-        <div style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="s-6fab3a gen-pad">
             <p><strong>What is a Q-Q Plot?</strong> A Quantile-Quantile plot compares the quantiles of your data against the quantiles of a theoretical normal distribution.</p>
             
-            <div style="margin: 15px 0; padding: 12px; background: #e8f4f8; border-radius: 8px;">
+            <div class="s-efcf63">
                 <strong>📐 How to interpret:</strong><br>
-                • <span style="color: #28a745;">Points follow the diagonal line</span> → Data is normally distributed<br>
-                • <span style="color: #dc3545;">S-shaped pattern</span> → Heavy tails (more outliers than normal)<br>
-                • <span style="color: #ffc107;">Curved upward/downward</span> → Skewed distribution<br>
-                • <span style="color: #17a2b8;">Correlation near 1</span> → Strong evidence of normality
+                • <span class="s-7773e9">Points follow the diagonal line</span> → Data is normally distributed<br>
+                • <span class="s-81c63c">S-shaped pattern</span> → Heavy tails (more outliers than normal)<br>
+                • <span class="s-2673ca">Curved upward/downward</span> → Skewed distribution<br>
+                • <span class="s-a2648b">Correlation near 1</span> → Strong evidence of normality
             </div>
             
-            <div style="background: #fff3cd; padding: 12px; border-radius: 8px;">
+            <div class="s-6da5f7">
                 <strong>💡 Formula for probability positions (Blom's method):</strong><br>
                 p = (i - 0.375) / (n + 0.25)<br>
                 where i = rank (1 to n), n = sample size<br><br>
@@ -204,22 +204,22 @@ function computeQQPlotWithSteps(numbers) {
     </div>
     
     <!-- Step 2: Calculation Table (ALL rows - scrollable) -->
-    <div style="background: white; border-radius: 16px; margin-bottom: 25px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-        <div style="background: #1a5490; color: white; padding: 14px 20px;">
-            <h2 style="margin: 0; font-size: 16px;">🔢 Step 2: Quantile Calculations (All ${n} Data Points)</h2>
-            <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">For each data point: p = (i - 0.375)/(n + 0.25) → q = p - 0.5 → z = Φ⁻¹(p)</p>
-            <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;"><strong>👇 Click on any z-value to see the complete step-by-step calculation!</strong></p>
-            <p style="margin: 5px 0 0 0; font-size: 11px; opacity: 0.8;">📌 Scroll horizontally if needed | ${n} total observations</p>
+    <div class="s-802cd7">
+        <div class="s-63fd4e">
+            <h2 class="s-123848">🔢 Step 2: Quantile Calculations (All ${n} Data Points)</h2>
+            <p class="s-92c601">For each data point: p = (i - 0.375)/(n + 0.25) → q = p - 0.5 → z = Φ⁻¹(p)</p>
+            <p class="s-92c601"><strong>👇 Click on any z-value to see the complete step-by-step calculation!</strong></p>
+            <p class="s-3fc726">📌 Scroll horizontally if needed | ${n} total observations</p>
         </div>
-        <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <div class="s-a1e1e3">
+            <table class="s-306b2c gen-sized">
                 <thead>
-                    <tr style="background: #e9ecef; position: sticky; top: 0; z-index: 10;">
-                        <th style="padding: 12px; background: #e9ecef;">Rank (i)</th>
-                        <th style="padding: 12px; background: #e9ecef;">Sample Value (x)</th>
-                        <th style="padding: 12px; background: #e9ecef;">Probability p</th>
-                        <th style="padding: 12px; background: #e9ecef;">q = p - 0.5</th>
-                        <th style="padding: 12px; background: #e9ecef;">Theoretical Quantile (z) - Click to see calculation</th>
+                    <tr class="s-380b77">
+                        <th class="s-ac65bb">Rank (i)</th>
+                        <th class="s-ac65bb">Sample Value (x)</th>
+                        <th class="s-ac65bb">Probability p</th>
+                        <th class="s-ac65bb">q = p - 0.5</th>
+                        <th class="s-ac65bb">Theoretical Quantile (z) - Click to see calculation</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -230,56 +230,56 @@ function computeQQPlotWithSteps(numbers) {
     </div>
     
     <!-- Step 3: Detailed Correlation Calculation (ALL rows) -->
-    <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf1 100%); border-radius: 16px; padding: 20px; margin-bottom: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #1a5490; color: white; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px;">3</span>
+    <div class="s-95d04a gen-pad">
+        <h2 class="s-13101f gen-flex">
+            <span class="s-09767f gen-sized">3</span>
             📊 Step-by-Step Correlation Calculation (All ${n} Data Points)
         </h2>
         
-        <div style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="s-6fab3a gen-pad">
             <p><strong>Formula:</strong> r = Σ(z - z̄)(x - x̄) / √[Σ(z - z̄)² × Σ(x - x̄)²]</p>
             
-            <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <div class="s-a1e1e3">
+                <table class="s-776a1d gen-sized">
                     <thead>
-                        <tr style="background: #1a5490; color: white; position: sticky; top: 0;">
-                            <th style="padding: 8px;">i</th>
-                            <th style="padding: 8px;">z (Theoretical)</th>
-                            <th style="padding: 8px;">x (Sample)</th>
-                            <th style="padding: 8px;">z × x</th>
-                            <th style="padding: 8px;">z²</th>
-                            <th style="padding: 8px;">x²</th>
+                        <tr class="s-e7cb60">
+                            <th class="s-939795">i</th>
+                            <th class="s-939795">z (Theoretical)</th>
+                            <th class="s-939795">x (Sample)</th>
+                            <th class="s-939795">z × x</th>
+                            <th class="s-939795">z²</th>
+                            <th class="s-939795">x²</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${allCorrRows}
-                        <tr style="background: #e9ecef; font-weight: bold;">
-                            <td style="padding: 8px;">SUM →</td>
-                            <td style="padding: 8px; text-align: center;">${sumX.toFixed(4)}</td>
-                            <td style="padding: 8px; text-align: center;">${sumY.toFixed(4)}</td>
-                            <td style="padding: 8px; text-align: center;">${sumXY.toFixed(4)}</td>
-                            <td style="padding: 8px; text-align: center;">${sumX2.toFixed(4)}</td>
-                            <td style="padding: 8px; text-align: center;">${sumY2.toFixed(4)}</td>
+                        <tr class="s-17b154">
+                            <td class="s-641001">SUM →</td>
+                            <td class="s-a7c3f4">${sumX.toFixed(4)}</td>
+                            <td class="s-a7c3f4">${sumY.toFixed(4)}</td>
+                            <td class="s-a7c3f4">${sumXY.toFixed(4)}</td>
+                            <td class="s-a7c3f4">${sumX2.toFixed(4)}</td>
+                            <td class="s-a7c3f4">${sumY2.toFixed(4)}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             
-            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <div class="s-a5b4cc">
                 <strong>📐 Step 3a: Calculate means</strong><br>
                 z̄ = Σz / n = ${sumX.toFixed(4)} / ${n} = ${meanX.toFixed(6)}<br>
                 x̄ = Σx / n = ${sumY.toFixed(4)} / ${n} = ${meanY.toFixed(6)}
             </div>
             
-            <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <div class="s-fa7a72">
                 <strong>📐 Step 3b: Calculate numerator (Covariance sum)</strong><br>
                 Σ(z - z̄)(x - x̄) = Σzx - n·z̄·x̄<br>
                 = ${sumXY.toFixed(4)} - ${n} × ${meanX.toFixed(6)} × ${meanY.toFixed(6)}<br>
                 = ${sumXY.toFixed(4)} - ${(n * meanX * meanY).toFixed(4)}<br>
-                = <strong style="color: #1a5490;">${numerator.toFixed(6)}</strong>
+                = <strong class="s-f342b5">${numerator.toFixed(6)}</strong>
             </div>
             
-            <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <div class="s-fa7a72">
                 <strong>📐 Step 3c: Calculate denominator</strong><br>
                 Σ(z - z̄)² = Σz² - n·z̄² = ${sumX2.toFixed(4)} - ${n} × ${(meanX * meanX).toFixed(6)} = ${(sumX2 - n * meanX * meanX).toFixed(6)}<br>
                 Σ(x - x̄)² = Σx² - n·x̄² = ${sumY2.toFixed(4)} - ${n} × ${(meanY * meanY).toFixed(6)} = ${(sumY2 - n * meanY * meanY).toFixed(6)}<br>
@@ -287,11 +287,11 @@ function computeQQPlotWithSteps(numbers) {
                 √Product = ${denominator.toFixed(6)}
             </div>
             
-            <div style="margin-top: 15px; padding: 15px; background: #d4edda; border-radius: 8px;">
+            <div class="s-d6cf81">
                 <strong>📐 Step 3d: Calculate correlation</strong><br>
                 r = ${numerator.toFixed(6)} / ${denominator.toFixed(6)}<br>
-                <div style="font-size: 24px; text-align: center; padding: 10px;">
-                    <strong style="color: #1a5490;">r = ${correlation.toFixed(8)}</strong>
+                <div class="s-ab5ee6">
+                    <strong class="s-f342b5">r = ${correlation.toFixed(8)}</strong>
                 </div>
                 <strong>Interpretation:</strong> ${Math.abs(correlation) > 0.98 ? '✅ Very strong linear relationship → Data appears normally distributed' : (Math.abs(correlation) > 0.95 ? '⚠️ Moderate relationship → Possible mild deviation from normality' : '❌ Weak relationship → Data likely NOT normally distributed')}
             </div>
@@ -299,37 +299,37 @@ function computeQQPlotWithSteps(numbers) {
     </div>
     
     <!-- Step 4: Q-Q Plot Visualization -->
-    <div style="background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); border-radius: 20px; padding: 25px; margin-top: 20px;">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #4fc3f7; padding-bottom: 15px;">
-            <span style="font-size: 28px;">📈</span>
-            <h3 style="margin: 0; color: #4fc3f7;">Q-Q PLOT VISUALIZATION</h3>
-            <p style="margin: 5px 0 0 0; font-size: 11px; color: #b39ddb;">💡 Hover over points to see values | Points should follow the red line for normality</p>
+    <div class="s-117739 gen-pad">
+        <div class="s-74360b gen-flex">
+            <span class="s-da9be8">📈</span>
+            <h3 class="s-e89f6f">Q-Q PLOT VISUALIZATION</h3>
+            <p class="s-79cb4e">💡 Hover over points to see values | Points should follow the red line for normality</p>
         </div>
         
-        <canvas id="qqplotChartCanvas" style="max-height: 500px; width: 100%; margin-top: 10px;"></canvas>
+        <canvas class="s-0e19d6 gen-sized" id="qqplotChartCanvas"></canvas>
         
-        <div style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
-            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 12px; height: 12px; background: #4fc3f7; border-radius: 50%;"></div><span style="color: #e6edf3; font-size: 11px;">Sample Quantiles</span></div>
-            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 20px; height: 2px; background: #ef5350;"></div><span style="color: #e6edf3; font-size: 11px;">Theoretical Line (y = x̄ + z·s)</span></div>
+        <div class="s-4eeef9 gen-flex">
+            <div class="s-6d12cd gen-flex"><div class="s-be0df3 gen-sized"></div><span class="s-205a8c">Sample Quantiles</span></div>
+            <div class="s-6d12cd gen-flex"><div class="s-b547cb gen-sized"></div><span class="s-205a8c">Theoretical Line (y = x̄ + z·s)</span></div>
         </div>
     </div>
     
     <!-- Step 5: Interpretation -->
-    <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-top: 25px;">
-        <h2 style="color: #1a5490; margin-top: 0;">📌 Final Interpretation</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
-            <div style="background: white; border-radius: 12px; padding: 15px;">
+    <div class="s-284793 gen-pad">
+        <h2 class="s-2ce3ad">📌 Final Interpretation</h2>
+        <div class="s-9ee21a gen-grid">
+            <div class="s-6fdce2">
                 <strong>Normality Assessment:</strong><br>
                 • Correlation with theoretical line: ${(correlation * 100).toFixed(1)}%<br>
                 • ${Math.abs(correlation) > 0.98 ? '✅ Data appears normally distributed' : (Math.abs(correlation) > 0.95 ? '⚠️ Data shows mild deviation from normality' : '❌ Data is likely NOT normally distributed')}
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px;">
+            <div class="s-6fdce2">
                 <strong>What to look for in the plot:</strong><br>
                 • Points close to red line → Good fit<br>
                 • S-curve → Heavy tails<br>
                 • Curved pattern → Skewness
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px;">
+            <div class="s-6fdce2">
                 <strong>Recommended next steps:</strong><br>
                 ${Math.abs(correlation) > 0.98 ? '✓ Use parametric tests (t-test, ANOVA, etc.)' : '⚠️ Consider non-parametric alternatives or data transformation'}
             </div>

@@ -88,7 +88,7 @@ test('every plotting tool is covered by destroyAllCharts', () => {
         for (const m of src.matchAll(/^let (\w*[cC]hart\w*)\s*=\s*null;/gm)) declared.push(m[1]);
     }
     assert.ok(declared.length >= 7, declared.join());
-    for (const name of declared) assert.ok(appSrc.includes(`() => ${name}`), `${name} is not released when switching tools`);
+    for (const name of declared) assert.ok(new RegExp('\\(\\)\\s*=>\\s*' + name + '\\b').test(appSrc.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')), `${name} is not released when switching tools (comments do not count)`);
 });
 
 test('sample-data contract: tools offering "Try sample data" declare an "Example:" placeholder', () => {

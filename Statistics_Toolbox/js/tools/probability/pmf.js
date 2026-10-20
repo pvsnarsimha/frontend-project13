@@ -137,15 +137,15 @@ function updatePMFParams() {
     if (dist === 'poisson') {
         setHtml(paramsDiv, `
             <label>📊 Lambda (λ) - Average rate:</label>
-            <input type="number" id="pmfLambda" value="3" step="0.5" min="0.01" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
-            <div class="desc" style="font-size: 0.75rem;">Average number of events per interval</div>
+            <input class="s-c689ef gen-sized" type="number" id="pmfLambda" value="3" step="0.5" min="0.01">
+            <div class="desc s-8b77e0">Average number of events per interval</div>
         `);
     } else if (dist === 'binomial') {
         setHtml(paramsDiv, `
             <label>📊 Number of trials (n):</label>
-            <input type="number" id="pmfN" value="10" step="1" min="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
+            <input class="s-c689ef gen-sized" type="number" id="pmfN" value="10" step="1" min="1">
             <label>📊 Probability of success (p):</label>
-            <input type="number" id="pmfP" value="0.5" step="0.1" min="0" max="1" style="width: 100%; padding: 10px; border-radius: 40px; margin-bottom: 10px;">
+            <input class="s-c689ef gen-sized" type="number" id="pmfP" value="0.5" step="0.1" min="0" max="1">
         `);
     }
 }

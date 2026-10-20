@@ -17,7 +17,7 @@ function renderLogTransformInterface() {
                 labelAttrs: { style: FIELD_GAP },
                 select: {
                     id: "logBase",
-                    style: "width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #cbdde9; margin-bottom: 15px;"
+                    style: FIELD_STYLE_BORDERED
                 },
                 options: [["natural", "Natural Log (ln) - Base e"], ["base10", "Log Base 10 (log₁₀)"], ["base2", "Log Base 2 (log₂)"]]
             }

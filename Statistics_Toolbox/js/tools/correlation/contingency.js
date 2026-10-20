@@ -81,35 +81,35 @@ function computeContingencyTableWithSteps(inputText) {
     const grandTotal = pairs.length;
     
     // Build HTML table
-    let tableHtml = `<div style="overflow-x: auto;">
-        <table style="border-collapse: collapse; width: 100%; margin: 15px 0; font-family: monospace;">
+    let tableHtml = `<div class="s-01a9b9">
+        <table class="s-24a669 gen-sized">
             <thead>
                 <tr>
-                    <th style="border: 1px solid #ddd; padding: 8px; background: #1a5490; color: white;"></th>`;
+                    <th class="s-b259dc"></th>`;
     for (let col of colCategories) {
-        tableHtml += `<th style="border: 1px solid #ddd; padding: 8px; background: #1a5490; color: white;">${col}</th>`;
+        tableHtml += `<th class="s-b259dc">${col}</th>`;
     }
-    tableHtml += `<th style="border: 1px solid #ddd; padding: 8px; background: #1a5490; color: white;">Row Total</th>
+    tableHtml += `<th class="s-b259dc">Row Total</th>
                 </tr>
             </thead>
             <tbody>`;
     
     for (let row of rowCategories) {
         tableHtml += `<tr>
-            <th style="border: 1px solid #ddd; padding: 8px; background: #e8f4f8;">${row}</th>`;
+            <th class="s-131038">${row}</th>`;
         for (let col of colCategories) {
-            tableHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${table[row][col]}</td>`;
+            tableHtml += `<td class="s-21fdcf">${table[row][col]}</td>`;
         }
-        tableHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #e8f4f8; font-weight: bold;">${rowTotals[row]}</td>
+        tableHtml += `<td class="s-e908bd">${rowTotals[row]}</td>
         </tr>`;
     }
     
     tableHtml += `<tr>
-        <th style="border: 1px solid #ddd; padding: 8px; background: #e8f4f8;">Column Total</th>`;
+        <th class="s-131038">Column Total</th>`;
     for (let col of colCategories) {
-        tableHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #e8f4f8; font-weight: bold;">${colTotals[col]}</td>`;
+        tableHtml += `<td class="s-e908bd">${colTotals[col]}</td>`;
     }
-    tableHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center; background: #e8f4f8; font-weight: bold;">${grandTotal}</td>
+    tableHtml += `<td class="s-e908bd">${grandTotal}</td>
     </tr>`;
     tableHtml += `</tbody></table></div>`;
     

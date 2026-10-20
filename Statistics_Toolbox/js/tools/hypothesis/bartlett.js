@@ -71,7 +71,13 @@ function computeBartlettTest(inputText, alpha) {
             squaredDiffs.push(diff * diff);
         }
         let sumSqDiffs = squaredDiffs.reduce((a,b) => a+b, 0);
+        if (n < 2) {
+            return { error: true, message: `Group ${escapeHtml(group)} has only one value, so its variance is undefined and Bartlett's test cannot be computed.` };
+        }
         let variance = sumSqDiffs / (n - 1);
+        if (!(variance > 0)) {
+            return { error: true, message: `Group ${escapeHtml(group)} has zero variance (all values are identical), so Bartlett's test is undefined (ln 0). Remove the constant group or add variation.` };
+        }
         
         groupVars.set(group, variance);
         groupSizes.set(group, n);
@@ -125,7 +131,7 @@ function computeBartlettTest(inputText, alpha) {
     let df = k - 1;
     let criticalValue = chiSquareCriticalValue(alpha, df);
     let pValue = 1 - chiSquareCDF(chiSquareAdj, df);
-    let rejectH0 = chiSquareAdj > criticalValue;
+    let rejectH0 = pValue < alpha;
     
     // Build comprehensive educational HTML
     const steps = stepsHtmlBartlett({ C, alpha, chiSquare, chiSquareAdj, criticalValue, denominator, df, groupMeans, groupSizes, groups, k, numerator, pValue, pooledDetails, pooledVar, rejectH0, sumInv, term1, term2, term2Details, totalN, varianceDetails });

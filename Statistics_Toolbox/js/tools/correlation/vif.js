@@ -133,7 +133,7 @@ function computeVIF(dataMatrix) {
             rSquared = olsRSquared(dependent, [independent]);
             
             calculationDetails = `
-            <div style="margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+            <div class="s-0db5a8">
                 <strong>📐 Step-by-Step R² Calculation for X<sub>${j+1}</sub>:</strong><br><br>
                 
                 <strong>Step 1: Calculate means</strong><br>
@@ -170,7 +170,7 @@ function computeVIF(dataMatrix) {
             rSquared = olsRSquared(dependent, others);
             
             calculationDetails = `
-            <div style="margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+            <div class="s-0db5a8">
                 <strong>📐 R² Calculation for X<sub>${j+1}</sub>:</strong><br><br>
                 
                 <strong>Step 1: Regress X<sub>${j+1}</sub> on the other ${p - 1} predictors</strong><br>
@@ -216,7 +216,7 @@ function computeVIF(dataMatrix) {
     let corrRows = '';
     for (let i = 0; i < p; i++) {
         corrRows += '<tr>';
-        corrRows += `<th style="padding: 10px; background: #e8f4f8;">X<sub>${i+1}</sub></th>`;
+        corrRows += `<th class="s-fccb1e">X<sub>${i+1}</sub></th>`;
         for (let j = 0; j < p; j++) {
             let bgColor = '';
             if (i !== j && Math.abs(correlations[i][j]) > 0.7) bgColor = 'background: #f8d7da;';
@@ -230,20 +230,20 @@ function computeVIF(dataMatrix) {
     let vifRows = '';
     for (let v of vifs) {
         vifRows += `
-        <tr style="border-bottom: 1px solid #e9ecef;">
-            <td style="padding: 12px; text-align: center; font-weight: 600;">X<sub>${v.variable}</sub></td>
-            <td style="padding: 12px; text-align: center;">
+        <tr class="s-00049c">
+            <td class="s-acab19">X<sub>${v.variable}</sub></td>
+            <td class="s-3294d6">
                 ${v.rSquared.toFixed(4)}
-                <div style="font-size: 10px; margin-top: 4px;">
+                <div class="s-378bdf">
                     <details>
-                        <summary style="cursor: pointer; color: #1a5490;">📐 Show R² Calculation</summary>
+                        <summary class="s-e00270">📐 Show R² Calculation</summary>
                         ${v.calculationDetails}
                     </details>
                 </div>
             </td>
             <td style="padding: 12px; text-align: center; background: ${v.severityColor}20; font-weight: 700; font-size: 16px;">${fmtVif(v.vif, 4)}</td>
             <td style="padding: 12px; text-align: center; color: ${v.severityColor}; font-weight: 600;">${v.severity}</td>
-            <td style="padding: 12px; text-align: center;">${v.recommendation}</td>
+            <td class="s-3294d6">${v.recommendation}</td>
         </tr>`;
     }
     
@@ -253,80 +253,80 @@ function computeVIF(dataMatrix) {
     
     // Build complete HTML
     let steps = `
-    <div style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; max-width: 100%;">
+    <div class="s-e3295e">
         
         <!-- HEADER -->
-        <div style="background: linear-gradient(135deg, #0d3b66 0%, #1a5490 100%); color: white; padding: 25px 30px; border-radius: 16px; margin-bottom: 25px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+        <div class="s-d0fea7 gen-pad">
+            <div class="s-b15718 gen-flex">
                 <div>
-                    <h1 style="margin: 0; font-size: 28px;">📊 Variance Inflation Factor (VIF)</h1>
-                    <p style="margin: 8px 0 0 0; opacity: 0.9;">Detecting Multicollinearity in Multiple Regression</p>
+                    <h1 class="s-b80b8c">📊 Variance Inflation Factor (VIF)</h1>
+                    <p class="s-259079">Detecting Multicollinearity in Multiple Regression</p>
                 </div>
-                <div style="background: rgba(255,255,255,0.15); padding: 10px 20px; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 11px;">Max VIF</div>
-                    <div style="font-size: 32px; font-weight: 700;">${fmtVif(Math.max(...vifs.map(v => v.vif)), 2)}</div>
+                <div class="s-a3617a">
+                    <div class="s-d52d0d">Max VIF</div>
+                    <div class="s-e35605 gen-big">${fmtVif(Math.max(...vifs.map(v => v.vif)), 2)}</div>
                 </div>
             </div>
         </div>
         
         <!-- FORMULA SECTION -->
-        <div style="background: #f0f4fa; border-radius: 16px; padding: 20px; margin-bottom: 25px; border-left: 5px solid #1a5490;">
-            <h3 style="margin: 0 0 12px 0; color: #1a5490;">📐 Mathematical Formula</h3>
-            <div style="background: white; padding: 20px; border-radius: 12px; text-align: center;">
-                <div style="font-family: monospace; font-size: 22px; font-weight: 700; margin-bottom: 10px;">
+        <div class="s-c21c61 gen-pad">
+            <h3 class="s-ed0bb5">📐 Mathematical Formula</h3>
+            <div class="s-f44534 gen-pad">
+                <div class="s-95ddd7">
                     VIF<sub>j</sub> = 1 / (1 - R<sub>j</sub>²)
                 </div>
-                <div style="font-family: monospace; font-size: 14px; color: #555; margin-top: 5px;">
+                <div class="s-01b657">
                     where R<sub>j</sub>² = coefficient of determination from regressing X<sub>j</sub> on all other predictors
                 </div>
             </div>
-            <div style="margin-top: 15px; background: #e8f4f8; padding: 15px; border-radius: 8px;">
+            <div class="s-938536">
                 <strong>📖 Step-by-Step VIF Calculation:</strong><br>
                 1. <strong>Regress X<sub>j</sub></strong> against all other predictor variables<br>
                 2. <strong>Calculate R<sub>j</sub>²</strong> (proportion of variance explained)<br>
                 3. <strong>Apply formula:</strong> VIF<sub>j</sub> = 1 / (1 - R<sub>j</sub>²)<br><br>
                 <strong>📊 Interpretation Thresholds:</strong><br>
-                • <span style="color: #28a745;">VIF = 1</span> → No correlation with other predictors<br>
-                • <span style="color: #ffc107;">1 < VIF < 5</span> → Moderate correlation<br>
-                • <span style="color: #e65100;">VIF ≥ 5</span> → High correlation (problematic)<br>
-                • <span style="color: #dc3545;">VIF ≥ 10</span> → Severe multicollinearity
+                • <span class="s-7773e9">VIF = 1</span> → No correlation with other predictors<br>
+                • <span class="s-2673ca">1 < VIF < 5</span> → Moderate correlation<br>
+                • <span class="s-055118">VIF ≥ 5</span> → High correlation (problematic)<br>
+                • <span class="s-81c63c">VIF ≥ 10</span> → Severe multicollinearity
             </div>
         </div>
         
         <!-- SUMMARY STATISTICS -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">
-            <div style="background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <div style="font-size: 11px; color: #666;">Observations (n)</div>
-                <div style="font-size: 32px; font-weight: 700;">${n}</div>
+        <div class="s-c08ff3 gen-grid gen-grid-many">
+            <div class="s-481a91">
+                <div class="s-8ddc1c">Observations (n)</div>
+                <div class="s-e35605 gen-big">${n}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <div style="font-size: 11px; color: #666;">Predictors (k)</div>
-                <div style="font-size: 32px; font-weight: 700;">${p}</div>
+            <div class="s-481a91">
+                <div class="s-8ddc1c">Predictors (k)</div>
+                <div class="s-e35605 gen-big">${p}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <div style="font-size: 11px; color: #666;">Mean VIF</div>
-                <div style="font-size: 24px; font-weight: 700;">${meanVifText}</div>
+            <div class="s-481a91">
+                <div class="s-8ddc1c">Mean VIF</div>
+                <div class="s-c2434f">${meanVifText}</div>
             </div>
-            <div style="background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <div style="font-size: 11px; color: #666;">Min VIF</div>
-                <div style="font-size: 24px; font-weight: 700;">${fmtVif(Math.min(...vifs.map(v => v.vif)), 2)}</div>
+            <div class="s-481a91">
+                <div class="s-8ddc1c">Min VIF</div>
+                <div class="s-c2434f">${fmtVif(Math.min(...vifs.map(v => v.vif)), 2)}</div>
             </div>
         </div>
         
         <!-- VIF RESULTS TABLE -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow-x: auto;">
-            <div style="background: #1a5490; color: white; padding: 14px 20px;">
-                <h3 style="margin: 0; font-size: 16px;">📊 Variance Inflation Factor Results</h3>
-                <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">Click "Show R² Calculation" to see detailed step-by-step derivation</p>
+        <div class="s-83f9af">
+            <div class="s-63fd4e">
+                <h3 class="s-2eb15f">📊 Variance Inflation Factor Results</h3>
+                <p class="s-92c601">Click "Show R² Calculation" to see detailed step-by-step derivation</p>
             </div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <table class="s-35b3d7 gen-sized">
                 <thead>
-                    <tr style="background: #e8f4f8; border-bottom: 2px solid #1a5490;">
-                        <th style="padding: 12px; text-align: center;">Predictor</th>
-                        <th style="padding: 12px; text-align: center;">R² (from regression)</th>
-                        <th style="padding: 12px; text-align: center;">VIF = 1/(1-R²)</th>
-                        <th style="padding: 12px; text-align: center;">Severity</th>
-                        <th style="padding: 12px; text-align: center;">Recommendation</th>
+                    <tr class="s-df5107">
+                        <th class="s-34ffd2">Predictor</th>
+                        <th class="s-34ffd2">R² (from regression)</th>
+                        <th class="s-34ffd2">VIF = 1/(1-R²)</th>
+                        <th class="s-34ffd2">Severity</th>
+                        <th class="s-34ffd2">Recommendation</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -336,17 +336,17 @@ function computeVIF(dataMatrix) {
         </div>
         
         <!-- CORRELATION MATRIX -->
-        <div style="background: white; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow-x: auto;">
-            <div style="background: #1a5490; color: white; padding: 14px 20px;">
-                <h3 style="margin: 0; font-size: 16px;">📈 Correlation Matrix (Between Predictors)</h3>
-                <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.9;">Shows pairwise correlations used in R² calculation</p>
+        <div class="s-83f9af">
+            <div class="s-63fd4e">
+                <h3 class="s-2eb15f">📈 Correlation Matrix (Between Predictors)</h3>
+                <p class="s-92c601">Shows pairwise correlations used in R² calculation</p>
             </div>
-            <div style="padding: 15px; overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <div class="s-82785a">
+                <table class="s-6bf13c gen-sized">
                     <thead>
                         <tr>
-                            <th style="padding: 10px;"></th>
-                            ${Array(p).fill().map((_, j) => `<th style="padding: 10px;">X<sub>${j+1}</sub></th>`).join('')}
+                            <th class="s-a756db"></th>
+                            ${Array(p).fill().map((_, j) => `<th class="s-a756db">X<sub>${j+1}</sub></th>`).join('')}
                         </tr>
                     </thead>
                     <tbody>
@@ -354,20 +354,20 @@ function computeVIF(dataMatrix) {
                     </tbody>
                 </table>
             </div>
-            <div style="background: #f8f9fa; padding: 12px 20px; font-size: 12px;">
-                <span style="background: #f8d7da; padding: 2px 8px; border-radius: 4px;">🔴 |r| > 0.7 (High correlation)</span>
-                <span style="background: #fff3cd; padding: 2px 8px; border-radius: 4px; margin-left: 10px;">🟡 0.5 < |r| ≤ 0.7 (Moderate correlation)</span>
-                <span style="background: white; padding: 2px 8px; border-radius: 4px; margin-left: 10px;">🟢 |r| ≤ 0.5 (Low correlation)</span>
+            <div class="s-e02992">
+                <span class="s-26f634">🔴 |r| > 0.7 (High correlation)</span>
+                <span class="s-f3c188">🟡 0.5 < |r| ≤ 0.7 (Moderate correlation)</span>
+                <span class="s-aa12c6">🟢 |r| ≤ 0.5 (Low correlation)</span>
             </div>
         </div>
         
         <!-- INTERPRETATION -->
-        <div style="border-radius: 16px; padding: 20px; background: #e8f4f8; margin-bottom: 25px;">
-            <h3 style="margin: 0 0 15px 0; color: #1a5490;">📌 Interpretation & Recommendations</h3>
+        <div class="s-72f6fd gen-pad">
+            <h3 class="s-6cfbec">📌 Interpretation & Recommendations</h3>
             
-            <div style="background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+            <div class="s-17e6a3">
                 <strong>🎯 What VIF Tells You:</strong>
-                <ul style="margin-top: 10px; margin-bottom: 0;">
+                <ul class="s-991c3f">
                     <li><strong>VIF = 1</strong> → Predictor is not correlated with others</li>
                     <li><strong>1 < VIF < 5</strong> → Moderate correlation, generally acceptable</li>
                     <li><strong>5 ≤ VIF < 10</strong> → High correlation, may cause issues</li>
@@ -375,9 +375,9 @@ function computeVIF(dataMatrix) {
                 </ul>
             </div>
             
-            <div style="background: white; border-radius: 10px; padding: 15px;">
+            <div class="s-2e46b1">
                 <strong>✅ Recommended Actions:</strong>
-                <ul style="margin-top: 10px; margin-bottom: 0;">
+                <ul class="s-991c3f">
                     <li>Remove one of the highly correlated predictors</li>
                     <li>Combine correlated predictors into a single composite variable</li>
                     <li>Use Ridge Regression or LASSO (regularization techniques)</li>
@@ -388,7 +388,7 @@ function computeVIF(dataMatrix) {
         
         <!-- DECISION SUMMARY -->
         <div style="border-radius: 16px; padding: 20px; ${Math.max(...vifs.map(v => v.vif)) >= 10 ? 'background: #f8d7da; border-left: 6px solid #dc3545;' : (Math.max(...vifs.map(v => v.vif)) >= 5 ? 'background: #fff3cd; border-left: 6px solid #ffc107;' : 'background: #d4edda; border-left: 6px solid #28a745;')}">
-            <h3 style="margin: 0 0 12px 0;">📊 Overall Assessment</h3>
+            <h3 class="s-c7f0b4">📊 Overall Assessment</h3>
             <p><strong>Maximum VIF:</strong> ${fmtVif(Math.max(...vifs.map(v => v.vif)), 4)}</p>
             <p><strong>Conclusion:</strong> ${Math.max(...vifs.map(v => v.vif)) >= 10 ? '❌ Severe multicollinearity detected. Model needs revision.' : (Math.max(...vifs.map(v => v.vif)) >= 5 ? '⚠️ Moderate multicollinearity detected. Consider addressing.' : '✅ No severe multicollinearity. Model is acceptable.')}</p>
         </div>

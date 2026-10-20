@@ -187,7 +187,7 @@ function stepsHtmlBartlett(scope) {
             
             <div class="s-19d20b gen-pad">
                 <h3>Decision Rule:</h3>
-                <p>If χ² > Critical Value OR p-value < α, we REJECT the null hypothesis.</p>
+                <p>If p-value < α, we REJECT the null hypothesis (equivalently, χ² exceeds the critical value).</p>
                 <p>Here, χ² = ${chiSquareAdj.toFixed(6)} ${chiSquareAdj > criticalValue ? '>' : '<'} ${criticalValue.toFixed(6)}</p>
                 <p>p-value = ${pValue.toFixed(6)} ${pValue < alpha ? '<' : '>'} ${alpha}</p>
                 
