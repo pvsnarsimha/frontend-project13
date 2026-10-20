@@ -426,3 +426,15 @@ footer { font-size: .76rem; text-align: center; padding: 16px; color: var(--mute
 
 .undef-note { margin: 14px 28px 0; padding: 12px 16px; border-radius: 12px; background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; font-size: .9rem; line-height: 1.45; }
 .undef-note::before { content: "⚠ " / ""; font-weight: 800; }
+
+/* "Was this explanation clear?" strip under each result */
+.fb-strip { margin-top: 18px; padding: 12px 14px; border-top: 1px dashed var(--line); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .85rem; }
+.fb-q { font-weight: 700; color: var(--ink-2); margin-right: 4px; }
+.fb-btn { font: inherit; font-size: .8rem; font-weight: 700; padding: 6px 12px; border-radius: 9px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
+.fb-btn:hover, .fb-btn:focus-visible { background: #eef2ff; border-color: #c7d2fe; }
+.fb-btn[aria-pressed="true"] { background: #e0e7ff; border-color: #6366f1; }
+.fb-detail { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fb-detail textarea { flex-basis: 100%; font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); }
+.fb-link { font: inherit; font-size: .8rem; background: none; border: 0; color: #3730a3; text-decoration: underline; cursor: pointer; padding: 6px 4px; }
+.fb-done { font-weight: 700; color: #155724; }
+@media print { .fb-strip { display: none !important; } }

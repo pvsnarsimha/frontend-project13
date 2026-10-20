@@ -1,5 +1,7 @@
 # Student trial: does StatLab work without help?
 
+> The on-screen version is `trial.html`: the students record their sessions there, download a JSON file, and you pick all the files on the same page to get a class summary. This sheet is the printed version for sitting next to a student.
+
 Ask 3 to 5 students (a mix of first-years and B.Tech data-science learners) to try it **without you explaining anything**. Sit next to them, say nothing, and write down where they pause. Twenty minutes each is enough.
 
 ## Give each student two textbook questions (they pick the tools themselves)

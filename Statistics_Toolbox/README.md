@@ -22,7 +22,8 @@ links straight into the right tool (`Statistics.html#tool=<id>` opens a tool dir
 * **Locally:** open `Statistics.html` in a browser. No install, no server.
 * **On the web (GitHub Pages):** repository Settings → Pages → "Deploy from a branch" → branch `main`, folder `/ (root)`. The root `index.html` forwards to the toolbox, and the site is a plain static site, so nothing is built.
 * **Minified build:** `npm run build` writes `dist/` (about 40% smaller to download). `.github/workflows/pages.yml` builds and publishes it on every push to `main` once Settings → Pages → Source is set to "GitHub Actions".
-* **Trying it with students:** `docs/student-trial.md` is a one-page script and note sheet for watching 3 to 5 students use it unaided.
+* **Trying it with students:** open `trial.html` (linked in the footer). Each student gets five questions (four fixed, one from their own textbook), a timer per question, and records whether they found the tool unaided, whether the answer matched the book, and what was confusing; they download one JSON file. The teacher picks all the files on the same page and gets a class summary: how many found each tool alone, the median time, how many matched the book, every note, and a "fix first" list (questions where fewer than 3 in 4 succeeded). `docs/student-trial.md` is the printed version of the same script for sitting next to a student.
+* **Feedback on every result:** each result ends with "Was this explanation clear?" (yes / no + a comment). It is saved on the device only; the student can send it as a pre-filled GitHub issue or download everything they wrote. Nothing is sent automatically.
 
 ## License
 
@@ -279,6 +280,7 @@ npm run test:all    # both
 * `tests/e2e/edge-cases.js`: every tool with one value, identical values, zeros, negatives and huge numbers: no freeze, no script error, and any NaN/Infinity comes with an explanation
 * `tests/e2e/responsive.js`: no tool makes the page scroll sideways at 360 px and 768 px
 * `tests/e2e/student-walkthrough.js`: a scripted first-time student finds five tools through the search box, types textbook questions (summary input, a table of counts, a frequency table) and must get the textbook answers and graphs
+* `tests/e2e/feedback.js`: the feedback strip saves and exports, the trial page records a session and the teacher summary reads session files; `tests/textbook-features.test.js` checks the summary arithmetic (rates, medians, fix-first list)
 * `tests/e2e/a11y.js`: axe-core (WCAG 2.0/2.1 A and AA) on every tool after its sample data has been calculated; `tests/e2e/print.js`: the print layout shows only the solution and its graphs and a PDF is produced
 * `npm run test:e2e:all-browsers` runs the browser suite in every installed Chromium, Firefox and WebKit and says which were not installed (CI runs all three on every pull request, the full suite including the edge-case sweep)
 * `tests/e2e/lazy-chartjs.js`: Chart.js is not fetched at page load, is fetched once on the first chart, and a failed fetch shows a message and can be retried

@@ -134,3 +134,32 @@ test('one-way ANOVA from group summaries matches the definition (scipy) and the 
     assert.equal(app.computeANOVAFromSummary([{ name: 'A', n: 5, mean: 1, sd: 0 }, { name: 'B', n: 5, mean: 2, sd: 0 }], 0.05).error, true);
     assert.equal(app.computeANOVAFromSummary(app.parseAnovaSummaryRows('A, 12, 23.5\nB, 15, 29.8, 2.6'), 0.05).error, true);
 });
+
+test('trial summary: found-rate, median time, match-rate, notes and the "fix first" list come out right', () => {
+    const task = (id, foundTool, seconds, matched, notes = '') => ({ id, title: id, foundTool, seconds, matched, notes });
+    const sessions = [
+        { student: 'S1', tasks: [task('a', 'yes', 60, 'yes'), task('b', 'no', 300, 'no', 'could not find it')], overall: { wouldUse: 'yes', hardest: 'finding tool b' } },
+        { student: 'S2', tasks: [task('a', 'yes', 120, 'yes'), task('b', 'yes', 100, 'yes')], overall: { wouldUse: 'maybe' } },
+        { student: 'S3', tasks: [task('a', 'yes', 90, 'unsure'), task('b', 'no', 200, 'no')], overall: { wouldUse: 'yes', changeFirst: 'search' } },
+        { notASession: true }
+    ];
+    const plain = x => JSON.parse(JSON.stringify(x));      // objects made inside the app's vm context have another prototype
+    const sum = plain(app.summarizeTrial(sessions));
+    assert.equal(sum.students, 3);
+    const a = sum.tasks.find(t => t.id === 'a'), b = sum.tasks.find(t => t.id === 'b');
+    assert.equal(a.foundRate, 1); assert.equal(a.medianSeconds, 90); assert.equal(a.matchedRate, 1);       // "unsure" is not counted as a comparison
+    close(b.foundRate, 1 / 3, 1e-12, 'b found'); assert.equal(b.medianSeconds, 200); close(b.matchedRate, 1 / 3, 1e-12, 'b matched');
+    assert.deepEqual(sum.problems, ['b']); assert.deepEqual(sum.wouldUse, { yes: 2, maybe: 1, no: 0 });
+    assert.deepEqual(b.notes, [{ student: 'S1', note: 'could not find it' }]); assert.deepEqual(sum.hardest, ['finding tool b']);
+    assert.equal(app.summarizeTrial([]).students, 0);
+});
+
+test('feedback helpers: the pre-filled issue link carries the tool and the comment, saving without storage is reported not thrown', () => {
+    const url = app.feedbackIssueUrl({ tool: 'One-Sample t-test', rating: 'unclear', comment: 'I did not know what "s" meant & more' });
+    assert.ok(url.startsWith('https://github.com/pvsnarsimha/frontend-project13/issues/new?template=student-feedback.md'));
+    const body = decodeURIComponent(url.split('&body=')[1]);
+    assert.ok(body.includes('One-Sample t-test') && body.includes('I did not know what "s" meant & more') && body.includes('No'));
+    assert.equal(app.saveFeedback({ tool: 'x', rating: 'clear', comment: 'ok' }), null);      // no localStorage in the unit-test sandbox
+    assert.equal(app.loadFeedback().length, 0);
+    const json = JSON.parse(app.feedbackToJson([{ tool: 'a' }])); assert.equal(json.kind, 'statlab-feedback'); assert.equal(json.entries.length, 1);
+});

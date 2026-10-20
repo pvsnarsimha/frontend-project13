@@ -1,0 +1,25 @@
+/* trial.html: the student trial page and the teacher's summary */
+body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #f1f5f9; color: #0f172a; line-height: 1.55; }
+main { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+h1 { font-size: 1.6rem; margin: 0 0 6px; }
+h2 { font-size: 1.15rem; margin: 28px 0 10px; }
+.lead { color: #475569; margin: 0 0 18px; }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
+.card h3 { margin: 0 0 6px; font-size: 1rem; }
+.task-q { margin: 0 0 8px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; align-items: end; }
+label { display: block; font-size: .8rem; font-weight: 700; color: #334155; margin-bottom: 3px; }
+input, select, textarea { width: 100%; box-sizing: border-box; font: inherit; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 9px; background: #fff; }
+textarea { min-height: 70px; }
+button, .btn { font: inherit; font-weight: 700; padding: 9px 16px; border-radius: 10px; border: 1px solid #6366f1; background: #4f46e5; color: #fff; cursor: pointer; text-decoration: none; display: inline-block; }
+button.secondary, .btn.secondary { background: #fff; color: #3730a3; }
+button:focus-visible, .btn:focus-visible, a:focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+.timer { font-variant-numeric: tabular-nums; font-weight: 700; margin-left: 8px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; font-size: .9rem; }
+th, td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+.bad { color: #b91c1c; font-weight: 700; }
+.good { color: #155724; font-weight: 700; }
+.note { color: #475569; font-size: .85rem; }
+[hidden] { display: none !important; }

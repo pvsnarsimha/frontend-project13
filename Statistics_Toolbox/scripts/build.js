@@ -34,6 +34,11 @@ const styles = [...page.matchAll(/<link rel="stylesheet" href="(css\/[^"]+)"/g)]
 styles.forEach(f => fs.writeFileSync(path.join(OUT, f), esbuild.transformSync(read(f), { loader: 'css', minify: true }).code));
 fs.writeFileSync(path.join(OUT, 'Statistics.html'), page);
 fs.copyFileSync(path.join(ROOT, 'Which-tool.html'), path.join(OUT, 'Which-tool.html'));
+// the student-trial page: its own small script (plus the shared feedback helpers) and stylesheet
+fs.mkdirSync(path.join(OUT, 'pages'), { recursive: true });
+fs.writeFileSync(path.join(OUT, 'pages/trial.min.js'), esbuild.transformSync(read('js/core/feedback.js') + ';\n' + read('pages/trial.js'), { minify: true, target: 'es2019' }).code);
+fs.writeFileSync(path.join(OUT, 'css/trial.css'), esbuild.transformSync(read('css/trial.css'), { loader: 'css', minify: true }).code);
+fs.writeFileSync(path.join(OUT, 'trial.html'), read('trial.html').replace('<script src="js/core/feedback.js"></script>\n', '').replace('pages/trial.js', 'pages/trial.min.js'));
 fs.cpSync(path.join(ROOT, 'vendor'), path.join(OUT, 'vendor'), { recursive: true });
 ['css/guide.css'].forEach(f => { if (fs.existsSync(path.join(ROOT, f)) && !fs.existsSync(path.join(OUT, f))) fs.copyFileSync(path.join(ROOT, f), path.join(OUT, f)); });
 
