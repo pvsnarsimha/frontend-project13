@@ -280,3 +280,10 @@ function describeQuantileType7(sorted, p, label) {
     if (lo === hi) return `${position} → ${label} = x[${lo}] = ${sorted[lo]}`;
     return `${position} → ${label} = x[${lo}] + ${+(h - lo).toFixed(6)} × (x[${hi}] - x[${lo}]) = ${sorted[lo]} + ${+(h - lo).toFixed(6)} × (${sorted[hi]} - ${sorted[lo]}) = ${+value.toFixed(10)}`;
 }
+
+// Result colours chosen at run time (green / red / amber / teal) are bright enough for a bar or a background but fail the 4.5:1 contrast
+// minimum as TEXT on a light card. Use textSafeColor(c) wherever the colour is applied to text; other colours pass through unchanged.
+const TEXT_SAFE_COLORS = { '#28a745': '#1e7e34', '#dc3545': '#b02a37', '#ffc107': '#8a6500', '#17a2b8': '#0b6b7c', '#e74c3c': '#b02a37', '#f39c12': '#8a5a00', '#27ae60': '#1e7e34' };
+function textSafeColor(color) {
+    return TEXT_SAFE_COLORS[String(color).toLowerCase()] || color;
+}

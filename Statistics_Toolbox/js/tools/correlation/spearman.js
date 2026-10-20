@@ -186,7 +186,7 @@ function computeSpearmanWithSteps(xValues, yValues) {
         
         <div style="border-radius: 16px; padding: 20px; ${Math.abs(rho) >= 0.7 ? 'background: #d4edda; border-left: 6px solid #28a745;' : (Math.abs(rho) >= 0.3 ? 'background: #fff3cd; border-left: 6px solid #ffc107;' : 'background: #f8d7da; border-left: 6px solid #dc3545;')}">
             <h3 class="s-3c2890"><span>📌</span> Interpretation</h3>
-            <div><strong>Spearman's ρ:</strong> ${rho.toFixed(6)} → <strong style="color: ${rho > 0 ? '#28a745' : '#dc3545'};">${rho > 0 ? 'Positive' : 'Negative'}</strong> monotonic association</div>
+            <div><strong>Spearman's ρ:</strong> ${rho.toFixed(6)} → <strong style="color: ${textSafeColor(rho > 0 ? '#28a745' : '#dc3545')};">${rho > 0 ? 'Positive' : 'Negative'}</strong> monotonic association</div>
             <div><strong>Strength:</strong> ${Math.abs(rho) >= 0.9 ? '🔥 Very Strong' : (Math.abs(rho) >= 0.7 ? '✅ Strong' : (Math.abs(rho) >= 0.5 ? '📊 Moderate' : (Math.abs(rho) >= 0.3 ? '⚠️ Weak' : '💨 Very Weak or No')))} monotonic relationship</div>
             <div class="s-0d79c9">
                 💡 <strong>Practical Meaning:</strong> Spearman's ρ measures whether as X increases, Y tends to increase (positive) or decrease (negative) consistently, even if not perfectly linear.

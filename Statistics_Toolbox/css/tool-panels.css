@@ -7,7 +7,7 @@
 #interfaceRoot .calculation-steps.rich .s-000adc { background: var(--tp-card) !important; border: 1px solid var(--line) !important; }
 #interfaceRoot .s-000c50 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
 #interfaceRoot .s-0021f5 { margin: 15px 0; padding: 12px; background: white; border-radius: 8px; }
-#interfaceRoot .s-006063 { font-size: 32px; font-weight: 700; color: #17a2b8; }
+#interfaceRoot .s-006063 { font-size: 32px; font-weight: 700; color: #0b6b7c; }
 #interfaceRoot .s-006f8c { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
 #interfaceRoot .s-00e121 { padding: 10px 8px; text-align: center; font-weight: 500; color: #1a5490; }
 #interfaceRoot .calculation-steps.rich .s-00e121 { color: var(--tp-accent) !important; }
@@ -83,7 +83,7 @@
 #interfaceRoot .s-10ba7a { margin-top: 15px; background: #d4edda; padding: 10px; border-radius: 6px; font-size: 13px; }
 #interfaceRoot .s-10bf27 { margin: 0; padding: 16px; background: #1a5490; color: white; }
 #interfaceRoot .calculation-steps.rich .s-10bf27 { background: var(--tp-head-soft) !important; color: #fff !important; }
-#interfaceRoot .s-111099 { color: #1e7e34; font-size: 16px; }
+#interfaceRoot .s-111099 { color: #1a6f2e; font-size: 16px; }
 #interfaceRoot .s-117739 { background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); border-radius: 20px; padding: 25px; margin-top: 20px; }
 #interfaceRoot .s-117dd0 { margin: 8px 0; }
 #interfaceRoot .s-118507 { text-align: center; font-weight: bold; }
@@ -107,7 +107,7 @@
 #interfaceRoot .calculation-steps.rich .s-150395 { background: var(--tp-card) !important; border: 1px solid var(--line) !important; }
 #interfaceRoot .s-151939 { background: #e8f5e9; border-radius: 16px; padding: 20px; margin-bottom: 24px; border-left: 4px solid #2e7d32; }
 #interfaceRoot .calculation-steps.rich .s-151939 { border-color: var(--tp-accent) !important; background: var(--tp-tint) !important; }
-#interfaceRoot .s-15a612 { color: #1e7e34; }
+#interfaceRoot .s-15a612 { color: #1a6f2e; }
 #interfaceRoot .s-15bf30 { background: #d4edda; font-weight: bold; }
 #interfaceRoot .s-168eee { font-family: monospace; font-size: 16px; margin-bottom: 12px; }
 #interfaceRoot .s-16aba4 { padding: 14px; text-align: center; }
@@ -116,7 +116,7 @@
 #interfaceRoot .s-17070e { font-size: 22px; font-weight: 600; }
 #interfaceRoot .s-17247c { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
 #interfaceRoot .s-172be4 { border: 1px solid #ddd; padding: 10px; background: #e8f4f8; }
-#interfaceRoot .s-179392 { font-size: 28px; font-weight: 700; color: #17a2b8; }
+#interfaceRoot .s-179392 { font-size: 28px; font-weight: 700; color: #0b6b7c; }
 #interfaceRoot .s-17b154 { background: #e9ecef; font-weight: bold; }
 #interfaceRoot .s-17e6a3 { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
 #interfaceRoot .s-17e8e5 { line-height: 1.8; }
@@ -156,8 +156,8 @@
 #interfaceRoot .s-1fd4d8 { margin: 0 0 16px 0; color: #495057; font-size: 18px; }
 #interfaceRoot .s-1fd66a { font-size: 48px; font-weight: 700; color: #b02a37; }
 #interfaceRoot .s-1fe640 { display: inline-table; border-collapse: collapse; margin-left: 10px; }
-#interfaceRoot .s-20161f { font-size: 28px; font-weight: 700; color: #1e7e34; }
-#interfaceRoot .s-201633 { color: #1e7e34; margin-top: 0; }
+#interfaceRoot .s-20161f { font-size: 28px; font-weight: 700; color: #1a6f2e; }
+#interfaceRoot .s-201633 { color: #1a6f2e; margin-top: 0; }
 #interfaceRoot .s-2046d3 { background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #e65100; }
 #interfaceRoot .calculation-steps.rich .s-2046d3 { border-color: var(--tp-accent) !important; }
 #interfaceRoot .s-205a8c { color: #e6edf3; font-size: 11px; }
@@ -235,7 +235,7 @@
 #interfaceRoot .s-2da758 { padding: 10px 8px; text-align: center; background: #e8f4f8; font-weight: 600; color: #1f6392; }
 #interfaceRoot .s-2dc07c { background: white; border-radius: 20px; margin-bottom: 30px; border: 2px solid #1a5490; overflow-x: auto; }
 #interfaceRoot .calculation-steps.rich .s-2dc07c { border-color: var(--tp-accent) !important; }
-#interfaceRoot .s-2dc3e3 { text-align: center; color: #1e7e34; }
+#interfaceRoot .s-2dc3e3 { text-align: center; color: #1a6f2e; }
 #interfaceRoot .s-2dd257 { text-align: center; vertical-align: middle; background: #e8f4f8; }
 #interfaceRoot .s-2e1589 { font-size: 24px; font-weight: 700; color: #b02a37; }
 #interfaceRoot .s-2e1d0b { padding: 8px; font-family: monospace; }
@@ -303,7 +303,7 @@
 #interfaceRoot .s-3c2890 { margin: 0 0 12px 0; font-size: 18px; }
 #interfaceRoot .s-3c49f1 { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 100%; }
 #interfaceRoot .s-3c52bb { padding: 10px; text-align: center; font-weight: 600; }
-#interfaceRoot .s-3c6f5f { font-size: 24px; font-weight: 700; color: #17a2b8; }
+#interfaceRoot .s-3c6f5f { font-size: 24px; font-weight: 700; color: #0b6b7c; }
 #interfaceRoot .s-3cce3a { margin: 4px 0 0 0; opacity: 0.75; }
 #interfaceRoot .s-3d1a65 { margin: 8px 0 0 0; opacity: 0.9; font-size: 14px; }
 #interfaceRoot .s-3d837c { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
@@ -348,7 +348,7 @@
 #interfaceRoot .s-463785 { padding: 8px; text-align: center; background: #ffc107; }
 #interfaceRoot .s-46421d { background: white; padding: 12px; border-radius: 12px; text-align: center; }
 #interfaceRoot .s-467ef9 { background: linear-gradient(135deg, #f0f4fa 0%, #e8eef5 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px; }
-#interfaceRoot .s-46e98c { padding: 8px; text-align: center; font-weight: 600; color: #1e7e34; }
+#interfaceRoot .s-46e98c { padding: 8px; text-align: center; font-weight: 600; color: #1a6f2e; }
 #interfaceRoot .s-46f2bb { padding: 8px; text-align: center; font-weight: bold; color: #1a5490; }
 #interfaceRoot .calculation-steps.rich .s-46f2bb { color: var(--tp-accent) !important; }
 #interfaceRoot .s-470ce2 { text-align: center; vertical-align: middle; font-weight: 700; font-size: 18px; background: #e8f4f8; }
@@ -369,7 +369,7 @@
 #interfaceRoot .s-49b675 { height: 12px; background: linear-gradient(to right, #28a745, #ffc107, #dc3545); border-radius: 6px; margin: 16px 0; }
 #interfaceRoot .s-49b8e0 { background: #f8f9fa; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 16px; background: var(--tp-card) !important; border: 1px solid var(--line) !important; }
 #interfaceRoot .s-4a5044 { background: #e8f4f8; padding: 12px; border-radius: 10px; margin-top: 10px; }
-#interfaceRoot .s-4a607c { color: #17a2b8; }
+#interfaceRoot .s-4a607c { color: #0b6b7c; }
 #interfaceRoot .s-4aae2c { padding: 12px; background: #d4edda; font-size: 13px; margin-top: 8px; }
 #interfaceRoot .s-4ab1da { margin: 0; padding: 16px 20px; background: #f8f9fa; border-bottom: 2px solid #6a1b9a; }
 #interfaceRoot .calculation-steps.rich .s-4ab1da { border-color: var(--tp-accent) !important; background: var(--tp-card) !important; border: 1px solid var(--line) !important; }
@@ -447,7 +447,7 @@
 #interfaceRoot .s-5c058b { background: #e8f4f8; font-weight: bold; }
 #interfaceRoot .s-5c898f { margin: 15px 0; padding: 12px; background: white; border-radius: 8px; }
 #interfaceRoot .s-5d9fe4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
-#interfaceRoot .s-5dac7a { text-align: center; font-weight: bold; color: #1e7e34; }
+#interfaceRoot .s-5dac7a { text-align: center; font-weight: bold; color: #1a6f2e; }
 #interfaceRoot .s-5e6201 { font-weight: 700; color: #1e3a5f; }
 #interfaceRoot .s-5e70e1 { margin-top: 12px; }
 #interfaceRoot .s-5e9494 { margin: 0 0 12px 0; }
@@ -468,12 +468,12 @@
 #interfaceRoot .s-61a8ef { padding: 12px; }
 #interfaceRoot .s-61f99d { background: rgba(255,255,255,0.15); padding: 10px 20px; border-radius: 12px; text-align: center; }
 #interfaceRoot .s-621d6a { background: #495057; color: white; }
-#interfaceRoot .s-622a05 { padding: 12px 8px; text-align: center; color: #1e7e34; }
+#interfaceRoot .s-622a05 { padding: 12px 8px; text-align: center; color: #1a6f2e; }
 #interfaceRoot .s-62466c { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #9c27b0; padding-bottom: 15px; }
 #interfaceRoot .s-629d96 { margin-top: 15px; padding: 10px; background: #1a5490; color: white; border-radius: 8px; text-align: center; }
 #interfaceRoot .s-62c9d0 { background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
 #interfaceRoot .s-62d24b { font-size: 13px; color: #666; }
-#interfaceRoot .s-62e092 { padding: 12px; text-align: center; color: #1e7e34; font-weight: bold; }
+#interfaceRoot .s-62e092 { padding: 12px; text-align: center; color: #1a6f2e; font-weight: bold; }
 #interfaceRoot .s-6341db { margin: 0 0 16px 0; color: #2d6a4f; font-size: 18px; display: flex; align-items: center; gap: 8px; }
 #interfaceRoot .s-635578 { background: #f1f5f9; font-weight: 600; }
 #interfaceRoot .s-63afdf { background: white; padding: 12px; border-radius: 12px; }
@@ -501,7 +501,7 @@
 #interfaceRoot .s-68271a { background: linear-gradient(135deg, #e65100 0%, #bf360c 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px; }
 #interfaceRoot .calculation-steps.rich .s-68271a { background: var(--tp-banner) !important; box-shadow: var(--tp-banner-shadow) !important; }
 #interfaceRoot .s-689a2a { background: #e8f4f8; padding: 8px 12px; border-radius: 8px; display: inline-block; }
-#interfaceRoot .s-689fb3 { color: #1e7e34; }
+#interfaceRoot .s-689fb3 { color: #1a6f2e; }
 #interfaceRoot .s-6920c9 { font-family: monospace; font-size: 20px; font-weight: 700; color: #495057; text-align: center; padding: 12px; background: #f8f9fa; border-radius: 8px; }
 #interfaceRoot .calculation-steps.rich .s-6920c9 { background: var(--tp-card) !important; border: 1px solid var(--line) !important; }
 #interfaceRoot .s-694182 { background: #e8f4f8; border-radius: 10px; padding: 15px; }
@@ -537,7 +537,7 @@
 #interfaceRoot .calculation-steps.rich .s-6d8291 { background: var(--tp-banner) !important; box-shadow: var(--tp-banner-shadow) !important; }
 #interfaceRoot .s-6d943d { margin: 0; padding: 20px; background: #1a5490; color: white; text-align: center; }
 #interfaceRoot .s-6da5f7 { background: #fff3cd; padding: 12px; border-radius: 8px; }
-#interfaceRoot .s-6e12f1 { margin-top: 8px; font-weight: bold; color: #1e7e34; }
+#interfaceRoot .s-6e12f1 { margin-top: 8px; font-weight: bold; color: #1a6f2e; }
 #interfaceRoot .s-6e1b96 { padding: 12px; text-align: center; font-weight: 500; }
 #interfaceRoot .s-6e278c { background: #f0f4fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
 #interfaceRoot .s-6ead76 { background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #1a5490; }
@@ -590,7 +590,7 @@
 #interfaceRoot .s-770f02 { width: 100%; margin-top: 8px; font-size: 13px; }
 #interfaceRoot .s-771f9b { background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%); color: white; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 #interfaceRoot .s-776a1d { width: 100%; border-collapse: collapse; font-size: 12px; }
-#interfaceRoot .s-7773e9 { color: #1e7e34; }
+#interfaceRoot .s-7773e9 { color: #1a6f2e; }
 #interfaceRoot .s-778100 { background: white; padding: 12px; border-radius: 12px; text-align: center; border-left: 4px solid #1a5490; }
 #interfaceRoot .calculation-steps.rich .s-778100 { border-color: var(--tp-accent) !important; }
 #interfaceRoot .s-77c0fb { margin-top: 15px; background: #fff8f0; padding: 15px; border-radius: 8px; }
@@ -672,7 +672,7 @@
 #interfaceRoot .s-8cbbf2 { padding: 8px; }
 #interfaceRoot .s-8cdb56 { padding: 8px; text-align: center; background: #1a5490; color: white; }
 #interfaceRoot .s-8d2e44 { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; }
-#interfaceRoot .s-8d6db5 { font-size: 36px; font-weight: 700; color: #1e7e34; }
+#interfaceRoot .s-8d6db5 { font-size: 36px; font-weight: 700; color: #1a6f2e; }
 #interfaceRoot .s-8d84a7 { cursor: pointer; color: #1a5490; font-weight: 600; margin-top: 10px; color: var(--tp-accent) !important; }
 #interfaceRoot .s-8dc3df { background: #f0f4fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
 #interfaceRoot .s-8ddc1c { font-size: 11px; color: #666; }
@@ -782,7 +782,7 @@
 #interfaceRoot .s-a1df57 { overflow-x: auto; margin-top: 20px; }
 #interfaceRoot .s-a1e1e3 { overflow-x: auto; max-height: 500px; overflow-y: auto; }
 #interfaceRoot .s-a2089f { background: #2d6a4f; color: white; position: sticky; top: 0; }
-#interfaceRoot .s-a2648b { color: #17a2b8; }
+#interfaceRoot .s-a2648b { color: #0b6b7c; }
 #interfaceRoot .s-a28558 { border-bottom: 1px solid #e9ecef; background: #fff3cd; }
 #interfaceRoot .s-a2bbfd { font-size: 13px; }
 #interfaceRoot .s-a2c7ca { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; background: var(--tp-card) !important; border: 1px solid var(--line) !important; }
@@ -804,7 +804,7 @@
 #interfaceRoot .s-a756db { padding: 10px; }
 #interfaceRoot .s-a759b8 { background: #e65100; color: white; padding: 8px 12px; border-radius: 8px; display: inline-block; margin-top: 8px; }
 #interfaceRoot .calculation-steps.rich .s-a759b8 { background: var(--tp-head-soft) !important; color: #fff !important; }
-#interfaceRoot .s-a767b0 { margin: 0 0 16px 0; color: #1e7e34; }
+#interfaceRoot .s-a767b0 { margin: 0 0 16px 0; color: #1a6f2e; }
 #interfaceRoot .s-a790d4 { margin-top: 15px; background: #e8f4f8; border-radius: 12px; padding: 15px; font-size: 12px; }
 #interfaceRoot .s-a79d4a { text-align: center; font-weight: bold; color: #1a5490; }
 #interfaceRoot .calculation-steps.rich .s-a79d4a { color: var(--tp-accent) !important; }
@@ -897,7 +897,7 @@
 #interfaceRoot .s-b8a397 { font-size: 36px; }
 #interfaceRoot .s-b8aac1 { margin-top: 12px; padding: 10px; background: #1a5490; color: white; border-radius: 8px; text-align: center; }
 #interfaceRoot .s-b8ce58 { min-width: 150px; text-align: center; padding: 12px; background: white; border-radius: 12px; }
-#interfaceRoot .s-b939c1 { padding: 8px; text-align: center; font-weight: bold; color: #1e7e34; }
+#interfaceRoot .s-b939c1 { padding: 8px; text-align: center; font-weight: bold; color: #1a6f2e; }
 #interfaceRoot .s-b93f03 { background: #e8f4f8; padding: 12px; border-radius: 8px; }
 #interfaceRoot .s-b955ab { margin: 0 0 16px 0; color: #1565c0; }
 #interfaceRoot .s-ba1bb3 { margin-top: 20px; background: #e8f4f8; border-radius: 12px; padding: 15px; font-size: 12px; }
@@ -952,7 +952,7 @@
 #interfaceRoot .s-c4e3d2 { margin: 8px 0; color: #856404; }
 #interfaceRoot .s-c51e38 { margin-top: 10px; padding: 10px; background: #1a5490; color: white; border-radius: 8px; text-align: center; }
 #interfaceRoot .s-c53f8e { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; background: var(--tp-card) !important; border: 1px solid var(--line) !important; }
-#interfaceRoot .s-c5b75d { font-size: 48px; font-weight: 700; color: #1e7e34; }
+#interfaceRoot .s-c5b75d { font-size: 48px; font-weight: 700; color: #1a6f2e; }
 #interfaceRoot .s-c5bb82 { background: #d4edda; border-radius: 15px; padding: 15px; margin-top: 15px; text-align: center; }
 #interfaceRoot .s-c647c3 { border-bottom: 1px solid #e9ecef; background: white; }
 #interfaceRoot .s-c6645b { margin-top: 8px; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px; }
@@ -1002,14 +1002,14 @@
 #interfaceRoot .calculation-steps.rich .s-d163b6 { color: var(--tp-accent) !important; }
 #interfaceRoot .s-d174a2 { margin: 0; line-height: 1.6; }
 #interfaceRoot .s-d17639 { margin-top: 20px; background: #1a5490; color: white; border-radius: 12px; padding: 15px; text-align: center; }
-#interfaceRoot .s-d17747 { font-size: 32px; font-weight: 700; color: #1e7e34; }
+#interfaceRoot .s-d17747 { font-size: 32px; font-weight: 700; color: #1a6f2e; }
 #interfaceRoot .s-d1792e { display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 12px; }
 #interfaceRoot .s-d1f4df { font-size: 12px; color: #b39ddb; margin-bottom: 15px; }
 #interfaceRoot .s-d2b9d3 { background: white; padding: 12px; border-radius: 12px; border-left: 4px solid #17a2b8; }
 #interfaceRoot .s-d32c36 { padding: 12px; text-align: center; }
 #interfaceRoot .s-d38fa2 { background: #e9ecef; padding: 15px; border-radius: 10px; margin-top: 15px; }
 #interfaceRoot .s-d3acac { padding: 12px; background: #e8f4f8; font-size: 13px; }
-#interfaceRoot .s-d3b644 { font-size: 24px; font-weight: 700; color: #1e7e34; }
+#interfaceRoot .s-d3b644 { font-size: 24px; font-weight: 700; color: #1a6f2e; }
 #interfaceRoot .s-d45b93 { border-radius: 16px; padding: 20px; background: #d4edda; border-left: 6px solid #28a745; }
 #interfaceRoot .s-d502a1 { margin-top: 15px; }
 #interfaceRoot .s-d517aa { margin: 15px 0; padding: 12px; background: #f8f9fa; border-radius: 8px; }
@@ -1226,7 +1226,7 @@
 #interfaceRoot .calculation-steps.rich .s-fd7545 { border-color: var(--tp-accent) !important; }
 #interfaceRoot .s-fe253b { margin-top: 12px; font-size: 13px; color: #666; }
 #interfaceRoot .s-fec7da { font-size: 11px; opacity: 0.8; letter-spacing: 1px; }
-#interfaceRoot .s-ff4a94 { padding: 10px 8px; text-align: center; color: #1e7e34; }
+#interfaceRoot .s-ff4a94 { padding: 10px 8px; text-align: center; color: #1a6f2e; }
 #interfaceRoot .s-ff6d0f { padding: 12px; text-align: center; font-family: monospace; color: #b02a37; }
 #interfaceRoot .s-ffad1e { margin: 4px 0 0 0; opacity: 0.95; }
 #interfaceRoot .s-ffb54b { margin-top: 15px; background: #e8f4f8; padding: 12px; border-radius: 10px; }
@@ -1239,8 +1239,8 @@
 #interfaceRoot .tp-ok-6 { background: #d4edda; border-left: 6px solid #28a745; }
 #interfaceRoot .tp-ok-8 { background: #d4edda; border-left: 8px solid #28a745; }
 #interfaceRoot .tp-text-bad { color: #b02a37; }
-#interfaceRoot .tp-text-ok { color: #1e7e34; }
-#interfaceRoot .tp-infl-ok { color: #1e7e34; }
+#interfaceRoot .tp-text-ok { color: #1a6f2e; }
+#interfaceRoot .tp-infl-ok { color: #1a6f2e; }
 #interfaceRoot .tp-infl-warn { color: #8a6500; }
 #interfaceRoot .tp-infl-bad { color: #b02a37; }
 #interfaceRoot .tp-infl-ok-bg { background: #28a74520; }

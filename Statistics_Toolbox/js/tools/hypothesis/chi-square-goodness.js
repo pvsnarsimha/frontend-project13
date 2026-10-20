@@ -98,7 +98,7 @@ function computeChiSquareGoodnessTest(observed, expected, alpha) {
             <td class="s-6e1b96">${c.category}</td>
             <td class="s-3294d6">${c.observed}</td>
             <td class="s-3294d6">${c.expected.toFixed(2)}</td>
-            <td style="padding: 12px; text-align: center; color: ${diffColor}; font-weight: 500;">${c.diff >= 0 ? '+' : ''}${c.diff.toFixed(2)}</td>
+            <td style="padding: 12px; text-align: center; color: ${textSafeColor(diffColor)}; font-weight: 500;">${c.diff >= 0 ? '+' : ''}${c.diff.toFixed(2)}</td>
             <td class="s-3294d6">(${c.diff.toFixed(2)})² = ${c.diffSq.toFixed(2)}</td>
             <td class="s-1204a5">${c.contribution.toFixed(4)}</td>
         </tr>`;

@@ -131,11 +131,11 @@ function computeRunsTest(inputText, alpha) {
         const val = sequence[i];
         const color = val === value1 ? '#28a745' : '#dc3545';
         if (i > 0 && sequence[i] !== sequence[i-1]) {
-            sequenceDisplay += `<span style="color: ${color}; font-weight: bold;"> ${val} </span>`;
+            sequenceDisplay += `<span style="color: ${textSafeColor(color)}; font-weight: bold;"> ${val} </span>`;
         } else if (i === 0) {
-            sequenceDisplay += `<span style="color: ${color}; font-weight: bold;">${val} </span>`;
+            sequenceDisplay += `<span style="color: ${textSafeColor(color)}; font-weight: bold;">${val} </span>`;
         } else {
-            sequenceDisplay += `<span style="color: ${color};">${val} </span>`;
+            sequenceDisplay += `<span style="color: ${textSafeColor(color)};">${val} </span>`;
         }
     }
     

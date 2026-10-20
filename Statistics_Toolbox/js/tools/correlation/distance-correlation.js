@@ -180,7 +180,7 @@ function computeDistanceCorrelationWithSteps(x, y) {
             <th class="s-131038">${i+1}</th>`;
         for (let j = 0; j < n; j++) {
             let val = A_centered[i][j];
-            centeredAHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center; ${val >= 0 ? 'color: #1e7e34;' : 'color: #b02a37;'}">
+            centeredAHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center; ${val >= 0 ? 'color: #1a6f2e;' : 'color: #b02a37;'}">
                 ${val >= 0 ? '+' : ''}${val.toFixed(2)}
             </td>`;
         }
@@ -204,7 +204,7 @@ function computeDistanceCorrelationWithSteps(x, y) {
             <th class="s-131038">${i+1}</th>`;
         for (let j = 0; j < n; j++) {
             let val = B_centered[i][j];
-            centeredBHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center; ${val >= 0 ? 'color: #1e7e34;' : 'color: #b02a37;'}">
+            centeredBHtml += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center; ${val >= 0 ? 'color: #1a6f2e;' : 'color: #b02a37;'}">
                 ${val >= 0 ? '+' : ''}${val.toFixed(2)}
             </td>`;
         }

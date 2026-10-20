@@ -242,7 +242,7 @@ function computeVIF(dataMatrix) {
                 </div>
             </td>
             <td style="padding: 12px; text-align: center; background: ${v.severityColor}20; font-weight: 700; font-size: 16px;">${fmtVif(v.vif, 4)}</td>
-            <td style="padding: 12px; text-align: center; color: ${v.severityColor}; font-weight: 600;">${v.severity}</td>
+            <td style="padding: 12px; text-align: center; color: ${textSafeColor(v.severityColor)}; font-weight: 600;">${v.severity}</td>
             <td class="s-3294d6">${v.recommendation}</td>
         </tr>`;
     }

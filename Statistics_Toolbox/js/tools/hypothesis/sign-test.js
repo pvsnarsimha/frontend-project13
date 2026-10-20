@@ -114,7 +114,7 @@ function computeSignTest(data, hypothesizedMedian, alpha, alternative) {
             <td class="s-a7c3f4">${i+1}</td>
             <td class="s-a7c3f4">${s.value}</td>
             <td class="s-a7c3f4">${s.value} - ${hypothesizedMedian} = ${s.diff.toFixed(4)}</td>
-            <td style="padding: 8px; text-align: center; font-weight: bold; color: ${signColor};">${s.sign === '0' ? 'Tie (ignored)' : (s.sign === '+' ? 'Positive (+) → Above Median' : 'Negative (-) → Below Median')}</td>
+            <td style="padding: 8px; text-align: center; font-weight: bold; color: ${textSafeColor(signColor)};">${s.sign === '0' ? 'Tie (ignored)' : (s.sign === '+' ? 'Positive (+) → Above Median' : 'Negative (-) → Below Median')}</td>
         </tr>`;
     }
     
