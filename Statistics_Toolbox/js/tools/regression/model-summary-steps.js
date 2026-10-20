@@ -108,7 +108,7 @@ function stepsHtmlModelSummary(scope) {
         steps.push('<td class="s-618bb3">' + (i+1) + '</td>');
         steps.push('<td class="s-618bb3"><strong>' + r.actual + '</strong></td>');
         steps.push('<td class="s-618bb3">' + r.predicted.toFixed(4) + '</td>');
-        steps.push('<td style="padding: 10px; text-align: center; color: ' + (r.residual >= 0 ? '#10b981' : '#ef4444') + ';">' + (r.residual >= 0 ? '+' : '') + r.residual.toFixed(4) + '</td>');
+        steps.push('<td style="padding: 10px; text-align: center; color: ' + textSafeColor(r.residual >= 0 ? '#10b981' : '#ef4444') + ';">' + (r.residual >= 0 ? '+' : '') + r.residual.toFixed(4) + '</td>');
         steps.push('<td class="s-618bb3">' + r.squaredRes.toFixed(4) + '</td>');
         steps.push('<td class="s-618bb3">' + r.squaredDev.toFixed(4) + '</td>');
         steps.push('</tr>');
