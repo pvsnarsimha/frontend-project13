@@ -534,7 +534,10 @@ test('histogram: bin labels state which edge belongs to which bin, and every val
         assert.ok(r.binLabels.slice(0, -1).every(l => /^\[.*\)$/.test(l)), 'half-open bins use [a, b)');
         assert.ok(/^\[.*\]$/.test(r.binLabels[r.binLabels.length - 1]), 'the last bin is closed');
     }
-    assert.ok(app.computeHistogramWithSteps([4, 4, 4], 3).error, 'constant data is an error, not a divide by zero');
+    const flat = app.computeHistogramWithSteps([4, 4, 4], 3);       // constant data: one bin, no divide by zero
+    assert.ok(!flat.error);
+    assert.deepEqual(flat.frequencies, [3]);
+    assert.ok(!/NaN|Infinity/.test(flat.steps));
 });
 
 test('small-sample flags reach the answer tiles of the rank tests and chi-square goodness of fit', () => {

@@ -141,9 +141,8 @@ function computeHistogramWithSteps(numbers, numBins) {
     const minVal = Math.min(...numbers);
     const maxVal = Math.max(...numbers);
     const range = maxVal - minVal;
-    if (!(range > 0)) {
-        return { error: true, message: "All values are identical, so the range is 0 and there is nothing to divide into bins. Enter values that vary." };
-    }
+    // Identical values have no range to divide: one bin holds them all (its width is 0, so a density is not defined)
+    if (range === 0) numBins = 1;
     
     // Calculate optimal bin width using Sturges' rule
     const sturgesBins = Math.ceil(Math.log2(n) + 1);
@@ -203,7 +202,7 @@ function computeHistogramWithSteps(numbers, numBins) {
         cumSum += f;
         cumulativeFreq.push(cumSum);
     }
-    const density = bins.map(f => (f / (n * binWidth)).toFixed(6));
+    const density = bins.map(f => binWidth > 0 ? (f / (n * binWidth)).toFixed(6) : 'n/a');
     
     // Build histogram table
     let tableHtml = '<div class="s-91cab3">';
@@ -351,6 +350,11 @@ function setupHistogramLogic() {
         
         const result = computeHistogramWithSteps(numbers, numBins);
         resultDiv.style.display = "block";
+        if (result.error) {
+            valueSpan.innerText = "Error";
+            setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
+            return;
+        }
         setHtml(valueSpan, `📊 ${numBins} bins | ${numbers.length} values | Range: ${Math.min(...numbers).toFixed(2)} - ${Math.max(...numbers).toFixed(2)} | Width: ${result.binWidth.toFixed(4)}`);
         setHtml(stepsSpan, result.steps);
         
