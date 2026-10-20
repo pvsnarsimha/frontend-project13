@@ -70,6 +70,8 @@ body { background: var(--bg); min-height: 100vh; color: var(--ink); -webkit-font
     color: #cbd5e1; border: 1px solid rgba(255,255,255,.25); border-radius: 6px; padding: 2px 8px; background: rgba(0,0,0,.2);
 }
 .search-hint { font-size: .78rem; color: #94a3b8; margin-top: 8px; min-height: 1.1em; }
+.guide-link { color: #c7d2fe; text-decoration: underline; }
+.guide-link:hover, .guide-link:focus-visible { color: #fff; }
 
 /* ---------- APP SHELL ---------- */
 .stats-dashboard {

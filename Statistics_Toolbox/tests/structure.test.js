@@ -354,3 +354,43 @@ test('distribution-analysis.js documents, and gets, the globals it depends on', 
         assert.equal(typeof app.get(dep), 'function', `${dep} is defined by the loaded scripts`);
     }
 });
+
+test('the "Which tool should I use?" page links only to tools that exist, and every link opens its tool', () => {
+    const guide = fs.readFileSync(path.join(ROOT, 'Which-tool.html'), 'utf8');
+    const links = [...guide.matchAll(/data-tool="([^"]+)" href="Statistics\.html#tool=([^"]+)"/g)];
+    assert.ok(links.length >= 60, 'the guide covers most tools');
+    for (const [, id, target] of links) {
+        assert.equal(id, target, 'data-tool and href agree');
+        assert.ok(routes[id], `the guide points at unknown tool "${id}"`);
+    }
+    assert.ok(/href="Statistics\.html"/.test(guide), 'a way back');
+    assert.ok(html.includes('href="Which-tool.html"'), 'Statistics.html links to the guide');
+    assert.ok(fs.existsSync(path.join(ROOT, 'css/guide.css')));
+});
+
+test('the deep link #tool=<id> is handled by app.js', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js/app.js'), 'utf8');
+    assert.ok(/#tool=/.test(src) && /hashchange/.test(src));
+});
+
+test('every textarea offers an "Example:" placeholder (the sample-data contract); parameter-only tools have no textarea', () => {
+    const bad = [];
+    for (const [stat, [render]] of Object.entries(routes)) {
+        const out = render();
+        for (const m of out.matchAll(/<textarea[^>]*>/g)) {
+            const ph = (m[0].match(/placeholder="([^"]*)"/) || [])[1];
+            if (ph === undefined || !/example|e\.g\./i.test(ph) || ph.length >= 700) bad.push(`${stat}: ${(ph || '(none)').slice(0, 40)}`);
+        }
+        if (/data-parameter-only/.test(out) && /<textarea/.test(out)) bad.push(`${stat}: parameter-only but has a textarea`);
+    }
+    assert.deepEqual(bad, []);
+});
+
+test('README states the real amount of script (within 10%)', () => {
+    const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+    const m = readme.match(/about ([\d.]+) MB of script/);
+    assert.ok(m, 'README states the script size');
+    const bytes = scriptList().reduce((sum, rel) => sum + fs.statSync(path.join(ROOT, rel)).size, 0);
+    const actualMB = bytes / 1e6;
+    assert.ok(Math.abs(actualMB - parseFloat(m[1])) / actualMB <= 0.1, `README says ${m[1]} MB, the scripts are ${actualMB.toFixed(2)} MB`);
+});

@@ -13,6 +13,8 @@
         }
         return out;
     }
+    // SAMPLE-DATA CONTRACT (also in README.md): a pasted-data textarea has a placeholder of the form "Example: <data>"; this reads it for the
+    // "Try sample data" button. Parameter-only tools (parameterOnly: true in buildInterface) have no textarea. tests/structure.test.js enforces it.
     // Returns the sample text of a placeholder ("Example: 1, 2, 3"), or null when the placeholder offers none
     function sampleFromPlaceholder(placeholder) {
         const ph = decodeEntities(placeholder || '').replace(/\r\n?/g, '\n');
@@ -55,6 +57,8 @@
             if (!ctl.id) ctl.id = (iface.id || 'iface') + '-ctl-' + Math.random().toString(36).slice(2, 8);
             l.htmlFor = ctl.id;
         });
+        // The tool title is the page's heading for this tool, and the place keyboard focus moves to when a tool is chosen (see focusToolTitle)
+        $$('.interface-title', iface).forEach(t => { t.setAttribute('role', 'heading'); t.setAttribute('aria-level', '2'); t.tabIndex = -1; });
         $$('.result-value', iface).forEach(v => { v.setAttribute('role', 'status'); v.setAttribute('aria-live', 'polite'); });
         // The worked solution is rebuilt after every calculation: announce that it is ready without reading all of it out
         $$('.calculation-steps', iface).forEach(v => {

@@ -158,6 +158,17 @@ function switchToStat(statType) {
     });
 }
 
+// After the user picks a tool from the sidebar the old content is gone, so focus would be left on a button that no longer
+// leads anywhere meaningful for a screen reader. Move it to the new tool's title (a heading, also given its role by
+// makeAccessible in ui/forms.js); a screen reader then reads the tool's name and the keyboard user can Tab straight into
+// its first input. Not done for module tabs (arrow keys must keep focus on the tab list) or for the initial render.
+function focusToolTitle() {
+    const title = interfaceRoot.querySelector('.interface-title');
+    if (!title) return;
+    title.tabIndex = -1;       // set here as well: the accessibility pass in ui/forms.js runs a moment later (MutationObserver)
+    title.focus();
+}
+
 function showModule(moduleName) {
     document.querySelectorAll('.tab').forEach(t => {
         const on = t.dataset.tab === moduleName;
@@ -176,7 +187,7 @@ document.querySelector('.main-panel').addEventListener('click', e => {
     const btn = e.target.closest('.stat-btn');
     if (!btn) return;
     if (btn.dataset.action === 'visualize') { visualizeCurrentData(); return; }
-    if (btn.dataset.stat) switchToStat(btn.dataset.stat);
+    if (btn.dataset.stat) { switchToStat(btn.dataset.stat); focusToolTitle(); }
 });
 
 // Tabs: click, Enter/Space, and arrow-key navigation (WAI-ARIA tabs pattern)
@@ -221,3 +232,17 @@ document.addEventListener('click', e => {
 });
 
 switchToStat('mean');
+
+// Deep link: Statistics.html#tool=pearson opens that tool (the "Which tool should I use?" page links this way)
+function openToolFromHash() {
+    if (typeof location === 'undefined') return;
+    const m = /^#tool=([A-Za-z0-9]+)$/.exec(location.hash);
+    if (!m || !STAT_ROUTES[m[1]]) return;
+    const btn = document.querySelector('.stat-btn[data-stat="' + m[1] + '"]');
+    const sidebar = btn && btn.closest('.action-sidebar');
+    if (!sidebar) return;
+    showModule(sidebar.dataset.module);
+    switchToStat(m[1]);
+}
+openToolFromHash();
+window.addEventListener('hashchange', openToolFromHash);

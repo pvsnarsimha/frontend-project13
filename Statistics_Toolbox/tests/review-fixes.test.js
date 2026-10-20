@@ -596,3 +596,41 @@ test('log transform never prints a negative "reduction" or NaN, and reports skew
     const skewed = app.computeLogTransformWithSteps([1, 2, 4, 8, 16, 1000], 'natural');
     assert.ok(/closer to symmetric/.test(skewed.steps));
 });
+
+test('perfect fit: one rule for every regression tool (descriptive tools report R² = 1, inference tools stop with the same message)', () => {
+    const x = [1, 2, 3, 4, 5, 6], y = [3, 5, 7, 9, 11, 13];            // y = 2x + 1 exactly
+    assert.ok(app.isPerfectFit(0, 10) && app.isPerfectFit(1e-13, 10) && !app.isPerfectFit(0.5, 10));
+    const simple = app.computeSimpleLinearRegression(x, y);
+    assert.ok(!simple.error, 'descriptive tool still fits');
+    close(simple.rSquared, 1, 1e-12);
+    assert.equal(simple.perfectFit, true);
+    assert.ok(/undefined \(perfect fit\)/.test(simple.steps) && !/Infinity|NaN/.test(simple.steps));
+    for (const r of [app.computeStdErrorsWithSteps(x, y), app.computeTStatsWithSteps(x, y), app.computeFTestOverallWithSteps(x, y, 0.05)]) {
+        assert.ok(r.error, 'inference tool refuses');
+        assert.equal(r.message, app.get('PERFECT_FIT_MESSAGE'));
+    }
+    const noisy = app.computeSimpleLinearRegression(x, [3, 5.2, 6.8, 9.1, 11, 12.9]);
+    assert.equal(noisy.perfectFit, false);
+    assert.ok(Number.isFinite(noisy.fStatistic) && Number.isFinite(noisy.pF));
+});
+
+test('Model Summary: RMSE divides by n and is labelled; the residual standard error divides by n - k - 1', () => {
+    const actual = [2, 3, 4, 5, 6.5, 7], predicted = [2.1, 2.9, 4.2, 4.8, 6.0, 7.2];
+    const r = app.computeModelSummary(actual, predicted, 2);
+    const ss = actual.reduce((s, a, i) => s + (a - predicted[i]) ** 2, 0);
+    close(r.rmse, Math.sqrt(ss / 6), 1e-12);
+    close(r.rse, Math.sqrt(ss / 3), 1e-12);
+    assert.ok(/÷ n/.test(r.steps) && /Residual std\. error \(÷ 3 df\)/.test(r.steps));
+});
+
+test('MANOVA: perfect group separation is an error, not an F of 0 or NaN', () => {
+    const rows = ['Group, Y1, Y2', 'A, 1, 1', 'A, 1, 1', 'A, 1, 1', 'B, 5, 9', 'B, 5, 9', 'B, 5, 9'];
+    const r = app.computeMANOVA(rows.join('\n'), 0.05);
+    assert.ok(r.error, 'no within-group variation: nothing to divide by');
+    assert.ok(!/NaN|Infinity/.test(r.message));
+});
+
+test('Cook\'s distance uses one wording for an infinite value (leverage 1)', () => {
+    assert.equal(app.formatCooksD(Infinity), '∞ (leverage = 1)');
+    assert.equal(app.formatCooksD(0.5, 2), '0.50');
+});

@@ -3,11 +3,14 @@
 An interactive statistics workbench: paste data, pick one of 99 techniques, and get the result, the formula,
 a full worked solution and a chart. It is a static site with **no build step**: open `Statistics.html` in a
 browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offline; Chart.js is only loaded when the first chart is drawn).
+Not sure which technique fits your question? Open **[Which tool should I use?](Which-tool.html)**: it starts from the question you are asking and
+links straight into the right tool (`Statistics.html#tool=<id>` opens a tool directly).
 
 ## Layout
 
 ```
 Statistics.html            Page shell only: header, tabs, sidebars (static, accessible markup), script tags
+Which-tool.html            "Which tool should I use?" guide: questions -> tools, each link a #tool=<id> deep link (css/guide.css; a test checks every id exists)
 css/statlab.css            Styles, and the --tp-* palette tokens for result panels
 css/tool-panels.css        s-xxxxxx classes generated from the inline styles of every tool (scripts/extract-styles.js), plus the hand-written tp-* state classes
 css/responsive.css         Phone / tablet rules (breakpoints 1100, 900, 640, 420)
@@ -86,8 +89,20 @@ Rules for all tools:
 * **Confidence intervals are two-sided at 1 - alpha** (`tCriticalValue(alpha / 2, df)`), whatever the alternative of the test; use the
   t quantile, never 1.96, when the standard deviation is estimated. `rejectH0` is always `pValue < alpha`.
 * **Sample data contract:** the "Try sample data" button reads the `Example:` text in a textarea's `placeholder`
-  attribute (HTML entities such as `&#10;` are decoded; category names without digits are fine). Keep that format;
-  tools that are pure parameter forms (no pasted data) are the only ones without a button, and `tests/e2e/sample.js` lists them.
+  attribute (HTML entities such as `&#10;` are decoded; category names without digits are fine; under 700 characters, no markup). Keep that
+  format: a unit test fails for any textarea without an `Example:` placeholder. Tools that are pure parameter forms (no pasted data) declare
+  `parameterOnly: true` in their `buildInterface` config, have no textarea and are the only ones without a button; `tests/e2e/sample.js` presses the
+  button of every other tool and checks the answer. The rule is repeated where the placeholder is read (`js/ui/forms.js`) and where interfaces are built (`js/core/toolkit.js`).
+* **One definition per statistic.** The same number must never differ between tools. Quartiles, medians and percentiles: `quantileType7`.
+  Skewness and kurtosis: `sampleSkewness` / `sampleExcessKurtosis` (the adjusted estimators the Skewness and Kurtosis tools use). Perfect
+  regression fit: `isPerfectFit` (the inference tools stop with `PERFECT_FIT_MESSAGE`; the descriptive tools report R² = 1 and print
+  "undefined" for t and F). Within-group tests: `withinGroupError` (fewer than one residual degree of freedom, or no variation inside the groups, is an error).
+  Distribution parameters: `validateDistributionParams`. `tests/consistency.test.js` runs the same data through every tool that shows one of these.
+* **RMSE and the residual standard error are different numbers.** Model Summary reports RMSE = √(SS<sub>res</sub> / n) (the average prediction error on
+  these points) and, next to it, the residual standard error √(SS<sub>res</sub> / (n - k - 1)) that regression software prints. Both are labelled with their divisor.
+* **Eigenvalues.** `symmetricEigenvalues` (Jacobi) is for covariance / SSCP / correlation matrices; `generalizedSymmetricEigenvalues(B, W)` gives the
+  eigenvalues of W⁻¹B in the symmetric form L⁻¹BL⁻ᵀ (W = LLᵀ) and is what MANOVA uses. `computeEigenvalues` is the general QR routine: it is only valid
+  when every eigenvalue is real, and returns NaN (not a wrong real number) when they are not.
 * Plotting tools give their canvas a descriptive label with `labelChart(canvas, text)` (sample size, range, centre), and the chart canvas
   lives in the worked solution only: one canvas id per page.
 * Each plotting tool keeps its Chart.js instance in a module-level `let ...Chart = null;`. Add the variable to
@@ -96,6 +111,20 @@ Rules for all tools:
   `if (!chartJsReady(thisFunction, arguments)) return;`, which loads the library and then calls the function again.
 * Probability tools that ask for distribution parameters call `showDistributionParams('prefix')` from their `updateXParams()`
   (fields live in `DISTRIBUTION_PARAMS` in `core/toolkit.js`; inputs get the ids `prefixMean`, `prefixStd`, `prefixRate`, ...).
+
+## Checklist for adding or changing a tool
+
+1. Put the tool in `js/tools/<module>/<name>.js`; keep it under 600 lines (a test enforces the budget). Move the worked-solution HTML to `<name>-steps.js`
+   (`stepsHtmlName(scope)`, see `scheffe.js` / `manova.js`) when it grows.
+2. Run `npm run sync:scripts` (script tags) and `npm run sync:styles` (inline styles to classes); add the sidebar button with a `data-stat` id and register the route in `js/app.js`.
+3. Use the shared definitions listed under *One definition per statistic*; do not write a second quantile, skewness or critical-value routine.
+4. Bad input returns `{ error: true, message }` that says how to fix it; zero variance, a perfect fit, fewer than one residual degree of freedom and overflow are errors, never `NaN` or `Infinity` in the output.
+5. Escape user text (`escapeHtml`) that goes into generated HTML; labels typed by the user are escaped once, where they are parsed.
+6. Give every pasted-data textarea an `Example:` placeholder (sample-data contract above) or mark the tool `parameterOnly: true`.
+7. Plotting tool: own Chart.js variable in `destroyAllCharts()`, `chartJsReady(...)` first, `labelChart(...)` for the canvas.
+8. Add a row to `Which-tool.html` (a card under the question the tool answers) and, if the tool uses an approximation, a row to the accuracy table below.
+9. Add a test: a known value from SciPy / R / statsmodels for the calculation, and an edge case (one value, identical values, perfect fit).
+10. `npm test` (and `npm run test:e2e` with Playwright installed) must pass before you commit.
 
 ## Design notes
 
@@ -119,7 +148,7 @@ Rules for all tools:
 * **Classic scripts, not ES modules.** The page is meant to open straight from disk (`file://`), where browsers
   refuse to load ES modules. The cost is one shared global scope, which `tests/structure.test.js` polices
   (duplicate definitions, route integrity). Moving to modules would require serving the folder over http and a bundler.
-* **No build step** means no minification or tree-shaking: the page loads about 1.7 MB of script from disk (instant locally,
+* **No build step** means no minification or tree-shaking: the page loads about 1.5 MB of script from disk (`tests/structure.test.js` fails if this number drifts more than 10% from the real size) (instant locally,
   noticeable over a slow network if you host it). Chart.js and the fonts are vendored, so there are no CDN requests and
   the Content-Security-Policy only allows the page's own files.
 
@@ -155,9 +184,9 @@ These tools give a close answer, not an exact one, and say so in their worked so
 * **Beta random numbers for tiny shapes.** They are drawn in log space, so they never underflow, but for α or β around 0.001 the true distribution is
   almost two spikes at 0 and 1, and many draws are exactly 0 or 1 in double precision. Means are still correct.
 * **Random numbers** use `Math.random` (or a seeded 32-bit generator when a seed is given: the seed is read as an integer and only its low 32 bits matter). Normals come from Box-Muller (both values of each
-  pair are used), Gamma from Marsaglia-Tsang, Beta as a Gamma ratio (or rejection sampling when both shapes exceed 1). They are for teaching
+  pair are used), Gamma from Marsaglia-Tsang, Beta as a Gamma ratio (or rejection sampling when both shapes exceed 1, with the Gamma ratio as the exact fallback if a very peaked Beta exhausts the attempt limit). They are for teaching
   and simulation, not cryptography.
-* **Entropy** of Normal, Exponential, Uniform and Beta is closed form; Poisson and Binomial are summed exactly; the Beta entropy uses a series digamma (about 1e-12).
+* **Entropy** of Normal, Exponential, Uniform and Beta is closed form; Poisson and Binomial are summed exactly in a window around the mean (beyond variance 1e7 / 1e8 the asymptotic expansion replaces the sum, which is accurate to far more digits than shown); the Beta entropy uses a series digamma (about 1e-12).
 * **Lilliefors K-S** p-values come from a seeded simulation (deterministic, about +-0.004).
 * **Anderson-Darling p** uses polynomial approximations (about 3 digits). **MANOVA** uses Rao's F approximation.
 * **Histogram** bin rules (Sturges, Freedman-Diaconis) are suggestions; the chart uses the bin count you choose.

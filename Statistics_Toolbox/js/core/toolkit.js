@@ -157,6 +157,8 @@ const ALPHA_OPTIONS_3 = [ ["0.10", "α = 0.10 (90% Confidence)"], ["0.05", "α =
 //     coloured cards or a canvas. Style it with classes from css/, not inline style attributes.
 // Copy a tool of the style you need; do not mix the two in one tool. Set parameterOnly: true for a form with no pasted data
 // (number fields and drop-downs only): it is rendered as data-parameter-only, and the tests then expect no "Try sample data" button.
+// Sample-data contract: every `textarea` input needs a placeholder starting "Example:" (js/ui/forms.js turns it into the "Try sample data" button);
+// a tool with no pasted data sets `parameterOnly: true`. A test fails for a textarea without an Example.
 function buildInterface(cfg) {
     const attrs = a => Object.entries(a || {}).map(([k, v]) => (v === true ? ` ${k}` : ` ${k}="${v}"`)).join('');
     const control = item => {

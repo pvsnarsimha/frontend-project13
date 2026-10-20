@@ -203,3 +203,11 @@ test('showDistributionParams: every field it generates is read back by the tool 
     probe.showDistributionParams('pdf');
     assert.equal(el('pdfParams').html, 'kept');
 });
+
+test('choosing a tool from the sidebar moves focus to the new tool title (focus management)', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js/app.js'), 'utf8');
+    assert.ok(/function focusToolTitle\(/.test(src));
+    assert.ok(/switchToStat\(btn\.dataset\.stat\);\s*focusToolTitle\(\)/.test(src), 'sidebar click focuses the title');
+    const forms = fs.readFileSync(path.join(ROOT, 'js/ui/forms.js'), 'utf8');
+    assert.ok(forms.includes("'.interface-title', iface).forEach(t =>") && forms.includes('t.tabIndex = -1'), 'the title is a focusable heading');
+});
