@@ -10,10 +10,10 @@ function computeRangeWithSteps(numbers) {
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     steps += `Step 1: Find maximum value = ${max}\n`;
     steps += `Step 2: Find minimum value = ${min}\n`;
-    steps += `Step 3: Calculate range = ${max} - ${min} = ${range}\n`;
+    steps += `Step 3: Calculate range = ${max} - ${min} = ${tidyNumber(range)}\n`;
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    steps += `✅ Range = ${range}`;
-    return { value: range, steps: steps, min: min, max: max };
+    steps += `✅ Range = ${tidyNumber(range)}`;
+    return { value: +range.toFixed(10), steps: steps, min: min, max: max };
 }
 
 const rangeTool = defineListTool({

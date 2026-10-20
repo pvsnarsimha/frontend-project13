@@ -93,6 +93,8 @@ function computeCooksDistance(xValues, yValues) {
     }
     
     const mse = ssRes / (n - 2);
+    const ssTot = yValues.reduce((a, y) => a + (y - meanY) * (y - meanY), 0);
+    const perfectFit = isPerfectFit(ssRes, ssTot);      // the same relative rule as every regression tool (absolute MSE < 1e-15 depends on the units of y)
     
     // Calculate Cook's Distance for each observation with detailed leverage calculation
     let cookDetails = [];
@@ -117,7 +119,7 @@ function computeCooksDistance(xValues, yValues) {
         `);
         
         // A leverage of 1 (the only observation at its x value) makes the denominator 0; a perfect fit makes MSE 0
-        const D = mse < 1e-15 ? 0
+        const D = perfectFit ? 0
             : (1 - hii) < 1e-12 ? Infinity
             : (residuals[i] * residuals[i]) / (2 * mse) * (hii / Math.pow(1 - hii, 2));
         
@@ -169,7 +171,6 @@ function computeCooksDistance(xValues, yValues) {
     
     // Build complete HTML
     // A perfect fit has MSE = 0, so every Cook's D is 0 / 0. It is shown as 0 (no point moves a line that already passes through all of them), and the page says so.
-    const perfectFit = mse < 1e-15;
     const perfectFitNote = perfectFit ? `<div class="tp-warn-6 tp-perfect-note">⚠️ The line fits the data perfectly: all residuals are 0, so MSE = 0 and Cook's D = e²/(p·MSE) · h/(1−h)² is 0/0 for every point. D is shown as 0 here (no point is influential), but the measure is not informative for a perfect fit.</div>` : '';
     const steps = perfectFitNote + stepsHtmlCooksDistance({ cookDetails, influentialCount, intercept, leverageDetails, meanX, meanY, moderateCount, mse, n, predictionDetails, slope, sortedD, ssRes, sxx, tableRows, xxDetails, xxSum, xyDetails, xySum });
     return { cooksDistances: cookDetails.map(d => d.cooksD), leverages: cookDetails.map(d => d.leverage), residuals, mse, perfectFit, steps, cookDetails };

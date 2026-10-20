@@ -1,8 +1,5 @@
 /* MeanAbsDev: meanabsdev tool (render, compute, setup) */
 
-// FIVE-NUMBER SUMMARY COMPUTATION
-
-// SUM OF SQUARES COMPUTATION
 // Mean Absolute Deviation Interface
 function renderMeanAbsDevInterface() {
     return buildInterface({

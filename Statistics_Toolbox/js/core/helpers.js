@@ -56,6 +56,13 @@ function validateDistributionParams(dist, params, opts) {
     return checks[dist] ? checks[dist]() : null;
 }
 
+// A number for display in a worked step: floating-point noise (7.100000000000001, 3.0000000000000004) is rounded away at
+// 10 decimals, whole numbers print without a decimal point, and nothing else changes.
+function tidyNumber(v) {
+    if (!isFinite(v)) return String(v);
+    return Number.isInteger(v) ? String(v) : String(+v.toFixed(10));
+}
+
 // Guard for every procedure that divides by the pooled within-group variance (ANOVA, Tukey, Scheffe, Bonferroni, Levene):
 // returns an error result when the within-group degrees of freedom are below 1 (every group has a single value) or the
 // within-group sum of squares is 0 (no variation inside any group, so F and the t / q statistics are infinite), else null.
@@ -151,11 +158,14 @@ function normalCDF(x, mean = 0, std = 1) {
 }
 
 // Beta Distribution Functions
+// Beta density, evaluated in log space: for large shapes (Beta(1000, 1000)) B(α, β) and x^(α-1) underflow to 0 as plain numbers,
+// which turned the density into NaN / Infinity. At x = 0 or 1 the density is +Infinity for a shape below 1, 1/B for a shape of 1, 0 above 1.
 function betaPDF(x, alpha = 2, beta = 5) {
     if (x < 0 || x > 1) return 0;
-    // Beta function approximation
-    const B = Math.exp(logGamma(alpha) + logGamma(beta) - logGamma(alpha + beta));
-    return Math.pow(x, alpha - 1) * Math.pow(1 - x, beta - 1) / B;
+    const logB = logGamma(alpha) + logGamma(beta) - logGamma(alpha + beta);
+    if (x === 0) return alpha < 1 ? Infinity : (alpha === 1 ? Math.exp(-logB) : 0);
+    if (x === 1) return beta < 1 ? Infinity : (beta === 1 ? Math.exp(-logB) : 0);
+    return Math.exp((alpha - 1) * Math.log(x) + (beta - 1) * Math.log1p(-x) - logB);
 }
 
 function combination(n, k) {

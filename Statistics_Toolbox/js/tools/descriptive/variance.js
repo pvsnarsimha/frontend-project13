@@ -3,6 +3,7 @@
 // VARIANCE
 function computeVarianceWithSteps(numbers) {
     if (!numbers.length) return { error: true, message: "No numbers provided." };
+    if (numbers.length < 2) return { error: true, message: "The sample variance needs at least 2 values (it divides by n - 1)." };
     let n = numbers.length;
     let mean = numbers.reduce((a,b) => a+b, 0) / n;
     let squaredDiffs = numbers.map(v => (v - mean) ** 2);

@@ -48,14 +48,25 @@ function computeBinningWithSteps(numbers, method, numBins = 5, customBreaks = []
     let breaks = [];
     let binLabels = [];
     
+    numBins = Math.max(1, Math.min(100, Math.floor(numBins) || 5));       // clamped here, not only in the form handler
     if (method === 'equal_width') {
-        const binWidth = (max - min) / numBins;
-        for (let i = 0; i <= numBins; i++) {
-            breaks.push(min + i * binWidth);
+        if (max === min) {
+            // identical values have no range to split: one bin holds them all
+            numBins = 1;
+            breaks = [min, max];
+        } else {
+            const binWidth = (max - min) / numBins;
+            for (let i = 0; i <= numBins; i++) breaks.push(min + i * binWidth);
+            breaks[numBins] = max;                     // no rounding drift at the top edge
         }
     } else if (method === 'custom') {
         if (!customBreaks.length) return { error: true, message: "Please provide custom break points." };
-        breaks = [min, ...customBreaks.sort((a,b) => a-b), max];
+        customBreaks = [...new Set(customBreaks)].sort((a, b) => a - b);      // a copy: the caller's array is never reordered
+        const outside = customBreaks.filter(b => !(b > min && b < max));
+        if (outside.length) {
+            return { error: true, message: `Break points must lie strictly between the smallest (${min}) and largest (${max}) value; ${outside.join(', ')} ${outside.length === 1 ? 'does' : 'do'} not. A break outside the data would create an empty or reversed bin.` };
+        }
+        breaks = [min, ...customBreaks, max];
     }
     
     // Generate bin labels
@@ -95,7 +106,7 @@ function computeBinningWithSteps(numbers, method, numBins = 5, customBreaks = []
     steps += `   Range = ${(max - min).toFixed(4)}\n\n`;
     
     if (method === 'equal_width') {
-        steps += `Step 2: Create ${numBins} equal-width bins\n`;
+        steps += `Step 2: Create ${numBins} equal-width bin${numBins === 1 ? '' : 's'}${max === min ? ' (all values are identical, so there is a single bin)' : ''}\n`;
         steps += `   Bin width = (${max.toFixed(4)} - ${min.toFixed(4)}) / ${numBins} = ${((max-min)/numBins).toFixed(4)}\n\n`;
     } else {
         steps += `Step 2: Using custom break points\n`;

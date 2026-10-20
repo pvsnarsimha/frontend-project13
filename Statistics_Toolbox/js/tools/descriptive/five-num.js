@@ -59,10 +59,10 @@ function computeFiveNumWithSteps(numbers) {
     if (n % 2 === 0) {
         let left = sorted[n/2 - 1];
         let right = sorted[n/2];
-        steps += `   n is even → median = (${left} + ${right}) / 2 = ${median}\n\n`;
+        steps += `   n is even → median = (${left} + ${right}) / 2 = ${median.toFixed(6)}\n\n`;
     } else {
         let pos = Math.floor(n/2);
-        steps += `   n is odd → median = value at position ${pos+1} = ${median}\n\n`;
+        steps += `   n is odd → median = value at position ${pos+1} = ${median.toFixed(6)}\n\n`;
     }
     
     steps += `Step 5: Find Q₁ (25th percentile, Type 7 linear interpolation)\n`;

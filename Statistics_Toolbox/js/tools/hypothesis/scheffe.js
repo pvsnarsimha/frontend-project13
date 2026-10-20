@@ -141,7 +141,10 @@ function computeScheffeTest(inputText, alpha) {
     
     // Build comprehensive HTML output
     const steps = stepsHtmlScheffe({ alpha, comparisons, dfBetween, dfWithin, fCritical, fStatistic, grandMean, groupData, k, msWithin, ssBetween, ssBetweenDetails, ssWithin, ssWithinDetails, totalN });
-    return { comparisons, scheffeCritical: comparisons[0]?.scheffeValue, fCritical, fStatistic, steps };
+    // Each pair has its own critical difference when the group sizes differ, so a single number is returned only when they all agree
+    const scheffeValues = comparisons.map(c => c.scheffeValue);
+    const sameScheffe = scheffeValues.every(v => Math.abs(v - scheffeValues[0]) <= 1e-12 * Math.max(1, Math.abs(scheffeValues[0])));
+    return { comparisons, scheffeCritical: sameScheffe ? scheffeValues[0] : null, scheffeValues, fCritical, fStatistic, steps };
 }
 
 // ========== SCHEFFÉ SETUP ==========

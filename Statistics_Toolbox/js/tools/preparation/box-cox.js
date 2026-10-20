@@ -90,7 +90,9 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
         lambda = (lo + hi) / 2;
     } else {
         lambda = customLambda;
-        if (lambda === null || isNaN(lambda)) lambda = 0;
+        if (lambda === null || !isFinite(lambda)) {
+            return { error: true, message: "Enter a numeric value for the custom λ (it was empty or not a number)." };
+        }
     }
     
     // Apply transformation
@@ -110,8 +112,9 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
     const transStd = Math.sqrt(transformed.reduce((a, b) => a + Math.pow(b - transMean, 2), 0) / n);
     
     // Calculate skewness before and after
-    const origSkew = validNumbers.reduce((a, b) => a + Math.pow((b - origMean) / origStd, 3), 0) / n;
-    const transSkew = transformed.reduce((a, b) => a + Math.pow((b - transMean) / transStd, 3), 0) / n;
+    // the Skewness tool's estimator (sampleSkewness), so the same data shows the same number in both tools; null when undefined
+    const origSkew = sampleSkewness(validNumbers);
+    const transSkew = sampleSkewness(transformed);
     
     let steps = `📐 BOX-COX TRANSFORMATION - STEP BY STEP\n`;
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
@@ -146,9 +149,11 @@ function computeBoxCoxWithSteps(numbers, lambdaType, customLambda = null) {
     steps += `   Transformed Mean: ${transMean.toFixed(6)}\n`;
     steps += `   Original Std Dev: ${origStd.toFixed(6)}\n`;
     steps += `   Transformed Std Dev: ${transStd.toFixed(6)}\n`;
-    steps += `   Original Skewness: ${origSkew.toFixed(6)}\n`;
-    steps += `   Transformed Skewness: ${transSkew.toFixed(6)} `;
-    if (Math.abs(transSkew) < Math.abs(origSkew)) {
+    steps += `   Original Skewness: ${origSkew === null ? 'N/A' : origSkew.toFixed(6)}\n`;
+    steps += `   Transformed Skewness: ${transSkew === null ? 'N/A' : transSkew.toFixed(6)} `;
+    if (origSkew === null || transSkew === null) {
+        steps += `(skewness needs at least 3 distinct values)\n`;
+    } else if (Math.abs(transSkew) < Math.abs(origSkew)) {
         steps += `(✓ Reduced skewness)\n`;
     } else {
         steps += `(⚠ Skewness increased - try different λ)\n`;
@@ -226,7 +231,7 @@ function setupBoxCoxLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, '⚠️ ' + escapeHtml(result.message));
         } else {
-            setHtml(valueSpan, `λ = ${result.lambda.toFixed(4)} | Skewness: ${result.origSkew.toFixed(4)} → ${result.transSkew.toFixed(4)}`);
+            setHtml(valueSpan, `λ = ${result.lambda.toFixed(4)} | Skewness: ${result.origSkew === null ? 'N/A' : result.origSkew.toFixed(4)} → ${result.transSkew === null ? 'N/A' : result.transSkew.toFixed(4)}`);
             stepsSpan.innerText = result.steps;
         }
     });

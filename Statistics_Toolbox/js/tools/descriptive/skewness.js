@@ -33,7 +33,7 @@ function computeSkewnessWithSteps(numbers) {
     let variance = sumSqDiffs / (n - 1);
     let stdDev = Math.sqrt(variance);
     
-    steps += `   Σ(xᵢ - x̄)² = ${diffTerms.join(' + ')}\n`;
+    diffTerms.forEach(term => { steps += `   ${term}\n`; });      // one squared deviation per line, then their sum
     steps += `   Σ(xᵢ - x̄)² = ${sumSqDiffs.toFixed(6)}\n`;
     steps += `   s² = Σ(xᵢ - x̄)² / (n-1) = ${sumSqDiffs.toFixed(6)} / ${n-1} = ${variance.toFixed(6)}\n`;
     steps += `   s = √${variance.toFixed(6)} = ${stdDev.toFixed(6)}\n\n`;

@@ -130,8 +130,8 @@ function computeMcNemarTest(inputText, alpha) {
                 Formula: χ² = (|b - c| - 1)² / (b + c) [with continuity correction]<br>
                 = (|${b} - ${c}| - 1)² / (${b} + ${c})<br>
                 = (${Math.abs(b - c)} - 1)² / ${b + c}<br>
-                = (${Math.abs(b - c) - 1})² / ${b + c}<br>
-                = ${Math.pow(Math.abs(b - c) - 1, 2)} / ${b + c}<br>
+                ${Math.abs(b - c) < 1 ? `|b - c| - 1 would be negative (b = c), so the corrected numerator is taken as 0: χ² = 0 / ${b + c}<br>` : `= (${Math.abs(b - c) - 1})² / ${b + c}<br>
+                = ${Math.pow(Math.abs(b - c) - 1, 2)} / ${b + c}<br>`}
                 = <strong class="s-bbce95">χ² = ${chiSquare.toFixed(6)}</strong>
             </div>
             

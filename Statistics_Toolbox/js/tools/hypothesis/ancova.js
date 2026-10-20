@@ -229,7 +229,7 @@ function computeANCOVA(inputText, alpha) {
         return { error: true, message: "The covariate-adjusted between-group sum of squares came out negative, so the ANCOVA decomposition is not reliable for this data. Check for a constant covariate or near-collinear groups." };
     }
     if (ssBetweenAdj < 0) ssBetweenAdj = 0;
-    const ssCovariate = ssTotal - ssBetweenAdj - ssWithinAdj;
+    const ssCovariate = Math.max(0, ssTotal - ssBetweenAdj - ssWithinAdj);      // a tiny negative is floating-point cancellation
     
     // ========== STEP 9: Degrees of Freedom ==========
     const dfBetween = k - 1;
