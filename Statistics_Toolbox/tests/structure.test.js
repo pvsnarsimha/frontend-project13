@@ -99,11 +99,18 @@ test('Statistics.html lists exactly the scripts under js/, in dependency order (
     assert.deepEqual([...onDisk].sort(), [...scriptOrder()].sort());
 });
 
-test('each tool lives in its own file: one route per file, no file larger than 1,200 lines', () => {
+// File-size budget. A tool file above the limit must be split (worked-solution HTML goes to <tool>-steps.js, the pattern of
+// scheffe.js / manova.js / violin.js); the shared core files get a larger limit because they hold many small functions.
+// The budget is a ratchet: it fails on any file over the limit, with no exception list to grow.
+const MAX_TOOL_LINES = 600, MAX_CORE_LINES = 800;
+test(`file size is enforced: tool files <= ${MAX_TOOL_LINES} lines, core and UI files <= ${MAX_CORE_LINES}, and one route per file`, () => {
+    const tooBig = [];
     for (const rel of scriptList()) {
         const lines = fs.readFileSync(path.join(ROOT, rel), 'utf8').split('\n').length;
-        assert.ok(lines <= 1200, `${rel} has ${lines} lines`);
+        const limit = rel.startsWith('js/tools/') ? MAX_TOOL_LINES : MAX_CORE_LINES;
+        if (lines > limit) tooBig.push(`${rel} has ${lines} lines (limit ${limit})`);
     }
+    assert.deepEqual(tooBig, []);
 });
 
 test('tool functions live in the file that names them (renderX/computeX/setupX/updateX belong to x.js)', () => {
@@ -338,4 +345,12 @@ test('no blocking alert() outside notifyUser (messages go through the toast)', (
         if (hits > (rel === 'js/core/charts.js' ? 1 : 0)) offenders.push(rel);
     }
     assert.deepEqual(offenders, []);
+});
+
+test('distribution-analysis.js documents, and gets, the globals it depends on', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'js/tools/preparation/distribution-analysis.js'), 'utf8');
+    for (const dep of ['quantileType7', 'computeModeWithSteps']) {
+        assert.ok(src.includes(dep + '  ') || new RegExp(dep).test(src.split('*/')[0]), `${dep} is named in the header comment`);
+        assert.equal(typeof app.get(dep), 'function', `${dep} is defined by the loaded scripts`);
+    }
 });

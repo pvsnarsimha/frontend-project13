@@ -329,29 +329,27 @@ const boxplotPlugin = {
             }
         }
         
-        // 9. Draw NON-OVERLAPPING LABELS with proper positioning
+        // 9. Labels, placed so that none of them overlap: Q1, Q3 and the median sit to the right of the box,
+        //    the whisker labels above/below the caps, and the min/max values beside their points
         ctx.font = 'bold 12px "Segoe UI", Arial';
         
-        // Q1 Label - left side of box
-// Q1 Label - RIGHT side of box (moved from left to right)
-ctx.font = 'bold 12px "Segoe UI", Arial';
-ctx.fillStyle = '#17a2b8';
-ctx.fillText('Q₁', boxRight + 15, q1Y + 4);
-ctx.font = '10px monospace';
-ctx.fillStyle = '#8b949e';
-ctx.fillText(q1.toFixed(4), boxRight + 15, q1Y + 20);
-
-
-        // Q3 Label - RIGHT side of box (moved from left to right)
-ctx.font = 'bold 12px "Segoe UI", Arial';
-ctx.fillStyle = '#17a2b8';
-ctx.fillText('Q₃', boxRight + 15, q3Y + 4);
-ctx.font = '10px monospace';
-ctx.fillStyle = '#8b949e';
-ctx.fillText(q3.toFixed(4), boxRight + 15, q3Y + 20);
-
+        // Q1 label (right of the box)
+        ctx.font = 'bold 12px "Segoe UI", Arial';
+        ctx.fillStyle = '#17a2b8';
+        ctx.fillText('Q₁', boxRight + 15, q1Y + 4);
+        ctx.font = '10px monospace';
+        ctx.fillStyle = '#8b949e';
+        ctx.fillText(q1.toFixed(4), boxRight + 15, q1Y + 20);
         
-        // Median Label - right side of box
+        // Q3 label (right of the box)
+        ctx.font = 'bold 12px "Segoe UI", Arial';
+        ctx.fillStyle = '#17a2b8';
+        ctx.fillText('Q₃', boxRight + 15, q3Y + 4);
+        ctx.font = '10px monospace';
+        ctx.fillStyle = '#8b949e';
+        ctx.fillText(q3.toFixed(4), boxRight + 15, q3Y + 20);
+        
+        // Median label (right of the box, slightly further out than Q1 / Q3)
         ctx.font = 'bold 12px "Segoe UI", Arial';
         ctx.fillStyle = '#ffb74d';
         ctx.fillText('Median', boxRight + 20, medianY + 4);
@@ -359,36 +357,35 @@ ctx.fillText(q3.toFixed(4), boxRight + 15, q3Y + 20);
         ctx.fillStyle = '#8b949e';
         ctx.fillText(median.toFixed(4), boxRight + 20, medianY + 20);
         
-// Lower Whisker Label - move DOWN more (increase the negative offset)
-ctx.font = 'bold 11px "Segoe UI", Arial';
-ctx.fillStyle = '#81c784';
-ctx.fillText('Lower Whisker', xCenter, whiskerMinY - 28);
-ctx.font = '9px monospace';
-ctx.fillStyle = '#8b949e';
-ctx.fillText(whiskerMin.toFixed(4), xCenter, whiskerMinY - 12);
-
-// Upper Whisker Label - move UP more (increase the positive offset)
-ctx.fillStyle = '#81c784';
-ctx.fillText('Upper Whisker', xCenter, whiskerMaxY + 38);
-ctx.font = '9px monospace';
-ctx.fillStyle = '#8b949e';
-ctx.fillText(whiskerMax.toFixed(4), xCenter, whiskerMaxY + 52);
+        // Lower whisker label (above the lower cap, in canvas pixels y grows downwards)
+        ctx.font = 'bold 11px "Segoe UI", Arial';
+        ctx.fillStyle = '#81c784';
+        ctx.fillText('Lower Whisker', xCenter, whiskerMinY - 28);
+        ctx.font = '9px monospace';
+        ctx.fillStyle = '#8b949e';
+        ctx.fillText(whiskerMin.toFixed(4), xCenter, whiskerMinY - 12);
         
-        // IQR Box Label - above the box
+        // Upper whisker label (below the upper cap)
+        ctx.font = 'bold 11px "Segoe UI", Arial';
+        ctx.fillStyle = '#81c784';
+        ctx.fillText('Upper Whisker', xCenter, whiskerMaxY + 38);
+        ctx.font = '9px monospace';
+        ctx.fillStyle = '#8b949e';
+        ctx.fillText(whiskerMax.toFixed(4), xCenter, whiskerMaxY + 52);
+        
+        // IQR box label and value
         ctx.font = 'bold 11px "Segoe UI", Arial';
         ctx.fillStyle = '#4fc3f7';
-ctx.fillText('IQR Box', xCenter + 50, q3Y - 15);
+        ctx.fillText('IQR Box', xCenter + 50, q3Y - 15);
         ctx.font = '9px monospace';
         ctx.fillStyle = '#8b949e';
         ctx.fillText(`IQR = ${(q3 - q1).toFixed(4)}`, xCenter, q1Y + 28);
         
-// Min Value Label - move further right
-ctx.font = '9px monospace';
-ctx.fillStyle = '#8b949e';
-ctx.fillText(minVal.toFixed(4), xCenter + 35, minY + 12);
-
-// Max Value Label - move further right
-ctx.fillText(maxVal.toFixed(4), xCenter + 35, maxY - 8);
+        // Min and max values (beside their points)
+        ctx.font = '9px monospace';
+        ctx.fillStyle = '#8b949e';
+        ctx.fillText(minVal.toFixed(4), xCenter + 35, minY + 12);
+        ctx.fillText(maxVal.toFixed(4), xCenter + 35, maxY - 8);
         
         // Outlier Label if any
         if (outliers && outliers.length > 0) {

@@ -251,7 +251,7 @@ function stepsHtmlCooksDistance(scope) {
                         <tr class="s-0d2692">
                             <td class="s-182047">${idx + 1}</td>
                             <td class="s-182047">${d.obs}</td>
-                            <td class="s-291e24 tp-infl-${d.influenceClass}">${isFinite(d.cooksD) ? d.cooksD.toFixed(6) : "∞"}</td>
+                            <td class="s-291e24 tp-infl-${d.influenceClass}">${formatCooksD(d.cooksD)}</td>
                             <td class="s-182047 tp-infl-${d.influenceClass}">${d.influence}</td>
                         </tr>
                         `).join('')}
@@ -264,10 +264,10 @@ function stepsHtmlCooksDistance(scope) {
         <div class="s-ba1bb3">
             <strong>📊 Cook's Distance Summary Statistics:</strong>
             <div class="s-1d249f gen-flex">
-                <div>Min D = ${(v => isFinite(v) ? v.toFixed(6) : '∞')(Math.min(...cookDetails.map(d => d.cooksD)))}</div>
-                <div>Max D = ${(v => isFinite(v) ? v.toFixed(6) : '∞ (an observation has leverage 1)')(Math.max(...cookDetails.map(d => d.cooksD)))}</div>
-                <div>Mean D = ${(v => isFinite(v) ? v.toFixed(6) : '∞')(cookDetails.reduce((a,b) => a + b.cooksD, 0) / n)}</div>
-                <div>Median D = ${(v => isFinite(v) ? v.toFixed(6) : '∞')(quantileType7(cookDetails.map(d => d.cooksD).sort((a, b) => a - b), 0.5))}</div>
+                <div>Min D = ${formatCooksD(Math.min(...cookDetails.map(d => d.cooksD)))}</div>
+                <div>Max D = ${formatCooksD(Math.max(...cookDetails.map(d => d.cooksD)))}</div>
+                <div>Mean D = ${formatCooksD(cookDetails.reduce((a,b) => a + b.cooksD, 0) / n)}</div>
+                <div>Median D = ${formatCooksD(quantileType7(cookDetails.map(d => d.cooksD).sort((a, b) => a - b), 0.5))}</div>
             </div>
         </div>
         

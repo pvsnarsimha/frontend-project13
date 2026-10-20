@@ -34,6 +34,12 @@ function renderCooksDistanceInterface() {
 }
 
 // ========== COOK'S DISTANCE COMPUTATION (PROFESSIONAL VERSION WITH DETAILED CALCULATIONS) ==========
+// Cook's D as text: D is infinite exactly when an observation has leverage 1 (it alone determines the fitted line, so
+// deleting it changes the fit without limit). One wording everywhere, instead of a bare "∞" in some places and a message in others.
+function formatCooksD(value, digits) {
+    return isFinite(value) ? value.toFixed(digits === undefined ? 6 : digits) : '∞ (leverage = 1)';
+}
+
 function computeCooksDistance(xValues, yValues) {
     if (!xValues.length || !yValues.length) {
         return { error: true, message: "Please enter both X and Y values." };
@@ -152,7 +158,7 @@ function computeCooksDistance(xValues, yValues) {
             <td class="s-69c02e">${d.yPred.toFixed(4)}</td>
             <td class="s-69c02e ${d.residual >= 0 ? 'tp-text-ok' : 'tp-text-bad'}">${d.residual.toFixed(4)}</td>
             <td class="s-69c02e">${d.leverage.toFixed(4)}</td>
-            <td class="s-34f862 tp-infl-${d.influenceClass}-bg">${isFinite(d.cooksD) ? d.cooksD.toFixed(6) : "∞"}</td>
+            <td class="s-34f862 tp-infl-${d.influenceClass}-bg">${formatCooksD(d.cooksD)}</td>
             <td class="s-e73169 tp-infl-${d.influenceClass}">${d.influence}</td>
         </tr>`;
     }
@@ -189,7 +195,7 @@ function setupCooksDistanceLogic() {
             const influential = result.cooksDistances.filter(d => d >= 1).length;
             const maxD = Math.max(...result.cooksDistances);
             // Cook's D is Infinity when a point has leverage 1 (it alone determines the line); say so instead of printing "Infinity"
-            setHtml(valueSpan, `${influential} influential obs | Max D = ${isFinite(maxD) ? maxD.toFixed(4) : '∞ (leverage = 1)'}`);
+            setHtml(valueSpan, `${influential} influential obs | Max D = ${formatCooksD(maxD, 4)}`);
             setHtml(stepsSpan, result.steps);  // ← CRITICAL: use innerHTML not innerText
         }
     });

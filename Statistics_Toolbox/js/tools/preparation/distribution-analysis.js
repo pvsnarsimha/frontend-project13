@@ -1,5 +1,9 @@
 /* DistributionAnalysis: the plain-language "Visualize Data" summary shown under the Histogram and Box Plot charts.
-   Depends on computeModeWithSteps and quantileType7 (core/helpers.js), resolved when called. */
+   Cross-file dependencies (all plain global functions, resolved when generateDistributionAnalysis is called, so the load order
+   only has to put every one of these files before the first click):
+     quantileType7           js/core/numerics.js
+     computeModeWithSteps    js/tools/descriptive/mode.js
+   Callers: histogram.js and boxplot-chart.js. If either dependency is renamed, tests/structure.test.js fails. */
 
 // Function to generate detailed distribution analysis
 function generateDistributionAnalysis(numbers) {
