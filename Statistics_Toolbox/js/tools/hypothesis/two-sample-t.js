@@ -6,7 +6,7 @@ function renderTwoSampleTInterface() {
         id: "statTwoSampleTInterface",
         title: "📊 Independent Two-Sample t-test",
         formula: "📌 t = (x̄₁ - x̄₂) / √(s₁²/n₁ + s₂²/n₂)",
-        desc: "Tests whether the means of two independent populations are significantly different (Welch's t-test, does not assume equal variances).",
+        desc: "Tests whether the means of two independent populations are significantly different (Welch's t-test by default, which does not assume equal variances; choose “equal variances” for the pooled t-test many textbooks teach).",
         inputs: [
             inputModeItem("twoSampleMode", "🧮 Summary statistics (n, mean, s for each group)"),
             {
@@ -36,6 +36,11 @@ function renderTwoSampleTInterface() {
                     ["greater", "μ₁ > μ₂ (Sample1 greater than Sample2)"],
                     ["less", "μ₁ < μ₂ (Sample1 less than Sample2)"]
                 ]
+            },
+            {
+                label: "📋 Variances:",
+                select: { id: "twoSampleVariance", style: FIELD_STYLE },
+                options: [["welch", "Not assumed equal (Welch) - safe default", true], ["pooled", "Assumed equal (pooled t-test)"]]
             }
         ],
         run: { id: "twoSampleTComputeBtn", text: "📊 Run Two-Sample t-test + Full Steps" },
@@ -50,7 +55,7 @@ function renderTwoSampleTInterface() {
 }
 
 // ========== TWO-SAMPLE T-TEST (WELCH'S) COMPUTATION ==========
-function computeTwoSampleTTest(sample1, sample2, alpha, alternative) {
+function computeTwoSampleTTest(sample1, sample2, alpha, alternative, pooled = false) {
     if (!sample1.length || !sample2.length) {
         return { error: true, message: "Both samples must contain data." };
     }
@@ -65,11 +70,11 @@ function computeTwoSampleTTest(sample1, sample2, alpha, alternative) {
     const mean2 = sample2.reduce((a, b) => a + b, 0) / n2;
     const stdDev1 = Math.sqrt(sample1.reduce((a, b) => a + Math.pow(b - mean1, 2), 0) / (n1 - 1));
     const stdDev2 = Math.sqrt(sample2.reduce((a, b) => a + Math.pow(b - mean2, 2), 0) / (n2 - 1));
-    return computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, alpha, alternative);
+    return computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, alpha, alternative, pooled);
 }
 
-// The same Welch test from the summary a textbook question gives: n, x̄ and s for each group
-function computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, alpha, alternative) {
+// The same test from the summary a textbook question gives: n, x̄ and s for each group. Welch by default; pooled = true assumes equal variances.
+function computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, alpha, alternative, pooled = false) {
     if (!(n1 >= 2 && n2 >= 2) || !Number.isInteger(n1) || !Number.isInteger(n2)) return { error: true, message: "Each sample size must be a whole number of at least 2." };
     if (!isFinite(mean1) || !isFinite(mean2)) return { error: true, message: "Enter both sample means as numbers." };
     if (!(stdDev1 >= 0 && stdDev2 >= 0) || !isFinite(stdDev1) || !isFinite(stdDev2)) return { error: true, message: "Each sample standard deviation must be a number that is 0 or more." };
@@ -78,15 +83,11 @@ function computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, al
     const var2 = stdDev2 * stdDev2;
     
     // Standard error
-    const se = Math.sqrt(var1 / n1 + var2 / n2);
-    
-    // t-statistic
+    // Pooled (equal variances): s_p² = [(n₁-1)s₁² + (n₂-1)s₂²] / (n₁+n₂-2), df = n₁+n₂-2. Welch: unpooled SE and Welch-Satterthwaite df.
+    const pooledVar = ((n1 - 1) * var1 + (n2 - 1) * var2) / (n1 + n2 - 2);
+    const se = pooled ? Math.sqrt(pooledVar * (1 / n1 + 1 / n2)) : Math.sqrt(var1 / n1 + var2 / n2);
     const tStatistic = (mean1 - mean2) / se;
-    
-    // Welch-Satterthwaite degrees of freedom
-    const numeratorDF = Math.pow(var1 / n1 + var2 / n2, 2);
-    const denominatorDF = Math.pow(var1 / n1, 2) / (n1 - 1) + Math.pow(var2 / n2, 2) / (n2 - 1);
-    const df = numeratorDF / denominatorDF;
+    const df = pooled ? n1 + n2 - 2 : Math.pow(var1 / n1 + var2 / n2, 2) / (Math.pow(var1 / n1, 2) / (n1 - 1) + Math.pow(var2 / n2, 2) / (n2 - 1));
     
     // Confidence intervals are two-sided at level 1 - α whatever the alternative of the test
     const ciT = tCriticalValue(alpha / 2, df);
@@ -124,9 +125,9 @@ function computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, al
         <div class="s-83bd0e gen-pad">
             <div class="s-4c6057 gen-flex">
                 <span class="s-1f18a8 gen-big">📊</span>
-                <h2 class="s-f8a94d">Independent Two-Sample t-test (Welch's)</h2>
+                <h2 class="s-f8a94d">Independent Two-Sample t-test (${pooled ? 'pooled variance' : "Welch's"})</h2>
             </div>
-            <p class="s-259079">Formula: t = (x̄₁ - x̄₂) / √(s₁²/n₁ + s₂²/n₂)</p>
+            <p class="s-259079">Formula: ${pooled ? 't = (x̄₁ - x̄₂) / √[s_p²(1/n₁ + 1/n₂)]' : 't = (x̄₁ - x̄₂) / √(s₁²/n₁ + s₂²/n₂)'}</p>
             <p class="s-20a400">H₀: μ₁ = μ₂ | H₁: μ₁ ${alternative === 'two.sided' ? '≠' : (alternative === 'greater' ? '>' : '<')} μ₂</p>
         </div>
         
@@ -157,9 +158,10 @@ function computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, al
                     <div><strong>Calculate Standard Error</strong></div>
                 </div>
                 <div class="s-f55593">
-                    SE = √(s₁²/n₁ + s₂²/n₂)<br>
+                    ${pooled ? `s_p² = [(n₁-1)s₁² + (n₂-1)s₂²] / (n₁+n₂-2) = [${n1 - 1}×${var1.toFixed(6)} + ${n2 - 1}×${var2.toFixed(6)}] / ${n1 + n2 - 2} = ${pooledVar.toFixed(6)}<br>
+                    SE = √[s_p²(1/n₁ + 1/n₂)] = √[${pooledVar.toFixed(6)} × (1/${n1} + 1/${n2})]<br>` : `SE = √(s₁²/n₁ + s₂²/n₂)<br>
                     SE = √(${var1.toFixed(6)}/${n1} + ${var2.toFixed(6)}/${n2})<br>
-                    SE = √(${(var1/n1).toFixed(6)} + ${(var2/n2).toFixed(6)})<br>
+                    SE = √(${(var1/n1).toFixed(6)} + ${(var2/n2).toFixed(6)})<br>`}
                     SE = ${se.toFixed(8)}
                 </div>
             </div>
@@ -180,10 +182,10 @@ function computeTwoSampleTFromSummary(n1, mean1, stdDev1, n2, mean2, stdDev2, al
             <div class="s-6025fc">
                 <div class="s-94fb6b gen-flex">
                     <div class="s-541469 gen-flex gen-sized">3</div>
-                    <div><strong>Welch-Satterthwaite Degrees of Freedom</strong></div>
+                    <div><strong>${pooled ? 'Degrees of Freedom (pooled)' : 'Welch-Satterthwaite Degrees of Freedom'}</strong></div>
                 </div>
                 <div class="s-f55593">
-                    df = (s₁²/n₁ + s₂²/n₂)² / [ (s₁²/n₁)²/(n₁-1) + (s₂²/n₂)²/(n₂-1) ]<br>
+                    ${pooled ? `df = n₁ + n₂ - 2 = ${n1} + ${n2} - 2<br>` : 'df = (s₁²/n₁ + s₂²/n₂)² / [ (s₁²/n₁)²/(n₁-1) + (s₂²/n₂)²/(n₂-1) ]<br>'}
                     df = ${df.toFixed(6)}<br>
                     α = ${alpha} | Critical Value = ${criticalValueText(criticalValue, alternative)} | p-value = ${pValue.toFixed(8)}
                 </div>
@@ -237,9 +239,10 @@ function setupTwoSampleTLogic() {
         }
         
         const num = id => parseFloat(document.getElementById(id).value);
+        const pooled = document.getElementById("twoSampleVariance").value === "pooled";
         const result = summaryMode
-            ? computeTwoSampleTFromSummary(num("twoSampleN1"), num("twoSampleMean1"), num("twoSampleSd1"), num("twoSampleN2"), num("twoSampleMean2"), num("twoSampleSd2"), alpha, alternative)
-            : computeTwoSampleTTest(sample1, sample2, alpha, alternative);
+            ? computeTwoSampleTFromSummary(num("twoSampleN1"), num("twoSampleMean1"), num("twoSampleSd1"), num("twoSampleN2"), num("twoSampleMean2"), num("twoSampleSd2"), alpha, alternative, pooled)
+            : computeTwoSampleTTest(sample1, sample2, alpha, alternative, pooled);
         resultDiv.style.display = "block";
         
         if (result.error) {

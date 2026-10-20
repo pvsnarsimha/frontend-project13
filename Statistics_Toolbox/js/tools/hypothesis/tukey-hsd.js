@@ -421,6 +421,7 @@ function setupTukeyHSDLogic() {
         if (!raw.trim()) {
             resultDiv.style.display = "block";
             valueSpan.innerText = "No data";
+            hideAllStatCharts();
             setHtml(stepsSpan, "Please enter data in format 'value:group'");
             return;
         }
@@ -430,11 +431,13 @@ function setupTukeyHSDLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             const sigCount = result.comparisons.filter(c => c.significant).length;
             setHtml(valueSpan, `${sigCount}/${result.comparisons.length} comparisons significant | ${result.hsd !== null && result.hsd !== undefined ? 'HSD = ' + result.hsd.toFixed(4) : 'HSD differs by pair (unequal n)'}`);
             setHtml(stepsSpan, result.steps);
+            showPairwiseChart("tukeyResultArea", tukeyChartRows(result.comparisons), "Tukey HSD: difference of means with its HSD interval", "Each bar is mean₁ − mean₂ ± HSD. A bar that does not cross the dashed line at 0 is a significant difference (red).");
         }
     });
     

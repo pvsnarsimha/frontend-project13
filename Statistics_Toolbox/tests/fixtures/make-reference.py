@@ -154,6 +154,8 @@ def t_from_summary(n, mean, s, mu0, alt):
 out["summary"]["one_t"] = {alt: t_from_summary(25, 16.2, 2.5, 15, alt) for alt in ("two-sided", "less", "greater")}
 out["summary"]["one_z"] = {alt: {"z": float((15.8 - 15) / (2 / 6)), "p": float({"two-sided": 2 * st.norm.sf(abs((15.8 - 15) / (2 / 6))), "greater": st.norm.sf((15.8 - 15) / (2 / 6)), "less": st.norm.cdf((15.8 - 15) / (2 / 6))}[alt])} for alt in ("two-sided", "less", "greater")}
 out["summary"]["welch"] = {alt: dict(zip(("t", "p"), map(float, st.ttest_ind_from_stats(82, 8, 30, 78, 10, 35, equal_var=False, alternative=alt)))) for alt in ("two-sided", "less", "greater")}
+out["summary"]["pooled"] = {alt: dict(zip(("t", "p"), map(float, st.ttest_ind_from_stats(82, 8, 30, 78, 10, 35, equal_var=True, alternative=alt)))) for alt in ("two-sided", "less", "greater")}
+out["pooled_raw"] = {alt: dict(zip(("t", "p"), map(float, st.ttest_ind(x, y, equal_var=True, alternative=alt)))) for alt in ("two-sided", "less", "greater")}
 out["summary"]["two_prop"] = {alt: dict(zip(("z", "p"), map(float, proportions_ztest([45, 30], [120, 110], alternative={"two-sided": "two-sided", "greater": "larger", "less": "smaller"}[alt])))) for alt in ("two-sided", "less", "greater")}
 tbl = [[30, 20, 10], [20, 25, 15]]
 c2 = chi2_contingency(tbl, correction=False)

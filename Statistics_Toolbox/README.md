@@ -6,10 +6,32 @@ browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offl
 Not sure which technique fits your question? Open **[Which tool should I use?](Which-tool.html)**: it starts from the question you are asking and
 links straight into the right tool (`Statistics.html#tool=<id>` opens a tool directly).
 
+![StatLab: a one-sample t-test typed in from summary statistics](docs/screenshot-input.png)
+
+## How to use it
+
+1. **Pick a technique.** Choose a module (Descriptive, Probability, Hypothesis Testing, ...) and a tool, or open **[Which tool should I use?](Which-tool.html)** and start from your question.
+2. **Type what your question gives you.** Paste a list of values, or choose "Summary statistics" and enter n, the mean, the standard deviation (or counts, or a table). "Try sample data" fills in an example.
+3. **Press Calculate.** You get the answer, the formula, a worked solution step by step, and a graph.
+4. **Take it with you.** "Copy solution" copies the working as text; "Print / Save as PDF" prints the solution and its graphs for homework.
+
+![The rejection region, critical values and test statistic](docs/screenshot-graph.png)
+
+## Run it or put it online
+
+* **Locally:** open `Statistics.html` in a browser. No install, no server.
+* **On the web (GitHub Pages):** repository Settings → Pages → "Deploy from a branch" → branch `main`, folder `/ (root)`. The root `index.html` forwards to the toolbox, and the site is a plain static site, so nothing is built.
+* **Trying it with students:** `docs/student-trial.md` is a one-page script and note sheet for watching 3 to 5 students use it unaided.
+
+## License
+
+MIT, see `LICENSE`. The bundled Chart.js (MIT) and fonts (SIL OFL 1.1) keep their own licenses: `vendor/README.md`.
+
 ## Layout
 
 ```
 Statistics.html            Page shell only: header, tabs, sidebars (static, accessible markup), script tags
+docs/                      Screenshots for this README and the student trial script
 Which-tool.html            "Which tool should I use?" guide: questions -> tools, each link a #tool=<id> deep link (css/guide.css; a test checks every id exists)
 css/statlab.css            Styles, and the --tp-* palette tokens for result panels
 css/tool-panels.css        s-xxxxxx classes generated from the inline styles of every tool (scripts/extract-styles.js), plus the hand-written tp-* state classes
@@ -135,12 +157,12 @@ Rules for all tools:
   reduces the data to the same summary and calls the same function, so the two cannot disagree. The summary layouts are in `js/core/summary-tests.js`.
 * **Graphs.** Every hypothesis test with a reference distribution draws it with the rejection region shaded, the critical value(s) and the test
   statistic marked, and the p-value area (`js/core/stat-charts.js`: `showTestChart`, driven by the `chart` spec each compute function returns).
-  The sign, binomial and exact binomial tests draw the binomial bars. Exceptions (no single reference curve): Shapiro-Wilk, Anderson-Darling,
-  Kolmogorov-Smirnov, Tukey HSD and Bonferroni. Correlation and regression tools add a scatter plot with the fitted line and a residual plot.
+  The sign, binomial and exact binomial tests draw the binomial bars. The normality tests draw a normal Q-Q plot (Kolmogorov-Smirnov also the empirical against the normal CDF) and Tukey HSD / Bonferroni draw a confidence interval for each pairwise difference (`js/core/compare-charts.js`). Correlation and regression tools add a scatter plot with the fitted line and a residual plot.
   The PDF, CDF, PMF, quantile, survival and hazard tools draw the curve with the asked probability shaded (`js/core/dist-graphs.js`).
 * **Probability Calculator** (`probcalc`): P(X ≤ a), P(X < a), P(X ≥ a), P(X > a), P(a ≤ X ≤ b), outside, and P(X = a) for the normal, t, chi-square,
   F, exponential, uniform, beta, Weibull, binomial and Poisson distributions, with the working and the shaded graph. The densities and named
   distributions are in `js/core/density.js`.
+* **Print / Save as PDF** on every result card prints the worked solution with its graphs (`body.print-one` in `css/statlab.css`).
 * **Frequency Table / Grouped Data** (`groupeddata`): rows like `10-20, 5` (class, frequency) or `7, 3` (value, frequency) give the mean, median,
   quartiles, mode and spread by the textbook grouped-data formulas, with the histogram, frequency polygon and ogive.
 * `tests/textbook-features.test.js` checks all of this against SciPy / statsmodels / NumPy values (`tests/fixtures/make-reference.py`).

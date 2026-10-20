@@ -316,10 +316,12 @@ function setupShapiroWilkLogic() {
         
         if (result.error) {
             valueSpan.innerText = "Error";
+            hideAllStatCharts();
             setHtml(stepsSpan, result.message);
         } else {
             setHtml(valueSpan, `W = ${result.W.toFixed(6)} | p = ${result.pValue.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
+            showNormalityCharts("swResultArea", data, false);
         }
     });
     

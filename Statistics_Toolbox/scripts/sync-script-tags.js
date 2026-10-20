@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Rewrites the <script> block of Statistics.html from the files under js/.
 // The page uses classic scripts (so it opens from disk), which must be listed in dependency order:
-//   core/numerics, core/toolkit, core/charts, core/helpers, core/distributions, core/density, core/stat-charts, core/dist-graphs, core/summary-tests   shared foundations
+//   core/numerics, core/toolkit, core/charts, core/helpers, core/distributions, core/density, core/stat-charts, core/dist-graphs, core/summary-tests, core/compare-charts   shared foundations
 //   tools/<module>/*.js                                      one file per tool, modules in tab order
 //   app.js                                                   route table + navigation (needs every tool)
 //   ui/navigation, ui/solution, ui/forms                     presentation layer (each uses what the previous exports)
@@ -24,7 +24,7 @@ function scriptOrder() {
     const unknown = toolModules.filter(m => !MODULE_ORDER.includes(m));
     if (unknown.length) throw new Error('Unknown tool module folder(s): ' + unknown.join(', ') + ' (add them to MODULE_ORDER)');
     return [
-        'js/core/numerics.js', 'js/core/toolkit.js', 'js/core/charts.js', 'js/core/helpers.js', 'js/core/distributions.js', 'js/core/density.js', 'js/core/stat-charts.js', 'js/core/dist-graphs.js', 'js/core/summary-tests.js',
+        'js/core/numerics.js', 'js/core/toolkit.js', 'js/core/charts.js', 'js/core/helpers.js', 'js/core/distributions.js', 'js/core/density.js', 'js/core/stat-charts.js', 'js/core/dist-graphs.js', 'js/core/summary-tests.js', 'js/core/compare-charts.js',
         ...MODULE_ORDER.flatMap(m => list(`js/tools/${m}`)),
         'js/app.js',
         'js/ui/navigation.js', 'js/ui/solution.js', 'js/ui/forms.js'   // forms uses what the other two export

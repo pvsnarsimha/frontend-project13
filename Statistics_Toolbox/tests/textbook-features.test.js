@@ -32,6 +32,17 @@ test('summary input: one-sample t, one-sample z, Welch t and two-proportion z ma
     }
 });
 
+test('pooled-variance two-sample t matches scipy (equal_var=True), from summary and from raw data', () => {
+    for (const [alt, want] of Object.entries(ref.summary.pooled)) {
+        const r = app.computeTwoSampleTFromSummary(30, 82, 8, 35, 78, 10, 0.05, ALT[alt], true);
+        close(r.tStatistic, want.t, 1e-10, `pooled t ${alt}`); close(r.pValue, want.p, 1e-9, `pooled p ${alt}`); assert.equal(r.df, 63);
+    }
+    for (const [alt, want] of Object.entries(ref.pooled_raw)) {
+        const r = app.computeTwoSampleTTest(ref.x, ref.y, 0.05, ALT[alt], true);
+        close(r.tStatistic, want.t, 1e-10, `pooled raw t ${alt}`); close(r.pValue, want.p, 1e-9, `pooled raw p ${alt}`);
+    }
+});
+
 test('summary input: raw data and its own summary give the same test result', () => {
     const data = [12, 15, 14, 16, 13, 15, 14, 17, 16, 15];
     const n = data.length, mean = data.reduce((a, b) => a + b) / n, sd = Math.sqrt(data.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1));
