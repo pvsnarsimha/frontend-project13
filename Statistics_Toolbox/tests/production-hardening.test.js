@@ -124,7 +124,12 @@ test('copyText prefers the Clipboard API in a secure context and falls back othe
     assert.deepEqual(calls, ['legacy']);
 });
 
-test('ANCOVA still returns a result for ordinary data after the negative-SS guard', () => {
-    const r = app.computeANCOVA('10:A:1, 12:A:2, 14:A:3, 11:B:1, 15:B:2, 18:B:3, 20:C:1, 25:C:2, 31:C:3', 0.05);
-    assert.ok(r.error || r.rejectH0 === (r.pValue < 0.05));
+test('ANCOVA still returns the right result for ordinary data after the negative-SS guard (one line per observation: Y, Group, Covariate)', () => {
+    const r = app.computeANCOVA('Y, Group, Covariate\n10, A, 1\n12, A, 2\n14, A, 3\n11, B, 1\n15, B, 2\n18, B, 3\n20, C, 1\n25, C, 2\n31, C, 3', 0.05);
+    assert.ok(!r.error, r.message);      // (the previous version of this test fed a format the tool rejects and accepted any error, so it proved nothing)
+    // statsmodels: anova_lm(ols('y ~ C(g) + x'), typ=2) gives F(2, 5) = 58.947368 for the group effect, p = 0.000334
+    assert.ok(Math.abs(r.fStatistic - 58.94736842105263) < 1e-9, `F was ${r.fStatistic}`);
+    assert.equal(r.dfBetween, 2); assert.equal(r.dfWithin, 5);
+    assert.ok(Math.abs(r.pValue - 0.000334) < 5e-6, `p was ${r.pValue}`);
+    assert.equal(r.rejectH0, true);
 });

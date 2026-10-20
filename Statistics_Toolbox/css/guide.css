@@ -1,3 +1,4 @@
+:root { color-scheme: light; }
 /* Layout of Which-tool.html (the "Which tool should I use?" guide). Same palette tokens as statlab.css. */
 :root { --ink: #0f172a; --ink-2: #334155; --muted: #475569; --line: #e2e8f0; --bg: #f1f5f9; --card: #ffffff; --brand: #4f46e5; }
 * { box-sizing: border-box; }
@@ -17,8 +18,4 @@ h3 { margin: 0 0 8px; font-size: 1rem; }
 .tool:hover, .tool:focus-visible { background: var(--brand); color: #fff; }
 .note { margin: 0; color: var(--muted); font-size: .9rem; }
 .foot { margin: 32px 0; color: var(--muted); font-size: .9rem; }
-@media (prefers-color-scheme: dark) {
-    :root { --ink: #e2e8f0; --ink-2: #cbd5e1; --muted: #94a3b8; --line: #334155; --bg: #0b1020; --card: #131a33; --brand: #a5b4fc; }
-    .tool { background: #1e254a; color: #c7d2fe; }
-    .tool:hover, .tool:focus-visible { background: #a5b4fc; color: #0b1020; }
-}
+/* Light only, like the main app: the guide and the tools look the same (the main app has no dark theme; one look is easier to keep readable). */

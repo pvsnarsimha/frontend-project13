@@ -58,6 +58,8 @@ function validateDistributionParams(dist, params, opts) {
 
 // A number for display in a worked step: floating-point noise (7.100000000000001, 3.0000000000000004) is rounded away at
 // 10 decimals, whole numbers print without a decimal point, and nothing else changes.
+// Consequence: a non-zero value smaller than 1e-10 in size (for example 3e-11) prints as '0', and values just above it keep only one digit (1.5e-10 prints as 1e-10). That is intended for worked steps, where such a
+// value is rounding noise; use toExponential() (not tidyNumber) when a genuinely tiny result, such as a p-value, must stay visible.
 function tidyNumber(v) {
     if (!isFinite(v)) return String(v);
     return Number.isInteger(v) ? String(v) : String(+v.toFixed(10));

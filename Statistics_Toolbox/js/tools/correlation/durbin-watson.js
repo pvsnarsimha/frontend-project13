@@ -268,7 +268,7 @@ function computeDurbinWatson(residuals) {
                 </table>
             </div>
             <div class="s-fa6d3d">
-                💡 <strong>Note:</strong> Values shown as (d<sub>L</sub>, d<sub>U</sub>). Reject H₀ if d < d<sub>L</sub> or d > 4 - d<sub>L</sub>.
+                💡 <strong>Note:</strong> Values shown as (d<sub>L</sub>, d<sub>U</sub>). Reject H₀ if d < d<sub>L</sub> or d > 4 - d<sub>L</sub>.<br>⚠ This table only covers <strong>n = 15 to 50</strong> and <strong>1 to 5 predictors</strong>. For other sizes use a full Durbin-Watson table or software; between d<sub>L</sub> and d<sub>U</sub> the test is inconclusive.
             </div>
         </div>
     </div>`;

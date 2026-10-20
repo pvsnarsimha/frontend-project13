@@ -202,3 +202,20 @@ test('Scheffé returns one critical difference only when every pair has the same
     assert.equal(unequal.scheffeCritical, null);
     assert.ok(unequal.scheffeValues.length === 3);
 });
+
+test('every tool title is readable text (no Cyrillic, no mojibake letters), including Z-scores and the hazard function', () => {
+    const renderers = Object.keys(app).filter(k => /^render.+Interface$/.test(k) && typeof app[k] === 'function');
+    assert.ok(renderers.includes('renderZScoreInterface') && renderers.includes('renderHazardInterface'), 'the Z-score and hazard tools are among the checked renderers');
+    assert.ok(renderers.length >= 90, `expected every tool to be checked, found ${renderers.length}`);
+    for (const fn of renderers) {
+        const html = app[fn]();
+        const title = html.match(/<div class="interface-title">([^<]*)<\/div>/);
+        if (!title) { assert.ok(!/[\u0400-\u04FF]/.test(html), `${fn} has Cyrillic letters`); continue; }       // a few tools build their own heading: still no Cyrillic
+        const text = title[1];
+        assert.ok(!/[\u0400-\u04FF]/.test(text), `${fn} title has Cyrillic letters (double-encoded UTF-8): ${text}`);
+        assert.ok(!/Ã|â€|Ž|╬|ŌłÆ|┬/.test(text), `${fn} title has mojibake: ${text}`);
+        assert.ok(/[A-Za-z]{3,}/.test(text), `${fn} title has readable words: ${text}`);
+    }
+    assert.match(app.renderZScoreInterface(), /interface-title">📊 Standardization/);
+    assert.match(app.renderHazardInterface(), /interface-title">⚠️ Hazard Function/);
+});

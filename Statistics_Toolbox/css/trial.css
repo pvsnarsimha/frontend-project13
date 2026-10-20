@@ -1,3 +1,4 @@
+:root { color-scheme: light; }
 /* trial.html: the student trial page and the teacher's summary */
 body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #f1f5f9; color: #0f172a; line-height: 1.55; }
 main { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
