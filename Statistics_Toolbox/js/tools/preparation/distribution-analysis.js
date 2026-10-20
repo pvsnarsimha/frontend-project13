@@ -83,12 +83,15 @@ function generateDistributionAnalysis(numbers) {
     
     analysis += `📌 DISTRIBUTION SHAPE:\n`;
     analysis += `• Pearson's median skewness (mean − median) / σ: ${skewness.toFixed(4)} → ${skewType}\n`;
+    const g1 = sampleSkewness(numbers), g2 = sampleExcessKurtosis(numbers);
+    analysis += `• Skewness G1 (the Skewness tool's adjusted estimator): ${g1 === null ? 'N/A (needs at least 3 distinct values)' : g1.toFixed(4)}\n`;
     analysis += `  `;
     if (skewness > 0.1) analysis += `Mean > Median, tail extends to the right.\n`;
     else if (skewness < -0.1) analysis += `Mean < Median, tail extends to the left.\n`;
     else analysis += `Mean ≈ Median, roughly bell-shaped.\n`;
     
     analysis += `• Excess kurtosis (population): ${kurtosis.toFixed(4)} → ${kurtosisType}\n`;
+    analysis += `• Excess kurtosis G2 (the Kurtosis tool's bias-corrected estimator): ${g2 === null ? 'N/A (needs at least 4 distinct values)' : g2.toFixed(4)}\n`;
     analysis += `  `;
     if (kurtosis > 0.5) analysis += `Distribution has heavier tails and sharper peak than normal.\n`;
     else if (kurtosis < -0.5) analysis += `Distribution has lighter tails and flatter peak than normal.\n`;

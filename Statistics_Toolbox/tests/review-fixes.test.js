@@ -664,3 +664,18 @@ test("Cook's D: an infinite value is explained as leverage = 1 or as numerical o
     assert.ok(/numerical overflow/.test(app.formatCooksD(Infinity, 6, 0.4)));
     assert.equal(app.formatCooksD(2, 3, 0.4), '2.000');
 });
+
+test('binning: constant data is one bin, out-of-range breaks are errors, the caller\'s breaks are not reordered, bins clamp', () => {
+    const flat = app.computeBinningWithSteps([4, 4, 4], 'equal_width', 5);
+    assert.ok(!flat.error && flat.bins.length === 1 && flat.bins[0] === 3);
+    assert.ok(!/NaN|Infinity/.test(flat.steps));
+    for (const breaks of [[5], [-3, 20], [10], [15, 25]]) {
+        const r = app.computeBinningWithSteps([10, 12, 15, 20], 'custom', 5, breaks);
+        assert.ok(r.error, `breaks ${breaks} are outside (10, 20)`);
+    }
+    const mine = [18, 14];
+    const ok = app.computeBinningWithSteps([10, 12, 15, 20], 'custom', 5, mine);
+    assert.ok(!ok.error); assert.deepEqual(mine, [18, 14]);
+    assert.equal(app.computeBinningWithSteps([1, 2, 3, 4], 'equal_width', 1e9).bins.length, 100);
+    assert.equal(app.computeBinningWithSteps([1, 2, 3, 4], 'equal_width', NaN).bins.length, 5);
+});

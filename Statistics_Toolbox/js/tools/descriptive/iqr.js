@@ -34,10 +34,10 @@ function computeIQRWithSteps(numbers) {
     steps += `Step 2: Find median (Q₂) = ${quantileType7(sorted, 0.5)}\n`;
     steps += `Step 3: Find Q₁ (25th percentile, Type 7)\n   ${describeQuantileType7(sorted, 0.25, 'Q₁')}\n`;
     steps += `Step 4: Find Q₃ (75th percentile, Type 7)\n   ${describeQuantileType7(sorted, 0.75, 'Q₃')}\n`;
-    steps += `Step 5: Calculate IQR = ${q3} - ${q1} = ${iqr}\n`;
+    steps += `Step 5: Calculate IQR = ${tidyNumber(q3)} - ${tidyNumber(q1)} = ${tidyNumber(iqr)}\n`;
     steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    steps += `✅ Interquartile Range (IQR) = ${iqr}`;
-    return { value: iqr, steps: steps, q1: q1, q3: q3 };
+    steps += `✅ Interquartile Range (IQR) = ${tidyNumber(iqr)}`;
+    return { value: +iqr.toFixed(10), steps: steps, q1: q1, q3: q3 };
 }
 
 function setupIQRCustomLogic() {

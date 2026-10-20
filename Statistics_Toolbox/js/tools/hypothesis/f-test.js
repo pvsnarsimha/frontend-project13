@@ -307,7 +307,7 @@ function computeFTest(sample1, sample2, alpha, alternative) {
             <h3 class="s-c7f0b4">Test Conclusion</h3>
             <div><strong>F-statistic:</strong> ${fStatistic.toFixed(6)}</div>
             <div><strong>Degrees of Freedom:</strong> (${df1}, ${df2})</div>
-            <div><strong>Critical Value:</strong> ${criticalValue.toFixed(6)}</div>
+            <div><strong>${alternative === 'less' ? 'Lower critical value (reject if F is below it)' : 'Critical Value'}:</strong> ${criticalValue.toFixed(6)}</div>
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
             <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>

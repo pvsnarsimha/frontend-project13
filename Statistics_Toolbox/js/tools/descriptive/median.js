@@ -24,7 +24,7 @@ function computeMedianWithSteps(numbers) {
             let midIdx = Math.floor(n / 2);
             median = quantileType7(sorted, 0.5);
             steps += `Step 3: n is odd → median = value at position (n+1)/2 = position ${midIdx+1}\n`;
-            steps += `   Value at position ${midIdx+1} = ${median}\n`;
+            steps += `   Value at position ${midIdx+1} = ${tidyNumber(median)}\n`;
         }
         steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
         steps += `✅ Median = ${(Number.isInteger(median) ? median : median.toFixed(10))}`;

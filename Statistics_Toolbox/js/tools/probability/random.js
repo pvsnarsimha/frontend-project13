@@ -196,7 +196,12 @@ function computeRandomWithSteps() {
         // Generate the random numbers and store in randomNumbers array
         randomNumbers = [];
         
-        if (params.alpha > 1 && params.beta > 1) {
+        // Rejection sampling accepts a candidate with probability 1 / f(mode); above a peak height of 500 that is under 0.2%, so those
+        // shapes go straight to the exact Gamma-ratio method instead of looping through thousands of rejected candidates per value
+        const REJECTION_MAX_PEAK = 500;
+        const useRejection = mode !== null && betaPDF(mode, params.alpha, params.beta) <= REJECTION_MAX_PEAK;
+        
+        if (useRejection) {
             steps += `✓ METHOD: Acceptance-Rejection Sampling (Best for α>1, β>1)\n\n`;
             steps += `Why this method?\n`;
             steps += `• Both shape parameters > 1 → Distribution is unimodal (has a single peak)\n`;
@@ -220,7 +225,7 @@ function computeRandomWithSteps() {
             steps += `🔢 GENERATION PROCESS (showing first 5 samples in detail):\n`;
             steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
             
-            const MAX_REJECTION_ATTEMPTS = 100000;   // a very peaked Beta accepts rarely; never loop forever
+            const MAX_REJECTION_ATTEMPTS = 5000;   // at the peak limit above the acceptance rate is >= 0.2%, so 5000 tries is never exhausted in practice
             let samplesShown = 0;
             const maxShowDetails = Math.min(5, count);
             
@@ -257,7 +262,9 @@ function computeRandomWithSteps() {
             }
             
         } else {
-            steps += `✓ METHOD: Gamma Ratio (Marsaglia-Tsang Gamma generator, works for all α,β > 0)\n\n`;
+            steps += `✓ METHOD: Gamma Ratio (Marsaglia-Tsang Gamma generator, works for all α,β > 0)\n`;
+            if (mode !== null) steps += `   (α, β > 1 but the peak is very tall, f(mode) > ${REJECTION_MAX_PEAK}: rejection sampling would reject almost every candidate, so the exact Gamma ratio is used)\n`;
+            steps += `\n`;
             steps += `Why this method?\n`;
             steps += `• One or both shape parameters ≤ 1 → Distribution may be J-shaped or U-shaped\n`;
             steps += `• Gamma ratio method is stable and works for all parameter values\n`;

@@ -1,6 +1,9 @@
 /* geometric: geometric tool (render, compute, setup) */
 
 // ------------------ GEOMETRIC MEAN with product/log safety + detailed steps ------------------
+// 12 decimals, or scientific notation when the value is so small that 12 decimals would print 0.000000000000
+function fmtSmall(v) { return v >= 1e-6 ? v.toFixed(12) : v.toExponential(10); }
+
 function computeGeometricWithSteps(numbers) {
         if (!numbers.length) return { error: true, message: "No numbers entered. Provide at least one positive value.", value: null };
         const nonPositive = numbers.filter(v => v <= 0);
@@ -17,7 +20,8 @@ function computeGeometricWithSteps(numbers) {
         // Safe approach: if product might overflow or is extremely large, use log-sum
         let useLogMethod = false;
         let testProduct = numbers.reduce((acc, v) => acc * Math.abs(v), 1);
-        if (testProduct > 1e100 || testProduct === Infinity || numbers.some(v => v === 0)) useLogMethod = true;
+        // the product of many small values underflows to 0 (and of many large ones overflows), so either extreme uses the log sum
+        if (testProduct > 1e100 || testProduct < 1e-100 || !isFinite(testProduct)) useLogMethod = true;
         
         if (useLogMethod) {
             let sumLog = numbers.reduce((acc, v) => acc + Math.log(v), 0);
@@ -27,9 +31,9 @@ function computeGeometricWithSteps(numbers) {
             steps += `   Σ ln(xᵢ) = ${logTerms}\n`;
             steps += `            = ${sumLog.toFixed(10)}\n`;
             steps += `Step 2: Divide sum of logs by n → ${sumLog.toFixed(10)} / ${n} = ${(sumLog/n).toFixed(10)}\n`;
-            steps += `Step 3: Exponentiate → e^( ${(sumLog/n).toFixed(10)} ) = ${geomMean.toFixed(12)}\n`;
+            steps += `Step 3: Exponentiate → e^( ${(sumLog/n).toFixed(10)} ) = ${fmtSmall(geomMean)}\n`;
             steps += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-            steps += `✅ Geometric Mean = ${geomMean.toFixed(12)}`;
+            steps += `✅ Geometric Mean = ${fmtSmall(geomMean)}`;
             return { error: false, value: geomMean, steps: steps };
         } else {
             for (let v of numbers) product *= v;
@@ -57,5 +61,5 @@ const geometricTool = defineListTool({
     empty: { value: "⚠️ No valid numbers", steps: "Please enter positive numbers for geometric mean." },
     errorValue: "❌ Invalid",
     compute: computeGeometricWithSteps,
-    display: r => r.value.toFixed(12)
+    display: r => (r.value >= 1e-6 ? r.value.toFixed(12) : r.value.toExponential(10))
 });

@@ -35,19 +35,14 @@ function computeSumSquaresWithSteps(inputText) {
     let allValues = [];
     
     if (hasGroups) {
-        let entries = inputText.split(/[,\s\n]+/);
-        for (let entry of entries) {
-            entry = entry.trim();
-            if (entry === "") continue;
-            let [valStr, groupName] = entry.split(':');
-            let val = parseFloat(valStr);
-            if (!isNaN(val) && isFinite(val) && groupName) {
-                groupName = escapeHtml(groupName.trim());
-                if (!groups.has(groupName)) groups.set(groupName, []);
-                groups.get(groupName).push(val);
-                allValues.push(val);
-            }
+        // the same parser as the group-comparison tests: a group name may contain spaces ("1:Group A 2:Group B"), and anything
+        // that is not value:group is reported instead of being dropped silently
+        const parsed = parseValueGroupInput(inputText);
+        if (parsed.skipped.length) {
+            return { error: true, message: `Could not read: ${parsed.skipped.slice(0, 5).join(', ')}${parsed.skipped.length > 5 ? ', …' : ''}. Each entry must look like value:group (for example 12.5:Control).` };   // shown through escapeHtml by the caller
         }
+        groups = parsed.groups;
+        for (const values of groups.values()) allValues.push(...values);
     } else {
         let numbers = parseNumbersFromInput(inputText);
         allValues = numbers;
@@ -127,7 +122,8 @@ function computeSumSquaresWithSteps(inputText) {
         steps += `   ${totalSS.toFixed(6)} = ${(withinSS + betweenSS).toFixed(6)} ✅\n\n`;
     } else {
         steps += `📌 NOTE: Only one group detected. For multiple groups, use format "value:group"\n`;
-        steps += `   Within-groups SS and Between-groups SS require at least 2 groups.\n\n`;
+        steps += `   Within-groups SS and Between-groups SS require at least 2 groups.\n`;
+        steps += `   (For a single group, SSₜₒₜₐₗ is itself the within-group sum of squares: there is no between-group component.)\n\n`;
         withinSS = "N/A (only one group)";
         betweenSS = "N/A (only one group)";
     }
@@ -142,8 +138,8 @@ function computeSumSquaresWithSteps(inputText) {
     
     return { 
         totalSS: totalSS, 
-        withinSS: (typeof withinSS === 'number') ? withinSS : withinSS, 
-        betweenSS: (typeof betweenSS === 'number') ? betweenSS : betweenSS,
+        withinSS: withinSS,
+        betweenSS: betweenSS,
         grandMean: grandMean,
         n: n,
         hasGroups: (groups.size > 1),

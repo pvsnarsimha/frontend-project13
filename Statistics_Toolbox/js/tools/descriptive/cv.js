@@ -46,6 +46,9 @@ function computeCVWithSteps(numbers) {
     steps += `   σ = √σ² = √${variance.toFixed(6)} = ${stdDev.toFixed(6)}\n\n`;
     
     // Step 4: Calculate CV
+    if (mean === 0) {
+        return { error: true, message: "The coefficient of variation is undefined when the mean is 0 (σ / μ divides by zero). It only makes sense for ratio-scale data with a non-zero mean." };
+    }
     let cv = (stdDev / mean) * 100;
     steps += `Step 4: Calculate Coefficient of Variation\n`;
     steps += `   CV = (σ / μ) × 100%\n`;

@@ -275,17 +275,19 @@ ${plotLines.join('\n')}
         <div class="s-6fab3a gen-pad">
             <div class="s-87555e gen-grid">
                 <div>
-                    <strong>📐 Formula:</strong>
+                    <strong>📐 Rule used:</strong>
                     <div class="s-ab1ee9">
-                        Stem Unit = 10<sup>⌊log₁₀(Range)⌋</sup>
+                        Range ≥ 1000 → stems are hundreds, two-digit leaves<br>
+                        Range ≥ 100 → stems are tens<br>
+                        Range &lt; 1, or decimal data with Range &lt; 30 → stems are whole numbers, leaves are tenths<br>
+                        otherwise → stems are tens, leaves are the units digit
                     </div>
                 </div>
                 <div>
                     <strong>🔢 Calculation:</strong>
                     <div class="s-ab1ee9">
-                        log₁₀(${range.toFixed(2)}) = ${Math.log10(range).toFixed(2)}<br>
-                        ⌊${Math.log10(range).toFixed(2)}⌋ = ${Math.floor(Math.log10(range))}<br>
-                        Stem Unit = 10<sup>${Math.floor(Math.log10(range))}</sup> = <strong class="s-f342b5">${stemUnit}</strong>
+                        Range = ${maxVal} - ${minVal} = ${range.toFixed(2)}${hasDecimals ? ' (decimal data)' : ''}<br>
+                        → <strong class="s-f342b5">${unitName}</strong>: ${stemFormula}
                     </div>
                 </div>
             </div>
@@ -423,7 +425,7 @@ function renderStemLeafScatterChart(scatterData, numbers) {
                     grid: { color: '#e9ecef' },
                     ticks: { stepSize: 1, precision: 0 },
                     min: 0,
-                    max: 10
+                    max: Math.max(10, ...sortedData.map(d => d.y + 1))      // two-digit leaves (stems in hundreds) reach 99
                 }
             },
             animation: { duration: 800, easing: 'easeOutQuart' }

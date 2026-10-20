@@ -19,7 +19,7 @@ function computeMeanWithSteps(numbers) {
         return { value: mean, steps: steps, sum, n };
     }
 
-// ========== Tools defined with defineListTool (see js/00-toolkit.js) ==========
+// ========== Tools defined with defineListTool (see js/core/toolkit.js) ==========
 const meanTool = defineListTool({
     id: 'mean', interfaceId: 'statMeanInterface',
     title: "📐 Arithmetic Mean (Average)",
