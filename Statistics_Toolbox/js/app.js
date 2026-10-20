@@ -119,24 +119,6 @@ const STAT_MODULES = {
 const interfaceRoot = document.getElementById('interfaceRoot');
 let currentStat = null;
 
-// Each plotting tool keeps its own Chart.js instance in a module-level variable; this is the single place that knows them all
-function destroyAllCharts() {
-    const holders = [
-        [() => currentChart, () => { currentChart = null; }],
-        [() => histogramChart, () => { histogramChart = null; }],
-        [() => boxplotChartInstance, () => { boxplotChartInstance = null; }],
-        [() => violinChart, () => { violinChart = null; }],
-        [() => qqplotChart, () => { qqplotChart = null; }],
-        [() => ppplotChart, () => { ppplotChart = null; }],
-        [() => stemLeafChart, () => { stemLeafChart = null; }]
-    ];
-    holders.forEach(([get, clear]) => {
-        const chart = get();
-        if (chart && typeof chart.destroy === 'function') chart.destroy();
-        clear();
-    });
-}
-
 function switchToStat(statType) {
     const route = STAT_ROUTES[statType] || STAT_ROUTES.mean;
     if (!STAT_ROUTES[statType]) statType = 'mean';

@@ -146,3 +146,15 @@ test('computeEigenvalues gives NaN, not wrong real numbers, for a rotation (comp
     assert.ok(app.computeEigenvalues([[0, -1], [1, 0]]).every(Number.isNaN));
     assert.ok(app.computeEigenvalues([[0, -1, 0], [1, 0, 0], [0, 0, 2]]).every(Number.isNaN));
 });
+
+test('computeEigenvalues: a non-symmetric 5x5 matrix with known real eigenvalues (similarity transform of a diagonal)', () => {
+    const D = [[5, 0, 0, 0, 0], [0, 4, 0, 0, 0], [0, 0, 3, 0, 0], [0, 0, 0, 2, 0], [0, 0, 0, 0, 1]];
+    // an invertible, deterministic, clearly non-symmetric P (unit lower triangle plus a few upper entries)
+    const P = [[1, 0.5, 0, 0.2, 0], [0.3, 1, 0.4, 0, 0.1], [0.2, 0.1, 1, 0.6, 0], [0.5, 0, 0.3, 1, 0.2], [0.1, 0.4, 0, 0.3, 1]];
+    const Pinv = app.inverseMatrix(P);
+    assert.ok(Pinv, 'P is invertible');
+    const A = app.multiplyMatrices(app.multiplyMatrices(P, D), Pinv);
+    assert.ok(A.some((row, i) => row.some((v, j) => Math.abs(v - A[j][i]) > 1e-6)), 'A is not symmetric');
+    const e = app.computeEigenvalues(A);
+    [5, 4, 3, 2, 1].forEach((v, i) => close(e[i], v, 1e-6));
+});

@@ -60,10 +60,11 @@
         // The tool title is the page's heading for this tool, and the place keyboard focus moves to when a tool is chosen (see focusToolTitle)
         $$('.interface-title', iface).forEach(t => { t.setAttribute('role', 'heading'); t.setAttribute('aria-level', '2'); t.tabIndex = -1; });
         $$('.result-value', iface).forEach(v => { v.setAttribute('role', 'status'); v.setAttribute('aria-live', 'polite'); });
-        // The worked solution is rebuilt after every calculation: announce that it is ready without reading all of it out
+        // The worked solution is a labelled region that users move to when they want it. It is deliberately NOT a live region:
+        // after every calculation the short answer (.result-value, role="status" above) is what gets announced, and a live
+        // worked solution would make a screen reader read the whole derivation out.
         $$('.calculation-steps', iface).forEach(v => {
             v.setAttribute('role', 'region'); v.setAttribute('aria-label', 'Worked solution');
-            v.setAttribute('aria-live', 'polite'); v.setAttribute('aria-atomic', 'false'); v.setAttribute('aria-relevant', 'additions');
         });
         $$('button:not([type])', iface).forEach(b => { b.type = 'button'; });
     }

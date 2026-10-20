@@ -52,7 +52,7 @@ const BAD_OUTPUT = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
             if (!shown.value || shown.value === '—') problems.push(`${stat}: empty answer after calculating the sample`);
             if (BAD_OUTPUT.test(shown.value + ' ' + shown.steps)) problems.push(`${stat}: NaN/Infinity/undefined in the result`);
             if (!shown.answerLabel && shown.value && shown.value !== '—') problems.push(`${stat}: the answer has no screen-reader "Answer:" label`);
-            if (shown.stepsLive !== 'polite') problems.push(`${stat}: the worked solution is not an aria-live region`);
+            if (shown.stepsLive) problems.push(`${stat}: the worked solution must not be an aria-live region (the short answer is the live region)`);
             if (shown.dupIds.length) problems.push(`${stat}: duplicate element ids ${[...new Set(shown.dupIds)].join(', ')}`);
         }
     }

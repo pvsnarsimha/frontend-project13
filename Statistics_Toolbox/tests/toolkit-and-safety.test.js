@@ -80,15 +80,22 @@ test("Cook's distance keeps observation order and survives leverage 1 / perfect 
     assert.ok(!/NaN/.test(lev1.steps));
 });
 
-test('every plotting tool is covered by destroyAllCharts', () => {
-    const appSrc = fs.readFileSync(path.join(ROOT, 'js/app.js'), 'utf8');
-    const declared = [];
+test('every Chart.js instance variable is registered with registerChart (so destroyAllCharts releases it)', () => {
+    const declared = [], registered = [];
     for (const rel of scriptList()) {
-        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+        const src = fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/\/\/.*$/gm, '');
         for (const m of src.matchAll(/^let (\w*[cC]hart\w*)\s*=\s*null;/gm)) declared.push(m[1]);
+        for (const m of src.matchAll(/registerChart\(\(\)\s*=>\s*(\w+),\s*\(\)\s*=>\s*\{\s*\1\s*=\s*null;/g)) registered.push(m[1]);
     }
     assert.ok(declared.length >= 7, declared.join());
-    for (const name of declared) assert.ok(new RegExp('\\(\\)\\s*=>\\s*' + name + '\\b').test(appSrc.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')), `${name} is not released when switching tools (comments do not count)`);
+    assert.deepEqual([...declared].sort(), [...registered].sort(), 'a chart variable is declared but not registered (or the reverse)');
+    // and the registry really releases them
+    const probe = loadApp();
+    let destroyed = 0;
+    probe.histogramChart = null;
+    probe.get('histogramChart = { destroy() { globalThis.__d = 1; } }');
+    probe.destroyAllCharts();
+    assert.equal(probe.get('histogramChart'), null);
 });
 
 test('sample-data contract: tools offering "Try sample data" declare an "Example:" placeholder', () => {

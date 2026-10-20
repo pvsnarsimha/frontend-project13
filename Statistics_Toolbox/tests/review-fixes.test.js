@@ -637,3 +637,30 @@ test('Cook\'s distance uses one wording for an infinite value (leverage 1)', () 
     assert.equal(app.formatCooksD(Infinity), '∞ (leverage = 1)');
     assert.equal(app.formatCooksD(0.5, 2), '0.50');
 });
+
+test('rank-test answer tiles say "approx" for small samples and not for large ones (Mann-Whitney, Wilcoxon)', () => {
+    const runTile = (setupName, prefix, fields, vals) => {
+        const els = {};
+        const el = id => (els[id] = els[id] || { value: '', style: {}, innerText: '', addEventListener(ev, fn) { this.handler = fn; } });
+        const probe = loadApp();
+        probe.document.getElementById = el;
+        probe.setHtml = (e, h) => { e.html = String(h); };
+        probe.get('setHtml = function (e, h) { e.html = String(h); }');
+        Object.entries(vals).forEach(([id, v]) => { el(id).value = v; });
+        probe[setupName]();
+        el(prefix + 'ComputeBtn').handler();
+        return els[prefix + 'ValueDisplay'].html;
+    };
+    const small = runTile('setupMannWhitneyLogic', 'mannWhitney', null, { mannWhitneyData1: '1,2,3,4', mannWhitneyData2: '5,6,7,9', mannWhitneyAlpha: '0.05', mannWhitneyAlternative: 'two-sided' });
+    assert.ok(/approx/.test(small), small);
+    const large = runTile('setupMannWhitneyLogic', 'mannWhitney', null, { mannWhitneyData1: '1,2,3,4,5,6', mannWhitneyData2: '5.5,6.5,7,9,10,11', mannWhitneyAlpha: '0.05', mannWhitneyAlternative: 'two-sided' });
+    assert.ok(!/approx/.test(large), large);
+    const w = runTile('setupWilcoxonLogic', 'wilcoxon', null, { wilcoxonBeforeData: '1,2,3,4,5', wilcoxonAfterData: '2,4,3.5,6,8', wilcoxonAlpha: '0.05', wilcoxonAlternative: 'two-sided' });
+    assert.ok(/approx/.test(w), w);
+});
+
+test("Cook's D: an infinite value is explained as leverage = 1 or as numerical overflow", () => {
+    assert.equal(app.formatCooksD(Infinity, 6, 1), '∞ (leverage = 1)');
+    assert.ok(/numerical overflow/.test(app.formatCooksD(Infinity, 6, 0.4)));
+    assert.equal(app.formatCooksD(2, 3, 0.4), '2.000');
+});

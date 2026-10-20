@@ -106,7 +106,7 @@ Rules for all tools:
 * Plotting tools give their canvas a descriptive label with `labelChart(canvas, text)` (sample size, range, centre), and the chart canvas
   lives in the worked solution only: one canvas id per page.
 * Each plotting tool keeps its Chart.js instance in a module-level `let ...Chart = null;`. Add the variable to
-  `destroyAllCharts()` in `js/app.js` (a test fails if you forget).
+  and register it on the next line with `registerChart(() => name, () => { name = null; })` in `js/core/charts.js`; `destroyAllCharts()` then releases it (a test fails if you forget).
 * Chart.js is not a `<script>` tag: `vendor/chart.umd.js` is fetched on the first chart. Start every chart-drawing function with
   `if (!chartJsReady(thisFunction, arguments)) return;`, which loads the library and then calls the function again.
 * Probability tools that ask for distribution parameters call `showDistributionParams('prefix')` from their `updateXParams()`
@@ -121,7 +121,7 @@ Rules for all tools:
 4. Bad input returns `{ error: true, message }` that says how to fix it; zero variance, a perfect fit, fewer than one residual degree of freedom and overflow are errors, never `NaN` or `Infinity` in the output.
 5. Escape user text (`escapeHtml`) that goes into generated HTML; labels typed by the user are escaped once, where they are parsed.
 6. Give every pasted-data textarea an `Example:` placeholder (sample-data contract above) or mark the tool `parameterOnly: true`.
-7. Plotting tool: own Chart.js variable in `destroyAllCharts()`, `chartJsReady(...)` first, `labelChart(...)` for the canvas.
+7. Plotting tool: own Chart.js variable registered with `registerChart(...)`, `chartJsReady(...)` first, `labelChart(...)` for the canvas.
 8. Add a row to `Which-tool.html` (a card under the question the tool answers) and, if the tool uses an approximation, a row to the accuracy table below.
 9. Add a test: a known value from SciPy / R / statsmodels for the calculation, and an edge case (one value, identical values, perfect fit).
 10. `npm test` (and `npm run test:e2e` with Playwright installed) must pass before you commit.
@@ -142,6 +142,12 @@ Rules for all tools:
   `--tp-*` tokens, so `statlab.css` no longer matches substrings of style attributes). Styles that depend on data (`style="color: ${color}"`) stay
   inline; a style of the form `${cond ? 'css' : 'css'}` becomes `class="${cond ? 's-a' : 's-b'}"`. `display: none` stays inline because scripts toggle it.
   The tests fail if a convertible inline style remains, a class has no rule, a rule is unused, or an inline style uses one of the old accent colours.
+* **The Content-Security-Policy allows `style-src 'unsafe-inline'` on purpose.** Static inline styles were moved to classes, but many places in the tools still
+  put a value that is only known at run time into a `style` attribute (a colour chosen from the data, a bar width from a percentage, `display: none`
+  toggled by scripts). Without `'unsafe-inline'` those would need a nonce or a generated stylesheet per result. Scripts stay locked down (`script-src 'self'`, no inline handlers), which is where the risk is.
+* **Tabs are `div role="tab"` elements.** They follow the WAI-ARIA tabs pattern (roving `tabindex`, arrow keys, Home/End, `aria-selected`, `aria-controls`). Native `<button>` elements
+  would be equivalent for assistive technology; this was left as is on purpose and would only change in a rewrite of the tab bar.
+* **Worked solutions are labelled regions, not live regions.** The short answer is the live region (`role="status"`); the derivation is read when the user moves to it.
 * **Answer tiles keep a live value.** When the answer is split into tiles (`.kpi-row`, hidden from assistive technology), the plain value stays
   in the page, visually clipped, as the `role="status"` live region that announces "Answer: ...".
 
@@ -220,7 +226,7 @@ npm run test:all    # both
 * `tests/e2e/responsive.js`: no tool makes the page scroll sideways at 360 px and 768 px
 * `tests/e2e/lazy-chartjs.js`: Chart.js is not fetched at page load, is fetched once on the first chart, and a failed fetch shows a message and can be retried
 * `tests/e2e/smoke.js`: every tool opens, sample data produces a result with no NaN/undefined, no script or console errors
-* `tests/e2e/sample.js`: sample data + Calculate for every tool: no NaN/Infinity, no entity debris in the sample, an "Answer:" label, an `aria-live` solution, no duplicate ids, labelled charts, a labelled tab panel
+* `tests/e2e/sample.js`: sample data + Calculate for every tool: no NaN/Infinity, no entity debris in the sample, an "Answer:" label, a labelled (not live) worked-solution region, no duplicate ids, labelled charts, a labelled tab panel
 * `tests/numerics.test.js`: special functions and critical values against SciPy reference values
 * `tests/calculations.test.js`: whole tests (t, ANOVA, ANCOVA, MANOVA, Tukey, Shapiro-Wilk, ...) against SciPy/NumPy
 * `tests/toolkit-and-safety.test.js`: toolkit behaviour, HTML escaping, CSP / no inline handlers, chart cleanup
