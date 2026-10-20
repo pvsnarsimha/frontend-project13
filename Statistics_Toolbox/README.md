@@ -154,7 +154,7 @@ Rules for all tools:
 * **Classic scripts, not ES modules.** The page is meant to open straight from disk (`file://`), where browsers
   refuse to load ES modules. The cost is one shared global scope, which `tests/structure.test.js` polices
   (duplicate definitions, route integrity). Moving to modules would require serving the folder over http and a bundler.
-* **No build step** means no minification or tree-shaking: the page loads about 1.5 MB of script from disk (`tests/structure.test.js` fails if this number drifts more than 10% from the real size) (instant locally,
+* **No build step** means no minification or tree-shaking: the page loads about 1.5 MB of script from disk, about 390 KB once a web server gzips it (`npm run size` prints both and CI enforces a budget; `tests/structure.test.js` fails if the 1.5 MB drifts more than 10%) (instant locally,
   noticeable over a slow network if you host it). Chart.js and the fonts are vendored, so there are no CDN requests and
   the Content-Security-Policy only allows the page's own files.
 
@@ -169,8 +169,9 @@ Rules for all tools:
 | Shapiro-Wilk W and p | Royston (1992/1995), same algorithm as SciPy and R | W to 1e-9, p to 1e-7 |
 | Kolmogorov-Smirnov (normality) | Lilliefors null distribution, simulated with a fixed seed and cached per n | p within about 0.004 |
 | Anderson-Darling p | D'Agostino and Stephens polynomial formulas | approximate (3 digits) |
-| MANOVA F | Rao's approximation to Wilks' Lambda | exact only for 1-2 dependent variables or 2-3 groups |
-| Mann-Whitney, Wilcoxon, runs test | Normal approximation | **not exact for small samples** (e.g. n = 6 vs 7 can differ from SciPy's exact p) |
+| MANOVA F | Rao's approximation to Wilks' Lambda | exact for 1-2 dependent variables or 2-3 groups; the answer tile says "exact F" or "Rao F approximation" |
+| Mann-Whitney, Wilcoxon | **Exact** null distribution when there are no ties (Mann-Whitney: both samples ≤ 20; Wilcoxon: ≤ 50 non-zero pairs); otherwise the normal approximation | exact = SciPy `method="exact"` to 1e-12; with ties the tile says "normal approx." for small samples |
+| Runs test | Normal approximation | rough for fewer than about 10 runs |
 | Kruskal-Wallis, Friedman, Cochran Q, Mood's median, chi-square tests | Asymptotic chi-square | needs reasonable sample sizes; expected counts below 5 weaken the p-value |
 | Sign test, binomial exact | Exact binomial | exact |
 
@@ -178,9 +179,10 @@ Rules for all tools:
 
 These tools give a close answer, not an exact one, and say so in their worked solution where it matters:
 
-* **Normal approximations for rank tests.** Mann-Whitney and Wilcoxon use the normal approximation with a 0.5 continuity correction
-  (moved toward the null for every alternative), the tie correction to the variance, and (Wilcoxon) zero differences dropped. SciPy's
-  `method="asymptotic"` / `"approx"` agrees to 1e-10; for small samples without ties SciPy's exact p-value can differ.
+* **Rank tests.** Mann-Whitney and Wilcoxon give the exact p-value (counting every arrangement of the ranks / every sign pattern) when
+  there are no ties and the samples are small. With ties, or for larger samples, they use the normal approximation with a 0.5 continuity
+  correction (moved toward the null for every alternative), the tie correction to the variance and (Wilcoxon) zero differences dropped;
+  SciPy's `method="asymptotic"` / `"approx"` agrees to 1e-10. The answer tile says "(exact)" or "(normal approx.)".
 * **Kendall's tau is tau-b** (ties in X or Y corrected). Without ties it equals tau-a. **Spearman's rho** is the Pearson correlation of the
   average ranks, so ties are handled; **Friedman** divides by the tie correction C.
 * **Box-Cox** maximises the profile log-likelihood by a grid scan on [-5, 5] plus golden-section refinement (lambda to about 1e-8); data must be positive.
@@ -199,17 +201,20 @@ These tools give a close answer, not an exact one, and say so in their worked so
 
 **What has been checked against a reference implementation (SciPy / statsmodels / NumPy)**
 
-* **28 tools have automated tests** in `tests/`: mean, variance, geometric and harmonic mean, one-sample t, Welch t,
-  one-way ANOVA, Pearson, simple and multiple linear regression, chi-square independence and goodness of fit,
-  F-test, ANCOVA, MANOVA, Tukey HSD, Scheffe, Shapiro-Wilk, Anderson-Darling, Kolmogorov-Smirnov, one-sample z,
-  binomial exact, Kruskal-Wallis, Friedman, Cochran Q, runs test, Cook's distance, Mann-Whitney (decision).
-* **Also tested against SciPy / NumPy:** sign test, Wilcoxon, Mann-Whitney (one- and two-sided), one-sample z and one-proportion z
-  (every alternative), F-test (every alternative), Kendall tau-b, Spearman with ties, Friedman with ties, VIF, Box-Cox lambda,
-  entropy, MGF, hazard and survival functions, random Beta moments, and the quartile/percentile/decile tools (Type 7).
-* **Compared by hand once, no automated test yet:** paired t, Levene, Mood's median.
-* **The remaining tools have not been independently verified.** They share the verified numerics layer, but
-  their own formulas and worked solutions may still contain mistakes. Please report any result that disagrees with
-  R, SciPy or a textbook.
+* **`tests/reference-values.test.js` compares tools with SciPy / statsmodels / NumPy values** stored in `tests/fixtures/reference-values.json`
+  (`tests/fixtures/make-reference.py` regenerates it; `npm test` itself needs no Python). It covers: paired t and Welch t (every alternative),
+  Levene (mean-centred), Bartlett, Mood's median, ANOVA / Scheffé F, Bonferroni pairwise t, McNemar, phi, Cramér's V, covariance, partial
+  correlation, point-biserial, correlation matrix, distance correlation, Durbin-Watson, simple-regression standard errors / t / p / overall F /
+  R² / adjusted R², Model Summary (R², RMSE, RSE, MAE, MAPE), ANCOVA, Lilliefors D, MAD, SEM, skewness, kurtosis, CV, winsorizing, ranking,
+  z-scores, min-max, IQR fences, exact Mann-Whitney and Wilcoxon, histogram and binning counts, log transforms, mutual information (bits), Normal / Exponential / Uniform MLE fits, and a grid of CDFs, PMFs and critical values (normal, t, chi-square, F, beta, binomial).
+* **Also tested** (other test files): mean, variance, geometric and harmonic mean, one-sample t, one-way ANOVA, Pearson, multiple linear regression,
+  chi-square independence and goodness of fit, F-test, MANOVA, Tukey HSD, Shapiro-Wilk, Anderson-Darling, one-sample z, one-proportion z, binomial exact,
+  Kruskal-Wallis, Friedman, Cochran Q, runs test, Cook's distance, sign test, Kendall tau-b, Spearman with ties, VIF, Box-Cox lambda, entropy, MGF,
+  hazard and survival functions, random Beta moments, and the quartile/percentile/decile tools (Type 7).
+* **Not independently verified against a reference implementation:** stem-and-leaf layout, the violin plot's density curve, Q-Q and P-P plot
+  coordinates, and the PDF / CDF / PMF / quantile / random-number / distribution-moment tool screens (their underlying functions are in the
+  grid check above). They share the verified numerics layer, but their own formulas and worked solutions may still contain mistakes. Please report
+  any result that disagrees with R, SciPy or a textbook.
 
 ## Tests
 
@@ -218,6 +223,9 @@ npm test            # unit tests, no dependencies (Node 20+)
 npm install         # once, for the browser test
 npx playwright install chromium
 npm run test:e2e    # opens every tool in a real browser, loads sample data, presses Calculate
+npm run test:e2e:quick   # the same minus the 7-minute edge-case sweep
+BROWSER=firefox npm run test:e2e:quick   # or webkit; CI runs Chromium, Firefox and WebKit
+npm run size        # script size (raw and gzip) against the budget
 npm run test:all    # both
 ```
 

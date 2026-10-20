@@ -132,6 +132,16 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
         pValue = normCDF(z);
     }
     
+    // Small samples without ties: the exact p-value from the null distribution of U replaces the normal approximation
+    // (the same as SciPy's method="exact"). Us is U for sample 1 in the usual orientation (large when sample 1 has the larger ranks).
+    const EXACT_MAX_N = 20;
+    const exact = tieTerm === 0 && n1 <= EXACT_MAX_N && n2 <= EXACT_MAX_N;
+    if (exact) {
+        const tails = exactTailProbabilities(mannWhitneyUCounts(n1, n2), n1 * n2 - U1);
+        pValue = alternative === 'two.sided' ? Math.min(1, 2 * Math.min(tails.lower, tails.upper))
+            : (alternative === 'greater' ? tails.upper : tails.lower);
+    }
+    
     // Critical value (approximate)
     const criticalZ = normInv(1 - (alternative === 'two.sided' ? alpha / 2 : alpha));
     const rejectH0 = pValue < alpha;
@@ -205,20 +215,25 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
                 <strong>U = min(U₁, U₂) = ${U.toFixed(2)}</strong>
             </div>
             
-            <div class="s-6025fc">
+            ${exact ? `<div class="s-6025fc">
+                <strong>Step 3: Exact p-value</strong><br>
+                There are no ties and the samples are small (n₁ = ${n1}, n₂ = ${n2}), so the p-value is computed exactly from the null distribution of U:
+                all ${(() => { let c = 1; for (let i = 1; i <= Math.min(n1, n2); i++) c = c * (N - Math.min(n1, n2) + i) / i; return Math.round(c); })()} equally likely arrangements of the ranks are counted (no normal approximation).<br>
+                p-value = ${pValue.toFixed(8)}
+            </div>` : `<div class="s-6025fc">
                 <strong>Step 3: Calculate z-score approximation</strong><br>
                 Expected U = n₁n₂/2 = ${expectedU.toFixed(2)}<br>
                 Standard Deviation = √(tie-corrected variance) = ${stdU.toFixed(4)}<br>
                 Tie-corrected variance = n₁n₂/12 × [(N+1) − Σ(t³−t)/(N(N−1))] = ${varU.toFixed(4)}<br>
                 z = (ExpectedU − U₁ ∓ 0.5) / SD = ${z.toFixed(6)} (continuity correction 0.5 toward H₀; positive z means Sample 1 tends to be larger, so a one-sided test uses the matching tail)<br>
                 p-value = ${pValue.toFixed(8)}
-            </div>
+            </div>`}
         </div>
         
         <div class="${rejectH0 ? 's-d45b93 gen-pad' : 's-a314d9 gen-pad'}">
             <h3 class="s-c7f0b4">📌 Test Conclusion</h3>
             <div><strong>U Statistic:</strong> ${U.toFixed(2)}</div>
-            <div><strong>z-score:</strong> ${z.toFixed(6)}</div>
+            ${exact ? '' : `<div><strong>z-score:</strong> ${z.toFixed(6)}</div>`}
             <div><strong>p-value:</strong> ${pValue.toFixed(8)}</div>
             <div class="s-34b24f">
                 <strong>Decision:</strong> ${conclusion}<br>
@@ -228,7 +243,7 @@ function computeMannWhitneyTest(sample1, sample2, alpha, alternative) {
     </div>`;
     
     // the p-value uses the normal approximation, which is rough for small samples
-    return { U, z, pValue, rejectH0, conclusion, interpretation, steps, smallSample: n1 * n2 < 20 };
+    return { U, z, pValue, rejectH0, conclusion, interpretation, steps, exact, method: exact ? 'exact' : 'normal approximation', smallSample: !exact && n1 * n2 < 20 };
 }
 
 // ========== MANN-WHITNEY SETUP ==========
@@ -261,7 +276,7 @@ function setupMannWhitneyLogic() {
             valueSpan.innerText = "Error";
             setHtml(stepsSpan, result.message);
         } else {
-            setHtml(valueSpan, `U = ${result.U.toFixed(2)} | p${result.smallSample ? ' (normal approx.)' : ''} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}${result.smallSample ? ' | ⚠ small sample: treat p as approximate' : ''}`);
+            setHtml(valueSpan, `U = ${result.U.toFixed(2)} | p${result.exact ? ' (exact)' : (result.smallSample ? ' (normal approx.)' : '')} = ${result.pValue.toFixed(6)} | ${result.rejectH0 ? 'Reject H₀' : 'Fail to reject H₀'}${result.smallSample ? ' | ⚠ small sample: treat p as approximate' : ''}`);
             setHtml(stepsSpan, result.steps);
         }
     });

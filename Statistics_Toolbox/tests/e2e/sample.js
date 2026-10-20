@@ -3,7 +3,7 @@
 // undefined / [object Object], no HTML-entity debris ("&#10;") left in the sample text, no script error, and no duplicate element ids.
 // Usage: node tests/e2e/sample.js   (needs Playwright; set CHROMIUM=/path/to/chromium to use an existing browser)
 const path = require('path');
-const { chromium } = require('playwright');
+const launcher = require('./launch');      // BROWSER=chromium|firefox|webkit
 
 const BAD_OUTPUT = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
 // Tools that legitimately offer no sample button declare themselves parameter-only (parameterOnly: true in their buildInterface
@@ -11,7 +11,7 @@ const BAD_OUTPUT = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
 
 (async () => {
     const file = process.argv[2] || path.join(__dirname, '..', '..', 'Statistics.html');
-    const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
+    const browser = await launcher.launch();
     const page = await browser.newPage();
     const problems = [];
     let current = 'load';

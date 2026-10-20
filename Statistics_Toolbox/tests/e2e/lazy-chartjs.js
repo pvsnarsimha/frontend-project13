@@ -2,11 +2,11 @@
 // fetches it exactly once and draws, later charts reuse it, and a failed fetch tells the user and can be retried.
 // Usage: node tests/e2e/lazy-chartjs.js   (needs Playwright; set CHROMIUM=/path/to/chromium to use an existing browser)
 const path = require('path');
-const { chromium } = require('playwright');
+const launcher = require('./launch');      // BROWSER=chromium|firefox|webkit
 
 (async () => {
     const file = process.argv[2] || path.join(__dirname, '..', '..', 'Statistics.html');
-    const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
+    const browser = await launcher.launch();
     const page = await browser.newPage();
     const problems = [];
     const dialogs = [];

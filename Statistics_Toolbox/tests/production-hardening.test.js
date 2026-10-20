@@ -56,11 +56,15 @@ test('Anderson-Darling shows an approximate p-value (about 3 significant digits)
     assert.ok(/approximate/.test(r.steps));
 });
 
-test('Mann-Whitney flags small samples by n1*n2 < 20', () => {
-    const small = app.computeMannWhitneyTest([1, 2, 3, 4], [5, 6, 7, 8], 0.05);
-    assert.equal(small.smallSample, true);
-    const big = app.computeMannWhitneyTest([1, 2, 3, 4, 5], [6, 7, 8, 9, 10], 0.05);
-    assert.equal(big.smallSample, false);
+test('Mann-Whitney: no ties and small samples use the exact p-value; small samples WITH ties still carry the approximation flag', () => {
+    const exact = app.computeMannWhitneyTest([1, 2, 3, 4], [5, 6, 7, 8], 0.05);
+    assert.equal(exact.exact, true);
+    assert.equal(exact.smallSample, false);
+    const tied = app.computeMannWhitneyTest([1, 2, 3, 4], [4, 6, 7, 8], 0.05);          // a tie across the samples: no exact distribution
+    assert.equal(tied.exact, false);
+    assert.equal(tied.smallSample, true);
+    const bigTied = app.computeMannWhitneyTest([1, 2, 3, 4, 5, 6], [6, 7, 8, 9, 10, 11], 0.05);
+    assert.equal(bigTied.smallSample, false);
 });
 
 test('Stem-and-leaf shape verdict comes from skewness, not stem size', () => {
