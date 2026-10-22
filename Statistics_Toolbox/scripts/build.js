@@ -34,6 +34,21 @@ const styles = [...page.matchAll(/<link rel="stylesheet" href="(css\/[^"]+)"/g)]
 styles.forEach(f => fs.writeFileSync(path.join(OUT, f), esbuild.transformSync(read(f), { loader: 'css', minify: true }).code));
 fs.writeFileSync(path.join(OUT, 'Statistics.html'), page);
 fs.copyFileSync(path.join(ROOT, 'Which-tool.html'), path.join(OUT, 'Which-tool.html'));
+// Pages serves dist/ as the site root, so the bare address needs an index.html (the repo-root one points at Statistics_Toolbox/)
+fs.writeFileSync(path.join(OUT, 'index.html'), `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StatLab: Statistics Toolbox</title>
+<meta http-equiv="refresh" content="0; url=Statistics.html">
+<link rel="canonical" href="Statistics.html">
+</head>
+<body>
+<p>Opening StatLab… If nothing happens, <a href="Statistics.html">open the Statistics Toolbox</a> or read <a href="Which-tool.html">which tool to use</a>.</p>
+</body>
+</html>
+`);
 // the student-trial page: its own small script (plus the shared feedback helpers) and stylesheet
 fs.mkdirSync(path.join(OUT, 'pages'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'pages/trial.min.js'), esbuild.transformSync(read('js/core/feedback.js') + ';\n' + read('pages/trial.js'), { minify: true, target: 'es2019' }).code);
