@@ -46,3 +46,21 @@
     if (root && typeof MutationObserver === 'function') new MutationObserver(enhance).observe(root, { childList: true, subtree: true });
     enhance();
 })();
+
+// Always-visible feedback panel (#feedbackPanel in Statistics.html), so students can leave feedback without first running a tool.
+(function () {
+    const g = id => document.getElementById(id);
+    const panel = g('feedbackPanel');
+    if (!panel) return;
+    const tool = g('fbPanelTool'), rating = g('fbPanelRating'), comment = g('fbPanelComment'), send = g('fbPanelSend'), done = g('fbPanelDone');
+    const entry = () => ({ tool: tool.value.trim() || 'General feedback', rating: rating.value, comment: comment.value });
+    const refresh = () => { send.href = feedbackIssueUrl(entry()); };
+    [tool, rating, comment].forEach(c => c.addEventListener('input', refresh));
+    g('fbPanelSave').addEventListener('click', () => {
+        if (!comment.value.trim()) { done.textContent = 'Please write a short comment first.'; return; }
+        const ok = saveFeedback(entry());
+        done.textContent = ok ? `Thanks! Saved on this device (${loadFeedback().length} so far).` : 'Could not save: this browser blocks storage. Use "Send to the developers" instead.';
+        if (ok) { comment.value = ''; refresh(); window.StatLabUI.showToast('Feedback saved'); }
+    });
+    refresh();
+})();
