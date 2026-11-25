@@ -238,6 +238,7 @@ function setupPearsonLogic() {
             setHtml(valueSpan, `r = ${result.r.toFixed(6)}`);
             setHtml(stepsSpan, result.steps);
             showFitCharts("pearsonResultArea", xValues, yValues, { xName: "x", yName: "y" });  // Changed to innerHTML
+            showCorrelationAnimation("pearsonResultArea", xValues, yValues);
         }
     });
     

@@ -30,6 +30,7 @@ const STAT_ROUTES = {
     cdf: [renderCDFInterface, setupCDFLogic],
     quantile: [renderQuantileInterface, setupQuantileLogic],
     random: [renderRandomInterface, setupRandomLogic],
+    sampling: [renderSamplingInterface, setupSamplingLogic],
     pmf: [renderPMFInterface, setupPMFLogic],
     survival: [renderSurvivalInterface, setupSurvivalLogic],
     hazard: [renderHazardInterface, setupHazardLogic],

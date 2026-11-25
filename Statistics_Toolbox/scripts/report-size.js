@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const ROOT = path.join(__dirname, '..');
-const BUDGET = { scriptRawKB: 1700, scriptGzipKB: 440 };       // the real figures are in the README; raise these on purpose, never by accident
+const BUDGET = { scriptRawKB: 1780, scriptGzipKB: 470 };       // the real figures are in the README; raise these on purpose, never by accident (1700/440 -> 1780/470 for the seven narrated animations, +70 KB raw, +22 KB gzip)
 
 const html = fs.readFileSync(path.join(ROOT, 'Statistics.html'), 'utf8');
 const scripts = [...html.matchAll(/<script src="(js\/[^"]+)"><\/script>/g)].map(m => m[1]);
