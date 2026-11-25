@@ -33,6 +33,10 @@ const launcher = require('./launch');
   const px = await p.evaluate(() => { const c = document.querySelector('#tutorCard-teacher canvas'), x = c.getContext('2d'); const d = x.getImageData(0, 0, c.width, c.height).data; let green = 0, skin = 0, cream = 0; for (let i = 0; i < d.length; i += 40) { const [r, g, bl] = [d[i], d[i + 1], d[i + 2]]; if (g > r + 15 && g > bl && r < 60) green++; if (r > 200 && g > 160 && g < 200 && bl > 120 && bl < 170) skin++; if (r > 220 && g > 215 && bl > 190) cream++; } return { green, skin, cream }; });
   expect(px.green > 200 && px.skin > 5 && px.cream > 200, 'classroom looks empty: ' + JSON.stringify(px));
 
+  // a class that is replaced gives its canvas memory back (WebKit keeps removed canvases' pixel buffers until GC, which stalled CI after ~900 tool switches)
+  const released = await p.evaluate(() => { const old = document.querySelector('#tutorCard-teacher canvas'); document.querySelector('.stat-btn[data-stat="median"]') && document.querySelector('.tab[data-tab="descriptive"]').click(); document.querySelector('.stat-btn[data-stat="range"]').click(); return old.width === 0 && old.height === 0; });
+  expect(released, 'the replaced class card should release its canvas buffer');
+
   // every tab opens an overview class; every topic opens its own class, whose scenes all draw
   const sweep = await p.evaluate(() => {
     const out = { tabs: 0, topics: 0, bad: [] };

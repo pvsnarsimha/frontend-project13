@@ -174,7 +174,9 @@ function createTutor(card, def) {
         started = true; playing = true; last = performance.now(); setPlayLabel();
     }
     function pause() { playing = false; stopSpeech(); setPlayLabel(); }
-    function destroy() { dead = true; playing = false; stopSpeech(); cancelAnimationFrame(raf); }
+    // Release the canvas's pixel buffer: WebKit keeps the buffers of removed canvases until its garbage collector runs, and a page that
+    // switches tools hundreds of times (every tool now has an AI teacher card) would otherwise pile up gigabytes and stall.
+    function destroy() { dead = true; playing = false; stopSpeech(); cancelAnimationFrame(raf); try { canvas.width = 0; canvas.height = 0; } catch (e) { /* ignore */ } }
 
     playBtn.onclick = () => (playing ? pause() : play());
     replayBtn.onclick = () => { stopSpeech(); play(0); };
