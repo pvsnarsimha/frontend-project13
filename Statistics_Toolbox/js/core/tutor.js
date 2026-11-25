@@ -81,6 +81,8 @@ function createTutor(card, def) {
 
     const scenes = def.scenes, N = scenes.length;
     let scene = 0, elapsed = 0, started = false, playing = false, finished = false, speechDone = true, speechToken = 0, last = 0, raf = 0, dead = false, fallbackTimer = 0;
+    // speech is used only when the browser really has a voice (Firefox and CI machines expose the API with no voices: captions then set the pace)
+    const voiceReady = () => { if (!(speechOK && speakBox.checked)) return false; try { return window.speechSynthesis.getVoices().length > 0; } catch (e) { return false; } };
     const speed = () => (typeof window.STATLAB_TUTOR_SPEED === 'number' && window.STATLAB_TUTOR_SPEED > 0 ? window.STATLAB_TUTOR_SPEED : 1);
 
     // ---- drawing ----
@@ -118,7 +120,7 @@ function createTutor(card, def) {
     function startSpeech() {
         const s = scenes[scene], token = ++speechToken;
         clearTimeout(fallbackTimer);
-        if (!(speechOK && speakBox.checked)) { speechDone = true; return; }
+        if (!voiceReady()) { speechDone = true; return; }
         speechDone = false;
         const done = () => { if (token === speechToken) { speechDone = true; clearTimeout(fallbackTimer); } };
         try {
@@ -129,7 +131,7 @@ function createTutor(card, def) {
             window.speechSynthesis.speak(u);
         } catch (e) { speechDone = true; return; }
         // Some browsers (and machines with no voice installed) never fire `end`: never wait on the voice forever
-        fallbackTimer = setTimeout(done, tutorReadMs(s.line) + 4000);
+        fallbackTimer = setTimeout(done, (tutorReadMs(s.line) + 4000) / speed());
     }
 
     // ---- the loop ----
@@ -142,7 +144,7 @@ function createTutor(card, def) {
         if (playing) {
             elapsed += dt;
             const s = scenes[scene];
-            const speaking = speechOK && speakBox.checked;
+            const speaking = voiceReady();
             const minMs = speaking ? s.ms : Math.max(s.ms, tutorReadMs(s.line));
             paint(scene, Math.min(1, elapsed / s.ms));
             if (elapsed >= minMs && speechDone) {
