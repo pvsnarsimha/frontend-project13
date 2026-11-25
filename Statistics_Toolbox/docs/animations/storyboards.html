@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>StatLab animation storyboards</title>
+<!-- One page per animation: 4 real frames of the running animation, each with the line the narrator speaks.
+     scripts/animation-previews.js captures the frames from the app and renders ?c=1..7 to docs/animations/0N-*.png -->
+<style>
+ :root { --ink:#0f172a; --ink2:#334155; --line:#e2e8f0; --brand:#4338ca; }
+ * { box-sizing: border-box; margin: 0; font-family: Inter, system-ui, 'Segoe UI', Roboto, sans-serif; }
+ body { background:#f1f5f9; padding:28px 32px 22px; width:1700px; color:var(--ink); }
+ header { display:flex; align-items:center; gap:18px; margin-bottom:18px; }
+ .num { width:54px; height:54px; border-radius:16px; background:var(--brand); color:#fff; font-size:28px; font-weight:800; display:grid; place-items:center; }
+ h1 { font-size:30px; font-weight:800; } .sub { font-size:15px; color:var(--ink2); margin-top:3px; }
+ .pill { margin-left:auto; text-align:right; font-size:14px; color:var(--ink2); line-height:1.5 } .pill b { color:var(--brand); }
+ .row { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+ .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:12px; box-shadow:0 8px 22px -14px rgba(15,23,42,.25); }
+ .step { font-size:15px; font-weight:800; color:#3730a3; margin:2px 0 8px; display:flex; align-items:center; gap:8px; }
+ .step i { font-style:normal; background:#4338ca; color:#fff; border-radius:50%; width:24px; height:24px; display:inline-grid; place-items:center; font-size:13px; }
+ .card img { display:block; width:100%; }
+ .card img + img { margin-top:10px; }
+ .say { margin-top:6px; font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:#3730a3; }
+ footer { margin-top:14px; font-size:13px; color:#475569; display:flex; justify-content:space-between; }
+</style></head>
+<body>
+<header><div class="num" id="num"></div><div><h1 id="title"></h1><div class="sub">Narrated animation · the AI explains while the picture plays</div></div><div class="pill" id="pill"></div></header>
+<div class="row" id="row"></div>
+<footer><span id="note"></span><span>StatLab · AI Tutor · animation roadmap</span></footer>
+<script>
+const STORY = {
+ 1: { title:'Hypothesis test', file:'js/core/tutor-hypothesis.js', pri:'1 · Start here', data:'one-sample t-test, n = 10, μ₀ = 50', steps:['The curve if H₀ is true','The rejection region shades in','The statistic drops onto the curve','The verdict'] },
+ 2: { title:'Mean and standard deviation', file:'js/core/tutor-descriptive.js', pri:'2', data:'standard deviation tool, data 4, 6, 7, 9, 12, 16', steps:['Dots slide onto the line','The mean balances like a seesaw','Deviation lines grow','Squares become the SD'] },
+ 3: { title:'Normal curve and z-score', file:'js/core/tutor-normal.js', pri:'3', data:'z-score tool, 10 values', steps:['The normal curve','Your smallest value: area fills live','Slide up: more area lies to the left','All your values on the curve'] },
+ 4: { title:'Box plot', file:'js/core/tutor-boxplot.js', pri:'4', data:'box plot tool, 10 values with one outlier', steps:['Values sort themselves','Q1, median and Q3 cut the data','The box forms','The whiskers stretch out'] },
+ 5: { title:'Correlation', file:'js/core/tutor-relations.js', pri:'5', data:'Pearson tool, 8 pairs', steps:['r = 0: a shapeless cloud','Slide towards +1','Slide through 0 towards −1','Your own data'] },
+ 6: { title:'Regression: least squares', file:'js/core/tutor-relations.js', pri:'6', data:'simple linear regression tool, 8 pairs', steps:['Residuals appear','Squares form on the residuals','The line pivots','The best line'] },
+ 7: { title:'Sampling and the central limit theorem', file:'js/core/tutor-clt.js, js/tools/probability/sampling.js', pri:'7', data:'new Sampling tool: skewed population, n = 30, 1000 samples', steps:['A skewed population','Each sample mean drops into place','The pile grows','A bell appears'] }
+};
+const q = new URLSearchParams(location.search), id = +(q.get('c') || 1), S = STORY[id], dir = q.get('img') || 'frames';
+document.getElementById('num').textContent = id; document.getElementById('title').textContent = S.title;
+document.getElementById('pill').innerHTML = `Priority <b>${S.pri}</b><br>Code: <b>${S.file}</b><br>Status: <b>Built</b>`;
+document.getElementById('note').textContent = `Frames are screenshots of the real animation running in StatLab (${S.data}).`;
+const row = document.getElementById('row');
+S.steps.forEach((step, i) => {
+  const card = document.createElement('div'); card.className = 'card'; card.innerHTML = `<div class="step"><i>${i + 1}</i>${step}</div>`;
+  const a = document.createElement('img'); a.src = `${dir}/${id}-stage-${i + 1}.png`; const b = document.createElement('img'); b.src = `${dir}/${id}-caption-${i + 1}.png`;
+  card.append(a, b); row.appendChild(card);
+});
+Promise.all([...document.images].map(im => im.decode().catch(() => {}))).then(() => document.fonts.ready).then(() => { document.body.dataset.ready = '1'; });
+</script></body></html>

@@ -30,6 +30,7 @@ const STAT_ROUTES = {
     cdf: [renderCDFInterface, setupCDFLogic],
     quantile: [renderQuantileInterface, setupQuantileLogic],
     random: [renderRandomInterface, setupRandomLogic],
+    sampling: [renderSamplingInterface, setupSamplingLogic],
     pmf: [renderPMFInterface, setupPMFLogic],
     survival: [renderSurvivalInterface, setupSurvivalLogic],
     hazard: [renderHazardInterface, setupHazardLogic],
@@ -121,6 +122,7 @@ const STAT_MODULES = {
 
 const interfaceRoot = document.getElementById('interfaceRoot');
 let currentStat = null;
+let teacherNextMode = 'topic';      // a tab click opens the tab overview class; a topic click opens the topic class
 
 function switchToStat(statType) {
     const route = STAT_ROUTES[statType] || STAT_ROUTES.mean;
@@ -135,6 +137,8 @@ function switchToStat(statType) {
     const [render, setup] = route;
     setHtml(interfaceRoot, render());
     if (setup) setup();
+    if (typeof mountTeacherClass === 'function') mountTeacherClass(statType, teacherNextMode);   // the AI teacher's class for this topic (or tab overview)
+    teacherNextMode = 'topic';
 
     document.querySelectorAll('.stat-btn[data-stat]').forEach(b => {
         const on = b.dataset.stat === statType;
@@ -164,6 +168,7 @@ function showModule(moduleName) {
     document.querySelectorAll('.action-sidebar').forEach(sb => { sb.hidden = sb.dataset.module !== moduleName; });
     // The one panel below the tab list is the tab panel of whichever tab is selected
     document.getElementById('mainPanel').setAttribute('aria-labelledby', 'tab-' + moduleName);
+    teacherNextMode = 'tab';
     switchToStat(STAT_MODULES[moduleName] || 'mean');
 }
 
@@ -172,7 +177,7 @@ document.querySelector('.main-panel').addEventListener('click', e => {
     const btn = e.target.closest('.stat-btn');
     if (!btn) return;
     if (btn.dataset.action === 'visualize') { visualizeCurrentData(); return; }
-    if (btn.dataset.stat) { switchToStat(btn.dataset.stat); focusToolTitle(); }
+    if (btn.dataset.stat) { teacherNextMode = 'topic'; switchToStat(btn.dataset.stat); focusToolTitle(); }
 });
 
 // Raw data / summary statistics switch (see inputModeItem in core/toolkit.js): show the input group that matches the select
@@ -185,6 +190,8 @@ function applyInputMode(select) {
         group.style.display = group.dataset.mode === select.value ? '' : 'none';
     });
 }
+// typing numbers updates the AI teacher's worked example (not while the class is playing)
+interfaceRoot.addEventListener('input', e => { if (e.target && e.target.tagName === 'TEXTAREA' && typeof teacherScheduleRefresh === 'function') teacherScheduleRefresh(); });
 document.addEventListener('change', e => {
     const select = e.target.closest && e.target.closest('[data-mode-select]');
     if (select) applyInputMode(select);
