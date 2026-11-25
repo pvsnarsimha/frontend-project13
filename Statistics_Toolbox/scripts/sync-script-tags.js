@@ -24,7 +24,7 @@ function scriptOrder() {
     const unknown = toolModules.filter(m => !MODULE_ORDER.includes(m));
     if (unknown.length) throw new Error('Unknown tool module folder(s): ' + unknown.join(', ') + ' (add them to MODULE_ORDER)');
     return [
-        'js/core/numerics.js', 'js/core/toolkit.js', 'js/core/charts.js', 'js/core/helpers.js', 'js/core/distributions.js', 'js/core/density.js', 'js/core/stat-charts.js', 'js/core/tutor.js', 'js/core/tutor-hypothesis.js', 'js/core/dist-graphs.js', 'js/core/summary-tests.js', 'js/core/compare-charts.js', 'js/core/feedback.js',
+        'js/core/numerics.js', 'js/core/toolkit.js', 'js/core/charts.js', 'js/core/helpers.js', 'js/core/distributions.js', 'js/core/density.js', 'js/core/stat-charts.js', 'js/core/tutor.js', 'js/core/tutor-hypothesis.js', 'js/core/tutor-descriptive.js', 'js/core/tutor-normal.js', 'js/core/tutor-boxplot.js', 'js/core/tutor-relations.js', 'js/core/tutor-clt.js', 'js/core/dist-graphs.js', 'js/core/summary-tests.js', 'js/core/compare-charts.js', 'js/core/feedback.js',
         ...MODULE_ORDER.flatMap(m => list(`js/tools/${m}`)),
         'js/app.js',
         'js/ui/navigation.js', 'js/ui/solution.js', 'js/ui/forms.js', 'js/ui/feedback.js'   // forms uses what the other two export

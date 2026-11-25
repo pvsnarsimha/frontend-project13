@@ -150,6 +150,7 @@ function createTutor(card, def) {
     function frame(now) {
         if (dead) return;
         if (!canvas.isConnected) { destroy(); return; }       // the tool changed: its result area was replaced
+        if (playing && canvas.offsetParent === null) pause();  // the tool was hidden (another tool or tab opened): stop talking
         const dt = Math.min(64, now - last) * speed();
         last = now;
         if (playing) {
@@ -200,3 +201,42 @@ function createTutor(card, def) {
         get state() { return { scene, playing, finished, speechDone }; }
     };
 }
+
+// Small drawing helpers shared by the concept files (tutor-*.js)
+const TD = {
+    ink: '#111827', mute: '#64748b', axis: '#94a3b8', blue: '#2563eb', red: '#dc2626', redDark: '#b91c1c', green: '#15803d', amber: '#f59e0b', brand: '#4338ca', curve: '#1a5490',
+    font: (px, w) => `${w || 500} ${px}px Inter, system-ui, sans-serif`,
+    line(c, x1, y1, x2, y2, col, w, dash) { c.beginPath(); c.setLineDash(dash || []); c.strokeStyle = col; c.lineWidth = w || 1; c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); c.setLineDash([]); },
+    dot(c, x, y, r, col, ring) { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fillStyle = col; c.fill(); if (ring !== false) { c.lineWidth = 2; c.strokeStyle = '#fff'; c.stroke(); } },
+    text(c, s, x, y, o) {
+        o = o || {}; c.font = TD.font(o.s || 12, o.w || 600); c.textAlign = o.a || 'center'; c.textBaseline = o.b || 'middle';
+        if (o.halo) { c.lineJoin = 'round'; c.lineWidth = 5; c.strokeStyle = '#fff'; c.strokeText(s, x, y); }
+        c.fillStyle = o.c || '#1f2937'; c.fillText(s, x, y);
+    },
+    arrow(c, x1, y1, x2, y2, col, w) {
+        TD.line(c, x1, y1, x2, y2, col, w || 2); const a = Math.atan2(y2 - y1, x2 - x1);
+        c.beginPath(); c.moveTo(x2, y2); c.lineTo(x2 - 9 * Math.cos(a - 0.4), y2 - 9 * Math.sin(a - 0.4)); c.lineTo(x2 - 9 * Math.cos(a + 0.4), y2 - 9 * Math.sin(a + 0.4)); c.closePath(); c.fillStyle = col; c.fill();
+    },
+    pill(c, s, x, y, bg, fg, size) {
+        c.font = TD.font(size || 13, 800); const w = c.measureText(s).width + 24;
+        c.fillStyle = bg; c.beginPath(); if (c.roundRect) c.roundRect(x - w / 2, y - 14, w, 28, 14); else c.rect(x - w / 2, y - 14, w, 28); c.fill();
+        TD.text(c, s, x, y + 1, { c: fg || '#fff', w: 800, s: size || 13 });
+    },
+    // dark readout box whose right edge is at x
+    readout(c, s, x, y) {
+        c.font = TD.font(13, 800); const w = c.measureText(s).width + 20;
+        c.fillStyle = '#0f172a'; c.beginPath(); if (c.roundRect) c.roundRect(x - w, y - 13, w, 26, 8); else c.rect(x - w, y - 13, w, 26); c.fill();
+        TD.text(c, s, x - w / 2, y + 1, { c: '#fff', w: 800, s: 13 });
+    },
+    lerp: (a, b, t) => a + (b - a) * t,
+    nice(span, ticks) { const raw = span / (ticks || 6), mag = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / mag; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * mag; },
+    // horizontal axis with ticks; map: value -> x
+    axisX(c, map, lo, hi, y, label) {
+        TD.line(c, map(lo), y, map(hi), y, TD.axis, 1.2);
+        const step = TD.nice(hi - lo);
+        for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) { TD.line(c, map(v), y, map(v), y + 5, TD.axis, 1); TD.text(c, fmtChartNum(+v.toFixed(8)), map(v), y + 16, { s: 11, c: '#475569', w: 500 }); }
+        if (label) TD.text(c, label, (map(lo) + map(hi)) / 2, y + 34, { s: 12, c: '#334155', w: 500 });
+    },
+    // seeded uniform generator (so demo clouds look the same every time)
+    rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+};

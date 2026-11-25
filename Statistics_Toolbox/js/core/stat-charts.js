@@ -40,6 +40,7 @@ function hideStatChartCard(key) {
 // every card a tool may have shown (used when a calculation ends in an error message)
 function hideAllStatCharts() {
     ['test', 'scatter', 'residuals', 'extra', 'freq', 'ogive'].forEach(hideStatChartCard);
+    if (typeof hideTutorCard === 'function') ['corr', 'regress'].forEach(hideTutorCard);
 }
 
 function putStatChart(key, canvas, config) {

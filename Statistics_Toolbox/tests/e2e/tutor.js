@@ -60,6 +60,36 @@ const launcher = require('./launch');
   const hasBtn = await p.locator('#binomialExactComputeBtn, [id$="ComputeBtn"]:visible').count();
   expect(hasBtn >= 0, 'sanity');
   expect(await p.locator('#tutorCard-test:visible').count() === 0, 'binomial tool should have no animation card');
+  // every tool that has an animation shows it, plays it to the end, and paints the canvas
+  const TOOLS = [
+    ['mean', { '#meanInput': '4, 6, 7, 9, 12, 16' }, '#meanComputeBtn', 'meansd'], ['stddev', { '#stddevInput': '4, 6, 7, 9, 12, 16' }, '#stddevComputeBtn', 'meansd'],
+    ['zscore', { '#zscoreInput': '52, 55, 53, 58, 54, 56, 57, 55, 59, 54' }, '#zscoreComputeBtn', 'zscore'],
+    ['boxplot', { '#boxplotInput': '12, 3, 19, 7, 15, 9, 22, 5, 11, 41' }, '#boxplotComputeBtn', 'boxplot'],
+    ['pearson', { '#pearsonXInput': '1, 2, 3, 4, 5, 6, 7, 8', '#pearsonYInput': '2.1, 3.9, 3.2, 5.8, 5.1, 7.4, 6.6, 9.0' }, '#pearsonComputeBtn', 'corr'],
+    ['simplelinear', { '#simpleXInput': '1, 2, 3, 4, 5, 6, 7, 8', '#simpleYInput': '2.1, 3.9, 3.2, 5.8, 5.1, 7.4, 6.6, 9.0' }, '#simpleLinearComputeBtn', 'regress'],
+    ['sampling', { '#samplingSeed': '5' }, '#samplingComputeBtn', 'clt']
+  ];
+  for (const [tool, fill, btn, key] of TOOLS) {
+    await p.goto('file://' + path.join(root, 'Statistics.html') + '#tool=' + tool); await p.reload(); await p.waitForTimeout(300);
+    for (const [sel, v] of Object.entries(fill)) await p.fill(sel, v);
+    await p.click(btn); await p.waitForTimeout(900);
+    expect(await p.locator('#tutorCard-' + key + ':visible').count() === 1, `${tool}: animation card missing`);
+    if (!(await p.locator('#tutorCard-' + key).count())) continue;
+    await p.click('#tutorCard-' + key + ' .tutor-play');
+    let done = false; for (let i = 0; i < 150 && !done; i++) { done = await p.evaluate(k => tutorCards.get(k).state.finished, key); if (!done) await p.waitForTimeout(100); }
+    expect(done, `${tool}: animation never finished`);
+    const ink = await p.evaluate(k => { const c = document.querySelector('#tutorCard-' + k + ' canvas'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++; return n; }, key);
+    expect(ink > 2000, `${tool}: canvas looks blank`);
+    // calculating again with nothing valid must remove the stale animation
+    await p.click(btn); await p.waitForTimeout(400);
+  }
+  // an animation must stop talking when its tool is left
+  await p.goto('file://' + path.join(root, 'Statistics.html') + '#tool=stddev'); await p.reload(); await p.waitForTimeout(300);
+  await p.fill('#stddevInput', '4, 6, 7, 9, 12, 16'); await p.click('#stddevComputeBtn'); await p.waitForTimeout(600);
+  await p.click('#tutorCard-meansd .tutor-play'); await p.waitForTimeout(200);
+  await p.click('[data-stat="mean"]'); await p.waitForTimeout(400);
+  expect(!(await p.evaluate(() => (tutorCards.get('meansd') || { state: { playing: false } }).state.playing)), 'animation kept playing after leaving its tool');
+
   // with a working voice (faked here: it records what is spoken and "finishes" each line after 300 ms) every scene is spoken, in order,
   // and the animation waits for the voice
   const v = await (await b.newContext({ viewport: { width: 1000, height: 900 } })).newPage();

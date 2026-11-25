@@ -1,6 +1,6 @@
 # StatLab: Statistics Toolbox
 
-An interactive statistics workbench: paste data, pick one of 102 techniques, and get the result, the formula,
+An interactive statistics workbench: paste data, pick one of 103 techniques, and get the result, the formula,
 a full worked solution and a chart. It is built for working your own textbook questions: type the numbers the question gives (a list of values, or just n / mean / standard deviation, or a table of counts) and see the calculation and the graph. It is a static site with **no build step**: open `Statistics.html` in a
 browser (Chart.js and the fonts are bundled in `vendor/`, so it works fully offline; Chart.js is only loaded when the first chart is drawn).
 Not sure which technique fits your question? Open **[Which tool should I use?](Which-tool.html)**: it starts from the question you are asking and
@@ -13,7 +13,7 @@ links straight into the right tool (`Statistics.html#tool=<id>` opens a tool dir
 1. **Pick a technique.** Choose a module (Descriptive, Probability, Hypothesis Testing, ...) and a tool, or open **[Which tool should I use?](Which-tool.html)** and start from your question.
 2. **Type what your question gives you.** Paste a list of values, or choose "Summary statistics" and enter n, the mean, the standard deviation (or counts, or a table). "Try sample data" fills in an example.
 3. **Press Calculate.** You get the answer, the formula, a worked solution step by step, and a graph.
-4. **Watch it explained.** Under a hypothesis test's graph, "Watch it explained" plays a short animation while a narrator (your browser's voice, switchable) says what is happening: the curve, the rejection region, your statistic dropping onto it, the p-value and the verdict. More concepts are planned: `docs/animations/README.md`.
+4. **Watch it explained.** "Watch it explained" plays a short animation while a narrator (your browser's voice, switchable) says what is happening, using your own numbers. It is under hypothesis tests, mean / standard deviation, z-scores, box plot, Pearson correlation, simple regression and the new Sampling & Central Limit Theorem tool: `docs/animations/README.md`.
 5. **Take it with you.** "Copy solution" copies the working as text; "Print / Save as PDF" prints the solution and its graphs for homework.
 
 ![The rejection region, critical values and test statistic](docs/screenshot-graph.png)
@@ -45,7 +45,7 @@ js/core/numerics.js        Special functions, CDFs and exact critical values (no
                            matrix helpers (multiplyMatrices, inverseMatrix, transposeMatrix, olsRSquared, computeEigenvalues).
                            Single source of truth: tools never carry their own copy.
 js/core/toolkit.js         buildInterface(), defineListTool(), setHtml() (sanitised HTML insertion), escapeHtml()
-js/core/tutor.js           Narrated-animation player (animation + speech + captions); js/core/tutor-hypothesis.js is the hypothesis-test animation
+js/core/tutor.js           Narrated-animation player (animation + speech + captions) and the drawing helpers (TD); js/core/tutor-<concept>.js hold the seven animations
 js/core/charts.js          One variable per plotting tool for its Chart.js instance, lazy loading of Chart.js, labelChart() (accessible chart names)
                            and the shared canvas hover tooltip
 js/core/helpers.js         Input parsing (parseNumbersFromInput, parseValueGroupInput), parameter validation (validateDistributionParams),
@@ -201,7 +201,7 @@ Rules for all tools:
 * **Classic scripts, not ES modules.** The page is meant to open straight from disk (`file://`), where browsers
   refuse to load ES modules. The cost is one shared global scope, which `tests/structure.test.js` polices
   (duplicate definitions, route integrity). Moving to modules would require serving the folder over http and a bundler.
-* **No build step for the source, an optional one for hosting.** `npm run build` writes `dist/`: every script minified into one file (about 1.3 MB raw, **about 250 KB gzipped** instead of 424 KB) with the same behaviour; CI runs the browser suite against `dist/` and the Pages workflow publishes it. The source itself stays build-free: it loads about 1.6 MB of script from disk, about 424 KB once a web server gzips it (`npm run size` prints both and CI enforces a budget; `tests/structure.test.js` fails if the 1.5 MB drifts more than 10%) (instant locally,
+* **No build step for the source, an optional one for hosting.** `npm run build` writes `dist/`: every script minified into one file (about 1.3 MB raw, **about 268 KB gzipped** instead of 457 KB) with the same behaviour; CI runs the browser suite against `dist/` and the Pages workflow publishes it. The source itself stays build-free: it loads about 1.7 MB of script from disk, about 457 KB once a web server gzips it (`npm run size` prints both and CI enforces a budget; `tests/structure.test.js` fails if the 1.5 MB drifts more than 10%) (instant locally,
   noticeable over a slow network if you host it). Chart.js and the fonts are vendored, so there are no CDN requests and
   the Content-Security-Policy only allows the page's own files.
 

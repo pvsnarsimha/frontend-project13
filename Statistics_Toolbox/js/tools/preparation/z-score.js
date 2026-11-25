@@ -94,6 +94,7 @@ function setupZScoreLogic() {
         const resultDiv = document.getElementById("zscoreResultArea");
         const valueSpan = document.getElementById("zscoreValueDisplay");
         const stepsSpan = document.getElementById("zscoreStepsDisplay");
+        hideTutorCard('zscore');
         
         if (!numbers.length) {
             resultDiv.style.display = "block";
@@ -113,6 +114,7 @@ function setupZScoreLogic() {
         resultDiv.style.display = "block";
         setHtml(valueSpan, `Z-scores: ${zscoreRes.zScores.map(z => z.toFixed(4)).join(', ')}`);
         stepsSpan.innerText = zscoreRes.steps;
+        showZScoreAnimation("zscoreResultArea", numbers);
     });
     attachClearHandler("zscoreClearBtn", "zscoreInput", "zscoreResultArea");
 }

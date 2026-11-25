@@ -34,5 +34,6 @@ const stddevTool = defineListTool({
     empty: { value: "No data", steps: "Enter numbers to compute standard deviation." },
     min: { count: 2, value: "❌ Need at least 2 values", steps: "Sample standard deviation requires at least 2 observations." },
     compute: computeStdDevWithSteps,
-    display: r => `Pop: ${r.population.toFixed(8)} | Sample: ${r.sample.toFixed(8)}`
+    display: r => `Pop: ${r.population.toFixed(8)} | Sample: ${r.sample.toFixed(8)}`,
+    after: (r, nums, areaId) => { if (r) showMeanSdAnimation(areaId, nums, 'sd'); else hideTutorCard('meansd'); }
 });
