@@ -42,7 +42,7 @@ function mountTutorCard(areaId, def) {
             '<div class="stat-chart-head"><h4 class="stat-chart-title"></h4></div><p class="stat-chart-hint"></p>' +
             '<div class="tutor-stage"><canvas class="tutor-canvas" width="640" height="320"></canvas></div>' +
             '<div class="tutor-caption" role="group"><span class="tutor-step"></span><p class="tutor-line"></p></div>' +
-            '<div class="tutor-bar">' +
+            '<p class="tutor-note" role="status"></p><div class="tutor-bar">' +
             '<button type="button" class="tutor-btn tutor-play">▶ Play explanation</button>' +
             '<button type="button" class="tutor-btn tutor-replay">↻ Replay</button>' +
             '<label class="tutor-voice"><input type="checkbox" class="tutor-speak" checked> 🔊 Narrate aloud</label>' +
@@ -68,7 +68,7 @@ function createTutor(card, def) {
     const $c = sel => card.querySelector(sel);
     const canvas = $c('.tutor-canvas'), ctx2d = canvas.getContext('2d');
     const playBtn = $c('.tutor-play'), replayBtn = $c('.tutor-replay'), speakBox = $c('.tutor-speak'), dots = $c('.tutor-dots');
-    const lineEl = $c('.tutor-line'), stepEl = $c('.tutor-step');
+    const lineEl = $c('.tutor-line'), stepEl = $c('.tutor-step'), note = $c('.tutor-note');
     card.style.display = '';
     $c('.stat-chart-title').textContent = def.title;
     $c('.stat-chart-hint').textContent = def.hint || '';
@@ -81,8 +81,11 @@ function createTutor(card, def) {
 
     const scenes = def.scenes, N = scenes.length;
     let scene = 0, elapsed = 0, started = false, playing = false, finished = false, speechDone = true, speechToken = 0, last = 0, raf = 0, dead = false, fallbackTimer = 0;
-    // speech is used only when the browser really has a voice (Firefox and CI machines expose the API with no voices: captions then set the pace)
-    const voiceReady = () => { if (!(speechOK && speakBox.checked)) return false; try { return window.speechSynthesis.getVoices().length > 0; } catch (e) { return false; } };
+    // Voices load lazily in Chrome (getVoices() is empty at first), so never decide from the voice list: try to speak, and treat the
+    // voice as unavailable only if it does not start within a moment (Firefox / CI machines with no voice installed). Captions then set the pace.
+    let voiceDead = false;
+    const voiceReady = () => speechOK && speakBox.checked && !voiceDead;
+    if (speechOK) { try { window.speechSynthesis.getVoices(); } catch (e) { /* ignore */ } }
     const speed = () => (typeof window.STATLAB_TUTOR_SPEED === 'number' && window.STATLAB_TUTOR_SPEED > 0 ? window.STATLAB_TUTOR_SPEED : 1);
 
     // ---- drawing ----
@@ -122,16 +125,24 @@ function createTutor(card, def) {
         clearTimeout(fallbackTimer);
         if (!voiceReady()) { speechDone = true; return; }
         speechDone = false;
+        let started = false;
         const done = () => { if (token === speechToken) { speechDone = true; clearTimeout(fallbackTimer); } };
         try {
             const u = new window.SpeechSynthesisUtterance(speakable(s.say || s.line));
             u.lang = 'en-US'; u.rate = 0.95;
+            u.onstart = () => { if (token === speechToken) { started = true; clearTimeout(fallbackTimer); fallbackTimer = setTimeout(done, (tutorReadMs(s.line) + 6000) / speed()); } };
             u.onend = done; u.onerror = done;
             window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(u);
+            setTimeout(() => { if (token === speechToken) window.speechSynthesis.speak(u); }, 40);     // speak() straight after cancel() is dropped by some Chrome builds
         } catch (e) { speechDone = true; return; }
-        // Some browsers (and machines with no voice installed) never fire `end`: never wait on the voice forever
-        fallbackTimer = setTimeout(done, (tutorReadMs(s.line) + 4000) / speed());
+        // no voice started: stop waiting for it, and say so (the captions carry on)
+        fallbackTimer = setTimeout(() => {
+            if (token !== speechToken || started) return;
+            voiceDead = true; try { window.speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+            speakBox.parentNode.title = 'No speech voice started in this browser; the lines are shown as captions.';
+            note.textContent = '🔇 This browser did not start a speech voice, so the lines are shown as captions.';
+            speechDone = true;
+        }, 2500 / speed());
     }
 
     // ---- the loop ----
@@ -166,7 +177,7 @@ function createTutor(card, def) {
 
     playBtn.onclick = () => (playing ? pause() : play());
     replayBtn.onclick = () => { stopSpeech(); play(0); };
-    speakBox.onchange = () => { if (playing) startSpeech(); };
+    speakBox.onchange = () => { if (speakBox.checked) { voiceDead = false; note.textContent = ''; } if (playing) startSpeech(); };
     dots.textContent = '';
     scenes.forEach((s, i) => {
         const b = document.createElement('button');

@@ -60,6 +60,24 @@ const launcher = require('./launch');
   const hasBtn = await p.locator('#binomialExactComputeBtn, [id$="ComputeBtn"]:visible').count();
   expect(hasBtn >= 0, 'sanity');
   expect(await p.locator('#tutorCard-test:visible').count() === 0, 'binomial tool should have no animation card');
+  // with a working voice (faked here: it records what is spoken and "finishes" each line after 300 ms) every scene is spoken, in order,
+  // and the animation waits for the voice
+  const v = await (await b.newContext({ viewport: { width: 1000, height: 900 } })).newPage();
+  v.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
+  await v.addInitScript(() => {
+    window.__said = [];
+    window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { getVoices: () => [], cancel() {}, speak(u) { window.__said.push(u.text); setTimeout(() => u.onstart && u.onstart(), 10); setTimeout(() => u.onend && u.onend(), 300); } } });
+  });
+  await v.goto('file://' + path.join(root, 'Statistics.html') + '#tool=onesamplet'); await v.reload(); await v.waitForTimeout(300);
+  await v.fill('#oneSampleData', '52, 55, 53, 58, 54, 56, 57, 55, 59, 54'); await v.fill('#hypothesizedMean', '50');
+  await v.click('#oneSampleTComputeBtn'); await v.waitForTimeout(900);
+  await v.click('#tutorCard-test .tutor-play');
+  for (let i = 0; i < 100; i++) { if ((await v.evaluate(() => tutorCards.get('test').state)).finished) break; await v.waitForTimeout(100); }
+  const said = await v.evaluate(() => window.__said);
+  expect(said.length === 5, 'expected 5 spoken lines, got ' + said.length);
+  expect(said[0] && /H zero/.test(said[0]) && /reject H zero/.test(said[4] || ''), 'spoken text wrong: ' + JSON.stringify(said));
+  expect(await v.locator('#tutorCard-test .tutor-note:visible').count() === 0, 'a working voice must not show the "no voice" note');
   await b.close();
   if (errs.length) { console.log(errs.join('\n')); console.log('TUTOR CHECK FAILED'); process.exit(1); }
   console.log('narrated animation plays, pauses, replays, jumps and follows the result');
