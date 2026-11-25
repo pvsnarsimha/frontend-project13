@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>StatLab animation storyboards</title>
+<!-- Design mockups of the planned narrated animations (docs/animations/README.md). Open storyboards.html?c=1..7 to see one;
+     scripts/animation-previews.js renders each to a PNG. Concept 1 uses real frames from the app when ?img=... is given. -->
+<style>
+ :root { --ink:#0f172a; --ink2:#334155; --line:#e2e8f0; --brand:#4338ca; }
+ * { box-sizing: border-box; margin: 0; font-family: Inter, system-ui, 'Segoe UI', Roboto, sans-serif; }
+ body { background:#f1f5f9; padding:28px 32px 22px; width:1640px; color:var(--ink); }
+ header { display:flex; align-items:center; gap:18px; margin-bottom:18px; }
+ .num { width:54px; height:54px; border-radius:16px; background:var(--brand); color:#fff; font-size:28px; font-weight:800; display:grid; place-items:center; }
+ h1 { font-size:30px; font-weight:800; } .sub { font-size:15px; color:var(--ink2); margin-top:3px; }
+ .pill { margin-left:auto; text-align:right; font-size:14px; color:var(--ink2); line-height:1.5 } .pill b { color:var(--brand); }
+ .row { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+ .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:12px; box-shadow:0 8px 22px -14px rgba(15,23,42,.25); }
+ .step { font-size:14px; font-weight:800; color:#3730a3; margin:2px 0 8px; display:flex; align-items:center; gap:8px; }
+ .step i { font-style:normal; background:#4338ca; color:#fff; border-radius:50%; width:22px; height:22px; display:inline-grid; place-items:center; font-size:12px; }
+ canvas, .card img { display:block; width:100%; border:1px solid var(--line); border-radius:10px; background:#fff; }
+ .say { margin-top:10px; padding:10px 12px; background:#eef2ff; border:1px solid #c7d2fe; border-radius:12px; font-size:15px; line-height:1.42; font-weight:600; min-height:84px; position:relative; }
+ .say::before { content:"🔊 AI narrator"; display:block; font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:#3730a3; margin-bottom:3px; }
+ footer { margin-top:14px; font-size:13px; color:#475569; display:flex; justify-content:space-between; }
+</style></head>
+<body>
+<header><div class="num" id="num"></div><div><h1 id="title"></h1><div class="sub" id="sub"></div></div><div class="pill" id="pill"></div></header>
+<div class="row" id="row"></div>
+<footer><span id="note"></span><span>StatLab · AI Tutor · animation roadmap</span></footer>
+<script>
+const W = 360, H = 250, DPR = 2;
+const C = { curve:'#1a5490', red:'#dc2626', redDark:'#b91c1c', amber:'#f59e0b', ink:'#111827', mute:'#64748b', grid:'#e2e8f0', blue:'#2563eb', green:'#15803d', brand:'#4338ca' };
+function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const erf = x => { const s = Math.sign(x); x = Math.abs(x); const t = 1/(1+0.3275911*x); const y = 1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x); return s*y; };
+const Phi = z => 0.5*(1+erf(z/Math.SQRT2)), phi = z => Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
+function line(c,x1,y1,x2,y2,col,w,dash){ c.beginPath(); c.setLineDash(dash||[]); c.strokeStyle=col; c.lineWidth=w||1; c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke(); c.setLineDash([]); }
+function dot(c,x,y,r,col,ring){ c.beginPath(); c.arc(x,y,r,0,7); c.fillStyle=col; c.fill(); if(ring){ c.lineWidth=2; c.strokeStyle='#fff'; c.stroke(); } }
+function text(c,s,x,y,o){ o=o||{}; if(o.halo){ c.font=`${o.w||600} ${o.s||12}px Inter, system-ui, sans-serif`; c.textAlign=o.a||'center'; c.textBaseline=o.b||'middle'; c.lineJoin='round'; c.lineWidth=5; c.strokeStyle='#fff'; c.strokeText(s,x,y); } c.font=`${o.w||600} ${o.s||12}px Inter, system-ui, sans-serif`; c.fillStyle=o.c||'#1f2937'; c.textAlign=o.a||'center'; c.textBaseline=o.b||'middle'; c.fillText(s,x,y); }
+function pill(c,s,x,y,bg,fg,size){ c.font=`800 ${size||13}px Inter, system-ui, sans-serif`; const w=c.measureText(s).width+22; c.fillStyle=bg; c.beginPath(); c.roundRect(x-w/2,y-14,w,28,14); c.fill(); text(c,s,x,y+1,{c:fg||'#fff',w:800,s:size||13}); }
+function arrow(c,x1,y1,x2,y2,col,w){ line(c,x1,y1,x2,y2,col,w||2); const a=Math.atan2(y2-y1,x2-x1); c.beginPath(); c.moveTo(x2,y2); c.lineTo(x2-9*Math.cos(a-0.4),y2-9*Math.sin(a-0.4)); c.lineTo(x2-9*Math.cos(a+0.4),y2-9*Math.sin(a+0.4)); c.closePath(); c.fillStyle=col; c.fill(); }
+function readout(c,s,x,y){ c.font='800 14px Inter, system-ui, sans-serif'; const w=c.measureText(s).width+20; c.fillStyle='#0f172a'; c.beginPath(); c.roundRect(x-w,y-13,w,26,8); c.fill(); text(c,s,x-w/2,y+1,{c:'#fff',w:800,s:14}); }
+
+// ---------- 2. Mean / SD ----------
+const MD = [4,6,7,9,12,16], MEAN = MD.reduce((a,b)=>a+b)/MD.length, SS = MD.reduce((a,b)=>a+(b-MEAN)**2,0), SD = Math.sqrt(SS/(MD.length-1));
+const mx = v => 22 + v*(W-44)/18;
+function meanAxis(c,y){ line(c,mx(0),y,mx(18),y,'#94a3b8',1.5); for(let v=0;v<=18;v+=3){ line(c,mx(v),y,mx(v),y+5,'#94a3b8',1); text(c,v,mx(v),y+16,{s:11,c:'#475569'}); } }
+const meanFrames = [
+ c => { meanAxis(c,200); MD.forEach((v,i)=>{ const y=200-12-(i%2)*0; for(let k=3;k>=1;k--) dot(c,mx(v)+ (i%2?1:-1)*k*9,60+ (3-k)*0 + k*-6,5,'rgba(67,56,202,'+(0.12*(4-k))+')'); line(c,mx(v),64,mx(v),180,'rgba(67,56,202,.25)',1.5,[3,4]); dot(c,mx(v),188,8,C.brand,true); }); text(c,'Data points slide onto the number line',W/2,22,{s:13,w:700,c:C.mute}); },
+ c => { meanAxis(c,205); const my=165; c.save(); line(c,mx(0),my,mx(18),my,'#475569',5); c.restore(); c.beginPath(); c.moveTo(mx(MEAN),my+3); c.lineTo(mx(MEAN)-22,my+38); c.lineTo(mx(MEAN)+22,my+38); c.closePath(); c.fillStyle=C.amber; c.fill(); MD.forEach(v=>dot(c,mx(v),my-12,8,C.brand,true)); pill(c,'mean = '+MEAN,mx(MEAN),62,C.amber,'#111827',15); line(c,mx(MEAN),78,mx(MEAN),my-2,C.amber,2,[5,4]); text(c,'balanced like a seesaw',mx(MEAN),28,{s:12,c:C.mute}); },
+ c => { meanAxis(c,214); MD.forEach((v,i)=>{ const y=40+i*26; dot(c,mx(v),y,6,C.brand,true); if(v!==MEAN){ arrow(c,mx(v)+(v<MEAN?7:-7),y,mx(MEAN)-(v<MEAN?7:-7)*0,y,v<MEAN?C.blue:C.red,2.5); } text(c,(v-MEAN>0?'+':'')+(v-MEAN),(mx(v)+mx(MEAN))/2,y-12,{s:11,w:700,c:v<MEAN?C.blue:C.red}); }); line(c,mx(MEAN),28,mx(MEAN),208,C.amber,2,[5,4]); text(c,'x̄ = '+MEAN,mx(MEAN),16,{s:12,w:800,c:'#92400e'}); },
+ c => { const base=168, k=13; let x=18; MD.forEach(v=>{ const d=v-MEAN, s=Math.abs(d)*k; if(s>0){ c.fillStyle=d<0?'rgba(37,99,235,.35)':'rgba(220,38,38,.35)'; c.fillRect(x,base-s,s,s); c.strokeStyle=d<0?C.blue:C.red; c.lineWidth=2; c.strokeRect(x,base-s,s,s); text(c,d*d,x+s/2,base-s/2,{s:s>24?14:10,w:800}); } else text(c,'0',x+6,base-8,{s:11,w:800}); text(c,(d>0?'+':'')+d,x+Math.max(s,12)/2,base+14,{s:11,c:C.mute}); x+=Math.max(s,12)+10; }); line(c,10,base,W-10,base,'#94a3b8',1.5); text(c,'Squared deviations (area = d²)',W/2,18,{s:12,w:700,c:C.mute}); text(c,`Σd² = ${SS}   →   s² = ${SS}/${MD.length-1} = ${(SS/(MD.length-1)).toFixed(1)}`,W/2,196,{s:12,w:700}); pill(c,'SD = '+SD.toFixed(2),W/2,226,C.brand,'#fff',14); }
+];
+// ---------- 3. Normal / z ----------
+function zFrame(z){ return c => { const l=26,r=W-14,t=44,b=206, xs=v=>l+(v+3.6)/7.2*(r-l), ys=y=>b-y/0.42*(b-t);
+  c.beginPath(); c.moveTo(xs(-3.6),b); for(let v=-3.6;v<=z+1e-9;v+=0.05) c.lineTo(xs(v),ys(phi(v))); c.lineTo(xs(z),ys(phi(z))); c.lineTo(xs(z),b); c.closePath(); c.fillStyle='rgba(37,99,235,.38)'; c.fill();
+  c.beginPath(); for(let v=-3.6;v<=3.6;v+=0.05){ const x=xs(v),y=ys(phi(v)); v<-3.59?c.moveTo(x,y):c.lineTo(x,y);} c.strokeStyle=C.curve; c.lineWidth=2.6; c.stroke();
+  line(c,l,b,r,b,'#94a3b8',1.5); for(let v=-3;v<=3;v++){ line(c,xs(v),b,xs(v),b+5,'#94a3b8',1); text(c,v,xs(v),b+16,{s:11,c:'#475569'}); }
+  line(c,xs(z),b,xs(z),ys(phi(z)),C.ink,2,[5,4]); dot(c,xs(z),ys(phi(z)),8,C.ink,true);
+  [-1,0,1].forEach(()=>{}); text(c,'z = '+z.toFixed(2),xs(z)-(z>=0?34:34),ys(phi(z))-16,{s:13,w:800,c:C.ink,halo:1});
+  readout(c,'Area to the left = '+Phi(z).toFixed(4),W-10,22); arrow(c,xs(z)-26,b+30,xs(z)-4,b+30,C.mute,2); text(c,'move z',xs(z)-40,b+30,{s:11,c:C.mute,a:'right'}); }; }
+// ---------- 4. Box plot ----------
+const BD = [12,3,19,7,15,9,22,5,11], BS = [...BD].sort((a,b)=>a-b);
+const tile = (c,x,y,v,col,w) => { c.fillStyle=col||'#eef2ff'; c.strokeStyle=C.brand; c.lineWidth=1.5; c.beginPath(); c.roundRect(x,y,w||30,32,6); c.fill(); c.stroke(); text(c,v,x+(w||30)/2,y+17,{s:13,w:800}); };
+const bx = v => 24 + (v-0)*(W-48)/24;
+const boxFrames = [
+ c => { BD.forEach((v,i)=>tile(c,14+i*37,120,v)); BD.forEach((v,i)=>{ const j=BS.indexOf(v); if(j!==i) { c.beginPath(); c.setLineDash([3,3]); c.strokeStyle='rgba(67,56,202,.4)'; c.moveTo(29+i*37,118); c.quadraticCurveTo((29+i*37+29+j*37)/2,50,29+j*37,118); c.stroke(); c.setLineDash([]); } }); text(c,'collected order',W/2,196,{s:12,c:C.mute}); text(c,'values start to sort themselves…',W/2,24,{s:12,w:700,c:C.mute}); },
+ c => { const y=110, cols=['#dbeafe','#dcfce7','#fef9c3','#fee2e2']; BS.forEach((v,i)=>tile(c,14+i*37,y,v,i<4?cols[i<2?0:1]:(i===4?'#fde68a':i<7?cols[2]:cols[3]),30)); [[2.5,'Q1 = 7'],[4.5,'median = 11'],[6.5,'Q3 = 15']].forEach(([p,t],k)=>{ const x=14+p*37-3.5; line(c,x,y-20,x,y-3,C.red,3); c.beginPath(); c.moveTo(x-6,y-9); c.lineTo(x+6,y-9); c.lineTo(x,y-1); c.closePath(); c.fillStyle=C.red; c.fill(); text(c,t,x,y-30,{s:11,w:800,c:C.redDark}); }); text(c,'sorted → 4 equal parts',W/2,24,{s:12,w:700,c:C.mute}); text(c,'each part holds about ¼ of the values',W/2,y+72,{s:12,c:C.mute}); },
+ c => { const y=160; line(c,bx(0),y,bx(24),y,'#94a3b8',1.5); for(let v=0;v<=24;v+=4){ line(c,bx(v),y,bx(v),y+5,'#94a3b8',1); text(c,v,bx(v),y+16,{s:11,c:'#475569'}); } BS.forEach(v=>dot(c,bx(v),y-14,5,'rgba(67,56,202,.55)')); c.fillStyle='rgba(99,102,241,.25)'; c.fillRect(bx(7),y-68,bx(15)-bx(7),44); c.strokeStyle=C.brand; c.lineWidth=2.5; c.strokeRect(bx(7),y-68,bx(15)-bx(7),44); line(c,bx(11),y-68,bx(11),y-24,C.red,3.5); text(c,'Q1',bx(7),y-78,{s:12,w:800}); text(c,'median',bx(11),y-78,{s:12,w:800,c:C.redDark}); text(c,'Q3',bx(15),y-78,{s:12,w:800}); text(c,'the box = the middle half of the data',W/2,24,{s:12,w:700,c:C.mute}); },
+ c => { const y=160; line(c,bx(0),y,bx(24),y,'#94a3b8',1.5); for(let v=0;v<=24;v+=4){ line(c,bx(v),y,bx(v),y+5,'#94a3b8',1); text(c,v,bx(v),y+16,{s:11,c:'#475569'}); } BS.forEach(v=>dot(c,bx(v),y-14,5,'rgba(67,56,202,.35)')); c.fillStyle='rgba(99,102,241,.25)'; c.fillRect(bx(7),y-68,bx(15)-bx(7),44); c.strokeStyle=C.brand; c.lineWidth=2.5; c.strokeRect(bx(7),y-68,bx(15)-bx(7),44); line(c,bx(11),y-68,bx(11),y-24,C.red,3.5); line(c,bx(3),y-46,bx(7),y-46,C.brand,2.5); line(c,bx(15),y-46,bx(22),y-46,C.brand,2.5); line(c,bx(3),y-56,bx(3),y-36,C.brand,2.5); line(c,bx(22),y-56,bx(22),y-36,C.brand,2.5); arrow(c,bx(7)-4,y-46,bx(3)+6,y-46,C.green,2); arrow(c,bx(15)+4,y-46,bx(22)-6,y-46,C.green,2); text(c,'min 3',bx(3),y-66,{s:11,w:800}); text(c,'max 22',bx(22),y-66,{s:11,w:800}); line(c,bx(7),y-84,bx(15),y-84,C.amber,2.5); text(c,'IQR = 8',bx(11),y-94,{s:12,w:800,c:'#92400e'}); text(c,'whiskers stretch out',W/2,24,{s:12,w:700,c:C.mute}); }
+];
+// ---------- 5. Correlation ----------
+function corrPoints(r){ const R=rng(7), n=40, x=[],e=[]; for(let i=0;i<n;i++){ const u=R(),v=R(); const g=Math.sqrt(-2*Math.log(u+1e-9))*Math.cos(2*Math.PI*v); x.push(g); e.push(Math.sqrt(-2*Math.log(R()+1e-9))*Math.cos(2*Math.PI*R())); }
+ const mean=a=>a.reduce((s,v)=>s+v,0)/a.length, std=a=>{ const m=mean(a); return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/a.length); };
+ const mxv=mean(x), sx=std(x); const xs=x.map(v=>(v-mxv)/sx); let me=mean(e); let ee=e.map(v=>v-me); const dp=ee.reduce((s,v,i)=>s+v*xs[i],0)/n; ee=ee.map((v,i)=>v-dp*xs[i]); const se=std(ee); ee=ee.map(v=>v/se);
+ return xs.map((v,i)=>[v, r*v+Math.sqrt(1-r*r)*ee[i]]); }
+function corrFrame(r){ return c => { const pts=corrPoints(r), l=34,rr=W-16,t=18,b=186, X=v=>l+(v+3)/6*(rr-l), Y=v=>b-(v+3)/6*(b-t);
+  line(c,l,b,rr,b,'#94a3b8',1.5); line(c,l,t,l,b,'#94a3b8',1.5); pts.forEach(([x,y])=>dot(c,X(x),Y(y),4.3,'rgba(67,56,202,.7)'));
+  const s=r; line(c,X(-2.6),Y(-2.6*s),X(2.6),Y(2.6*s),'rgba(220,38,38,.55)',2,[6,4]);
+  const sx0=60, sx1=W-60, sy=218; c.fillStyle='#e2e8f0'; c.beginPath(); c.roundRect(sx0,sy-4,sx1-sx0,8,4); c.fill(); const kx=sx0+(r+1)/2*(sx1-sx0); c.fillStyle='#c7d2fe'; c.beginPath(); c.roundRect(sx0,sy-4,kx-sx0,8,4); c.fill(); dot(c,kx,sy,11,C.brand,true); text(c,'−1',sx0-14,sy,{s:12,w:700,c:C.mute}); text(c,'+1',sx1+14,sy,{s:12,w:700,c:C.mute}); readout(c,'r = '+(r>0?'+':r<0?'−':'')+Math.abs(r).toFixed(2),W-10,22); }; }
+// ---------- 6. Regression ----------
+const RX=[1,2,3,4,5,6,7,8], RY=[2.1,3.9,3.2,5.8,5.1,7.4,6.6,9.0];
+const rmx=RX.reduce((a,b)=>a+b)/8, rmy=RY.reduce((a,b)=>a+b)/8, slopeB=RX.reduce((s,x,i)=>s+(x-rmx)*(RY[i]-rmy),0)/RX.reduce((s,x)=>s+(x-rmx)**2,0), icptB=rmy-slopeB*rmx;
+const sse=(a,b)=>RX.reduce((s,x,i)=>s+(RY[i]-(a+b*x))**2,0);
+function regFrame(a,b,opts){ return c => { const l=30,r=W-20,t=24,bt=206, X=v=>l+(v-0.3)/8.4*(r-l)*0.78, Y=v=>bt-(v-0)/10.5*(bt-t), ppu=(bt-t)/10.5;
+  line(c,l,bt,r,bt,'#94a3b8',1.5); line(c,l,t,l,bt,'#94a3b8',1.5);
+  (opts.ghost||[]).forEach(([ga,gb])=>line(c,X(0.5),Y(ga+gb*0.5),X(8.5),Y(ga+gb*8.5),'rgba(220,38,38,.22)',2,[5,4]));
+  RX.forEach((x,i)=>{ const yh=a+b*x, res=RY[i]-yh, px=X(x), py1=Y(yh), py2=Y(RY[i]);
+    if(opts.squares){ const s=Math.abs(res)*ppu; c.fillStyle='rgba(245,158,11,.38)'; c.fillRect(px,Math.min(py1,py2),s,s); c.strokeStyle='#b45309'; c.lineWidth=1.5; c.strokeRect(px,Math.min(py1,py2),s,s); }
+    if(opts.resid) line(c,px,py1,px,py2,'#b45309',2.4); });
+  line(c,X(0.5),Y(a+b*0.5),X(8.5),Y(a+b*8.5),C.red,3); RX.forEach((x,i)=>dot(c,X(x),Y(RY[i]),5.5,C.brand,true));
+  if(opts.rot) { arrow(c,X(7.7),Y(a+b*7.7)+26,X(7.7),Y(a+b*7.7)+6,C.green,2.5); }
+  if(opts.squares) readout(c,'Total square area = '+sse(a,b).toFixed(1),W-10,13); else text(c,'residual = actual − predicted',W-14,16,{s:12,w:700,c:C.mute,a:'right'}); }; }
+// ---------- 7. Sampling / CLT ----------
+function sims(count){ const R=rng(11), out=[]; for(let k=0;k<count;k++){ let s=0; for(let i=0;i<30;i++) s+=-Math.log(1-R()); out.push(s/30); } return out; }
+function cltFrame(stage){ return c => { const pl=10,pr=124, ml=146,mr=W-12, b=206;
+  // population (exponential) on the left
+  text(c,'Population',(pl+pr)/2,18,{s:11,w:800,c:C.mute}); const px=v=>pl+v/5*(pr-pl), py=y=>b-y*(b-60)*0.9; for(let v=0;v<5;v+=0.25){ const h=Math.exp(-v-0.125)*0.25; c.fillStyle='rgba(220,38,38,.45)'; c.fillRect(px(v),py(h*4),(pr-pl)/20-1,py(0)-py(h*4)); } line(c,pl,b,pr,b,'#94a3b8',1.2); text(c,'skewed, not a bell',(pl+pr)/2,b+16,{s:10,c:C.mute});
+  const lo=0.35,hi=1.85, mxx=v=>ml+(v-lo)/(hi-lo)*(mr-ml); line(c,ml,b,mr,b,'#94a3b8',1.5); [0.5,1,1.5].forEach(v=>{ line(c,mxx(v),b,mxx(v),b+5,'#94a3b8',1); text(c,v,mxx(v),b+16,{s:11,c:'#475569'}); }); text(c,'Sample means (n = 30)',(ml+mr)/2,18,{s:11,w:800,c:C.mute});
+  const bins=26, bw=(hi-lo)/bins; const draw=(data,scale)=>{ const h=new Array(bins).fill(0); data.forEach(m=>{ const k=Math.floor((m-lo)/bw); if(k>=0&&k<bins) h[k]++; }); const mxh=Math.max(...h); h.forEach((n,k)=>{ if(!n) return; const hh=n/mxh*scale; c.fillStyle='rgba(67,56,202,.62)'; c.fillRect(mxx(lo+k*bw)+0.5,b-hh,(mr-ml)/bins-1,hh); }); return mxh; };
+  if(stage===1){ arrow(c,pr+4,70,ml+30,98,C.mute,2); dot(c,ml+70,92,10,C.brand,true); text(c,'mean of one sample',ml+70,70,{s:11,w:700}); dot(c,ml+70,b-5,5,'rgba(67,56,202,.0)'); }
+  if(stage===2){ sims(10).forEach((m,i)=>{ dot(c,mxx(m),b-8-((i*7)%3)*14,7,'rgba(67,56,202,.8)',true); }); dot(c,mxx(1.25),82,10,C.brand,true); line(c,mxx(1.25),92,mxx(1.25),b-60,'rgba(67,56,202,.35)',2,[3,4]); readout(c,'10 samples',W-10,44); }
+  if(stage===3){ draw(sims(200),120); readout(c,'200 samples',W-10,44); }
+  if(stage===4){ draw(sims(3000),128); const s=1/Math.sqrt(30); c.beginPath(); for(let v=lo;v<=hi;v+=0.01){ const y=Math.exp(-0.5*((v-1)/s)**2); const x=mxx(v), yy=b-y*128*0.98; v===lo?c.moveTo(x,yy):c.lineTo(x,yy); } c.strokeStyle=C.curve; c.lineWidth=3; c.stroke(); readout(c,'3000 samples',W-10,44); text(c,'bell curve',mxx(1.5),b-70,{s:13,w:800,c:C.curve}); } }; }
+
+// ---------- the seven storyboards ----------
+const STORY = {
+ 1: { title:'Hypothesis test', file:'js/tools/hypothesis/*', pri:'1 · Start here', status:'Built: shipped in the app', real:true,
+   frames:[['The curve if H₀ is true','If H₀ is true, the t statistic follows this curve. Most results land near the middle; extreme values are rare.'],['The rejection region shades in','We chose α = 0.05, so the most extreme 5%, 2.5% in each tail, is the rejection region, shaded red.'],['The statistic drops onto the curve','Now we drop your t = 7.5714 onto the curve.'],['The verdict','Your t-value fell in the shaded tail, so we reject H₀.']] },
+ 2: { title:'Mean and standard deviation', file:'descriptive/mean.js, stddev.js', pri:'2', status:'Planned',
+   frames:[['Dots slide onto the line','Here are your six data points, sliding onto a number line.'],['The mean balances like a seesaw','The mean, 9, is the balance point: the seesaw sits level on it.'],['Deviation lines grow','Now we measure how far each point is from the mean.'],['Deviations get squared into boxes','Square every distance into a box, add the areas (96), divide by n − 1 and take the root: SD = 4.38.']], fr:meanFrames },
+ 3: { title:'Normal curve and z-score', file:'preparation/z-score.js, probability/cdf.js', pri:'3', status:'Planned',
+   frames:[['z = −1.00','Start at z = −1. Only 15.9% of the area lies to its left.'],['z = 0.00','At z = 0, exactly half of the area lies to its left.'],['z = 1.00','Slide to z = 1 and the shaded area grows to 84.1%.'],['z = 1.96','As z grows, more of the area lies to its left: at z = 1.96 it is 97.5%.']], fr:[zFrame(-1),zFrame(0),zFrame(1),zFrame(1.96)] },
+ 4: { title:'Box plot', file:'preparation/boxplot-steps.js', pri:'4', status:'Planned',
+   frames:[['Values arrive in any order','Here are nine values, in the order they were collected.'],['Sort, then cut in four','First we sort, then we cut the data into four equal parts.'],['The box','The box runs from Q1 = 7 to Q3 = 15, with the median, 11, inside it.'],['The whiskers stretch','The whiskers stretch out to the smallest and largest values that are not outliers: 3 and 22.']], fr:boxFrames },
+ 5: { title:'Correlation', file:'correlation/pearson.js', pri:'5', status:'Planned',
+   frames:[['r = −0.90','At r = −0.9 the points slope downward in a tight band.'],['r = 0.00','At r = 0 the points form a shapeless cloud: no straight-line pattern.'],['r = +0.60','Slide to r = 0.6 and a loose upward trend appears.'],['r = +0.95','Watch the points line up as r approaches 1.']], fr:[corrFrame(-0.9),corrFrame(0),corrFrame(0.6),corrFrame(0.95)] },
+ 6: { title:'Regression: least squares', file:'regression/simple-linear.js', pri:'6', status:'Planned',
+   frames:[['Residuals appear','Each point sits some distance above or below the line. That gap is its residual.'],['Squares form on the residuals','Over every residual we build a square. Big misses make big squares.'],['The line rotates','Now we tilt the line, and watch the squares change size.'],['The best line','The best line makes these squares as small as possible.']],
+   fr:[regFrame(2.2,0.3,{resid:1,top:0}),regFrame(2.2,0.3,{resid:1,squares:1}),regFrame(1.2,0.6,{resid:1,squares:1,rot:1,ghost:[[2.2,0.3]]}),regFrame(icptB,slopeB,{resid:1,squares:1,ghost:[[2.2,0.3],[1.2,0.6]]})] },
+ 7: { title:'Sampling and the central limit theorem', file:'New tool', pri:'7', status:'Planned',
+   frames:[['A skewed population','Our data are skewed, nothing like a bell. We take a sample and find its mean.'],['Drop each mean in','Each sample mean drops into place, like a ball. Now we repeat.'],['The pile grows','After 200 samples, the means already pile up in the middle.'],['A bell appears','Sample means pile up into a bell shape, whatever the data looks like.']], fr:[cltFrame(1),cltFrame(2),cltFrame(3),cltFrame(4)] }
+};
+const q = new URLSearchParams(location.search), id = +(q.get('c')||2), S = STORY[id];
+document.getElementById('num').textContent = id; document.getElementById('title').textContent = S.title;
+document.getElementById('sub').textContent = 'Narrated animation · AI explains while the picture plays';
+document.getElementById('pill').innerHTML = `Priority <b>${S.pri}</b><br>StatLab file: <b>${S.file}</b><br>Status: <b>${S.status}</b>`;
+document.getElementById('note').textContent = S.real ? 'Frames are screenshots of the real animation running in StatLab (one-sample t-test, n = 10, μ₀ = 50).' : 'Expected output: a design mockup of the animation, not yet in the app. The shapes and numbers are computed for real.';
+const row = document.getElementById('row');
+S.frames.forEach(([step,say],i)=>{ const card=document.createElement('div'); card.className='card'; card.innerHTML=`<div class="step"><i>${i+1}</i>${step}</div>`;
+  if(S.real){ const dir=q.get('img')||'frames'; const im=document.createElement('img'); im.src=`${dir}/hypothesis-stage-${i+1}.png`; card.appendChild(im); const cap=document.createElement('img'); cap.src=`${dir}/hypothesis-caption-${i+1}.png`; cap.style.marginTop='10px'; card.appendChild(cap); return row.appendChild(card); }
+  else { const cv=document.createElement('canvas'); cv.width=W*DPR; cv.height=H*DPR; cv.style.aspectRatio=W+'/'+H; const c=cv.getContext('2d'); c.scale(DPR,DPR); S.fr[i](c); card.appendChild(cv); }
+  const s=document.createElement('div'); s.className='say'; s.textContent='“'+say+'”'; card.appendChild(s); row.appendChild(card); });
+document.fonts.ready.then(()=>document.body.dataset.ready='1');
+</script></body></html>

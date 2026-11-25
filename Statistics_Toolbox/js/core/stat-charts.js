@@ -34,6 +34,7 @@ function hideStatChartCard(key) {
     if (card && card.style) card.style.display = 'none';
     const old = statChartInstances.get(key);
     if (old) { old.destroy(); statChartInstances.delete(key); }
+    if (key === 'test' && typeof hideTutorCard === 'function') hideTutorCard('test');     // the narrated animation belongs to the test chart
 }
 
 // every card a tool may have shown (used when a calculation ends in an error message)
@@ -275,6 +276,7 @@ function showTestChart(areaId, spec) {
     if (spec && spec.kind === 'binomial') {
         const bcanvas = statChartCard(areaId, 'test', 'Where your result falls', 'Black bar: your observed count. Amber bars: outcomes at least as extreme (their probabilities add up to the p-value). Bars with a thick red outline: the rejection region (the most extreme outcomes with total probability at most α).');
         if (bcanvas) drawBinomialTestChart(bcanvas, spec);
+        if (typeof hideTutorCard === 'function') hideTutorCard('test');
         return;
     }
     const cfg = spec ? buildTestChart(spec) : null;
@@ -282,6 +284,7 @@ function showTestChart(areaId, spec) {
     const hint = 'The shaded red area is the rejection region (the most extreme α of the distribution if H₀ is true). If the solid line (your test statistic) lands inside it, H₀ is rejected. The amber area is the p-value.';
     const canvas = statChartCard(areaId, 'test', 'Where your test statistic falls', hint);
     if (canvas) drawCurveChart('test', canvas, cfg);
+    if (typeof showTestAnimation === 'function') showTestAnimation(areaId, spec);     // narrated animation (js/core/tutor-hypothesis.js)
 }
 
 // ---- Scatter + residual cards for correlation / regression tools ----

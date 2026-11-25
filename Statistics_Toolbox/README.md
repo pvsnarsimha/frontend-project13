@@ -13,7 +13,8 @@ links straight into the right tool (`Statistics.html#tool=<id>` opens a tool dir
 1. **Pick a technique.** Choose a module (Descriptive, Probability, Hypothesis Testing, ...) and a tool, or open **[Which tool should I use?](Which-tool.html)** and start from your question.
 2. **Type what your question gives you.** Paste a list of values, or choose "Summary statistics" and enter n, the mean, the standard deviation (or counts, or a table). "Try sample data" fills in an example.
 3. **Press Calculate.** You get the answer, the formula, a worked solution step by step, and a graph.
-4. **Take it with you.** "Copy solution" copies the working as text; "Print / Save as PDF" prints the solution and its graphs for homework.
+4. **Watch it explained.** Under a hypothesis test's graph, "Watch it explained" plays a short animation while a narrator (your browser's voice, switchable) says what is happening: the curve, the rejection region, your statistic dropping onto it, the p-value and the verdict. More concepts are planned: `docs/animations/README.md`.
+5. **Take it with you.** "Copy solution" copies the working as text; "Print / Save as PDF" prints the solution and its graphs for homework.
 
 ![The rejection region, critical values and test statistic](docs/screenshot-graph.png)
 
@@ -44,6 +45,7 @@ js/core/numerics.js        Special functions, CDFs and exact critical values (no
                            matrix helpers (multiplyMatrices, inverseMatrix, transposeMatrix, olsRSquared, computeEigenvalues).
                            Single source of truth: tools never carry their own copy.
 js/core/toolkit.js         buildInterface(), defineListTool(), setHtml() (sanitised HTML insertion), escapeHtml()
+js/core/tutor.js           Narrated-animation player (animation + speech + captions); js/core/tutor-hypothesis.js is the hypothesis-test animation
 js/core/charts.js          One variable per plotting tool for its Chart.js instance, lazy loading of Chart.js, labelChart() (accessible chart names)
                            and the shared canvas hover tooltip
 js/core/helpers.js         Input parsing (parseNumbersFromInput, parseValueGroupInput), parameter validation (validateDistributionParams),
