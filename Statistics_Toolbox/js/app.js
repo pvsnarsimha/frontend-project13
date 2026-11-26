@@ -191,6 +191,8 @@ function applyInputMode(select) {
     });
 }
 // typing numbers updates the AI teacher's worked example (not while the class is playing)
+// pressing a tool's Calculate: the AI teacher then solves that problem (see teacherAfterCalculate in core/teacher.js)
+interfaceRoot.addEventListener('click', e => { const b = e.target && e.target.closest && e.target.closest('.primary-btn'); if (b && !b.closest('#teacherArea') && typeof teacherAfterCalculate === 'function') teacherAfterCalculate(); });
 interfaceRoot.addEventListener('input', e => { if (e.target && e.target.tagName === 'TEXTAREA' && typeof teacherScheduleRefresh === 'function') teacherScheduleRefresh(); });
 document.addEventListener('change', e => {
     const select = e.target.closest && e.target.closest('[data-mode-select]');

@@ -19,21 +19,26 @@ z-score pictures need 2 to 15 values (box plot 4 to 15), regression up to 40 pai
 
 ## AI Teacher class (every tab, every topic)
 
-Above the inputs of **every one of the 103 topics** there is an animated classroom where an AI maths teacher teaches that topic at the chalkboard.
-Clicking a **tab** opens a class that introduces the whole tab; clicking a **topic** opens that topic's class ("This topic" / "About this tab" switch between them).
+Above the inputs of **every one of the 103 topics** there is an animated cartoon classroom with an AI maths teacher. Three classes, switched with the buttons above the board:
+
+| Button | What she does |
+|---|---|
+| **Teach this topic** | Greets the class, says why the topic matters, chalks the formula, shows how it fits the tab, and asks "who can tell me?" (a student puts a hand up). |
+| **Solve my problem** | Reads back **what you typed**, then works your problem step by step from **the tool's own worked solution**, and announces **your answer** (she jumps, the class cheers). If your input is wrong she says "Oh no!" and explains the fix. It plays automatically after you press **Calculate** (not under browser automation, so the test suites stay fast). |
+| **About this tab** | Introduces the whole tab: the big idea, the 4-step method, the topics in it. (Opens when you click a tab.) |
 
 | Piece | File |
 |---|---|
-| Lessons: the scenes, the words, the worked example on the student's own numbers | `js/core/teacher-lessons.js` |
-| The classroom and the teacher (canvas drawing, skeleton, gestures) | `js/core/teacher.js` |
+| Lessons: scenes, words, the worked example, the "solve my problem" parser | `js/core/teacher-lessons.js` |
+| The classroom and the cartoon teacher (canvas drawing, skeleton, poses) | `js/core/teacher.js` |
 | Player (Play / Pause / Replay / voice / step buttons), shared with the animations above | `js/core/tutor.js` |
 
-* **Each class has 7 scenes** (a tab overview has 6): welcome, why we use it, the formula chalked up, how it fits the tab's method, **your own numbers**, a "who can tell me?" question (a student puts a hand up) and a wrap-up.
-* **Based on what the student gave:** the topic and tab come from the page; if numbers are typed in the tool the teacher reads them back (n, smallest, largest, mean, SD) and works out the topic's own statistic where it is a simple one (mean, median, mode, range, variance, SD, SE, CV, geometric, harmonic, sum of squares). The lesson refreshes as the student types (not while it is playing). Without numbers she asks the student to type some.
-* **Teacher motion is a skeleton, not a clip:** arms are two-bone IK limbs that really reach the chalk; she walks along the board to stand beside the line she is writing and returns to the middle; mouth opens and closes while she speaks; blinking, breathing, nodding; gaze to the board or to the class; poses *greet* (waves), *explain* (open hands), *write*, *point*, *count*, *ask*.
-* **Not a video file and not photographic:** it is a stylised 2-D illustration drawn live on a canvas, so it works offline, adds no downloads, and the CSP stays strict. The voice is the browser's speech synthesis, as for the other animations; without a voice the captions set the pace.
-* Hand-written teaching notes (when to use it, what to watch) exist for about 55 topics in `TEACHER_TOPIC_NOTES`; the others use the tab's note. Add a line there to improve any topic.
-* Tests: `tests/teacher.test.js` (lesson text and numbers) and `tests/e2e/teacher.js` (all 6 tabs and 103 topics open and draw, a full class plays through).
+* **Where "Solve my problem" gets its facts:** the inputs are read from the form; the answer from the answer tile; the working from the tool's `.solution .step` blocks (43 tools) or, for the table-style tools (t-tests, ANOVA, correlation, regression ...), from the equations in the solution text (label / value pairs, lines with `=`, the Decision / Interpretation lines). Long decimals are rounded and symbols are spoken (Σ = "sum of", ÷ = "divided by"). Nothing is invented: if a tool shows no answer yet, she presses Calculate first.
+* **Cartoon style, original character:** bold outlines, flat bright colours, a big round head with huge eyes behind round glasses, a pointer stick, squash-and-stretch bounce, sparkles, a sweat drop, a "?" and "!" for emphasis, and a class of five students. Style only: the character is original, not a copy of any TV character.
+* **Motion is a skeleton, not a clip:** arms are two-bone IK limbs that reach the chalk or the pointer's target; she walks along the board to stand beside the line she writes (never in front of the text) and returns to the middle; the mouth opens and closes while she speaks; blinking, head bob, gaze to the board or class; poses *greet, explain, write, point, count, ask, celebrate, oops, think*.
+* **Not a video file:** a vector animation drawn live on a canvas, so it works offline, adds no downloads, and the CSP stays strict. The voice is the browser's speech synthesis; without a voice the captions set the pace. A canvas is released when its card is replaced (WebKit keeps removed canvases' memory until GC).
+* Hand-written teaching notes (when to use it, what to watch) exist for about 55 topics in `TEACHER_TOPIC_NOTES`; the others use the tab's note.
+* Tests: `tests/teacher.test.js` (lesson text, numbers, the solve parser) and `tests/e2e/teacher.js` (all 6 tabs and 103 topics open and draw; **solve mode runs on every tool with its sample data**; the button works with no answer yet; bad input gives the "oh no" class; a replaced card releases its canvas).
 
 ## How the narration works
 

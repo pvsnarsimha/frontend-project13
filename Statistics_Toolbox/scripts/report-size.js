@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const ROOT = path.join(__dirname, '..');
-const BUDGET = { scriptRawKB: 1780, scriptGzipKB: 480 };       // the real figures are in the README; raise these on purpose, never by accident (1700/440 -> 1780/470 for the seven narrated animations, +70 KB raw, +22 KB gzip; gzip 470 -> 480 for the AI Teacher classroom, +16 KB gzip)
+const BUDGET = { scriptRawKB: 1780, scriptGzipKB: 490 };       // the real figures are in the README; raise these on purpose, never by accident (1700/440 -> 1780/470 for the seven narrated animations, +70 KB raw, +22 KB gzip; gzip 470 -> 490 for the AI Teacher classroom: cartoon teacher + "solve my problem" lessons, +26 KB gzip)
 
 const html = fs.readFileSync(path.join(ROOT, 'Statistics.html'), 'utf8');
 const scripts = [...html.matchAll(/<script src="(js\/[^"]+)"><\/script>/g)].map(m => m[1]);

@@ -20,7 +20,7 @@ function speakable(text) {
         .replace(/χ²/g, 'chi squared').replace(/x̄/g, 'x bar').replace(/ŷ/g, 'y hat').replace(/²/g, ' squared').replace(/√/g, 'square root of ')
         .replace(/±/g, 'plus or minus ').replace(/[−–]/g, ' minus ').replace(/≥/g, ' at least ').replace(/≤/g, ' at most ')
         .replace(/\bp\s*=\s*/g, 'p equals ').replace(/\s*=\s*/g, ' equals ').replace(/\s*<\s*/g, ' is less than ').replace(/\s*>\s*/g, ' is greater than ')
-        .replace(/\bt-value\b/g, 't value').replace(/\s+/g, ' ').trim();
+        .replace(/Σ/g, 'sum of ').replace(/ᵢ/g, ' i').replace(/÷/g, ' divided by ').replace(/×/g, ' times ').replace(/ρ/g, 'rho').replace(/β/g, 'beta').replace(/λ/g, 'lambda').replace(/τ/g, 'tau').replace(/→/g, ' gives ').replace(/≈/g, ' is about ').replace(/≠/g, ' is not equal to ').replace(/\bt-value\b/g, 't value').replace(/\s+/g, ' ').trim();
 }
 
 const tutorSpeechAvailable = () => typeof window !== 'undefined' && typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance !== 'undefined';
@@ -129,7 +129,7 @@ function createTutor(card, def) {
         const done = () => { if (token === speechToken) { speechDone = true; clearTimeout(fallbackTimer); } };
         try {
             const u = new window.SpeechSynthesisUtterance(speakable(s.say || s.line));
-            u.lang = 'en-US'; u.rate = 0.95;
+            u.lang = 'en-US'; u.rate = 0.95; u.pitch = def.pitch || 1;
             u.onstart = () => { if (token === speechToken) { started = true; clearTimeout(fallbackTimer); fallbackTimer = setTimeout(done, (tutorReadMs(s.line) + 6000) / speed()); } };
             u.onend = done; u.onerror = done;
             window.speechSynthesis.cancel();
@@ -198,6 +198,7 @@ function createTutor(card, def) {
     raf = requestAnimationFrame(frame);
     return {
         destroy: () => { destroy(); window.removeEventListener('resize', onResize); },
+        play: () => { finished = false; play(0); },          // start the lesson from its first scene (the AI teacher starts itself after Calculate)
         // test / screenshot hooks: show one frame without playing
         seek(i, p) { pause(); scene = i; elapsed = (p || 0) * scenes[i].ms; caption(); paint(i, p === undefined ? 1 : p); },
         get state() { return { scene, playing, finished, speechDone }; }

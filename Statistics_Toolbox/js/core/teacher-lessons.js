@@ -216,3 +216,102 @@ function teacherTabLesson(info) {
     scenes.push({ id: 'bye', title: 'Your turn', ms: 2600, pose: 'greet', look: 'class', board: [tab.name, 'Pick a topic and press Play!'], line: 'Now pick a topic on the left and press Play, and I will teach it at the board. Off you go!' });
     return scenes;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// "My problem": the teacher solves the problem the student actually entered, using the tool's own worked solution and answer.
+//   info = { moduleKey, toolId, title, formula, inputs: [{label, value}], answer, error,
+//            steps: [{ title, val, lines[] }]   (structured solutions: the tool's .step blocks)
+//            rawLines: [text lines]              (table-style solutions: read from the page text) }
+// Returns null when there is no answer on the page yet.
+// ---------------------------------------------------------------------------------------------------------------------------------
+const teacherShort = (s, n) => { s = String(s); return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s; };
+// 51.50000000 -> 51.5, 0.00321440 -> 0.0032144: long decimals are noise on a board and in a voice
+const teacherRoundText = s => String(s).replace(/-?\d+\.\d{5,}/g, m => String(+(+m).toPrecision(6)));
+const teacherPlain = s => teacherRoundText(teacherClean(s).replace(/\\bar\{(.)\}/g, '$1̄').replace(/^Answer:\s*/i, ''));
+
+function teacherInputLines(inputs) {
+    const out = [], say = [];
+    (inputs || []).forEach(({ label, value }) => {
+        const v = String(value == null ? '' : value).trim();
+        let l = teacherClean(label).replace(/\([^)]*\)?/g, '').replace(/^(enter|type|paste|input)\s+/i, '').replace(/[:：]\s*$/, '').trim();
+        l = l ? l.charAt(0).toUpperCase() + l.slice(1) : 'Input';
+        if (!v || !l || /^(raw|summary)\b/i.test(v) && v.length < 9) return;
+        const nums = v.split(/[,;\s]+/).filter(Boolean);
+        let shown = v;
+        if (nums.length > 8 && nums.every(x => /^-?[\d.e+]+$/i.test(x))) shown = `${nums.slice(0, 6).join(', ')} … (${nums.length} values)`;
+        out.push(`${teacherShort(l, 34)}: ${teacherShort(shown, 60)}`);
+        say.push(`${l.toLowerCase()} ${nums.length > 8 ? `a list of ${nums.length} values starting ${nums.slice(0, 4).join(', ')}` : teacherShort(v, 70)}`);
+    });
+    return { lines: out.slice(0, 5), say: say.slice(0, 5) };
+}
+
+// Table-style solutions arrive as page text: drop the interface words, pair "label / value" lines, keep the worked equations and the conclusion lines.
+const TEACHER_UI_LINE = /^([›▶▼✔✓•·\-–—|+]+|collapse all|expand all|solution roadmap|step-by-step calculation|copy solution|print.*|show.*|hide.*|\d{1,2})$/i;
+function teacherRawWorking(rawLines) {
+    const L = (rawLines || []).map(teacherPlain).filter(l => l && !TEACHER_UI_LINE.test(l)), merged = [];
+    for (let i = 0; i < L.length; i++) {
+        const nxt = L[i + 1], isNum = nxt && /^-?[\d.,]+(e[+-]?\d+)?%?$/i.test(nxt);
+        // "Sample Mean (x̄)" then "54.666667" is one fact; a bare small number after a heading is only a step number, so it is not glued on
+        if (isNum && /[a-z]/i.test(L[i]) && L[i].length < 48 && !/[=]/.test(L[i]) && (/^-?\d*\.\d+|^-?\d{3,}/.test(nxt) || /\b(n|df|size|count|number|observations|groups|total)\b|\(n\)/i.test(L[i]))) { merged.push(`${L[i]} = ${nxt}`); i++; }
+        else if (/^(interpretation|conclusion|decision|verdict)$/i.test(L[i]) && nxt) { merged.push(`${L[i]}: ${nxt}`); i++; }
+        else merged.push(L[i]);
+    }
+    const seen = new Set(), work = [], concl = [];
+    merged.forEach(l => {
+        if (seen.has(l)) return; seen.add(l);
+        if (/^(decision|interpretation|conclusion|verdict)\b/i.test(l)) { if (!/:\s*[A-Z0-9 \-–]{6,}$/.test(l) && !/guide/i.test(l)) concl.push(l); return; }     // not a section title in capitals
+        if (/=/.test(l) && /\d/.test(l) && l.length >= 6 && l.length <= 130 && !/[|]/.test(l) && !/^[-\d.]+\s/.test(l) && !/^(answer|copy|print)/i.test(l)) work.push(l);
+    });
+    return { work, concl };
+}
+
+function teacherSolveLesson(info) {
+    const tab = TEACHER_TABS[info.moduleKey] || TEACHER_TABS.descriptive;
+    const title = teacherClean(info.title) || 'this problem', note = TEACHER_TOPIC_NOTES[info.toolId] || null;
+    const answer = teacherPlain(info.answer || '');
+    if (!answer || answer === '—') return null;
+    const inp = teacherInputLines(info.inputs), scenes = [];
+
+    if (info.error) {
+        const msg = teacherShort(teacherPlain(info.answer) + (info.firstLine ? '. ' + teacherPlain(info.firstLine) : ''), 190);
+        return [
+            { id: 'hello', title: 'Oh no!', ms: 3000, pose: 'oops', fx: 'sweat', look: 'class', board: ['Oops!', title, 'Something is wrong with the input'], line: `Oh no! Look at this, class. Something is wrong with the problem you gave me for ${title}.` },
+            { id: 'what', title: 'What went wrong', ms: 3600, pose: 'point', look: 'board', board: ['The problem', msg], line: `Here is what the tool says: ${msg}` },
+            { id: 'fix', title: 'How to fix it', ms: 3400, pose: 'think', fx: 'think', look: 'class', board: ['Fix it like this', 'Check the numbers you typed', 'Then press Calculate again'], line: 'Do not worry! Check the numbers you typed, change them, and press Calculate again. I will solve it with you.' }
+        ];
+    }
+
+    scenes.push({ id: 'problem', title: 'Your problem', ms: 3800, pose: 'explain', fx: 'bang', look: 'class',
+        board: ['Your problem', title, ...(inp.lines.length ? inp.lines : [])],
+        line: `Let us solve YOUR problem, class! It is ${title}.` + (inp.say.length ? ` You gave me: ${inp.say.join('; ')}.` : '') });
+
+    const plan = teacherClean(info.formula);
+    if (plan) scenes.push({ id: 'plan', title: 'The plan', ms: 3000, pose: 'write', look: 'board', board: ['The plan', 'We use this formula:', plan], line: `First, the plan. We use this formula: ${plan}` });
+
+    // the working: the tool's own steps (structured), or the equations found in a table-style solution
+    let pieces = [];
+    if (info.steps && info.steps.length) {
+        pieces = info.steps.map((s, i) => {
+            const lines = (s.lines || []).map(teacherPlain).filter(Boolean).slice(0, 2), t = teacherPlain(s.title), v = s.val ? teacherPlain(s.val) : '';
+            return { head: `Step ${i + 1}`, board: [t, ...(v ? ['= ' + v] : []), ...lines].map(x => teacherShort(x, 80)), say: `Step ${i + 1}. ${t}${v ? `, and the value is ${v}` : ''}. ${lines.join('. ')}` };
+        });
+    }
+    const raw = teacherRawWorking(info.rawLines);
+    if (!pieces.length && raw.work.length) {
+        for (let i = 0; i < raw.work.length && pieces.length < 4; i += 3) {
+            const chunk = raw.work.slice(i, i + 3);
+            pieces.push({ head: `Working ${pieces.length + 1}`, board: chunk.map(x => teacherShort(x, 80)), say: chunk.join('. ') });
+        }
+    }
+    if (pieces.length > 5) pieces = [...pieces.slice(0, 4), pieces[pieces.length - 1]];
+    pieces.forEach((p, i) => scenes.push({ id: 'step' + i, title: p.head, ms: 3600, pose: i % 2 ? 'point' : 'write', look: 'board', board: [p.head, ...p.board], line: teacherShort(p.say, 330), say: p.say }));
+
+    const parts = answer.split(/\s*\|\s*/).filter(Boolean);
+    scenes.push({ id: 'answer', title: 'The answer', ms: 3600, pose: 'celebrate', fx: 'sparkle', look: 'class', board: ['The answer!', ...parts.slice(0, 4)],
+        line: `And the answer is: ${parts.join(', and ')}. Well done, class!` });
+    const concl = raw.concl.slice(0, 2).map(x => teacherShort(x, 150));
+    const meaning = concl.length ? concl.join(' ') : (/reject/i.test(answer) ? (/fail to reject|not significant/i.test(answer) ? 'We do not have enough evidence against H₀.' : 'There is enough evidence against H₀.') + ' ' : '') + (note ? note.watch : tab.tip);
+    scenes.push({ id: 'meaning', title: 'What it means', ms: 3800, pose: 'ask', look: 'class', student: 2, board: ['What it means', teacherShort(meaning, 150)], line: `What does it mean? ${meaning}` });
+    scenes.push({ id: 'bye', title: 'Wrap-up', ms: 2600, pose: 'greet', fx: 'sparkle', look: 'class', board: [title, 'Solved!', 'Any questions?'], line: 'That is the whole solution, worked out on the page below for you too. Any questions? Thank you, class!' });
+    return scenes;
+}

@@ -72,3 +72,50 @@ test('no lesson text says undefined / NaN / [object', () => {
 test('the board shows at most one short heading and the scenes are long enough to speak', () => {
     for (const s of app.teacherTopicLesson(topic({ nums: [1, 2, 3] }))) { assert.ok(s.board.length >= 2 && s.board.length <= 6, s.id); assert.ok(s.ms >= 2000, s.id); assert.ok(['greet', 'explain', 'write', 'point', 'count', 'ask'].includes(s.pose), s.id); }
 });
+
+// ---- "Solve my problem" ----
+const prob = over => Object.assign({ moduleKey: 'descriptive', toolId: 'mean', title: '📐 Arithmetic Mean (Average)', formula: '📌 μ = (Σ xᵢ) / n', answer: 'Answer: 51.5000000000',
+    inputs: [{ label: '📋 Enter numeric values (commas, spaces, or line breaks)', value: '12, 45.5, 78, 99, 23' }],
+    steps: [{ title: 'Sum all values (Σ xᵢ) = 12 + 45.5 + 78 + 99 + 23', val: '', lines: ['= 257.50000000 (total sum)'] }, { title: 'Count observations (n)', val: '5', lines: [] }, { title: 'Divide sum by n → 257.50000000 ÷ 5', val: '', lines: ['Result: x̄ = 51.5000000000'] }], rawLines: [] }, over);
+
+test('solve lesson: reads the problem back, works the tool\'s own steps, then gives the answer', () => {
+    const sc = app.teacherSolveLesson(prob());
+    assert.deepEqual(Array.from(sc.map(s => s.id)), ['problem', 'plan', 'step0', 'step1', 'step2', 'answer', 'meaning', 'bye']);
+    assert.match(sc[0].line, /solve YOUR problem.*You gave me: numeric values 12, 45\.5, 78, 99, 23/);
+    assert.equal(sc[0].board[2], 'Numeric values: 12, 45.5, 78, 99, 23', 'long labels are shortened for the board');
+    assert.match(sc[2].line, /Step 1\. Sum all values.*257\.5 \(total sum\)/, 'long decimals are rounded');
+    assert.match(sc[3].line, /Count observations \(n\), and the value is 5/);
+    assert.match(sc.find(s => s.id === 'answer').line, /answer is: 51\.5\./);
+    assert.equal(sc.find(s => s.id === 'answer').pose, 'celebrate');
+});
+
+test('solve lesson: a table-style solution is read from its text (label / value pairs, equations, conclusion)', () => {
+    const sc = app.teacherSolveLesson(prob({ moduleKey: 'hypothesis', toolId: 'onesamplet', title: 'One-Sample t-test', answer: 'Answer: t = 5.291503 | p = 0.003214 | Reject H₀', steps: [],
+        inputs: [{ label: 'Data:', value: '52, 55, 53, 58, 54, 56' }, { label: 'Hypothesized mean (μ₀)', value: '50' }],
+        rawLines: ['Sample Mean (x̄)', '54.666667', 't = (54.666667 - 50) / (2.160247 / √6)', 't = 5.29150262', 'df = n - 1 = 6 - 1 = 5', 'Decision: REJECT the null hypothesis', 'Interpretation: There IS sufficient evidence that the mean differs from 50.'] }));
+    assert.ok(sc.some(s => /^Working 1/.test(s.title)));
+    assert.match(sc.find(s => s.id === 'step0').board.join(' '), /Sample Mean \(x̄\) = 54\.6667/);
+    assert.match(sc.find(s => s.id === 'answer').line, /t = 5\.2915, and p = 0\.003214, and Reject H₀/);
+    assert.match(sc.find(s => s.id === 'meaning').line, /sufficient evidence/);
+    assert.match(sc[0].line, /hypothesized mean 50/);
+});
+
+test('solve lesson: no answer yet gives no lesson; an error answer gives a kind "oh no" class that explains the fix', () => {
+    assert.equal(app.teacherSolveLesson(prob({ answer: '' })), null);
+    assert.equal(app.teacherSolveLesson(prob({ answer: '—' })), null);
+    const sc = app.teacherSolveLesson(prob({ answer: '⚠️ Invalid input', error: true, firstLine: 'Please enter at least one numeric value (e.g., 4, 7.5, 12).' }));
+    assert.deepEqual(Array.from(sc.map(s => s.id)), ['hello', 'what', 'fix']);
+    assert.equal(sc[0].pose, 'oops'); assert.equal(sc[0].fx, 'sweat');
+    assert.match(sc[1].line, /Invalid input.*at least one numeric value/);
+});
+
+test('solve lesson: a long data list is summarised instead of read out', () => {
+    const big = Array.from({ length: 40 }, (_, i) => i + 1).join(', ');
+    const sc = app.teacherSolveLesson(prob({ inputs: [{ label: 'Data', value: big }] }));
+    assert.match(sc[0].line, /a list of 40 values starting 1, 2, 3, 4/);
+    assert.match(sc[0].board[2], /\(40 values\)/);
+});
+
+test('speech spells maths symbols out (sum, i, divided by, gives)', () => {
+    assert.equal(app.speakable('(Σ xᵢ) ÷ 5 → 51'), '(sum of x i) divided by 5 gives 51');
+});
