@@ -32,5 +32,6 @@ const meanTool = defineListTool({
     stepsPlaceholder: "Detailed calculation will appear here...",
     empty: { value: "⚠️ Invalid input", steps: "Please enter at least one numeric value (e.g., 4, 7.5, 12)." },
     compute: computeMeanWithSteps,
-    display: r => r.value.toFixed(10)
+    display: r => r.value.toFixed(10),
+    after: (r, nums, areaId) => { if (r) showMeanSdAnimation(areaId, nums, 'mean'); else hideTutorCard('meansd'); }
 });

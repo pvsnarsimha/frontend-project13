@@ -288,6 +288,7 @@ function setupSimpleLinearLogic() {
             setHtml(valueSpan, `ŷ = ${result.intercept.toFixed(4)} + ${result.slope.toFixed(4)}x | R² = ${result.rSquared.toFixed(4)} | adjusted R² = ${result.adjRSquared.toFixed(4)}`);
             setHtml(stepsSpan, result.steps);
             showFitCharts("simpleLinearResultArea", xValues, yValues, { xName: "x", yName: "y" });
+            showRegressionAnimation("simpleLinearResultArea", xValues, yValues);
         }
     });
     

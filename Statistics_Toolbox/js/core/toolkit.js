@@ -264,6 +264,8 @@ function defineListTool(cfg) {
             const valueSpan = document.getElementById(elementId('ValueDisplay'));
             const stepsSpan = document.getElementById(elementId('StepsDisplay'));
             resultDiv.style.display = 'block';
+            const after = cfg.after ? (r, nums) => cfg.after(r, nums, elementId('ResultArea')) : () => {};   // optional extras under the result (animations)
+            after(null, []);                                  // a new calculation starts: drop what belonged to the previous one
             if (!numbers.length) {
                 valueSpan.innerText = cfg.empty.value;
                 stepsSpan.innerText = cfg.empty.steps;
@@ -282,6 +284,7 @@ function defineListTool(cfg) {
             }
             valueSpan.innerText = cfg.display(result);
             stepsSpan.innerText = result.steps;
+            after(result, numbers);
         });
         attachClearHandler(elementId('ClearBtn'), elementId('Input'), elementId('ResultArea'));
     }

@@ -238,6 +238,7 @@ function setupBoxplotLogic() {
         const resultDiv = document.getElementById("boxplotResultArea");
         const valueSpan = document.getElementById("boxplotValueDisplay");
         const stepsSpan = document.getElementById("boxplotStepsDisplay");
+        hideTutorCard('boxplot');
         
         if (!numbers.length) {
             resultDiv.style.display = "block";
@@ -250,6 +251,7 @@ function setupBoxplotLogic() {
         resultDiv.style.display = "block";
         setHtml(valueSpan, `📦 Outliers: ${result.outliers.length} | IQR: ${result.iqr.toFixed(4)} | Range: ${result.minVal} - ${result.maxVal} | Median: ${result.median.toFixed(4)}`);
         setHtml(stepsSpan, result.steps);
+        showBoxplotAnimation("boxplotResultArea", numbers, result);
         
         setTimeout(() => {
             renderBoxplotChart(numbers, result);
