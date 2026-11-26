@@ -69,7 +69,8 @@ const BAD_OUTPUT = /\bNaN\b|-?\bInfinity\b|\bundefined\b|\[object/;
         await page.click(`.stat-btn[data-stat="${stat}"]`);
         await page.click('#interfaceRoot .sample-btn');
         await page.click('#interfaceRoot .primary-btn');
-        await page.waitForTimeout(400);
+        // wait for the chart to be drawn (it gets its role and label then) instead of a fixed sleep: a busy CI runner can take a few hundred ms longer
+        await page.waitForFunction(id => { const c = document.getElementById(id); return c && c.getAttribute('role') === 'img'; }, canvasId, { timeout: 8000 }).catch(() => {});
         const label = await page.evaluate(id => { const c = document.getElementById(id); return c ? { role: c.getAttribute('role'), label: c.getAttribute('aria-label') } : null; }, canvasId);
         if (!label || label.role !== 'img' || !/\d/.test(label.label || '') || /^chart$/i.test(label.label)) problems.push(`${stat}: chart canvas has no descriptive aria-label (${JSON.stringify(label)})`);
     }
