@@ -15,6 +15,9 @@ const AXE = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
   const found = {};
   for (const id of ids) {
     await p.goto('file://' + file + '#tool=' + id); await p.reload(); await p.waitForTimeout(150);
+    // Audit the end states, not the middle of a fade: on a slow runner axe can run while the "Sample data loaded" toast is half transparent,
+    // which measures as a (false) low contrast. With transitions off every element is fully shown or fully hidden.
+    await p.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' });
     const sample = await p.$('.sample-btn');
     if (sample) await sample.click().catch(() => {});
     const go = await p.$('.stat-interface:visible .primary-btn'); if (go) await go.click().catch(() => {});
